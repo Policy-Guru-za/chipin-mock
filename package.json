@@ -1,0 +1,92 @@
+{
+  "name": "chipin",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "knip": "knip",
+    "test": "vitest run --passWithNoTests",
+    "test:coverage": "vitest run --coverage",
+    "test:payments": "vitest run tests/unit/payfast-*.test.ts tests/unit/ozow-*.test.ts tests/unit/snapscan-*.test.ts tests/unit/payment-*.test.ts",
+    "test:webhooks": "vitest run tests/integration/*webhook*.test.ts",
+    "test:payouts": "vitest run tests/unit/payout-*.test.ts tests/integration/*payout*.test.ts",
+    "test:load": "tsx scripts/load-test/index.ts",
+    "openapi:generate": "tsx scripts/generate-openapi.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:seed": "tsx scripts/seed.ts",
+    "drizzle:generate": "drizzle-kit generate",
+    "drizzle:push": "drizzle-kit push",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.9.4",
+    "@opentelemetry/api": "1.8.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.49.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.49.0",
+    "@opentelemetry/resources": "^1.22.0",
+    "@opentelemetry/sdk-node": "^0.49.0",
+    "@opentelemetry/semantic-conventions": "^1.22.0",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@sentry/nextjs": "^10.36.0",
+    "@vercel/blob": "^0.27.3",
+    "@vercel/kv": "^2.0.0",
+    "canvas-confetti": "^1.9.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "drizzle-orm": "^0.33.0",
+    "framer-motion": "^11.18.2",
+    "nanoid": "^5.1.6",
+    "next": "16.1.4",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "resend": "^6.8.0",
+    "svix": "^1.84.1",
+    "tailwind-merge": "^3.4.0",
+    "web-vitals": "^4.2.4",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/node": "^20.11.30",
+    "@types/react": "^19.2.9",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.2",
+    "@vitest/coverage-v8": "^4.0.17",
+    "autoprefixer": "^10.4.19",
+    "drizzle-kit": "^0.24.2",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "16.1.4",
+    "husky": "^9.1.7",
+    "jsdom": "^27.4.0",
+    "knip": "^5.82.1",
+    "lint-staged": "^16.2.7",
+    "postcss": "^8.4.38",
+    "prettier": "^3.8.1",
+    "tailwindcss": "^3.4.13",
+    "tsx": "^4.20.0",
+    "typescript": "^5.5.4",
+    "vitest": "^4.0.17"
+  },
+  "engines": {
+    "node": ">=20 <21",
+    "pnpm": "10.14.0"
+  },
+  "packageManager": "pnpm@10.14.0+sha512.ad27a79641b49c3e481a16a805baa71817a04bbe06a38d17e60e2eaee83f6a146c6a688125f5792e48dd5ba30e7da52a5cda4c3992b9ccf333f9ce223af84748",
+  "lint-staged": {
+    "*.{ts,tsx,js,cjs,mjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
+}
