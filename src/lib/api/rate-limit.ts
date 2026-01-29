@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 
-import { kv } from '@vercel/kv';
+import { kvAdapter } from '@/lib/demo/kv-adapter';
 
 const HOUR_SECONDS = 60 * 60;
 const MINUTE_SECONDS = 60;
@@ -39,17 +39,17 @@ export const enforceApiRateLimit = async (params: {
   const now = Date.now();
   const minuteWindowStart = now - MINUTE_SECONDS * 1000;
 
-  const hourCount = await kv.incr(hourKey);
-  await kv.expire(hourKey, HOUR_SECONDS, 'NX');
+  const hourCount = await kvAdapter.incr(hourKey);
+  await kvAdapter.expire(hourKey, HOUR_SECONDS, 'NX');
 
-  await kv.zremrangebyscore(minuteKey, 0, minuteWindowStart);
-  await kv.zadd(minuteKey, { score: now, member: `${now}-${randomUUID()}` });
-  await kv.expire(minuteKey, MINUTE_SECONDS);
+  await kvAdapter.zremrangebyscore(minuteKey, 0, minuteWindowStart);
+  await kvAdapter.zadd(minuteKey, { score: now, member: `${now}-${randomUUID()}` });
+  await kvAdapter.expire(minuteKey, MINUTE_SECONDS);
 
   const [hourTtl, minuteCount, minuteEntries] = await Promise.all([
-    kv.ttl(hourKey),
-    kv.zcard(minuteKey),
-    kv.zrange(minuteKey, 0, 0, { withScores: true }),
+    kvAdapter.ttl(hourKey),
+    kvAdapter.zcard(minuteKey),
+    kvAdapter.zrange(minuteKey, 0, 0, { withScores: true }),
   ]);
 
   const rawOldestScore =

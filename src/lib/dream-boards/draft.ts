@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv';
+import { kvAdapter } from '@/lib/demo/kv-adapter';
 
 const DRAFT_EXPIRY_SECONDS = 60 * 60 * 24 * 7;
 
@@ -71,7 +71,7 @@ export async function updateDreamBoardDraft(hostId: string, draft: DreamBoardDra
     updatedAt: new Date().toISOString(),
   };
 
-  await kv.set(draftKey(hostId), payload, { ex: DRAFT_EXPIRY_SECONDS });
+  await kvAdapter.set(draftKey(hostId), payload, { ex: DRAFT_EXPIRY_SECONDS });
   return payload;
 }
 
@@ -80,9 +80,9 @@ export async function saveDreamBoardDraft(hostId: string, draft: DreamBoardDraft
 }
 
 export async function getDreamBoardDraft(hostId: string) {
-  return kv.get<DreamBoardDraft>(draftKey(hostId));
+  return kvAdapter.get<DreamBoardDraft>(draftKey(hostId));
 }
 
 export async function clearDreamBoardDraft(hostId: string) {
-  await kv.del(draftKey(hostId));
+  await kvAdapter.del(draftKey(hostId));
 }

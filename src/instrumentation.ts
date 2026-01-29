@@ -3,12 +3,15 @@ import { Resource } from '@opentelemetry/resources';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 
+import { assertNotProductionDb } from '@/lib/demo';
 import { buildOtelExporter, getServiceName } from './lib/observability/otel';
 
 let sdk: NodeSDK | null = null;
 
 export async function register() {
   if (process.env.NEXT_RUNTIME !== 'nodejs') return;
+
+  assertNotProductionDb();
 
   const exporter = buildOtelExporter();
   if (!exporter) return;

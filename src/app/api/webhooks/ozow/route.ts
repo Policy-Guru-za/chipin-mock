@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { isDemoMode } from '@/lib/demo';
 import {
   extractOzowReference,
   mapOzowStatus,
@@ -23,6 +24,10 @@ import {
 } from '@/lib/webhooks/payloads';
 
 export async function POST(request: NextRequest) {
+  if (isDemoMode()) {
+    return NextResponse.json({ received: true, demo: true }, { status: 200 });
+  }
+
   const rawBody = await request.text();
   const requestId = request.headers.get('x-request-id') ?? undefined;
   const ip = getClientIp(request);

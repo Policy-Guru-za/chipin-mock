@@ -1,8 +1,9 @@
 import { randomBytes } from 'crypto';
 
-import { kv } from '@vercel/kv';
 import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
+
+import { kvAdapter } from '@/lib/demo/kv-adapter';
 
 const SESSION_EXPIRY_SECONDS = 60 * 60 * 24 * 7;
 const SESSION_COOKIE_NAME = 'chipin_session';
@@ -35,8 +36,6 @@ export async function createSession(hostId: string, email: string) {
     createdAt: Date.now(),
   };
 
-  await kv.set(`session:${sessionId}`, session, { ex: SESSION_EXPIRY_SECONDS });
-
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE_NAME, sessionId, {
     httpOnly: true,
@@ -45,6 +44,8 @@ export async function createSession(hostId: string, email: string) {
     maxAge: SESSION_EXPIRY_SECONDS,
     path: '/',
   });
+
+  await kvAdapter.set(`session:${sessionId}`, session, { ex: SESSION_EXPIRY_SECONDS });
 }
 
 export async function getSession() {
@@ -54,14 +55,14 @@ export async function getSession() {
     return null;
   }
 
-  return kv.get<Session>(`session:${sessionId}`);
+  return kvAdapter.get<Session>(`session:${sessionId}`);
 }
 
 export async function deleteSession() {
   const cookieStore = await cookies();
   const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
   if (sessionId) {
-    await kv.del(`session:${sessionId}`);
+    await kvAdapter.del(`session:${sessionId}`);
   }
 
   cookieStore.delete(SESSION_COOKIE_NAME);

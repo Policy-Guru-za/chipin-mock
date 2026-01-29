@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 
+import { isDemoMode } from '@/lib/demo';
 import { log } from '@/lib/observability/logger';
 import { decryptSensitiveValue } from '@/lib/utils/encryption';
 import { WEBHOOK_DELIVERY_TIMEOUT_MS } from '@/lib/constants/webhooks';
@@ -129,6 +130,11 @@ export const emitWebhookEvent = async (
   data: Record<string, unknown>,
   meta?: WebhookEventPayload['meta']
 ): Promise<string | null> => {
+  if (isDemoMode()) {
+    console.log('DEMO_MODE: webhook event creation skipped');
+    return null;
+  }
+
   const payload: WebhookEventPayload = {
     id: crypto.randomUUID(),
     type,
@@ -205,6 +211,11 @@ const processEvent = async (event: PendingWebhookEvent): Promise<void> => {
 };
 
 export const processWebhookQueue = async (limit = 50): Promise<number> => {
+  if (isDemoMode()) {
+    console.log('DEMO_MODE: webhook queue processing skipped');
+    return 0;
+  }
+
   const events = await getPendingWebhookEvents(limit);
 
   if (events.length === 0) {
@@ -226,6 +237,11 @@ export const emitWebhookEventForPartner = async (
   data: Record<string, unknown>,
   meta?: WebhookEventPayload['meta']
 ): Promise<string[] | null> => {
+  if (isDemoMode()) {
+    console.log('DEMO_MODE: partner webhook dispatch skipped');
+    return null;
+  }
+
   try {
     const apiKeyIds = await getActiveApiKeysForPartner(partnerId);
     if (apiKeyIds.length === 0) {

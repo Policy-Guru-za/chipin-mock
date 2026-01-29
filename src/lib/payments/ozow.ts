@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 
-import { kv } from '@vercel/kv';
+import { isDemoMode } from '@/lib/demo';
+import { kvAdapter } from '@/lib/demo/kv-adapter';
 import { Webhook } from 'svix';
 
 type OzowConfig = {
@@ -47,13 +48,23 @@ export const isOzowConfigured = () => {
 const tokenCacheKey = (scope: string) => `ozow:token:${scope}`;
 
 export const getOzowAccessToken = async (scope: string) => {
+  if (isDemoMode()) {
+    const cacheKey = tokenCacheKey(scope);
+    const cached = await kvAdapter.get<string>(cacheKey);
+    if (cached) return cached;
+
+    const token = `demo-ozow-token:${scope}`;
+    await kvAdapter.set(cacheKey, token, { ex: 60 * 60 });
+    return token;
+  }
+
   const config = getOzowConfig();
   if (!config.clientId || !config.clientSecret || !config.baseUrl) {
     throw new Error('Ozow credentials are missing');
   }
 
   const cacheKey = tokenCacheKey(scope);
-  const cached = await kv.get<string>(cacheKey);
+  const cached = await kvAdapter.get<string>(cacheKey);
   if (cached) return cached;
 
   const body = new URLSearchParams({
@@ -79,11 +90,18 @@ export const getOzowAccessToken = async (scope: string) => {
   }
 
   const ttl = Math.max(60, (json.expires_in ?? 3600) - 60);
-  await kv.set(cacheKey, json.access_token, { ex: ttl });
+  await kvAdapter.set(cacheKey, json.access_token, { ex: ttl });
   return json.access_token;
 };
 
 export const createOzowPayment = async (params: OzowPaymentParams): Promise<OzowPayment> => {
+  if (isDemoMode()) {
+    return {
+      redirectUrl: params.returnUrl,
+      providerReference: `DEMO-${params.reference}`,
+    };
+  }
+
   const config = getOzowConfig();
   if (!config.clientId || !config.clientSecret || !config.siteCode || !config.baseUrl) {
     throw new Error('Ozow configuration is incomplete');
@@ -216,6 +234,10 @@ export const listOzowTransactions = async (params: {
   limit?: number;
   offset?: number;
 }) => {
+  if (isDemoMode()) {
+    return [];
+  }
+
   const config = getOzowConfig();
   if (!config.clientId || !config.clientSecret || !config.baseUrl) {
     throw new Error('Ozow configuration is incomplete');

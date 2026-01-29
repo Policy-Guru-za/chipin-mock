@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -88,6 +89,7 @@ const buildContributionPayload = (params: {
   const contributionCents = params.data.contributionCents;
   const totalCents = calculateTotalWithFee(contributionCents);
   const feeCents = totalCents - contributionCents;
+  const contributionId = randomUUID();
   const paymentRef = generatePaymentRef();
   const userAgent = params.request.headers.get('user-agent') ?? undefined;
   const contributorName = params.data.contributorName?.trim() || undefined;
@@ -95,6 +97,7 @@ const buildContributionPayload = (params: {
 
   return {
     contribution: {
+      id: contributionId,
       partnerId: params.board.partnerId,
       dreamBoardId: params.board.id,
       contributorName,
@@ -110,6 +113,7 @@ const buildContributionPayload = (params: {
     payment: {
       totalCents,
       paymentRef,
+      contributionId,
     },
   };
 };
@@ -142,6 +146,7 @@ export async function POST(request: NextRequest) {
     const payment = await createPaymentIntent(parsed.data.paymentProvider, {
       amountCents: payload.payment.totalCents,
       reference: payload.payment.paymentRef,
+      contributionId: payload.payment.contributionId,
       description: `Contribution to ${board.childName}'s Dream Board`,
       returnUrl: `${baseUrl}/${board.slug}/thanks?ref=${payload.payment.paymentRef}&provider=${parsed.data.paymentProvider}`,
       cancelUrl: `${baseUrl}/${board.slug}?cancelled=1&provider=${parsed.data.paymentProvider}`,

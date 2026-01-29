@@ -1,3 +1,5 @@
+import { isDemoMode } from '@/lib/demo';
+
 import { createOzowPayment, isOzowConfigured } from './ozow';
 import { createPayfastPayment } from './payfast';
 import { createSnapScanPayment, isSnapScanConfigured } from './snapscan';
@@ -8,6 +10,7 @@ export type PaymentProvider = (typeof PAYMENT_PROVIDERS)[number];
 export type CreatePaymentParams = {
   amountCents: number;
   reference: string;
+  contributionId?: string;
   description: string;
   returnUrl: string;
   cancelUrl: string;
@@ -37,12 +40,45 @@ export type PaymentIntent =
       reference: string;
       qrUrl: string;
       qrImageUrl: string;
+    }
+  | {
+      provider: PaymentProvider;
+      mode: 'redirect';
+      reference: string;
+      redirectUrl: string;
+      demo: true;
     };
+
+const buildDemoRedirectUrl = (params: CreatePaymentParams) => {
+  const contributionId = params.contributionId;
+  if (!contributionId) {
+    throw new Error('Contribution id is required for demo payments');
+  }
+
+  const normalizeReturnTo = (value: string | undefined) => {
+    if (!value) return '/';
+    if (value.startsWith('/')) return value;
+    try {
+      const url = new URL(value);
+      return `${url.pathname}${url.search}${url.hash}`;
+    } catch {
+      return '/';
+    }
+  };
+
+  const searchParams = new URLSearchParams({ contributionId });
+  searchParams.set('returnTo', normalizeReturnTo(params.returnUrl));
+  return `/demo/payment-simulator?${searchParams.toString()}`;
+};
 
 const isPayfastConfigured = () =>
   Boolean(process.env.PAYFAST_MERCHANT_ID && process.env.PAYFAST_MERCHANT_KEY);
 
 export const isPaymentProviderAvailable = (provider: PaymentProvider) => {
+  if (isDemoMode()) {
+    return true;
+  }
+
   switch (provider) {
     case 'payfast':
       return isPayfastConfigured();
@@ -62,6 +98,16 @@ export const createPaymentIntent = async (
   provider: PaymentProvider,
   params: CreatePaymentParams
 ): Promise<PaymentIntent> => {
+  if (isDemoMode()) {
+    return {
+      provider,
+      mode: 'redirect',
+      reference: `DEMO-${params.contributionId ?? params.reference}`,
+      redirectUrl: buildDemoRedirectUrl(params),
+      demo: true,
+    };
+  }
+
   switch (provider) {
     case 'payfast': {
       const payment = createPayfastPayment({

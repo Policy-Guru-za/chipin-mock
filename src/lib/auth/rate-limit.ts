@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv';
+import { kvAdapter } from '@/lib/demo/kv-adapter';
 
 export type RateLimitConfig = {
   limit: number;
@@ -14,14 +14,14 @@ export async function enforceRateLimit(
   key: string,
   config: RateLimitConfig
 ): Promise<RateLimitResult> {
-  const count = await kv.incr(key);
+  const count = await kvAdapter.incr(key);
 
   if (count === 1) {
-    await kv.expire(key, config.windowSeconds);
+    await kvAdapter.expire(key, config.windowSeconds);
   }
 
   if (count > config.limit) {
-    const ttl = await kv.ttl(key);
+    const ttl = await kvAdapter.ttl(key);
     return {
       allowed: false,
       retryAfterSeconds: ttl > 0 ? ttl : config.windowSeconds,

@@ -1,6 +1,7 @@
 import { createHash } from 'crypto';
-import { kv } from '@vercel/kv';
 import { z } from 'zod';
+
+import { kvAdapter } from '@/lib/demo/kv-adapter';
 
 export type TakealotProduct = {
   url: string;
@@ -279,7 +280,7 @@ export async function fetchTakealotSearch(
 ): Promise<TakealotSearchResult[]> {
   const normalizedQuery = query.trim();
   const cacheKey = buildCacheKey('search', normalizedQuery.toLowerCase());
-  const cached = await kv.get<TakealotSearchResult[]>(cacheKey);
+  const cached = await kvAdapter.get<TakealotSearchResult[]>(cacheKey);
   if (cached) {
     return cached.slice(0, limit);
   }
@@ -298,7 +299,7 @@ export async function fetchTakealotSearch(
 
   const html = await response.text();
   const results = parseTakealotSearchHtml(html);
-  await kv.set(cacheKey, results, { ex: TAKEALOT_CACHE_TTL_SECONDS });
+  await kvAdapter.set(cacheKey, results, { ex: TAKEALOT_CACHE_TTL_SECONDS });
   return results.slice(0, limit);
 }
 
@@ -308,7 +309,7 @@ export async function fetchTakealotProduct(rawUrl: string): Promise<TakealotProd
   }
 
   const cacheKey = buildCacheKey('product', rawUrl);
-  const cached = await kv.get<TakealotProduct>(cacheKey);
+  const cached = await kvAdapter.get<TakealotProduct>(cacheKey);
   if (cached) {
     return cached;
   }
@@ -330,6 +331,6 @@ export async function fetchTakealotProduct(rawUrl: string): Promise<TakealotProd
     throw new Error('Could not extract product details');
   }
 
-  await kv.set(cacheKey, parsed, { ex: TAKEALOT_CACHE_TTL_SECONDS });
+  await kvAdapter.set(cacheKey, parsed, { ex: TAKEALOT_CACHE_TTL_SECONDS });
   return parsed;
 }

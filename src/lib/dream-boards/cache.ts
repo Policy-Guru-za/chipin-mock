@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv';
+import { kvAdapter } from '@/lib/demo/kv-adapter';
 
 import { getDreamBoardBySlug, getDreamBoardSlugById } from '@/lib/db/queries';
 
@@ -22,21 +22,21 @@ const hydrateDreamBoard = (board: DreamBoardRecord): DreamBoardRecord => {
 };
 
 export const getCachedDreamBoardBySlug = async (slug: string): Promise<DreamBoardRecord> => {
-  const cached = await kv.get<DreamBoardRecord>(dreamBoardCacheKey(slug));
+  const cached = await kvAdapter.get<DreamBoardRecord>(dreamBoardCacheKey(slug));
   if (cached) {
     return hydrateDreamBoard(cached);
   }
 
   const board = await getDreamBoardBySlug(slug);
   if (board) {
-    await kv.set(dreamBoardCacheKey(slug), board, { ex: DREAM_BOARD_CACHE_TTL_SECONDS });
+    await kvAdapter.set(dreamBoardCacheKey(slug), board, { ex: DREAM_BOARD_CACHE_TTL_SECONDS });
   }
 
   return hydrateDreamBoard(board);
 };
 
 export const invalidateDreamBoardCacheBySlug = async (slug: string) => {
-  await kv.del(dreamBoardCacheKey(slug));
+  await kvAdapter.del(dreamBoardCacheKey(slug));
 };
 
 export const invalidateDreamBoardCacheById = async (dreamBoardId: string) => {

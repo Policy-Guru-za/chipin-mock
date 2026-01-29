@@ -1,13 +1,16 @@
 import { createHash, randomBytes } from 'crypto';
 
 import * as Sentry from '@sentry/nextjs';
-import { kv } from '@vercel/kv';
 
+import { kvAdapter } from '@/lib/demo/kv-adapter';
+import { isDemoMode } from '@/lib/demo';
 import { sendEmail } from '@/lib/integrations/email';
 import { log } from '@/lib/observability/logger';
 import { enforceRateLimit } from './rate-limit';
 
 const MAGIC_LINK_EXPIRY_SECONDS = 60 * 60;
+const DEMO_EMAIL = 'sarah@demo.chipin.co.za';
+
 
 export type MagicLinkResult =
   | { ok: true }
@@ -54,6 +57,11 @@ async function checkMagicLinkRateLimit(
 }
 
 export async function sendMagicLink(email: string, context?: MagicLinkContext) {
+  if (isDemoMode()) {
+    console.log('DEMO_MODE: magic link bypassed');
+    return { ok: true } as const;
+  }
+
   const normalizedEmail = email.trim().toLowerCase();
   const emailHash = hashIdentifier(normalizedEmail);
   const ipHash = context?.ip ? hashIdentifier(context.ip) : undefined;
@@ -73,7 +81,7 @@ export async function sendMagicLink(email: string, context?: MagicLinkContext) {
     const token = randomBytes(32).toString('hex');
     const tokenHash = hashIdentifier(token);
 
-    await kv.set(`magic:${tokenHash}`, normalizedEmail, { ex: MAGIC_LINK_EXPIRY_SECONDS });
+    await kvAdapter.set(`magic:${tokenHash}`, normalizedEmail, { ex: MAGIC_LINK_EXPIRY_SECONDS });
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
     const magicLink = `${baseUrl}/auth/verify?token=${token}`;
@@ -102,13 +110,18 @@ export async function sendMagicLink(email: string, context?: MagicLinkContext) {
 }
 
 export async function verifyMagicLink(token: string) {
+  if (isDemoMode()) {
+    console.log('DEMO_MODE: magic link verification bypassed');
+    return DEMO_EMAIL;
+  }
+
   const tokenHash = createHash('sha256').update(token).digest('hex');
-  const email = await kv.get<string>(`magic:${tokenHash}`);
+  const email = await kvAdapter.get<string>(`magic:${tokenHash}`);
 
   if (!email) {
     return null;
   }
 
-  await kv.del(`magic:${tokenHash}`);
+  await kvAdapter.del(`magic:${tokenHash}`);
   return email;
 }

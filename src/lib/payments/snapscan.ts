@@ -1,5 +1,7 @@
 import crypto from 'crypto';
 
+import { isDemoMode } from '@/lib/demo';
+
 type SnapScanConfig = {
   snapCode: string;
   webhookAuthKey: string;
@@ -162,6 +164,10 @@ export const listSnapScanPayments = async (params: {
   page?: number;
   perPage?: number;
 }) => {
+  if (isDemoMode()) {
+    return [];
+  }
+
   const { apiKey } = getSnapScanApiConfig();
   if (!apiKey) {
     throw new Error('SnapScan API key is missing');
