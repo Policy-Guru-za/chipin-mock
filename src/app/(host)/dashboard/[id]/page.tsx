@@ -9,9 +9,14 @@ import { requireSession } from '@/lib/auth/session';
 import { getDreamBoardDetailForHost, listContributionsForDreamBoard } from '@/lib/db/queries';
 import { buildDashboardViewModel } from '@/lib/host/dashboard-view-model';
 
-export default async function DreamBoardDetailPage({ params }: { params: { id: string } }) {
+export default async function DreamBoardDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   const session = await requireSession();
-  const board = await getDreamBoardDetailForHost(params.id, session.hostId);
+  const board = await getDreamBoardDetailForHost(id, session.hostId);
 
   if (!board) {
     redirect('/dashboard');
