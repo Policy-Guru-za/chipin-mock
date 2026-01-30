@@ -1,9 +1,14 @@
 import { neon } from '@neondatabase/serverless';
-import { drizzle, type NeonHttpDatabase } from 'drizzle-orm/neon-http';
+import type { PgDatabase } from 'drizzle-orm/pg-core';
+import type { NeonHttpQueryResultHKT } from 'drizzle-orm/neon-http';
+import type { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
+import { drizzle as drizzleNeon } from 'drizzle-orm/neon-http';
+import { drizzle as drizzlePg } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
 
 import * as schema from './schema';
 
-type Database = NeonHttpDatabase<typeof schema>;
+type Database = PgDatabase<NeonHttpQueryResultHKT | NodePgQueryResultHKT, typeof schema>;
 
 let dbInstance: Database | null = null;
 
@@ -15,8 +20,14 @@ const initDb = (): Database => {
     throw new Error('DATABASE_URL is not set');
   }
 
+  if (process.env.DATABASE_DRIVER === 'pg') {
+    const pool = new Pool({ connectionString });
+    dbInstance = drizzlePg(pool, { schema });
+    return dbInstance;
+  }
+
   const sql = neon(connectionString);
-  dbInstance = drizzle(sql, { schema });
+  dbInstance = drizzleNeon(sql, { schema });
   return dbInstance;
 };
 

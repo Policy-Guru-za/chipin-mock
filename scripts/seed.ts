@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import { seedDatabase } from '../src/lib/db/seed';
 
 async function main() {

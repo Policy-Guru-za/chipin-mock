@@ -1,1 +1,9 @@
 node_modules
+
+# Environment files (may contain secrets)
+.env
+.env.local
+.env*.local
+
+# Build artifacts
+tsconfig.tsbuildinfo
