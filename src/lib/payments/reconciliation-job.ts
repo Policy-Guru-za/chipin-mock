@@ -1,5 +1,6 @@
 import type { listContributionsForReconciliation } from '@/lib/db/queries';
 
+import { isDemoMode } from '@/lib/demo';
 import { markDreamBoardFundedIfNeeded, updateContributionStatus } from '@/lib/db/queries';
 import { invalidateDreamBoardCacheById } from '@/lib/dream-boards/cache';
 import { sendEmail } from '@/lib/integrations/email';
@@ -309,6 +310,9 @@ export const reconcilePending = async (params: {
   requestId?: string;
   phase: 'primary' | 'long_tail';
 }): Promise<ReconciliationPassResult> => {
+  if (isDemoMode()) {
+    return createEmptyReconciliationResult();
+  }
   const context = createReconciliationContext(params);
   const pendingByProvider = groupPendingByProvider(params.pending);
 

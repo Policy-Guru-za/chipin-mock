@@ -1,10 +1,12 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  checkKv,
   checkGivenGainAutomation,
   checkKarriAutomation,
   checkTakealotGiftCards,
 } from '@/lib/health/checks';
+import { kvAdapter } from '@/lib/demo/kv-adapter';
 
 describe('health checks', () => {
   const originalEnv = { ...process.env };
@@ -74,5 +76,32 @@ describe('health checks', () => {
     const result = await checkGivenGainAutomation();
     expect(result.ok).toBe(true);
     expect(result.detail).toBe('disabled');
+  });
+
+  it('returns demo when checking KV in demo mode', async () => {
+    process.env.DEMO_MODE = 'true';
+    delete process.env.KV_REST_API_URL;
+    delete process.env.KV_REST_API_TOKEN;
+
+    const kvGetSpy = vi.spyOn(kvAdapter, 'get');
+    const result = await checkKv();
+
+    expect(result.ok).toBe(true);
+    expect(result.detail).toBe('demo');
+    expect(kvGetSpy).not.toHaveBeenCalled();
+    kvGetSpy.mockRestore();
+  });
+
+  it('checks KV when configured outside demo mode', async () => {
+    delete process.env.DEMO_MODE;
+    process.env.KV_REST_API_URL = 'https://kv.test';
+    process.env.KV_REST_API_TOKEN = 'token';
+
+    const kvGetSpy = vi.spyOn(kvAdapter, 'get').mockResolvedValueOnce(null);
+    const result = await checkKv();
+
+    expect(result.ok).toBe(true);
+    expect(kvGetSpy).toHaveBeenCalledWith('health:ping');
+    kvGetSpy.mockRestore();
   });
 });

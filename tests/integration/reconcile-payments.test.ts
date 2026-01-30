@@ -7,6 +7,8 @@ const loadHandler = async () => {
 
 const originalEnv = {
   INTERNAL_JOB_SECRET: process.env.INTERNAL_JOB_SECRET,
+  DEMO_MODE: process.env.DEMO_MODE,
+  NEXT_PUBLIC_DEMO_MODE: process.env.NEXT_PUBLIC_DEMO_MODE,
   RECONCILIATION_ALERTS_ENABLED: process.env.RECONCILIATION_ALERTS_ENABLED,
   RECONCILIATION_ALERT_EMAIL: process.env.RECONCILIATION_ALERT_EMAIL,
   RECONCILIATION_LONG_TAIL_HOURS: process.env.RECONCILIATION_LONG_TAIL_HOURS,
@@ -23,12 +25,93 @@ afterEach(() => {
   process.env.RECONCILIATION_ALERTS_ENABLED = originalEnv.RECONCILIATION_ALERTS_ENABLED;
   process.env.RECONCILIATION_ALERT_EMAIL = originalEnv.RECONCILIATION_ALERT_EMAIL;
   process.env.RECONCILIATION_LONG_TAIL_HOURS = originalEnv.RECONCILIATION_LONG_TAIL_HOURS;
+  if (originalEnv.DEMO_MODE === undefined) {
+    delete process.env.DEMO_MODE;
+  } else {
+    process.env.DEMO_MODE = originalEnv.DEMO_MODE;
+  }
+  if (originalEnv.NEXT_PUBLIC_DEMO_MODE === undefined) {
+    delete process.env.NEXT_PUBLIC_DEMO_MODE;
+  } else {
+    process.env.NEXT_PUBLIC_DEMO_MODE = originalEnv.NEXT_PUBLIC_DEMO_MODE;
+  }
   vi.unmock('@/lib/db/queries');
   vi.unmock('@/lib/dream-boards/cache');
   vi.unmock('@/lib/payments/ozow');
   vi.unmock('@/lib/payments/snapscan');
   vi.clearAllMocks();
   vi.resetModules();
+});
+
+describe('payments reconciliation job - demo mode', () => {
+  it('returns empty results and skips provider and DB calls', async () => {
+    process.env.INTERNAL_JOB_SECRET = 'job-secret';
+    process.env.DEMO_MODE = 'true';
+
+    const listContributionsForReconciliation = vi.fn(async () => []);
+    const listContributionsForLongTailReconciliation = vi.fn(async () => []);
+    const updateContributionStatus = vi.fn(async () => undefined);
+    const markDreamBoardFundedIfNeeded = vi.fn(async () => undefined);
+
+    vi.doMock('@/lib/db/queries', () => ({
+      listContributionsForReconciliation,
+      listContributionsForLongTailReconciliation,
+      updateContributionStatus,
+      markDreamBoardFundedIfNeeded,
+    }));
+
+    const listOzowTransactionsPaged = vi.fn(async () => ({
+      transactions: [],
+      pagesFetched: 0,
+      pagingComplete: true,
+    }));
+
+    vi.doMock('@/lib/payments/ozow', async () => {
+      const actual =
+        await vi.importActual<typeof import('@/lib/payments/ozow')>('@/lib/payments/ozow');
+      return {
+        ...actual,
+        listOzowTransactionsPaged,
+      };
+    });
+
+    const listSnapScanPayments = vi.fn(async () => []);
+
+    vi.doMock('@/lib/payments/snapscan', async () => {
+      const actual =
+        await vi.importActual<typeof import('@/lib/payments/snapscan')>(
+          '@/lib/payments/snapscan'
+        );
+      return {
+        ...actual,
+        listSnapScanPayments,
+      };
+    });
+
+    const { POST } = await loadHandler();
+    const response = await POST(
+      new Request('http://localhost/api/internal/payments/reconcile', {
+        method: 'POST',
+        headers: { authorization: 'Bearer job-secret' },
+      })
+    );
+
+    expect(response.status).toBe(200);
+    const payload = await response.json();
+    expect(payload.scanned).toBe(0);
+    expect(payload.updated).toBe(0);
+    expect(payload.failed).toBe(0);
+    expect(payload.mismatches).toBe(0);
+    expect(payload.unresolved).toBe(0);
+    expect(payload.longTail?.scanned).toBe(0);
+
+    expect(listContributionsForReconciliation).not.toHaveBeenCalled();
+    expect(listContributionsForLongTailReconciliation).not.toHaveBeenCalled();
+    expect(listOzowTransactionsPaged).not.toHaveBeenCalled();
+    expect(listSnapScanPayments).not.toHaveBeenCalled();
+    expect(updateContributionStatus).not.toHaveBeenCalled();
+    expect(markDreamBoardFundedIfNeeded).not.toHaveBeenCalled();
+  });
 });
 
 describe('payments reconciliation job - updates', () => {

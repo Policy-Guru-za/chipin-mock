@@ -1,0 +1,156 @@
+import { createHash } from 'crypto';
+
+import { isDemoMode } from '@/lib/demo';
+import { buildDemoAssetUrl } from '@/lib/demo/urls';
+import { db } from './index';
+import {
+  apiKeys,
+  auditLogs,
+  contributions,
+  dreamBoards,
+  hosts,
+  partners,
+  payoutItems,
+  payouts,
+  webhookEvents,
+} from './schema';
+import { DEFAULT_PARTNER_ID, DEFAULT_PARTNER_NAME } from './partners';
+
+export const DEMO_SEEDED_BOARD_SLUG = 'emma-birthday-demo';
+
+const assertDemoSingleGift = (giftData: unknown) => {
+  if (!isDemoMode()) return;
+  if (!giftData || typeof giftData !== 'object' || Array.isArray(giftData)) {
+    throw new Error('DEMO_MODE seed requires a single gift object.');
+  }
+};
+
+export async function seedDemoDatabase(): Promise<void> {
+  await db.delete(webhookEvents);
+  await db.delete(auditLogs);
+  await db.delete(payoutItems);
+  await db.delete(apiKeys);
+  await db.delete(payouts);
+  await db.delete(contributions);
+  await db.delete(dreamBoards);
+  await db.delete(hosts);
+  await db.delete(partners);
+
+  await db.insert(partners).values({
+    id: DEFAULT_PARTNER_ID,
+    name: DEFAULT_PARTNER_NAME,
+  });
+
+  const [host] = await db
+    .insert(hosts)
+    .values({
+      email: 'sarah@demo.chipin.co.za',
+      name: 'Sarah Thompson',
+    })
+    .returning({ id: hosts.id });
+
+  const futureBirthday = new Date();
+  futureBirthday.setMonth(futureBirthday.getMonth() + 3);
+  const birthdayDate = futureBirthday.toISOString().split('T')[0];
+
+  const childPhotoUrl = buildDemoAssetUrl('/images/child-placeholder.svg');
+  const productImage = buildDemoAssetUrl('/images/child-placeholder.svg');
+
+  const giftData = {
+    type: 'takealot_product',
+    productUrl: buildDemoAssetUrl('/demo/takealot'),
+    productName: 'Storytime Train Set',
+    productImage,
+    productPrice: 35000,
+  } as const;
+
+  assertDemoSingleGift(giftData);
+
+  const [dreamBoard] = await db
+    .insert(dreamBoards)
+    .values({
+      partnerId: DEFAULT_PARTNER_ID,
+      hostId: host.id,
+      slug: DEMO_SEEDED_BOARD_SLUG,
+      childName: 'Emma',
+      childPhotoUrl,
+      birthdayDate,
+      giftType: 'takealot_product',
+      giftData,
+      goalCents: 35000,
+      payoutMethod: 'takealot_gift_card',
+      overflowGiftData: {
+        causeId: 'charity-hope-01',
+        causeName: 'Hope SA',
+        impactDescription: 'Provide school meals for 10 kids',
+      },
+      message: 'Let’s make Emma’s birthday magical.',
+      deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+      status: 'active',
+      payoutEmail: 'sarah@demo.chipin.co.za',
+    })
+    .returning({ id: dreamBoards.id });
+
+  await db.insert(contributions).values({
+    partnerId: DEFAULT_PARTNER_ID,
+    dreamBoardId: dreamBoard.id,
+    contributorName: 'Ava',
+    message: 'Happy birthday, Emma!',
+    amountCents: 5000,
+    feeCents: 300,
+    paymentProvider: 'payfast',
+    paymentRef: 'PF-DEMO-001',
+    paymentStatus: 'completed',
+  });
+
+  const [payout] = await db
+    .insert(payouts)
+    .values({
+      partnerId: DEFAULT_PARTNER_ID,
+      dreamBoardId: dreamBoard.id,
+      type: 'takealot_gift_card',
+      grossCents: 5000,
+      feeCents: 300,
+      netCents: 4700,
+      recipientData: {
+        email: 'sarah@demo.chipin.co.za',
+        productUrl: giftData.productUrl,
+      },
+      status: 'pending',
+    })
+    .returning({ id: payouts.id });
+
+  await db.insert(payoutItems).values({
+    payoutId: payout.id,
+    dreamBoardId: dreamBoard.id,
+    type: 'gift',
+    amountCents: 4700,
+    metadata: { seeded: true },
+  });
+
+  const [apiKey] = await db
+    .insert(apiKeys)
+    .values({
+      partnerId: DEFAULT_PARTNER_ID,
+      partnerName: 'Demo Partner',
+      keyHash: createHash('sha256')
+        .update('cpk_test_0123456789abcdef0123456789abcdef')
+        .digest('hex'),
+      keyPrefix: 'cpk_test_',
+      scopes: ['dreamboards:read'],
+      rateLimit: 1000,
+      isActive: true,
+    })
+    .returning({ id: apiKeys.id });
+
+  await db.insert(webhookEvents).values({
+    apiKeyId: apiKey.id,
+    eventType: 'dream_board.created',
+    payload: {
+      dreamBoardId: dreamBoard.id,
+      hostId: host.id,
+    },
+    status: 'pending',
+    attempts: 0,
+  });
+}

@@ -7,11 +7,13 @@ import { buttonVariants } from '@/components/ui/button';
 import { MenuIcon } from '@/components/icons';
 import { MobileNav } from '@/components/layout/MobileNav';
 import { trackNavDrawerOpened } from '@/lib/analytics/metrics';
+import { isDemoMode } from '@/lib/demo';
 
 const navLinkClasses = 'text-sm font-medium text-text-muted transition hover:text-text';
 
 export function Header() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const showDemoReset = isDemoMode();
 
   const handleOpenMobileNav = useCallback(() => {
     setIsMobileNavOpen(true);
@@ -38,6 +40,14 @@ export function Header() {
             <Link href="/#safety" className={navLinkClasses}>
               Trust & safety
             </Link>
+            {showDemoReset ? (
+              <Link
+                href="/demo/reset"
+                className={buttonVariants({ variant: 'outline', size: 'sm' })}
+              >
+                Reset demo
+              </Link>
+            ) : null}
             <Link href="/create" className={buttonVariants({ size: 'sm' })}>
               Create a Dream Board
             </Link>

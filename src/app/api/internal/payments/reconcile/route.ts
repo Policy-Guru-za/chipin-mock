@@ -4,6 +4,7 @@ import {
   listContributionsForReconciliation,
   listContributionsForLongTailReconciliation,
 } from '@/lib/db/queries';
+import { isDemoMode } from '@/lib/demo';
 import { log } from '@/lib/observability/logger';
 import { getLongTailStart, getReconciliationWindow } from '@/lib/payments/reconciliation';
 import {
@@ -31,6 +32,23 @@ export async function POST(request: NextRequest) {
 
   if (!isAuthorized(request)) {
     return jsonInternalError({ code: 'unauthorized', status: 401 });
+  }
+
+  if (isDemoMode()) {
+    const now = new Date();
+    const { lookbackStart, cutoff } = getReconciliationWindow(now);
+    const longTailStart = getLongTailStart(now);
+    const empty = createEmptyReconciliationResult();
+
+    return NextResponse.json(
+      buildReconciliationResponse({
+        primary: empty,
+        longTail: empty,
+        lookbackStart,
+        cutoff,
+        longTailStart,
+      })
+    );
   }
 
   const now = new Date();
