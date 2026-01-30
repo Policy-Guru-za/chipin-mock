@@ -8,6 +8,8 @@ import { createSession } from '@/lib/auth/session';
 import { ensureHostForEmail } from '@/lib/db/queries';
 import { isDemoMode } from '@/lib/demo';
 
+export const dynamic = 'force-dynamic';
+
 const DEMO_EMAIL = 'sarah@demo.chipin.co.za';
 
 const tokenSchema = z.object({
