@@ -1,3 +1,7 @@
+import { isDemoMode } from '@/lib/demo';
+import { buildDemoToken } from '@/lib/demo/tokens';
+import { buildDemoAssetUrl } from '@/lib/demo/urls';
+
 type GivenGainConfig = {
   baseUrl: string;
   apiKey: string;
@@ -35,6 +39,17 @@ const parseDonationStatus = (value: unknown): GivenGainDonationResult['status'] 
 export async function createGivenGainDonation(
   params: GivenGainDonationParams
 ): Promise<GivenGainDonationResult> {
+  if (isDemoMode()) {
+    const token = buildDemoToken(params.reference);
+    const donationId = `DEMO-GIVENGAIN-${token}`;
+    return {
+      donationId,
+      status: 'completed',
+      receiptUrl: buildDemoAssetUrl(`/demo/donations/${donationId}/receipt`),
+      certificateUrl: buildDemoAssetUrl(`/demo/donations/${donationId}/certificate`),
+    };
+  }
+
   const config = getGivenGainConfig();
   if (!config.baseUrl || !config.apiKey) {
     throw new Error('GivenGain credentials are missing');

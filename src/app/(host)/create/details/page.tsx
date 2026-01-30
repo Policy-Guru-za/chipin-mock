@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { requireSession } from '@/lib/auth/session';
+import { isDemoMode } from '@/lib/demo';
 import { getDreamBoardDraft, updateDreamBoardDraft } from '@/lib/dream-boards/draft';
 import type { DreamBoardDraft } from '@/lib/dream-boards/draft';
 import { isDeadlineWithinRange } from '@/lib/dream-boards/validation';
@@ -107,10 +108,12 @@ const verifyKarriCardIfNeeded = async (params: {
       hostId: params.hostId,
       error: error instanceof Error ? error.message : 'unknown',
     });
-    Sentry.captureException(error, {
-      tags: { area: 'karri', step: 'details' },
-      extra: { hostId: params.hostId },
-    });
+    if (!isDemoMode()) {
+      Sentry.captureException(error, {
+        tags: { area: 'karri', step: 'details' },
+        extra: { hostId: params.hostId },
+      });
+    }
     redirect('/create/details?error=karri_unavailable');
   }
 };

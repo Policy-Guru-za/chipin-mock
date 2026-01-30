@@ -1,3 +1,6 @@
+import { isDemoMode } from '@/lib/demo';
+import { buildDemoToken } from '@/lib/demo/tokens';
+
 type KarriConfig = {
   baseUrl: string;
   apiKey: string;
@@ -50,6 +53,13 @@ const parseKarriVerification = (data: Record<string, unknown>): KarriCardVerific
 };
 
 export async function verifyKarriCard(cardNumber: string): Promise<KarriCardVerificationResult> {
+  if (isDemoMode()) {
+    return {
+      valid: true,
+      cardholderFirstName: 'Demo',
+    };
+  }
+
   const config = getKarriConfig();
   if (!config.baseUrl || !config.apiKey) {
     throw new Error('Karri credentials are missing');
@@ -73,6 +83,14 @@ export async function verifyKarriCard(cardNumber: string): Promise<KarriCardVeri
 }
 
 export async function topUpKarriCard(params: KarriTopUpParams): Promise<KarriTopUpResult> {
+  if (isDemoMode()) {
+    const token = buildDemoToken(params.reference);
+    return {
+      transactionId: `DEMO-KARRI-${token}`,
+      status: 'completed',
+    };
+  }
+
   const config = getKarriConfig();
   if (!config.baseUrl || !config.apiKey) {
     throw new Error('Karri credentials are missing');

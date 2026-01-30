@@ -1,5 +1,7 @@
 import { del, put } from '@vercel/blob';
 
+import { isDemoMode } from '@/lib/demo';
+import { DEMO_BLOB_PLACEHOLDER_URL } from '@/lib/demo/fixtures';
 import { encryptSensitiveBuffer } from '@/lib/utils/encryption';
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
@@ -60,6 +62,13 @@ export async function uploadChildPhoto(file: File, hostId: string) {
     throw new UploadChildPhotoError('file_too_large', 'File is too large');
   }
 
+  if (isDemoMode()) {
+    return {
+      url: DEMO_BLOB_PLACEHOLDER_URL,
+      filename: `photos/${hostId}/demo-child.${extension}`,
+    };
+  }
+
   const filename = `photos/${hostId}/${Date.now()}.${extension}`;
   const { url } = await put(filename, file, {
     access: 'public',
@@ -87,13 +96,24 @@ export async function uploadPayoutReceipt(
     throw new UploadReceiptError('file_too_large', 'File is too large');
   }
 
-  const rawBuffer = Buffer.from(await file.arrayBuffer());
-  const encrypted = encryptSensitiveBuffer(rawBuffer);
-  const storageName = `payouts/${payoutId}/${documentType}-${Date.now()}.${extension}.enc`;
   const downloadName =
     file.name && file.name.trim().length > 0
       ? sanitizeFilename(file.name)
       : `${documentType}.${extension}`;
+
+  if (isDemoMode()) {
+    return {
+      url: DEMO_BLOB_PLACEHOLDER_URL,
+      filename: `payouts/${payoutId}/${documentType}-demo.${extension}.enc`,
+      downloadName,
+      contentType: file.type,
+      encrypted: true,
+    };
+  }
+
+  const rawBuffer = Buffer.from(await file.arrayBuffer());
+  const encrypted = encryptSensitiveBuffer(rawBuffer);
+  const storageName = `payouts/${payoutId}/${documentType}-${Date.now()}.${extension}.enc`;
 
   const { url } = await put(storageName, encrypted, {
     access: 'public',
@@ -110,5 +130,10 @@ export async function uploadPayoutReceipt(
 }
 
 export async function deleteChildPhoto(url: string) {
+  if (isDemoMode()) {
+    console.log('DEMO_MODE: blob delete suppressed', { url });
+    return;
+  }
+
   await del(url);
 }

@@ -1,6 +1,8 @@
 import { createHash } from 'crypto';
 import { z } from 'zod';
 
+import { isDemoMode } from '@/lib/demo';
+import { demoTakealotProducts } from '@/lib/demo/fixtures';
 import { kvAdapter } from '@/lib/demo/kv-adapter';
 
 export type TakealotProduct = {
@@ -19,6 +21,20 @@ const TAKEALOT_CACHE_TTL_SECONDS = 60 * 60 * 24;
 const buildCacheKey = (prefix: string, value: string) => {
   const hashed = createHash('sha256').update(value).digest('hex');
   return `takealot:${prefix}:${hashed}`;
+};
+
+const getDemoTakealotSearchResults = (query: string, limit: number) => {
+  const normalizedQuery = query.trim().toLowerCase();
+  const results = normalizedQuery
+    ? demoTakealotProducts.filter(
+        (product) =>
+          product.name.toLowerCase().includes(normalizedQuery) ||
+          product.url.toLowerCase().includes(normalizedQuery)
+      )
+    : demoTakealotProducts;
+
+  const fallback = results.length > 0 ? results : demoTakealotProducts;
+  return fallback.slice(0, limit);
 };
 
 export const isTakealotUrl = (rawUrl: string) => {
@@ -80,6 +96,20 @@ const hasJsonLdType = (value: string | string[] | undefined, target: string) => 
 const extractProductId = (url: string) => {
   const match = url.match(/PLID(\d+)/i);
   return match ? match[1] : null;
+};
+
+const getDemoTakealotProduct = (url: string): TakealotProduct => {
+  const match = demoTakealotProducts.find((product) => product.url === url);
+  if (match) {
+    return match;
+  }
+
+  const fallback = demoTakealotProducts[0];
+  return {
+    ...fallback,
+    url,
+    productId: extractProductId(url),
+  };
 };
 
 const parseAvailability = (availability: string | undefined) => {
@@ -279,6 +309,10 @@ export async function fetchTakealotSearch(
   limit = 6
 ): Promise<TakealotSearchResult[]> {
   const normalizedQuery = query.trim();
+  if (isDemoMode()) {
+    return getDemoTakealotSearchResults(normalizedQuery, limit);
+  }
+
   const cacheKey = buildCacheKey('search', normalizedQuery.toLowerCase());
   const cached = await kvAdapter.get<TakealotSearchResult[]>(cacheKey);
   if (cached) {
@@ -306,6 +340,10 @@ export async function fetchTakealotSearch(
 export async function fetchTakealotProduct(rawUrl: string): Promise<TakealotProduct> {
   if (!isTakealotUrl(rawUrl)) {
     throw new Error('Invalid Takealot URL');
+  }
+
+  if (isDemoMode()) {
+    return getDemoTakealotProduct(rawUrl);
   }
 
   const cacheKey = buildCacheKey('product', rawUrl);

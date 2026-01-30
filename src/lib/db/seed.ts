@@ -1,5 +1,6 @@
 import { createHash } from 'crypto';
 
+import { isDemoMode } from '@/lib/demo';
 import { db } from './index';
 import {
   apiKeys,
@@ -13,6 +14,13 @@ import {
   webhookEvents,
 } from './schema';
 import { DEFAULT_PARTNER_ID, DEFAULT_PARTNER_NAME } from './partners';
+
+const assertDemoSingleGift = (giftData: unknown) => {
+  if (!isDemoMode()) return;
+  if (!giftData || typeof giftData !== 'object' || Array.isArray(giftData)) {
+    throw new Error('DEMO_MODE seed requires a single gift object.');
+  }
+};
 
 export async function seedDatabase() {
   await db.delete(webhookEvents);
@@ -42,6 +50,16 @@ export async function seedDatabase() {
   futureBirthday.setMonth(futureBirthday.getMonth() + 3);
   const birthdayDate = futureBirthday.toISOString().split('T')[0];
 
+  const giftData = {
+    type: 'takealot_product',
+    productUrl: 'https://www.takealot.com/demo',
+    productName: 'Wooden Train Set',
+    productImage: 'https://images.unsplash.com/photo-1509223197845-458d87318791',
+    productPrice: 35000,
+  } as const;
+
+  assertDemoSingleGift(giftData);
+
   const [dreamBoard] = await db
     .insert(dreamBoards)
     .values({
@@ -52,13 +70,7 @@ export async function seedDatabase() {
       childPhotoUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1',
       birthdayDate,
       giftType: 'takealot_product',
-      giftData: {
-        type: 'takealot_product',
-        productUrl: 'https://www.takealot.com/demo',
-        productName: 'Wooden Train Set',
-        productImage: 'https://images.unsplash.com/photo-1509223197845-458d87318791',
-        productPrice: 35000,
-      },
+      giftData,
       goalCents: 35000,
       payoutMethod: 'takealot_gift_card',
       overflowGiftData: {

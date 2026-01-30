@@ -7,6 +7,7 @@ import { CreateFlowShell } from '@/components/layout/CreateFlowShell';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { requireSession } from '@/lib/auth/session';
+import { isDemoMode } from '@/lib/demo';
 import { CURATED_CAUSES, getCauseById } from '@/lib/dream-boards/causes';
 import { getDreamBoardDraft, updateDreamBoardDraft } from '@/lib/dream-boards/draft';
 import type { DreamBoardDraft } from '@/lib/dream-boards/draft';
@@ -74,6 +75,9 @@ async function saveTakealotGiftAction(formData: FormData) {
   if (view.redirectTo) {
     redirect(view.redirectTo);
   }
+  if (isDemoMode() && draft?.giftData) {
+    redirect('/create/details');
+  }
   const productUrl = formData.get('productUrl');
   const overflowSelection = formData.get('overflowSelection');
   const result = takealotSchema.safeParse({ productUrl, overflowSelection });
@@ -122,6 +126,9 @@ async function savePhilanthropyGiftAction(formData: FormData) {
   }
   if (!draft) {
     redirect('/create/child');
+  }
+  if (isDemoMode() && draft.giftData) {
+    redirect('/create/details');
   }
   const causeSelection = formData.get('causeSelection');
   const result = causeSelectionSchema.safeParse({ causeSelection });
@@ -270,6 +277,9 @@ export default async function CreateGiftPage({
   }
   if (!draft) {
     redirect('/create/child');
+  }
+  if (isDemoMode() && draft.giftData) {
+    redirect('/create/details');
   }
 
   const giftType = getGiftType(searchParams?.type);

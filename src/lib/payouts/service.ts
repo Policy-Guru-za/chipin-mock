@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/nextjs';
 import { eq, sql } from 'drizzle-orm';
 
 import { recordAuditEvent, type AuditActor } from '@/lib/audit';
+import { isDemoMode } from '@/lib/demo';
 import { db } from '@/lib/db';
 import { dreamBoards, payoutItems, payouts } from '@/lib/db/schema';
 import { log } from '@/lib/observability/logger';
@@ -228,7 +229,9 @@ export async function createPayoutsForDreamBoard(params: {
       dreamBoardId: board.id,
       message: error instanceof Error ? error.message : 'unknown_error',
     });
-    Sentry.captureException(error);
+    if (!isDemoMode()) {
+      Sentry.captureException(error);
+    }
     throw error;
   }
 

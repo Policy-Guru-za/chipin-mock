@@ -70,11 +70,13 @@ export async function sendMagicLink(email: string, context?: MagicLinkContext) {
     const rateLimit = await checkMagicLinkRateLimit(emailHash, ipHash);
     if (rateLimit) {
       log('warn', 'auth.magic_link_rate_limited', { emailHash, ipHash }, context?.requestId);
-      Sentry.captureMessage('auth.magic_link_rate_limited', {
-        level: 'warning',
-        tags: { area: 'auth' },
-        extra: { emailHash, ipHash },
-      });
+      if (!isDemoMode()) {
+        Sentry.captureMessage('auth.magic_link_rate_limited', {
+          level: 'warning',
+          tags: { area: 'auth' },
+          extra: { emailHash, ipHash },
+        });
+      }
       return rateLimit;
     }
 
@@ -101,10 +103,12 @@ export async function sendMagicLink(email: string, context?: MagicLinkContext) {
     return { ok: true } as const;
   } catch (error) {
     log('error', 'auth.magic_link_failed', { emailHash }, context?.requestId);
-    Sentry.captureException(error, {
-      tags: { area: 'auth', action: 'magic_link' },
-      extra: { emailHash, ipHash },
-    });
+    if (!isDemoMode()) {
+      Sentry.captureException(error, {
+        tags: { area: 'auth', action: 'magic_link' },
+        extra: { emailHash, ipHash },
+      });
+    }
     return { ok: false, reason: 'send_failed' } as const;
   }
 }

@@ -1,5 +1,7 @@
 import { Resend } from 'resend';
 
+import { isDemoMode } from '@/lib/demo';
+
 const fromEmail = process.env.RESEND_FROM_EMAIL ?? 'noreply@chipin.co.za';
 const fromName = process.env.RESEND_FROM_NAME ?? 'ChipIn';
 
@@ -17,6 +19,11 @@ const getResendClient = () => {
 };
 
 export async function sendEmail(payload: EmailPayload) {
+  if (isDemoMode()) {
+    console.log('DEMO_MODE: email suppressed', { to: payload.to, subject: payload.subject });
+    return;
+  }
+
   const resend = getResendClient();
 
   await resend.emails.send({

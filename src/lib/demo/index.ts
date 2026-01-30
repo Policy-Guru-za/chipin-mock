@@ -1,8 +1,12 @@
 const DEMO_MODE_VALUE = 'true';
 
-export const isDemoMode = (): boolean => process.env.DEMO_MODE === DEMO_MODE_VALUE;
+const isDemoModeEnabled = (value: string | undefined): boolean => value === DEMO_MODE_VALUE;
 
-export const DEMO_MODE: boolean = process.env.DEMO_MODE === DEMO_MODE_VALUE;
+export const isDemoMode = (): boolean =>
+  isDemoModeEnabled(process.env.DEMO_MODE) ||
+  isDemoModeEnabled(process.env.NEXT_PUBLIC_DEMO_MODE);
+
+export const DEMO_MODE: boolean = isDemoMode();
 
 const PRODUCTION_DENYLIST = ['prod', 'production'];
 
@@ -12,7 +16,7 @@ const isProductionDatabaseUrl = (databaseUrl: string): boolean => {
 };
 
 export function assertNotProductionDb(): void {
-  if (!DEMO_MODE) return;
+  if (!isDemoMode()) return;
 
   const databaseUrl = process.env.DATABASE_URL ?? '';
   if (!databaseUrl.trim()) {

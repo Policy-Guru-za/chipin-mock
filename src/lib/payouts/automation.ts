@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/nextjs';
 import { eq } from 'drizzle-orm';
 
 import { recordAuditEvent, type AuditActor } from '@/lib/audit';
+import { isDemoMode } from '@/lib/demo';
 import { db } from '@/lib/db';
 import { payouts } from '@/lib/db/schema';
 import { createGivenGainDonation } from '@/lib/integrations/givengain';
@@ -339,7 +340,9 @@ export async function executeAutomatedPayout(params: {
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Automation failed';
     log('error', 'payout_automation_failed', { payoutId: payout.id, message });
-    Sentry.captureException(error);
+    if (!isDemoMode()) {
+      Sentry.captureException(error);
+    }
     await markFailedPayout({ payout, errorMessage: message, actor: params.actor });
     throw error;
   }

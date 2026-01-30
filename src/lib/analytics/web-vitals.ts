@@ -1,5 +1,7 @@
 import { onCLS, onFCP, onLCP, onTTFB, onINP, type Metric } from 'web-vitals';
 
+import { isDemoMode } from '@/lib/demo';
+
 export type WebVitalsMetric = {
   name: 'CLS' | 'FCP' | 'LCP' | 'TTFB' | 'INP';
   value: number;
@@ -25,6 +27,10 @@ function mapMetric(metric: Metric): WebVitalsMetric {
  * Call this once in your app entry point.
  */
 export function initWebVitals(onReport: ReportCallback): void {
+  if (isDemoMode()) {
+    return;
+  }
+
   onCLS((metric) => onReport(mapMetric(metric)));
   onFCP((metric) => onReport(mapMetric(metric)));
   onLCP((metric) => onReport(mapMetric(metric)));
@@ -43,6 +49,10 @@ const SAMPLING_RATE = 0.05;
  * and sends to analytics endpoint in production with sampling.
  */
 export function reportWebVitals(metric: WebVitalsMetric): void {
+  if (isDemoMode()) {
+    return;
+  }
+
   // Guard against server-side execution
   if (typeof window === 'undefined') {
     return;

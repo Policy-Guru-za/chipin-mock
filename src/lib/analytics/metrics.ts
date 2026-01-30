@@ -2,6 +2,8 @@
  * Custom metrics tracking for ChipIn business KPIs.
  */
 
+import { isDemoMode } from '@/lib/demo';
+
 export type CustomMetricName =
   | 'dream_board_created'
   | 'contribution_started'
@@ -28,6 +30,10 @@ export function trackMetric(
   name: CustomMetricName,
   properties?: Record<string, string | number | boolean>
 ): void {
+  if (isDemoMode()) {
+    return;
+  }
+
   // Guard against server-side execution
   if (typeof window === 'undefined') {
     return;

@@ -1,3 +1,7 @@
+import { isDemoMode } from '@/lib/demo';
+import { buildDemoToken } from '@/lib/demo/tokens';
+import { buildDemoAssetUrl } from '@/lib/demo/urls';
+
 type TakealotGiftCardConfig = {
   baseUrl: string;
   apiKey: string;
@@ -33,6 +37,18 @@ const parseGiftCardStatus = (value: unknown): TakealotGiftCardIssueResult['statu
 export async function issueTakealotGiftCard(
   params: TakealotGiftCardIssueParams
 ): Promise<TakealotGiftCardIssueResult> {
+  if (isDemoMode()) {
+    const token = buildDemoToken(params.reference);
+    const giftCardCode = `DEMO-TAKEALOT-${token}`;
+    const giftCardUrl = buildDemoAssetUrl(`/demo/gift-cards/${giftCardCode}`);
+    return {
+      status: 'completed',
+      giftCardCode,
+      giftCardUrl,
+      orderId: `DEMO-ORDER-${token}`,
+    };
+  }
+
   const config = getGiftCardConfig();
   if (!config.baseUrl || !config.apiKey) {
     throw new Error('Takealot gift card credentials are missing');
