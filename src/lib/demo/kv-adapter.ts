@@ -67,10 +67,21 @@ const getRealKv = async (): Promise<KvAdapter> => {
   return realKvPromise!;
 };
 
+const hasRealKvCredentials = () =>
+  Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+
 const getKvClient = async (): Promise<KvAdapter> => {
+  // Use real KV if credentials are available, even in demo mode
+  // (needed for serverless session persistence on Vercel)
+  if (hasRealKvCredentials()) {
+    return getRealKv();
+  }
+
+  // Fall back to in-memory mock for local development without KV
   if (isDemoMode()) {
     return demoKv;
   }
+
   return getRealKv();
 };
 
