@@ -25,13 +25,17 @@ const requestSchema = z.object({
 
 const resolveEnvironment = (keyPrefix: string) => (keyPrefix.includes('_test_') ? 'test' : 'live');
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
   const auth = requireInternalAuth(request);
   if (!auth.ok) {
     return jsonInternalError({ code: auth.error, status: auth.status });
   }
 
-  if (!isValidUuid(params.id)) {
+  if (!isValidUuid(id)) {
     return jsonInternalError({ code: 'invalid_id', status: 400 });
   }
 
@@ -49,7 +53,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     return jsonInternalError({ code: 'rate_limit_required', status: 400 });
   }
 
-  const existing = await getApiKeyById(params.id);
+  const existing = await getApiKeyById(id);
   if (!existing) {
     return jsonInternalError({ code: 'not_found', status: 404 });
   }

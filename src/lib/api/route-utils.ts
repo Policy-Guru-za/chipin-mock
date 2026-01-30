@@ -134,11 +134,12 @@ export const withApiAuth =
     requiredScope: ApiKeyScope,
     handler: (request: NextRequest, context: ApiAuthContext, params: Params) => Promise<Response>
   ) =>
-  async (request: NextRequest, ctx?: { params: Params }) => {
+  async (request: NextRequest, ctx?: { params?: Params | Promise<Params> }) => {
     const auth = await enforceApiAuth(request, requiredScope);
     if (!auth.ok) return auth.response;
 
-    const response = await handler(request, auth.context, ctx?.params as Params);
+    const params = ctx?.params ? await ctx.params : undefined;
+    const response = await handler(request, auth.context, params as Params);
 
     if (response.ok) {
       await markApiKeyUsed(auth.context.apiKey.id);

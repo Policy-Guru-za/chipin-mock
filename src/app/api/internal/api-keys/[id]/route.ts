@@ -5,22 +5,26 @@ import { requireInternalAuth, getInternalActor } from '@/lib/api/internal-auth';
 import { deactivateApiKey, getApiKeyById } from '@/lib/db/api-key-queries';
 import { isValidUuid } from '@/lib/api/validation';
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
   const auth = requireInternalAuth(request);
   if (!auth.ok) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
 
-  if (!isValidUuid(params.id)) {
+  if (!isValidUuid(id)) {
     return NextResponse.json({ error: 'invalid_id' }, { status: 400 });
   }
 
-  const existing = await getApiKeyById(params.id);
+  const existing = await getApiKeyById(id);
   if (!existing) {
     return NextResponse.json({ error: 'not_found' }, { status: 404 });
   }
 
-  const updated = await deactivateApiKey(params.id);
+  const updated = await deactivateApiKey(id);
   if (!updated) {
     return NextResponse.json({ error: 'not_found' }, { status: 404 });
   }
@@ -28,7 +32,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   await recordAuditEvent({
     actor: getInternalActor(request),
     action: 'api_key.revoked',
-    target: { type: 'api_key', id: params.id },
+    target: { type: 'api_key', id },
     metadata: {
       partnerName: existing.partnerName,
       scopes: existing.scopes,
@@ -36,5 +40,5 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     },
   });
 
-  return NextResponse.json({ data: { id: params.id } }, { status: 200 });
+  return NextResponse.json({ data: { id } }, { status: 200 });
 }

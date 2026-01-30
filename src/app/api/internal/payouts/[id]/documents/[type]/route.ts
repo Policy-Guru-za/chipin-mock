@@ -80,16 +80,17 @@ const fetchEncryptedDocument = async (params: {
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string; type: string } }
+  context: { params: Promise<{ id: string; type: string }> }
 ) {
+  const { id, type } = await context.params;
   await requireAdminSession();
 
-  const documentType = getDocumentType(params.type);
+  const documentType = getDocumentType(type);
   if (!documentType) {
     return jsonInternalError({ code: 'not_found', status: 404 });
   }
 
-  const payout = await getPayoutDetail(params.id);
+  const payout = await getPayoutDetail(id);
   if (!payout || payout.type !== 'philanthropy_donation') {
     return jsonInternalError({ code: 'not_found', status: 404 });
   }
