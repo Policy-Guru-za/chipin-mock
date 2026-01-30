@@ -45,6 +45,7 @@ async function saveChildDetailsAction(formData: FormData) {
     redirect('/create/child?error=photo');
   }
 
+  let uploadSuccess = false;
   try {
     const upload = await uploadChildPhoto(photo, session.hostId);
     const existingDraft = await getDreamBoardDraft(session.hostId);
@@ -57,7 +58,7 @@ async function saveChildDetailsAction(formData: FormData) {
       childPhotoUrl: upload.url,
       photoFilename: upload.filename,
     });
-    redirect('/create/gift');
+    uploadSuccess = true;
   } catch (error) {
     log('error', 'child_photo_upload_failed', {
       hostId: session.hostId,
@@ -74,6 +75,10 @@ async function saveChildDetailsAction(formData: FormData) {
     }
 
     redirect('/create/child?error=upload_failed');
+  }
+
+  if (uploadSuccess) {
+    redirect('/create/gift');
   }
 }
 
