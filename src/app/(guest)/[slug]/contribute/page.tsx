@@ -16,9 +16,10 @@ const getBoard = cache(async (slug: string) => getCachedDreamBoardBySlug(slug));
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const board = await getBoard(params.slug);
+  const { slug } = await params;
+  const board = await getBoard(slug);
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
   if (!board) {
@@ -31,8 +32,13 @@ export async function generateMetadata({
   return buildDreamBoardMetadata(board, { baseUrl, path: `/${board.slug}/contribute` });
 }
 
-export default async function ContributionPage({ params }: { params: { slug: string } }) {
-  const board = await getBoard(params.slug);
+export default async function ContributionPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const board = await getBoard(slug);
   if (!board) {
     notFound();
   }

@@ -9,18 +9,20 @@ import { buildThankYouViewModel } from '@/lib/dream-boards/view-model';
 import type { PaymentProvider } from '@/lib/payments';
 
 type ThanksPageProps = {
-  params: { slug: string };
-  searchParams?: { ref?: string; provider?: PaymentProvider };
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ ref?: string; provider?: PaymentProvider }>;
 };
 
 export default async function ThankYouPage({ params, searchParams }: ThanksPageProps) {
-  const board = await getCachedDreamBoardBySlug(params.slug);
+  const { slug } = await params;
+  const searchParamsResolved = await searchParams;
+  const board = await getCachedDreamBoardBySlug(slug);
   if (!board) {
     notFound();
   }
 
-  const ref = searchParams?.ref;
-  const providerParam = searchParams?.provider;
+  const ref = searchParamsResolved?.ref;
+  const providerParam = searchParamsResolved?.provider;
   const provider: PaymentProvider =
     providerParam && ['payfast', 'ozow', 'snapscan'].includes(providerParam)
       ? providerParam

@@ -5,11 +5,12 @@ import { Button } from '@/components/ui/button';
 import { getCachedDreamBoardBySlug } from '@/lib/dream-boards/cache';
 
 type PaymentFailedPageProps = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 export default async function PaymentFailedPage({ params }: PaymentFailedPageProps) {
-  const board = await getCachedDreamBoardBySlug(params.slug);
+  const { slug } = await params;
+  const board = await getCachedDreamBoardBySlug(slug);
   if (!board) {
     notFound();
   }
