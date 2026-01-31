@@ -62,13 +62,6 @@ export async function uploadChildPhoto(file: File, hostId: string) {
     throw new UploadChildPhotoError('file_too_large', 'File is too large');
   }
 
-  if (isDemoMode()) {
-    return {
-      url: DEMO_BLOB_PLACEHOLDER_URL,
-      filename: `photos/${hostId}/demo-child.${extension}`,
-    };
-  }
-
   const filename = `photos/${hostId}/${Date.now()}.${extension}`;
   const { url } = await put(filename, file, {
     access: 'public',
