@@ -22,12 +22,14 @@ type TakealotProduct = {
   name: string;
   priceCents: number;
   imageUrl: string;
+  inStock?: boolean;
 };
 
 type TakealotGiftFormProps = {
   action: (formData: FormData) => void;
   causes: Cause[];
   defaultProductUrl: string;
+  defaultProduct?: TakealotProduct | null;
   selectedOverflow?: string;
   error?: string;
 };
@@ -45,67 +47,75 @@ const ErrorBanner = ({ message }: { message: string }) => (
   </div>
 );
 
-type SearchSectionProps = {
-  query: string;
-  onQueryChange: (value: string) => void;
-  onSearch: () => void;
-  loading: boolean;
-  searchError: string | null;
-  results: TakealotProduct[];
-  onSelect: (url: string) => void;
+type ProductPreviewProps = {
+  product: TakealotProduct;
+  onClear: () => void;
 };
 
-const SearchSection = ({
-  query,
-  onQueryChange,
-  onSearch,
-  loading,
-  searchError,
-  results,
-  onSelect,
-}: SearchSectionProps) => (
-  <div className="space-y-3">
-    <div className="flex flex-wrap gap-3">
-      <Input
-        value={query}
-        onChange={(event) => onQueryChange(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter') {
-            event.preventDefault();
-            onSearch();
-          }
-        }}
-        placeholder="Search Takealot for a product"
-      />
-      <Button type="button" variant="outline" disabled={loading} onClick={onSearch}>
-        {loading ? 'Searching…' : 'Search'}
-      </Button>
+const ProductPreview = ({ product, onClear }: ProductPreviewProps) => (
+  <div className="flex items-center gap-4 rounded-2xl border border-primary/30 bg-primary/5 p-4">
+    <Image
+      src={product.imageUrl}
+      alt={product.name}
+      width={80}
+      height={80}
+      className="h-20 w-20 rounded-xl object-cover"
+    />
+    <div className="flex-1 space-y-1">
+      <p className="text-sm font-semibold text-text">{product.name}</p>
+      <p className="text-sm text-text-muted">
+        R{(product.priceCents / 100).toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
+      </p>
+      {product.inStock === false ? (
+        <p className="text-xs text-amber-600">This product may be out of stock</p>
+      ) : null}
     </div>
-    {searchError ? <p className="text-sm text-red-600">{searchError}</p> : null}
-    {results.length ? (
-      <div className="grid gap-3 md:grid-cols-2">
-        {results.map((result) => (
-          <button
-            key={result.url}
-            type="button"
-            className="flex items-center gap-3 rounded-2xl border border-border bg-white p-4 text-left"
-            onClick={() => onSelect(result.url)}
-          >
-            <Image
-              src={result.imageUrl}
-              alt={result.name}
-              width={64}
-              height={64}
-              className="h-16 w-16 rounded-xl object-cover"
-            />
-            <div>
-              <p className="text-sm font-semibold text-text">{result.name}</p>
-              <p className="text-sm text-text-muted">R{(result.priceCents / 100).toFixed(2)}</p>
-            </div>
-          </button>
-        ))}
+    <Button type="button" variant="ghost" size="sm" onClick={onClear}>
+      Change
+    </Button>
+  </div>
+);
+
+type URLInputSectionProps = {
+  productUrl: string;
+  onUrlChange: (value: string) => void;
+  onFetch: () => void;
+  fetching: boolean;
+  error: string | null;
+};
+
+const URLInputSection = ({
+  productUrl,
+  onUrlChange,
+  onFetch,
+  fetching,
+  error,
+}: URLInputSectionProps) => (
+  <div className="space-y-3">
+    <div className="space-y-2">
+      <label htmlFor="productUrl" className="text-sm font-medium text-text">
+        Takealot product URL
+      </label>
+      <div className="flex flex-wrap gap-3">
+        <Input
+          id="productUrl"
+          value={productUrl}
+          onChange={(event) => onUrlChange(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              onFetch();
+            }
+          }}
+          placeholder="https://www.takealot.com/product-name/PLID12345678"
+          className="flex-1"
+        />
+        <Button type="button" variant="outline" disabled={fetching} onClick={onFetch}>
+          {fetching ? 'Fetching…' : 'Fetch Product'}
+        </Button>
       </div>
-    ) : null}
+    </div>
+    {error ? <p className="text-sm text-red-600">{error}</p> : null}
   </div>
 );
 
@@ -152,90 +162,101 @@ export function TakealotGiftForm({
   action,
   causes,
   defaultProductUrl,
+  defaultProduct,
   selectedOverflow,
   error,
 }: TakealotGiftFormProps) {
   const [productUrl, setProductUrl] = useState(defaultProductUrl);
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<TakealotProduct[]>([]);
-  const [searchError, setSearchError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [fetchedProduct, setFetchedProduct] = useState<TakealotProduct | null>(
+    defaultProduct ?? null
+  );
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [fetching, setFetching] = useState(false);
   const errorMessage = getTakealotErrorMessage(error);
 
-  const handleSearch = async () => {
-    setSearchError(null);
-    setResults([]);
+  const handleUrlChange = (value: string) => {
+    setProductUrl(value);
+    setFetchError(null);
+  };
 
-    if (!query.trim()) {
-      setSearchError('Please enter a search term.');
+  const handleFetchProduct = async () => {
+    setFetchError(null);
+    setFetchedProduct(null);
+
+    const trimmedUrl = productUrl.trim();
+    if (!trimmedUrl) {
+      setFetchError('Please enter a Takealot URL.');
       return;
     }
 
-    setLoading(true);
+    if (!trimmedUrl.includes('takealot.com')) {
+      setFetchError('Please enter a valid Takealot URL.');
+      return;
+    }
+
+    setFetching(true);
 
     try {
-      const response = await fetch(
-        `/api/internal/products/search?q=${encodeURIComponent(query.trim())}`
-      );
+      const response = await fetch('/api/internal/products/fetch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: trimmedUrl }),
+      });
 
       if (!response.ok) {
         const payload = await response.json().catch(() => null);
-        setSearchError(payload?.error ?? 'Search failed.');
+        setFetchError(payload?.error ?? 'Could not fetch product. Please check the URL.');
         return;
       }
 
       const payload = await response.json();
-      if (!payload?.data?.length) {
-        setSearchError('No results found. Try a different search.');
+      if (!payload?.data) {
+        setFetchError('Could not fetch product details.');
         return;
       }
 
-      const mappedResults = (payload.data as Array<Record<string, unknown>>).map((item) => ({
-        url: String(item.product_url ?? ''),
-        name: String(item.name ?? ''),
-        priceCents: Number(item.price_cents ?? 0),
-        imageUrl: String(item.image_url ?? ''),
-      }));
-
-      setResults(mappedResults);
+      setFetchedProduct({
+        url: payload.data.product_url,
+        name: payload.data.name,
+        priceCents: payload.data.price_cents,
+        imageUrl: payload.data.image_url,
+        inStock: payload.data.in_stock,
+      });
     } catch {
-      setSearchError('Search failed. Please try again.');
+      setFetchError('Failed to fetch product. Please try again.');
     } finally {
-      setLoading(false);
+      setFetching(false);
     }
+  };
+
+  const handleClearProduct = () => {
+    setFetchedProduct(null);
+    setProductUrl('');
   };
 
   return (
     <form action={action} className="space-y-6">
       {errorMessage ? <ErrorBanner message={errorMessage} /> : null}
 
-      <SearchSection
-        query={query}
-        onQueryChange={setQuery}
-        onSearch={handleSearch}
-        loading={loading}
-        searchError={searchError}
-        results={results}
-        onSelect={setProductUrl}
-      />
-
-      <div className="space-y-2">
-        <label htmlFor="productUrl" className="text-sm font-medium text-text">
-          Takealot product URL
-        </label>
-        <Input
-          id="productUrl"
-          name="productUrl"
-          placeholder="https://www.takealot.com/..."
-          required
-          value={productUrl}
-          onChange={(event) => setProductUrl(event.target.value)}
+      {fetchedProduct ? (
+        <ProductPreview product={fetchedProduct} onClear={handleClearProduct} />
+      ) : (
+        <URLInputSection
+          productUrl={productUrl}
+          onUrlChange={handleUrlChange}
+          onFetch={handleFetchProduct}
+          fetching={fetching}
+          error={fetchError}
         />
-      </div>
+      )}
+
+      <input type="hidden" name="productUrl" value={fetchedProduct?.url ?? productUrl} />
 
       <OverflowSelection causes={causes} selectedOverflow={selectedOverflow} />
 
-      <Button type="submit">Continue to payout details</Button>
+      <Button type="submit" disabled={!fetchedProduct || fetching}>
+        Continue to payout details
+      </Button>
     </form>
   );
 }

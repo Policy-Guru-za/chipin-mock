@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
@@ -166,17 +165,16 @@ type GiftSearchParams = {
 
 type TakealotSectionProps = {
   draft: DreamBoardDraft;
-  view: ReturnType<typeof buildCreateFlowViewModel>;
   error?: string;
   selectedOverflow?: string;
 };
 
-const TakealotGiftSection = ({ draft, view, error, selectedOverflow }: TakealotSectionProps) => (
+const TakealotGiftSection = ({ draft, error, selectedOverflow }: TakealotSectionProps) => (
   <Card>
     <CardHeader>
       <CardTitle>Takealot product</CardTitle>
       <CardDescription>
-        Search or paste a Takealot link and select a charity overflow.
+        Paste a Takealot product link and select a charity overflow.
       </CardDescription>
     </CardHeader>
     <CardContent className="space-y-6">
@@ -186,27 +184,19 @@ const TakealotGiftSection = ({ draft, view, error, selectedOverflow }: TakealotS
         defaultProductUrl={
           draft.giftData?.type === 'takealot_product' ? draft.giftData.productUrl : ''
         }
+        defaultProduct={
+          draft.giftData?.type === 'takealot_product'
+            ? {
+                url: draft.giftData.productUrl,
+                name: draft.giftData.productName,
+                priceCents: draft.giftData.productPrice,
+                imageUrl: draft.giftData.productImage,
+              }
+            : null
+        }
         selectedOverflow={selectedOverflow}
         error={error}
       />
-
-      {draft.giftData?.type === 'takealot_product' && view.giftPreview ? (
-        <div className="flex items-center gap-4 rounded-2xl border border-border bg-subtle p-4">
-          <Image
-            src={view.giftPreview.imageUrl}
-            alt={view.giftPreview.title}
-            width={72}
-            height={72}
-            className="h-16 w-16 rounded-xl object-cover"
-          />
-          <div className="space-y-1">
-            <p className="text-sm font-semibold text-text">{view.giftPreview.title}</p>
-            {view.giftPreview.priceLabel ? (
-              <p className="text-sm text-text-muted">{view.giftPreview.priceLabel}</p>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
     </CardContent>
   </Card>
 );
@@ -313,12 +303,7 @@ export default async function CreateGiftPage({
       </div>
 
       {giftType === 'takealot' ? (
-        <TakealotGiftSection
-          draft={draft}
-          view={view}
-          error={error}
-          selectedOverflow={selectedOverflow}
-        />
+        <TakealotGiftSection draft={draft} error={error} selectedOverflow={selectedOverflow} />
       ) : (
         <PhilanthropyGiftSection error={error} selectedCause={selectedCause} />
       )}
