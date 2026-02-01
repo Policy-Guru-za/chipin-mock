@@ -434,7 +434,8 @@ export async function fetchTakealotProduct(rawUrl: string): Promise<TakealotProd
     throw new TakealotFetchError('invalid_url', 'Invalid Takealot URL');
   }
 
-  const cacheKey = buildCacheKey('product', rawUrl);
+  // Use 'pplx' prefix to invalidate old HTML-scraped cache entries
+  const cacheKey = buildCacheKey('pplx', rawUrl);
   const cached = await kvAdapter.get<TakealotProduct>(cacheKey);
   if (cached) {
     return cached;
