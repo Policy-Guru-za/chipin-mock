@@ -4,7 +4,9 @@ import { z } from 'zod';
 import { enforceRateLimit } from '@/lib/auth/rate-limit';
 import { getSession } from '@/lib/auth/session';
 import { jsonInternalError } from '@/lib/api/internal-response';
-import { fetchTakealotProduct } from '@/lib/integrations/takealot';
+import { fetchTakealotProduct, TakealotFetchError } from '@/lib/integrations/takealot';
+
+export const runtime = 'nodejs';
 
 const requestSchema = z.object({ url: z.string().url() });
 
@@ -46,9 +48,16 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    return jsonInternalError({
-      code: error instanceof Error ? error.message : 'fetch_failed',
-      status: 400,
-    });
+    if (error instanceof TakealotFetchError) {
+      return NextResponse.json(
+        { error: error.message, code: error.code },
+        { status: error.code === 'rate_limited' ? 429 : 400 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: 'An unexpected error occurred', code: 'fetch_failed' },
+      { status: 500 }
+    );
   }
 }

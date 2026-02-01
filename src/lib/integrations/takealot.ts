@@ -16,6 +16,129 @@ export type TakealotSearchResult = TakealotProduct;
 
 const TAKEALOT_CACHE_TTL_SECONDS = 60 * 60 * 24;
 
+// ---------------------------------------------------------------------------
+// Error Types
+// ---------------------------------------------------------------------------
+
+export type TakealotFetchErrorCode =
+  | 'invalid_url'
+  | 'not_configured'
+  | 'rate_limited'
+  | 'parse_failed'
+  | 'fetch_failed';
+
+export class TakealotFetchError extends Error {
+  code: TakealotFetchErrorCode;
+
+  constructor(code: TakealotFetchErrorCode, message: string) {
+    super(message);
+    this.code = code;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Perplexity API Integration
+// ---------------------------------------------------------------------------
+
+const PERPLEXITY_API_URL = 'https://api.perplexity.ai/v2/chat/completions';
+
+const perplexityResponseSchema = z.object({
+  name: z.string(),
+  priceCents: z.number().int().positive(),
+  imageUrl: z.string().url().optional(),
+  inStock: z.boolean().optional(),
+});
+
+async function fetchProductViaPerplexity(takealotUrl: string): Promise<TakealotProduct> {
+  const apiKey = process.env.PERPLEXITY_API_KEY;
+
+  if (!apiKey) {
+    throw new TakealotFetchError('not_configured', 'Perplexity API not configured');
+  }
+
+  const productId = extractProductId(takealotUrl);
+
+  const response = await fetch(PERPLEXITY_API_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'sonar',
+      messages: [
+        {
+          role: 'system',
+          content: `You are a product data extractor. Extract product details from Takealot URLs and return ONLY valid JSON with no additional text or markdown.
+
+Return format (no markdown code blocks):
+{"name":"Product Name","priceCents":129900,"imageUrl":"https://...","inStock":true}
+
+Rules:
+- priceCents must be an integer in cents (R1299.00 = 129900)
+- imageUrl should be the main product image URL from Takealot
+- inStock should be true unless explicitly marked as out of stock
+- Return ONLY the JSON object, nothing else`,
+        },
+        {
+          role: 'user',
+          content: `Extract product details from: ${takealotUrl}`,
+        },
+      ],
+      max_tokens: 500,
+      search_domain_filter: ['takealot.com'],
+    }),
+  });
+
+  if (!response.ok) {
+    const status = response.status;
+    console.warn('perplexity_api_failed', { status, productId });
+
+    if (status === 429) {
+      throw new TakealotFetchError('rate_limited', 'Rate limit exceeded. Please try again later.');
+    }
+
+    throw new TakealotFetchError('fetch_failed', `Perplexity API error (${status})`);
+  }
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content;
+
+  if (!content) {
+    throw new TakealotFetchError('parse_failed', 'No content in Perplexity response');
+  }
+
+  // Parse JSON from response (handle potential markdown code blocks)
+  let jsonStr = content.trim();
+  const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+  if (jsonMatch) {
+    jsonStr = jsonMatch[1].trim();
+  }
+
+  let productData: unknown;
+  try {
+    productData = JSON.parse(jsonStr);
+  } catch {
+    console.warn('perplexity_json_parse_failed', { productId, content: jsonStr.slice(0, 200) });
+    throw new TakealotFetchError('parse_failed', 'Could not parse product JSON from response');
+  }
+
+  const parsed = perplexityResponseSchema.safeParse(productData);
+  if (!parsed.success) {
+    console.warn('perplexity_validation_failed', { productId, errors: parsed.error.errors });
+    throw new TakealotFetchError('parse_failed', 'Invalid product data structure');
+  }
+
+  return {
+    url: takealotUrl,
+    name: parsed.data.name,
+    priceCents: parsed.data.priceCents,
+    imageUrl: parsed.data.imageUrl || '/images/gift-placeholder.svg',
+    productId,
+    inStock: parsed.data.inStock ?? true,
+  };
+}
+
 const buildCacheKey = (prefix: string, value: string) => {
   const hashed = createHash('sha256').update(value).digest('hex');
   return `takealot:${prefix}:${hashed}`;
@@ -308,7 +431,7 @@ export async function fetchTakealotSearch(
 
 export async function fetchTakealotProduct(rawUrl: string): Promise<TakealotProduct> {
   if (!isTakealotUrl(rawUrl)) {
-    throw new Error('Invalid Takealot URL');
+    throw new TakealotFetchError('invalid_url', 'Invalid Takealot URL');
   }
 
   const cacheKey = buildCacheKey('product', rawUrl);
@@ -317,23 +440,9 @@ export async function fetchTakealotProduct(rawUrl: string): Promise<TakealotProd
     return cached;
   }
 
-  const response = await fetch(rawUrl, {
-    headers: {
-      'User-Agent': 'ChipIn/1.0 (+https://chipin.co.za)',
-    },
-    redirect: 'follow',
-  });
+  // Use Perplexity API (handles Takealot's bot blocking)
+  const product = await fetchProductViaPerplexity(rawUrl);
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch Takealot product');
-  }
-
-  const html = await response.text();
-  const parsed = parseTakealotHtml(html, rawUrl);
-  if (!parsed) {
-    throw new Error('Could not extract product details');
-  }
-
-  await kvAdapter.set(cacheKey, parsed, { ex: TAKEALOT_CACHE_TTL_SECONDS });
-  return parsed;
+  await kvAdapter.set(cacheKey, product, { ex: TAKEALOT_CACHE_TTL_SECONDS });
+  return product;
 }

@@ -4,6 +4,7 @@ import {
   isTakealotUrl,
   parseTakealotHtml,
   parseTakealotSearchHtml,
+  TakealotFetchError,
 } from '../../src/lib/integrations/takealot';
 
 describe('isTakealotUrl', () => {
@@ -87,5 +88,18 @@ describe('parseTakealotSearchHtml', () => {
 
     expect(results).toHaveLength(1);
     expect(results[0].url).toBe('https://www.takealot.com/blocks');
+  });
+});
+
+describe('TakealotFetchError', () => {
+  it('has correct error code', () => {
+    const error = new TakealotFetchError('rate_limited', 'Rate limit exceeded');
+    expect(error.code).toBe('rate_limited');
+    expect(error.message).toBe('Rate limit exceeded');
+  });
+
+  it('is instance of Error', () => {
+    const error = new TakealotFetchError('fetch_failed', 'Failed');
+    expect(error).toBeInstanceOf(Error);
   });
 });

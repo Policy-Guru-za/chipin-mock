@@ -11,7 +11,11 @@ import { CURATED_CAUSES, getCauseById } from '@/lib/dream-boards/causes';
 import { getDreamBoardDraft, updateDreamBoardDraft } from '@/lib/dream-boards/draft';
 import type { DreamBoardDraft } from '@/lib/dream-boards/draft';
 import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
-import { fetchTakealotProduct, isTakealotUrl } from '@/lib/integrations/takealot';
+import {
+  fetchTakealotProduct,
+  isTakealotUrl,
+  TakealotFetchError,
+} from '@/lib/integrations/takealot';
 import { TakealotGiftForm } from '@/components/forms/TakealotGiftForm';
 
 const takealotSchema = z.object({
@@ -109,7 +113,10 @@ async function saveTakealotGiftAction(formData: FormData) {
       },
     });
     redirect('/create/details');
-  } catch {
+  } catch (error) {
+    if (error instanceof TakealotFetchError) {
+      redirect(`/create/gift?error=${error.code}&type=takealot`);
+    }
     redirect('/create/gift?error=fetch_failed&type=takealot');
   }
 }

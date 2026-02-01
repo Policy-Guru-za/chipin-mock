@@ -34,11 +34,18 @@ type TakealotGiftFormProps = {
   error?: string;
 };
 
+const TAKEALOT_ERROR_MESSAGES: Record<string, string> = {
+  overflow: 'Please choose a charity overflow option.',
+  invalid_url: 'Please enter a valid Takealot link.',
+  not_configured: 'Product lookup is temporarily unavailable.',
+  rate_limited: 'Too many requests. Please try again later.',
+  parse_failed: 'Could not extract product details. Please try a different product.',
+  fetch_failed: 'We could not fetch that product. Please try another link.',
+};
+
 const getTakealotErrorMessage = (error?: string) => {
   if (!error) return null;
-  if (error === 'overflow') return 'Please choose a charity overflow option.';
-  if (error === 'fetch_failed') return 'We could not fetch that product. Please try another link.';
-  return 'Please enter a valid Takealot link.';
+  return TAKEALOT_ERROR_MESSAGES[error] ?? 'Please enter a valid Takealot link.';
 };
 
 const ErrorBanner = ({ message }: { message: string }) => (
@@ -205,7 +212,8 @@ export function TakealotGiftForm({
 
       if (!response.ok) {
         const payload = await response.json().catch(() => null);
-        setFetchError(payload?.error ?? 'Could not fetch product. Please check the URL.');
+        const errorCode = payload?.code ?? 'fetch_failed';
+        setFetchError(TAKEALOT_ERROR_MESSAGES[errorCode] ?? 'Could not fetch product.');
         return;
       }
 
