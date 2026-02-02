@@ -344,6 +344,20 @@ ALTER TABLE dream_boards ALTER COLUMN payout_method TYPE payout_method
   USING 'karri_card'::payout_method;
 DROP TYPE payout_method_old;
 
+-- Update payout_type enum (used in payouts table)
+ALTER TYPE payout_type RENAME TO payout_type_old;
+CREATE TYPE payout_type AS ENUM ('karri_card');
+ALTER TABLE payouts ALTER COLUMN type TYPE payout_type
+  USING 'karri_card'::payout_type;
+DROP TYPE payout_type_old;
+
+-- Update payout_item_type enum (remove 'overflow')
+ALTER TYPE payout_item_type RENAME TO payout_item_type_old;
+CREATE TYPE payout_item_type AS ENUM ('gift');
+ALTER TABLE payout_items ALTER COLUMN type TYPE payout_item_type
+  USING 'gift'::payout_item_type;
+DROP TYPE payout_item_type_old;
+
 -- Create Karri credit queue table
 CREATE TABLE karri_credit_queue (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -409,9 +423,10 @@ Execute these phases in order. Each phase must pass lint, typecheck, and tests b
 
 1. Create migration file: `drizzle/migrations/0008_chipin_simplification.sql`
 2. Update `src/lib/db/schema.ts` with new columns and modified enums.
-3. Run `drizzle:generate` to verify migration.
-4. Update `src/lib/db/seed.ts` to use new schema.
-5. Run lint, typecheck. Fix any errors.
+3. Also modify `payoutTypeEnum` and `payoutItemTypeEnum` to remove deprecated values.
+4. Run `drizzle:generate` to verify migration.
+5. Update `src/lib/db/seed.ts` to use new schema.
+6. Run lint, typecheck. Fix any errors.
 
 **Gate:** `pnpm lint && pnpm typecheck` must pass.
 
@@ -419,9 +434,10 @@ Execute these phases in order. Each phase must pass lint, typecheck, and tests b
 
 1. Delete files listed in FILES TO DELETE section.
 2. Remove imports of deleted files throughout codebase.
-3. Remove references to deleted functionality in AGENTS.md, docs/.
-4. Update `src/lib/health/checks.ts` to remove Takealot/GivenGain checks.
-5. Run lint, typecheck. Fix any errors.
+3. Clean up `src/components/forms/index.ts` to remove TakealotGiftForm export.
+4. Remove references to deleted functionality in AGENTS.md, docs/.
+5. Update `src/lib/health/checks.ts` to remove Takealot/GivenGain checks.
+6. Run lint, typecheck. Fix any errors.
 
 **Gate:** `pnpm lint && pnpm typecheck` must pass.
 
@@ -449,11 +465,12 @@ Execute these phases in order. Each phase must pass lint, typecheck, and tests b
 ### Phase 5: Refactor Create Flow
 
 1. Update `src/lib/dream-boards/schema.ts` with new validation.
-2. Update `src/app/(host)/create/gift/page.tsx` - replace Takealot with gift name + artwork generator.
-3. Update `src/app/(host)/create/details/page.tsx` - add Karri Card fields, WhatsApp field.
-4. Update `src/app/(host)/create/review/page.tsx` - show new fields.
-5. Update view models and form handlers.
-6. Run lint, typecheck, tests. Fix any errors.
+2. Update `src/lib/dream-boards/draft.ts` to handle new fields (giftName, giftImageUrl, giftImagePrompt, karriCardNumber, karriCardHolderName, hostWhatsAppNumber, partyDate).
+3. Update `src/app/(host)/create/gift/page.tsx` - replace Takealot with gift name + artwork generator.
+4. Update `src/app/(host)/create/details/page.tsx` - add Karri Card fields, WhatsApp field.
+5. Update `src/app/(host)/create/review/page.tsx` - show new fields.
+6. Update view models and form handlers.
+7. Run lint, typecheck, tests. Fix any errors.
 
 **Gate:** `pnpm lint && pnpm typecheck && pnpm test` must pass.
 
