@@ -10,6 +10,25 @@ import { enforceRateLimit } from './rate-limit';
 
 const MAGIC_LINK_EXPIRY_SECONDS = 60 * 60;
 const MAGIC_LINK_REUSE_WINDOW_SECONDS = 60 * 5;
+const parseBooleanFlag = (value: string | undefined) => {
+  if (!value) return false;
+  const normalized = value.trim().toLowerCase();
+  return normalized === 'true' || normalized === '1' || normalized === 'yes';
+};
+
+const isMagicLinkRateLimitDisabled = () =>
+  parseBooleanFlag(process.env.MAGIC_LINK_RATE_LIMIT_DISABLED);
+
+const parseRateLimitValue = (value: string | undefined, fallback: number) => {
+  const parsed = Number(value?.trim());
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+};
+
+const MAGIC_LINK_RATE_LIMITS = {
+  emailPerMinute: parseRateLimitValue(process.env.MAGIC_LINK_RATE_LIMIT_EMAIL_PER_MINUTE, 1),
+  emailPerHour: parseRateLimitValue(process.env.MAGIC_LINK_RATE_LIMIT_EMAIL_PER_HOUR, 5),
+  ipPerHour: parseRateLimitValue(process.env.MAGIC_LINK_RATE_LIMIT_IP_PER_HOUR, 10),
+};
 
 export type MagicLinkResult =
   | { ok: true }
@@ -45,8 +64,12 @@ async function checkMagicLinkRateLimit(
   emailHash: string,
   ipHash?: string
 ): Promise<MagicLinkResult | null> {
+  if (isMagicLinkRateLimitDisabled()) {
+    log('info', 'auth.magic_link_rate_limit_bypassed', { emailHash, ipHash });
+    return null;
+  }
   const emailMinute = await enforceRateLimit(`auth:magic:email:${emailHash}:1m`, {
-    limit: 1,
+    limit: MAGIC_LINK_RATE_LIMITS.emailPerMinute,
     windowSeconds: 60,
   });
   if (!emailMinute.allowed) {
@@ -54,7 +77,7 @@ async function checkMagicLinkRateLimit(
   }
 
   const emailHour = await enforceRateLimit(`auth:magic:email:${emailHash}:1h`, {
-    limit: 5,
+    limit: MAGIC_LINK_RATE_LIMITS.emailPerHour,
     windowSeconds: 60 * 60,
   });
   if (!emailHour.allowed) {
@@ -63,7 +86,7 @@ async function checkMagicLinkRateLimit(
 
   if (ipHash) {
     const ipHour = await enforceRateLimit(`auth:magic:ip:${ipHash}:1h`, {
-      limit: 10,
+      limit: MAGIC_LINK_RATE_LIMITS.ipPerHour,
       windowSeconds: 60 * 60,
     });
     if (!ipHour.allowed) {
@@ -80,6 +103,15 @@ export async function sendMagicLink(email: string, context?: MagicLinkContext) {
   const ipHash = context?.ip ? hashIdentifier(context.ip) : undefined;
 
   try {
+    log(
+      'info',
+      'auth.magic_link_rate_limit_flag',
+      {
+        raw: process.env.MAGIC_LINK_RATE_LIMIT_DISABLED ?? null,
+        disabled: isMagicLinkRateLimitDisabled(),
+      },
+      context?.requestId
+    );
     log('info', 'auth.magic_link_requested', { emailHash, ipHash }, context?.requestId);
     const rateLimit = await checkMagicLinkRateLimit(emailHash, ipHash);
     if (rateLimit) {
