@@ -18,13 +18,16 @@ type DashboardBoard = {
   slug: string;
   childName: string;
   childPhotoUrl: string;
-  giftType: 'takealot_product' | 'philanthropy';
+  giftType: 'takealot_product' | 'philanthropy' | null; // v2.0: nullable during migration
   giftData: unknown;
   overflowGiftData?: unknown | null;
   goalCents: number;
   status: string;
   raisedCents: number;
   contributionCount: number;
+  // v2.0 fields (optional during migration)
+  giftName?: string | null;
+  giftImageUrl?: string | null;
 };
 
 export type DashboardViewModel = {

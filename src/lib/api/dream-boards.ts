@@ -6,27 +6,33 @@ type DreamBoardApiRecord = {
   slug: string;
   childName: string;
   childPhotoUrl: string;
-  birthdayDate: Date | string;
-  giftType: 'takealot_product' | 'philanthropy';
+  birthdayDate: Date | string | null; // v2.0: nullable during migration
+  giftType: 'takealot_product' | 'philanthropy' | null; // v2.0: nullable during migration
   giftData: unknown;
-  payoutMethod: 'takealot_gift_card' | 'karri_card_topup' | 'philanthropy_donation';
+  payoutMethod: 'takealot_gift_card' | 'karri_card_topup' | 'philanthropy_donation' | 'karri_card';
   overflowGiftData: unknown | null;
   goalCents: number;
   raisedCents: number;
   message: string | null;
-  deadline: Date | string;
+  deadline: Date | string | null; // v2.0: nullable during migration
   status: string;
   contributionCount: number;
   createdAt: Date | string;
   updatedAt: Date | string;
+  // v2.0 fields (optional during migration)
+  partyDate?: Date | string | null;
+  giftName?: string | null;
+  giftImageUrl?: string | null;
 };
 
-const toDateOnly = (value: Date | string) => {
+const toDateOnly = (value: Date | string | null) => {
+  if (!value) return null;
   const date = value instanceof Date ? value : new Date(value);
   return date.toISOString().split('T')[0];
 };
 
-const toIsoString = (value: Date | string) => {
+const toIsoString = (value: Date | string | null) => {
+  if (!value) return null;
   const date = value instanceof Date ? value : new Date(value);
   return date.toISOString();
 };

@@ -26,12 +26,17 @@ export const dreamBoardStatusEnum = pgEnum('dream_board_status', [
   'cancelled',
 ]);
 
+// v2.0: giftTypeEnum deprecated - manual gift definition only
+// Kept for backward compatibility during migration
 export const giftTypeEnum = pgEnum('gift_type', ['takealot_product', 'philanthropy']);
 
+// v2.0: Karri Card is the sole payout method
+// NOTE: Keeping deprecated values for backward compatibility until Phase 2 cleanup
 export const payoutMethodEnum = pgEnum('payout_method', [
-  'takealot_gift_card',
-  'karri_card_topup',
-  'philanthropy_donation',
+  'karri_card', // v2.0: sole supported value
+  'takealot_gift_card', // @deprecated - remove in Phase 2
+  'karri_card_topup', // @deprecated - remove in Phase 2
+  'philanthropy_donation', // @deprecated - remove in Phase 2
 ]);
 
 export const paymentStatusEnum = pgEnum('payment_status', [
@@ -51,13 +56,21 @@ export const payoutStatusEnum = pgEnum('payout_status', [
   'failed',
 ]);
 
+// v2.0: Karri Card is the sole payout type
+// NOTE: Keeping deprecated values for backward compatibility until Phase 2 cleanup
 export const payoutTypeEnum = pgEnum('payout_type', [
-  'takealot_gift_card',
-  'philanthropy_donation',
-  'karri_card_topup',
+  'karri_card', // v2.0: sole supported value
+  'takealot_gift_card', // @deprecated - remove in Phase 2
+  'philanthropy_donation', // @deprecated - remove in Phase 2
+  'karri_card_topup', // @deprecated - remove in Phase 2
 ]);
 
-export const payoutItemTypeEnum = pgEnum('payout_item_type', ['gift', 'overflow']);
+// v2.0: Removed 'overflow' - no charity overflow in simplified model
+// NOTE: Keeping 'overflow' for backward compatibility until Phase 2 cleanup
+export const payoutItemTypeEnum = pgEnum('payout_item_type', [
+  'gift',
+  'overflow', // @deprecated - remove in Phase 2
+]);
 
 export const auditActorTypeEnum = pgEnum('audit_actor_type', ['admin', 'host', 'system']);
 
@@ -98,52 +111,58 @@ export const dreamBoards = pgTable(
       .notNull()
       .references(() => hosts.id, { onDelete: 'cascade' }),
     slug: varchar('slug', { length: 100 }).notNull().unique(),
+
+    // Child details
     childName: varchar('child_name', { length: 50 }).notNull(),
     childPhotoUrl: text('child_photo_url').notNull(),
-    birthdayDate: date('birthday_date').notNull(),
-    giftType: giftTypeEnum('gift_type').notNull(),
-    giftData: jsonb('gift_data').notNull(),
+    partyDate: date('party_date'), // v2.0: serves as pot close date (nullable during migration)
+
+    // v2.0: Manual gift definition with AI artwork
+    giftName: varchar('gift_name', { length: 200 }), // nullable during migration
+    giftImageUrl: text('gift_image_url'), // nullable during migration
+    giftImagePrompt: text('gift_image_prompt'),
     goalCents: integer('goal_cents').notNull(),
-    payoutMethod: payoutMethodEnum('payout_method').notNull(),
-    overflowGiftData: jsonb('overflow_gift_data'),
-    karriCardNumber: text('karri_card_number'),
-    message: text('message'),
-    deadline: timestamp('deadline', { withTimezone: true }).notNull(),
-    status: dreamBoardStatusEnum('status').notNull().default('draft'),
+
+    // v2.0: Karri Card is sole payout method
+    payoutMethod: payoutMethodEnum('payout_method').notNull().default('karri_card'),
+    karriCardNumber: varchar('karri_card_number', { length: 20 }), // nullable during migration
+    karriCardHolderName: varchar('karri_card_holder_name', { length: 100 }), // nullable during migration
     payoutEmail: varchar('payout_email', { length: 255 }).notNull(),
+
+    // v2.0: WhatsApp notifications
+    hostWhatsAppNumber: varchar('host_whatsapp_number', { length: 20 }), // nullable during migration
+
+    // Content
+    message: text('message'),
+
+    // Status
+    status: dreamBoardStatusEnum('status').notNull().default('draft'),
+
+    // Timestamps
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+
+    // Deprecated columns (kept for migration compatibility)
+    /** @deprecated Use partyDate instead */
+    birthdayDate: date('birthday_date'),
+    /** @deprecated Use partyDate instead */
+    deadline: timestamp('deadline', { withTimezone: true }),
+    /** @deprecated Removed in v2.0 */
+    giftType: giftTypeEnum('gift_type'),
+    /** @deprecated Use giftName + giftImageUrl instead */
+    giftData: jsonb('gift_data'),
+    /** @deprecated Removed in v2.0 - no charity overflow */
+    overflowGiftData: jsonb('overflow_gift_data'),
   },
   (table) => ({
     hostIdx: index('idx_dream_boards_host').on(table.hostId),
     partnerIdx: index('idx_dream_boards_partner').on(table.partnerId),
     slugIdx: index('idx_dream_boards_slug').on(table.slug),
     statusIdx: index('idx_dream_boards_status').on(table.status),
-    deadlineIdx: index('idx_dream_boards_deadline')
-      .on(table.deadline)
+    partyDateIdx: index('idx_dream_boards_party_date')
+      .on(table.partyDate)
       .where(sql`${table.status} = 'active'`),
-    validGoal: check('valid_goal', sql`${table.goalCents} >= 2000`),
-    validDeadline: check('valid_deadline', sql`${table.deadline} > ${table.createdAt}`),
-    payoutMethodValid: check(
-      'payout_method_valid',
-      sql`(
-        (${table.giftType} = 'takealot_product' AND ${table.payoutMethod} IN ('takealot_gift_card', 'karri_card_topup'))
-        OR
-        (${table.giftType} = 'philanthropy' AND ${table.payoutMethod} = 'philanthropy_donation')
-      )`
-    ),
-    karriCardRequired: check(
-      'karri_card_required',
-      sql`(${table.payoutMethod} != 'karri_card_topup' OR ${table.karriCardNumber} IS NOT NULL)`
-    ),
-    overflowRequired: check(
-      'overflow_required',
-      sql`(
-        (${table.giftType} = 'takealot_product' AND ${table.overflowGiftData} IS NOT NULL)
-        OR
-        (${table.giftType} = 'philanthropy')
-      )`
-    ),
+    validGoal: check('valid_goal', sql`${table.goalCents} >= 2000`), // R20 minimum (kept for backward compat)
   })
 );
 
@@ -344,5 +363,30 @@ export const webhookEvents = pgTable(
       .on(table.status)
       .where(sql`${table.status} = 'pending'`),
     apiKeyIdx: index('idx_webhook_events_api_key').on(table.apiKeyId),
+  })
+);
+
+// v2.0: Karri Credit Queue for batch processing
+export const karriCreditQueue = pgTable(
+  'karri_credit_queue',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    dreamBoardId: uuid('dream_board_id')
+      .notNull()
+      .references(() => dreamBoards.id),
+    karriCardNumber: varchar('karri_card_number', { length: 20 }).notNull(),
+    amountCents: integer('amount_cents').notNull(),
+    reference: varchar('reference', { length: 100 }).notNull().unique(),
+    status: varchar('status', { length: 20 }).notNull().default('pending'),
+    attempts: integer('attempts').notNull().default(0),
+    lastAttemptAt: timestamp('last_attempt_at', { withTimezone: true }),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    errorMessage: text('error_message'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    statusIdx: index('idx_karri_queue_status').on(table.status),
+    createdIdx: index('idx_karri_queue_created').on(table.createdAt),
+    dreamBoardIdx: index('idx_karri_queue_dream_board').on(table.dreamBoardId),
   })
 );

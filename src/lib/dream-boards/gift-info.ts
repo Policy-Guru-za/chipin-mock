@@ -10,9 +10,12 @@ export type PhilanthropyGiftData = {
 };
 
 type GiftInfoParams = {
-  giftType: 'takealot_product' | 'philanthropy';
+  giftType: 'takealot_product' | 'philanthropy' | null; // v2.0: nullable during migration
   giftData: unknown;
   takealotSubtitle?: string;
+  // v2.0 fields
+  giftName?: string | null;
+  giftImageUrl?: string | null;
 };
 
 const resolveTakealotGift = (params: GiftInfoParams) =>
@@ -39,6 +42,18 @@ const resolveGiftImage = (
 ) => takealotGift?.productImage ?? philanthropyGift?.causeImage ?? '';
 
 export const getGiftInfo = (params: GiftInfoParams) => {
+  // v2.0: If giftName is available, use the new simplified model
+  if (params.giftName) {
+    return {
+      takealotGift: null,
+      philanthropyGift: null,
+      giftTitle: params.giftName,
+      giftSubtitle: 'Dream gift',
+      giftImage: params.giftImageUrl ?? '',
+    };
+  }
+
+  // Legacy: Use old giftType-based logic
   const takealotGift = resolveTakealotGift(params);
   const philanthropyGift = resolvePhilanthropyGift(params);
 

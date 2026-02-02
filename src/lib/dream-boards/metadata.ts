@@ -13,11 +13,14 @@ export type DreamBoardMetadataSource = {
   slug: string;
   childName: string;
   childPhotoUrl: string;
-  giftType: 'takealot_product' | 'philanthropy';
+  giftType: 'takealot_product' | 'philanthropy' | null; // v2.0: nullable during migration
   giftData: unknown;
   overflowGiftData: unknown | null;
   goalCents: number;
   raisedCents: number;
+  // v2.0 fields (optional during migration)
+  giftName?: string | null;
+  giftImageUrl?: string | null;
 };
 
 type MetadataOptions = {
@@ -41,6 +44,11 @@ const getMetadataDescription = (
 ) => {
   if (showCharityOverflow && overflowData) {
     return `Gift funded. Contributions now support ${overflowData.causeName}: ${overflowData.impactDescription}.`;
+  }
+
+  // v2.0: Use giftName if available
+  if (board.giftName) {
+    return `Chip in for ${board.childName}'s ${board.giftName}.`;
   }
 
   if (board.giftType === 'takealot_product') {

@@ -73,7 +73,7 @@ type PayoutStatus = PayoutRecord['status'];
 type PayoutType = PayoutRecord['type'];
 
 const getExpectedPayoutTypes = (board: {
-  giftType: string;
+  giftType: string | null; // v2.0: nullable during migration
   payoutMethod: PayoutType;
   raisedCents: number;
   goalCents: number;

@@ -32,7 +32,7 @@ const getRecipientDataForGift = (params: {
   payoutEmail: string;
   childName: string;
   payoutMethod: string;
-  giftType: string;
+  giftType: string | null; // v2.0: nullable during migration
   giftData?: Record<string, unknown> | null;
   karriCardNumber?: string | null;
 }) => ({
@@ -77,7 +77,7 @@ const ensureBoardReady = (status: string) => {
 };
 
 const getAdjustedCalculation = (
-  giftType: string,
+  giftType: string | null, // v2.0: nullable during migration
   calculation: ReturnType<typeof calculatePayoutTotals>
 ) =>
   giftType === 'philanthropy'

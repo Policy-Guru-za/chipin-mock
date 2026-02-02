@@ -236,7 +236,7 @@ export const buildGuestViewModel = (
     displayImage,
     isClosed: board.status !== 'active' && board.status !== 'funded',
     percentage: Math.min(100, Math.round((board.raisedCents / board.goalCents) * 100)),
-    daysLeft: getDaysLeftFrom(new Date(board.deadline), now),
+    daysLeft: board.deadline ? getDaysLeftFrom(new Date(board.deadline), now) : 0,
     contributionCount: board.contributionCount,
     raisedCents: board.raisedCents,
     goalCents: board.goalCents,

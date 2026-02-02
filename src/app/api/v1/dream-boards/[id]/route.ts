@@ -57,7 +57,7 @@ const buildValidationError = (message: string, requestId: string, headers: Heade
 
 const resolveDeadlineUpdate = (params: {
   value: string;
-  currentDeadline: Date;
+  currentDeadline: Date | null; // v2.0: nullable during migration
   requestId: string;
   headers: HeadersInit;
 }) => {
@@ -80,7 +80,7 @@ const resolveDeadlineUpdate = (params: {
     };
   }
 
-  if (deadline.getTime() <= params.currentDeadline.getTime()) {
+  if (params.currentDeadline && deadline.getTime() <= params.currentDeadline.getTime()) {
     return {
       ok: false as const,
       response: buildConflict('Deadline can only be extended', params.requestId, params.headers),
@@ -137,7 +137,7 @@ const buildUpdatePayload = (params: {
   if (params.data.deadline) {
     const deadlineResult = resolveDeadlineUpdate({
       value: params.data.deadline,
-      currentDeadline: new Date(params.board.deadline),
+      currentDeadline: params.board.deadline ? new Date(params.board.deadline) : null,
       requestId: params.requestId,
       headers: params.headers,
     });

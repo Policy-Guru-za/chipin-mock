@@ -1,7 +1,7 @@
 export type OverflowStateInput = {
   raisedCents: number;
   goalCents: number;
-  giftType: 'takealot_product' | 'philanthropy';
+  giftType: 'takealot_product' | 'philanthropy' | null; // v2.0: nullable during migration
   overflowGiftData: unknown | null;
 };
 

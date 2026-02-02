@@ -1,6 +1,5 @@
 import { createHash } from 'crypto';
 
-import { isDemoMode } from '@/lib/demo';
 import { db } from './index';
 import {
   apiKeys,
@@ -14,13 +13,6 @@ import {
   webhookEvents,
 } from './schema';
 import { DEFAULT_PARTNER_ID, DEFAULT_PARTNER_NAME } from './partners';
-
-const assertDemoSingleGift = (giftData: unknown) => {
-  if (!isDemoMode()) return;
-  if (!giftData || typeof giftData !== 'object' || Array.isArray(giftData)) {
-    throw new Error('DEMO_MODE seed requires a single gift object.');
-  }
-};
 
 export async function seedDatabase() {
   await db.delete(webhookEvents);
@@ -46,19 +38,10 @@ export async function seedDatabase() {
     })
     .returning({ id: hosts.id });
 
-  const futureBirthday = new Date();
-  futureBirthday.setMonth(futureBirthday.getMonth() + 3);
-  const birthdayDate = futureBirthday.toISOString().split('T')[0];
-
-  const giftData = {
-    type: 'takealot_product',
-    productUrl: 'https://www.takealot.com/demo',
-    productName: 'Wooden Train Set',
-    productImage: 'https://images.unsplash.com/photo-1509223197845-458d87318791',
-    productPrice: 35000,
-  } as const;
-
-  assertDemoSingleGift(giftData);
+  // v2.0: Party date serves as pot close date
+  const futurePartyDate = new Date();
+  futurePartyDate.setMonth(futurePartyDate.getMonth() + 1);
+  const partyDate = futurePartyDate.toISOString().split('T')[0];
 
   const [dreamBoard] = await db
     .insert(dreamBoards)
@@ -68,18 +51,18 @@ export async function seedDatabase() {
       slug: 'maya-birthday-demo',
       childName: 'Maya',
       childPhotoUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1',
-      birthdayDate,
-      giftType: 'takealot_product',
-      giftData,
+      partyDate,
+      // v2.0: Manual gift definition with AI artwork
+      giftName: 'Wooden Train Set',
+      giftImageUrl: 'https://images.unsplash.com/photo-1509223197845-458d87318791',
+      giftImagePrompt: 'A whimsical watercolor illustration of a wooden train set',
       goalCents: 35000,
-      payoutMethod: 'takealot_gift_card',
-      overflowGiftData: {
-        causeId: 'charity-hope-01',
-        causeName: 'Hope SA',
-        impactDescription: 'Provide school meals for 10 kids',
-      },
-      message: 'Let’s make Maya’s birthday magical.',
-      deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+      // v2.0: Karri Card is sole payout method
+      payoutMethod: 'karri_card',
+      karriCardNumber: '5234123456781234',
+      karriCardHolderName: 'Maya Mahlangu',
+      hostWhatsAppNumber: '+27821234567',
+      message: "Let's make Maya's birthday magical.",
       status: 'active',
       payoutEmail: 'lerato@chipin.co.za',
     })
@@ -97,18 +80,20 @@ export async function seedDatabase() {
     paymentStatus: 'completed',
   });
 
+  // v2.0: Karri Card is sole payout type
   const [payout] = await db
     .insert(payouts)
     .values({
       partnerId: DEFAULT_PARTNER_ID,
       dreamBoardId: dreamBoard.id,
-      type: 'takealot_gift_card',
+      type: 'karri_card',
       grossCents: 5000,
       feeCents: 300,
       netCents: 4700,
       recipientData: {
         email: 'lerato@chipin.co.za',
-        productUrl: 'https://www.takealot.com/demo',
+        karriCardNumber: '5234123456781234',
+        karriCardHolderName: 'Maya Mahlangu',
       },
       status: 'pending',
     })

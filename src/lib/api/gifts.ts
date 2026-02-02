@@ -4,7 +4,7 @@ import {
   takealotGiftSchema,
 } from '@/lib/dream-boards/schema';
 
-export const serializeGiftData = (params: { giftType: string; giftData: unknown }) => {
+export const serializeGiftData = (params: { giftType: string | null; giftData: unknown }) => {
   if (params.giftType === 'takealot_product') {
     const parsed = takealotGiftSchema.safeParse(params.giftData);
     if (!parsed.success) return null;
