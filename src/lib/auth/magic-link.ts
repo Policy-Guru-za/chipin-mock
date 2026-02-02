@@ -60,6 +60,7 @@ export async function sendMagicLink(email: string, context?: MagicLinkContext) {
   const ipHash = context?.ip ? hashIdentifier(context.ip) : undefined;
 
   try {
+    log('info', 'auth.magic_link_requested', { emailHash, ipHash }, context?.requestId);
     const rateLimit = await checkMagicLinkRateLimit(emailHash, ipHash);
     if (rateLimit) {
       log('warn', 'auth.magic_link_rate_limited', { emailHash, ipHash }, context?.requestId);
@@ -81,6 +82,7 @@ export async function sendMagicLink(email: string, context?: MagicLinkContext) {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
     const magicLink = `${baseUrl}/auth/verify?token=${token}`;
 
+    log('info', 'auth.magic_link_sending', { emailHash }, context?.requestId);
     await sendEmail({
       to: normalizedEmail,
       subject: 'Your ChipIn magic link ✨',
