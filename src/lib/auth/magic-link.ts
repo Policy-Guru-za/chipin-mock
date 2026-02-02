@@ -9,6 +9,7 @@ import { log } from '@/lib/observability/logger';
 import { enforceRateLimit } from './rate-limit';
 
 const MAGIC_LINK_EXPIRY_SECONDS = 60 * 60;
+const MAGIC_LINK_REUSE_WINDOW_SECONDS = 60 * 5;
 
 export type MagicLinkResult =
   | { ok: true }
@@ -19,7 +20,26 @@ type MagicLinkContext = {
   requestId?: string;
 };
 
+type MagicLinkRecord = {
+  email: string;
+  usedAt: number | null;
+};
+
 const hashIdentifier = (value: string) => createHash('sha256').update(value).digest('hex');
+
+const normalizeMagicLinkRecord = (value: unknown): MagicLinkRecord | null => {
+  if (!value) return null;
+  if (typeof value === 'string') {
+    return { email: value, usedAt: null };
+  }
+  if (typeof value === 'object' && value !== null) {
+    const record = value as Partial<MagicLinkRecord>;
+    if (typeof record.email === 'string') {
+      return { email: record.email, usedAt: record.usedAt ?? null };
+    }
+  }
+  return null;
+};
 
 async function checkMagicLinkRateLimit(
   emailHash: string,
@@ -77,7 +97,8 @@ export async function sendMagicLink(email: string, context?: MagicLinkContext) {
     const token = randomBytes(32).toString('hex');
     const tokenHash = hashIdentifier(token);
 
-    await kvAdapter.set(`magic:${tokenHash}`, normalizedEmail, { ex: MAGIC_LINK_EXPIRY_SECONDS });
+    const record: MagicLinkRecord = { email: normalizedEmail, usedAt: null };
+    await kvAdapter.set(`magic:${tokenHash}`, record, { ex: MAGIC_LINK_EXPIRY_SECONDS });
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
     const magicLink = `${baseUrl}/auth/verify?token=${token}`;
@@ -110,12 +131,31 @@ export async function sendMagicLink(email: string, context?: MagicLinkContext) {
 
 export async function verifyMagicLink(token: string) {
   const tokenHash = createHash('sha256').update(token).digest('hex');
-  const email = await kvAdapter.get<string>(`magic:${tokenHash}`);
-
-  if (!email) {
+  const stored = await kvAdapter.get<MagicLinkRecord | string>(`magic:${tokenHash}`);
+  const record = normalizeMagicLinkRecord(stored);
+  if (!record) {
     return null;
   }
 
-  await kvAdapter.del(`magic:${tokenHash}`);
-  return email;
+  if (record.usedAt) {
+    const elapsedSeconds = (Date.now() - record.usedAt) / 1000;
+    if (elapsedSeconds > MAGIC_LINK_REUSE_WINDOW_SECONDS) {
+      await kvAdapter.del(`magic:${tokenHash}`);
+      return null;
+    }
+  }
+
+  const ttl = await kvAdapter.ttl(`magic:${tokenHash}`);
+  if (ttl === -2) {
+    return null;
+  }
+
+  const expiresIn = ttl > 0 ? ttl : MAGIC_LINK_EXPIRY_SECONDS;
+  await kvAdapter.set(
+    `magic:${tokenHash}`,
+    { ...record, usedAt: Date.now() },
+    { ex: expiresIn }
+  );
+
+  return record.email;
 }
