@@ -2,15 +2,13 @@ import { createHash, randomBytes } from 'crypto';
 
 import * as Sentry from '@sentry/nextjs';
 
+import { isMockSentry } from '@/lib/config/feature-flags';
 import { kvAdapter } from '@/lib/demo/kv-adapter';
-import { isDemoMode } from '@/lib/demo';
 import { sendEmail } from '@/lib/integrations/email';
 import { log } from '@/lib/observability/logger';
 import { enforceRateLimit } from './rate-limit';
 
 const MAGIC_LINK_EXPIRY_SECONDS = 60 * 60;
-const DEMO_EMAIL = 'sarah@demo.chipin.co.za';
-
 
 export type MagicLinkResult =
   | { ok: true }
@@ -57,11 +55,6 @@ async function checkMagicLinkRateLimit(
 }
 
 export async function sendMagicLink(email: string, context?: MagicLinkContext) {
-  if (isDemoMode()) {
-    console.log('DEMO_MODE: magic link bypassed');
-    return { ok: true } as const;
-  }
-
   const normalizedEmail = email.trim().toLowerCase();
   const emailHash = hashIdentifier(normalizedEmail);
   const ipHash = context?.ip ? hashIdentifier(context.ip) : undefined;
@@ -70,7 +63,7 @@ export async function sendMagicLink(email: string, context?: MagicLinkContext) {
     const rateLimit = await checkMagicLinkRateLimit(emailHash, ipHash);
     if (rateLimit) {
       log('warn', 'auth.magic_link_rate_limited', { emailHash, ipHash }, context?.requestId);
-      if (!isDemoMode()) {
+      if (!isMockSentry()) {
         Sentry.captureMessage('auth.magic_link_rate_limited', {
           level: 'warning',
           tags: { area: 'auth' },
@@ -103,7 +96,7 @@ export async function sendMagicLink(email: string, context?: MagicLinkContext) {
     return { ok: true } as const;
   } catch (error) {
     log('error', 'auth.magic_link_failed', { emailHash }, context?.requestId);
-    if (!isDemoMode()) {
+    if (!isMockSentry()) {
       Sentry.captureException(error, {
         tags: { area: 'auth', action: 'magic_link' },
         extra: { emailHash, ipHash },
@@ -114,11 +107,6 @@ export async function sendMagicLink(email: string, context?: MagicLinkContext) {
 }
 
 export async function verifyMagicLink(token: string) {
-  if (isDemoMode()) {
-    console.log('DEMO_MODE: magic link verification bypassed');
-    return DEMO_EMAIL;
-  }
-
   const tokenHash = createHash('sha256').update(token).digest('hex');
   const email = await kvAdapter.get<string>(`magic:${tokenHash}`);
 

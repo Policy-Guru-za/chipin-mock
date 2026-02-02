@@ -67,6 +67,13 @@
 |----------|--------|-------------|
 | [`docs/Platform-Spec-Docs/KARRI.md`](./docs/Platform-Spec-Docs/KARRI.md) | P0 - Core | Karri Card payout (sole payout method) |
 
+### Implementation Docs
+
+| Document | Description |
+| --- | --- |
+| [`docs/implementation-docs/SANDBOX_MODE_IMPLEMENTATION.md`](./docs/implementation-docs/SANDBOX_MODE_IMPLEMENTATION.md) | Sandbox mode feature flag spec and rollout plan. |
+| [`docs/MIGRATION.md`](./docs/MIGRATION.md) | Migration guide for `DEMO_MODE` → `MOCK_*` flags. |
+
 ---
 
 ## Tech Stack Summary

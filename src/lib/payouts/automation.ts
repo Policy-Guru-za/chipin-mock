@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/nextjs';
 import { eq } from 'drizzle-orm';
 
 import { recordAuditEvent, type AuditActor } from '@/lib/audit';
-import { isDemoMode } from '@/lib/demo';
+import { isMockSentry } from '@/lib/config/feature-flags';
 import { db } from '@/lib/db';
 import { payouts } from '@/lib/db/schema';
 import { processKarriCreditByReference } from '@/lib/integrations/karri-batch';
@@ -149,7 +149,7 @@ export async function executeAutomatedPayout(params: {
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Automation failed';
     log('error', 'payout_automation_failed', { payoutId: payout.id, message });
-    if (!isDemoMode()) {
+    if (!isMockSentry()) {
       Sentry.captureException(error);
     }
     await failPayout({ payoutId: payout.id, errorMessage: message, actor: params.actor });

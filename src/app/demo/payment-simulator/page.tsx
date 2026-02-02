@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 
-import { isDemoMode } from '@/lib/demo';
+import { isPaymentSimulatorEnabled } from '@/lib/config/feature-flags';
 
 import { PaymentSimulatorClient } from './PaymentSimulatorClient';
 
@@ -16,7 +16,7 @@ const normalizeReturnTo = (value: string | undefined) =>
   value && value.startsWith('/') ? value : '/';
 
 export default function PaymentSimulatorPage({ searchParams }: PaymentSimulatorPageProps) {
-  if (!isDemoMode()) {
+  if (!isPaymentSimulatorEnabled()) {
     notFound();
   }
 
@@ -26,9 +26,9 @@ export default function PaymentSimulatorPage({ searchParams }: PaymentSimulatorP
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-6 rounded-3xl border border-border bg-white p-8 shadow-soft">
       <div className="space-y-2">
-        <h1 className="text-2xl font-semibold text-text">Demo payment simulator</h1>
+        <h1 className="text-2xl font-semibold text-text">Sandbox payment simulator</h1>
         <p className="text-sm text-text-muted">
-          This is a demo-only flow. No external payment provider is contacted.
+          This is a sandbox flow. No external payment provider is contacted.
         </p>
       </div>
 

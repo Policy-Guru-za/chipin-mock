@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-import { isDemoMode } from '@/lib/demo';
+import { isMockPayments } from '@/lib/config/feature-flags';
 import { kvAdapter } from '@/lib/demo/kv-adapter';
 import { Webhook } from 'svix';
 
@@ -48,7 +48,7 @@ export const isOzowConfigured = () => {
 const tokenCacheKey = (scope: string) => `ozow:token:${scope}`;
 
 export const getOzowAccessToken = async (scope: string) => {
-  if (isDemoMode()) {
+  if (isMockPayments()) {
     const cacheKey = tokenCacheKey(scope);
     const cached = await kvAdapter.get<string>(cacheKey);
     if (cached) return cached;
@@ -95,7 +95,7 @@ export const getOzowAccessToken = async (scope: string) => {
 };
 
 export const createOzowPayment = async (params: OzowPaymentParams): Promise<OzowPayment> => {
-  if (isDemoMode()) {
+  if (isMockPayments()) {
     return {
       redirectUrl: params.returnUrl,
       providerReference: `DEMO-${params.reference}`,
@@ -234,7 +234,7 @@ export const listOzowTransactions = async (params: {
   limit?: number;
   offset?: number;
 }) => {
-  if (isDemoMode()) {
+  if (isMockPayments()) {
     return [];
   }
 

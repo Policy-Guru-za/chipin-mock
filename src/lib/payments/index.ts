@@ -1,4 +1,4 @@
-import { isDemoMode } from '@/lib/demo';
+import { isMockPayments } from '@/lib/config/feature-flags';
 
 import { createOzowPayment, isOzowConfigured } from './ozow';
 import { createPayfastPayment } from './payfast';
@@ -75,7 +75,7 @@ const isPayfastConfigured = () =>
   Boolean(process.env.PAYFAST_MERCHANT_ID && process.env.PAYFAST_MERCHANT_KEY);
 
 export const isPaymentProviderAvailable = (provider: PaymentProvider) => {
-  if (isDemoMode()) {
+  if (isMockPayments()) {
     return true;
   }
 
@@ -98,7 +98,7 @@ export const createPaymentIntent = async (
   provider: PaymentProvider,
   params: CreatePaymentParams
 ): Promise<PaymentIntent> => {
-  if (isDemoMode()) {
+  if (isMockPayments()) {
     return {
       provider,
       mode: 'redirect',

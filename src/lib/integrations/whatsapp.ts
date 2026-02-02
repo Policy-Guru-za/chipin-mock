@@ -1,4 +1,3 @@
-import { isDemoMode } from '@/lib/demo';
 import { log } from '@/lib/observability/logger';
 import { SA_MOBILE_REGEX } from '@/lib/dream-boards/validation';
 
@@ -34,15 +33,6 @@ const sendTemplateMessage = async (params: {
   const normalized = normalizePhoneNumber(params.phoneNumber);
   if (!normalized) {
     log('warn', 'whatsapp.invalid_number', { phoneNumber: params.phoneNumber });
-    return;
-  }
-
-  if (isDemoMode()) {
-    log('info', 'whatsapp.demo_suppressed', {
-      template: params.template,
-      to: normalized,
-      bodyParams: params.bodyParams,
-    });
     return;
   }
 

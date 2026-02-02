@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { isDemoMode } from '@/lib/demo';
+import { isMockPaymentWebhooks } from '@/lib/config/feature-flags';
 import {
   extractSnapScanReference,
   mapSnapScanStatus,
@@ -52,6 +52,9 @@ const rateLimitWebhook = async (context: WebhookContext) => {
 };
 
 const validateSignature = (rawBody: string, authHeader: string | null, context: WebhookContext) => {
+  if (isMockPaymentWebhooks()) {
+    return null;
+  }
   if (!verifySnapScanSignature(rawBody, authHeader)) {
     log('warn', 'payments.snapscan_invalid_signature', undefined, context.requestId);
     return NextResponse.json({ error: 'invalid_signature' }, { status: 400 });
@@ -129,10 +132,6 @@ const validateContributionAmount = (
 };
 
 export async function POST(request: NextRequest) {
-  if (isDemoMode()) {
-    return NextResponse.json({ received: true, demo: true }, { status: 200 });
-  }
-
   const rawBody = await request.text();
   const context = getWebhookContext(request);
 

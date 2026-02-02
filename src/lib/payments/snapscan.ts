@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-import { isDemoMode } from '@/lib/demo';
+import { isMockPayments } from '@/lib/config/feature-flags';
 
 type SnapScanConfig = {
   snapCode: string;
@@ -164,7 +164,7 @@ export const listSnapScanPayments = async (params: {
   page?: number;
   perPage?: number;
 }) => {
-  if (isDemoMode()) {
+  if (isMockPayments()) {
     return [];
   }
 

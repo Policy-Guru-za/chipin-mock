@@ -4,7 +4,7 @@ import {
   listContributionsForReconciliation,
   listContributionsForLongTailReconciliation,
 } from '@/lib/db/queries';
-import { isDemoMode } from '@/lib/demo';
+import { isMockPayments } from '@/lib/config/feature-flags';
 import { log } from '@/lib/observability/logger';
 import { getLongTailStart, getReconciliationWindow } from '@/lib/payments/reconciliation';
 import {
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     return jsonInternalError({ code: 'unauthorized', status: 401 });
   }
 
-  if (isDemoMode()) {
+  if (isMockPayments()) {
     const now = new Date();
     const { lookbackStart, cutoff } = getReconciliationWindow(now);
     const longTailStart = getLongTailStart(now);

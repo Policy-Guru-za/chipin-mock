@@ -31,13 +31,13 @@ export function PaymentSimulatorClient({ contributionId, returnTo }: PaymentSimu
 
       if (!response.ok) {
         const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-        setError(payload?.error ?? 'Failed to complete demo payment.');
+        setError(payload?.error ?? 'Failed to complete sandbox payment.');
         return;
       }
 
       router.push(returnTo);
     } catch {
-      setError('Failed to complete demo payment.');
+      setError('Failed to complete sandbox payment.');
     } finally {
       setIsSubmitting(false);
     }

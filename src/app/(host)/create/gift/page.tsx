@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
@@ -8,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { requireSession } from '@/lib/auth/session';
-import { isDemoMode } from '@/lib/demo';
 import { getDreamBoardDraft, updateDreamBoardDraft } from '@/lib/dream-boards/draft';
 import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
 
@@ -53,10 +51,6 @@ async function saveManualGiftAction(formData: FormData) {
   if (!draft?.childPhotoUrl) {
     redirect('/create/child');
   }
-  if (isDemoMode() && draft.giftImageUrl) {
-    redirect('/create/details');
-  }
-
   const giftName = formData.get('giftName');
   const giftDescription = formData.get('giftDescription');
   const giftImageUrl = formData.get('giftImageUrl');

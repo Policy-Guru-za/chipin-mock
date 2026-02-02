@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { isDemoMode } from '@/lib/demo';
+import { isMockPaymentWebhooks } from '@/lib/config/feature-flags';
 import {
   extractOzowReference,
   mapOzowStatus,
@@ -23,11 +23,15 @@ import {
   buildDreamBoardWebhookPayload,
 } from '@/lib/webhooks/payloads';
 
-export async function POST(request: NextRequest) {
-  if (isDemoMode()) {
-    return NextResponse.json({ received: true, demo: true }, { status: 200 });
+const parseOzowPayload = (rawBody: string) => {
+  try {
+    return JSON.parse(rawBody) as Record<string, unknown>;
+  } catch {
+    return null;
   }
+};
 
+export async function POST(request: NextRequest) {
   const rawBody = await request.text();
   const requestId = request.headers.get('x-request-id') ?? undefined;
   const ip = getClientIp(request);
@@ -45,10 +49,16 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const payload = verifyOzowWebhook(rawBody, request.headers);
+  const payload = isMockPaymentWebhooks()
+    ? parseOzowPayload(rawBody)
+    : verifyOzowWebhook(rawBody, request.headers);
   if (!payload) {
-    log('warn', 'payments.ozow_invalid_signature', undefined, requestId);
-    return NextResponse.json({ error: 'invalid_signature' }, { status: 400 });
+    const error = isMockPaymentWebhooks() ? 'invalid_payload' : 'invalid_signature';
+    const message = isMockPaymentWebhooks()
+      ? 'payments.ozow_invalid_payload'
+      : 'payments.ozow_invalid_signature';
+    log('warn', message, undefined, requestId);
+    return NextResponse.json({ error }, { status: 400 });
   }
 
   const timestampHeader = request.headers.get('svix-timestamp');

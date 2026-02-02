@@ -19,7 +19,6 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:seed": "tsx scripts/seed.ts",
-    "db:seed:demo": "tsx scripts/seed-demo.ts",
     "drizzle:generate": "drizzle-kit generate",
     "drizzle:push": "drizzle-kit push",
     "prepare": "husky"

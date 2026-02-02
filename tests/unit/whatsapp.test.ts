@@ -1,14 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const demoMocks = vi.hoisted(() => ({
-  isDemoMode: vi.fn(),
-}));
-
 const loggerMocks = vi.hoisted(() => ({
   log: vi.fn(),
 }));
 
-vi.mock('@/lib/demo', () => demoMocks);
 vi.mock('@/lib/observability/logger', () => loggerMocks);
 
 import { sendDreamBoardLink } from '@/lib/integrations/whatsapp';
@@ -20,7 +15,6 @@ const originalEnv = {
 };
 
 beforeEach(() => {
-  demoMocks.isDemoMode.mockReturnValue(false);
   process.env.WHATSAPP_BUSINESS_API_URL = 'https://graph.facebook.test/v1';
   process.env.WHATSAPP_BUSINESS_API_TOKEN = 'token';
   process.env.WHATSAPP_PHONE_NUMBER_ID = '123';

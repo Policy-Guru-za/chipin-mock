@@ -1,4 +1,4 @@
-import { isDemoMode } from '@/lib/demo';
+import { isMockKarri } from '@/lib/config/feature-flags';
 import { buildDemoToken } from '@/lib/demo/tokens';
 
 type KarriConfig = {
@@ -53,7 +53,7 @@ const parseKarriVerification = (data: Record<string, unknown>): KarriCardVerific
 };
 
 export async function verifyKarriCard(cardNumber: string): Promise<KarriCardVerificationResult> {
-  if (isDemoMode()) {
+  if (isMockKarri()) {
     return {
       valid: true,
       cardholderFirstName: 'Demo',
@@ -83,7 +83,7 @@ export async function verifyKarriCard(cardNumber: string): Promise<KarriCardVeri
 }
 
 export async function topUpKarriCard(params: KarriTopUpParams): Promise<KarriTopUpResult> {
-  if (isDemoMode()) {
+  if (isMockKarri()) {
     const token = buildDemoToken(params.reference);
     return {
       transactionId: `DEMO-KARRI-${token}`,

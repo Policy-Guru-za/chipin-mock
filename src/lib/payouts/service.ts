@@ -3,7 +3,7 @@ import { eq, sql } from 'drizzle-orm';
 
 import { recordAuditEvent, type AuditActor } from '@/lib/audit';
 import { LEGACY_PLACEHOLDER } from '@/lib/constants';
-import { isDemoMode } from '@/lib/demo';
+import { isMockSentry } from '@/lib/config/feature-flags';
 import { db } from '@/lib/db';
 import { dreamBoards, payoutItems, payouts } from '@/lib/db/schema';
 import { log } from '@/lib/observability/logger';
@@ -211,7 +211,7 @@ export async function createPayoutsForDreamBoard(params: {
       dreamBoardId: board.id,
       message: error instanceof Error ? error.message : 'unknown_error',
     });
-    if (!isDemoMode()) {
+    if (!isMockSentry()) {
       Sentry.captureException(error);
     }
     throw error;

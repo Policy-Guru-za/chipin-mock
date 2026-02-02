@@ -8,7 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { sendMagicLink } from '@/lib/auth/magic-link';
 import { getSession } from '@/lib/auth/session';
-import { isDemoMode } from '@/lib/demo';
 
 const emailSchema = z.object({
   email: z.string().email(),
@@ -55,22 +54,6 @@ const SentNotice = ({ email }: { email: string }) => (
 const ErrorNotice = ({ notice }: { notice: ErrorNotice }) => (
   <div className={`rounded-xl border px-4 py-3 text-sm ${errorNoticeStyles[notice.tone]}`}>
     {notice.message}
-  </div>
-);
-
-const DemoLoginView = () => (
-  <div className="mx-auto flex min-h-screen w-full max-w-2xl items-center px-6 py-16">
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Demo access</CardTitle>
-        <CardDescription>Skip the email step and jump straight in.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Button asChild className="w-full">
-          <Link href="/api/demo/auto-login">Enter Demo as Sarah</Link>
-        </Button>
-      </CardContent>
-    </Card>
   </div>
 );
 
@@ -185,10 +168,6 @@ export default async function CreateDreamBoardPage({
   const session = await getSession();
   if (session) {
     redirect('/create/child');
-  }
-
-  if (isDemoMode()) {
-    return <DemoLoginView />;
   }
 
   const state = getCreatePageState(searchParams);

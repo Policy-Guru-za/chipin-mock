@@ -1,7 +1,5 @@
 import { del, put } from '@vercel/blob';
 
-import { isDemoMode } from '@/lib/demo';
-import { DEMO_BLOB_PLACEHOLDER_URL } from '@/lib/demo/fixtures';
 import { encryptSensitiveBuffer } from '@/lib/utils/encryption';
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
@@ -94,16 +92,6 @@ export async function uploadPayoutReceipt(
       ? sanitizeFilename(file.name)
       : `${documentType}.${extension}`;
 
-  if (isDemoMode()) {
-    return {
-      url: DEMO_BLOB_PLACEHOLDER_URL,
-      filename: `payouts/${payoutId}/${documentType}-demo.${extension}.enc`,
-      downloadName,
-      contentType: file.type,
-      encrypted: true,
-    };
-  }
-
   const rawBuffer = Buffer.from(await file.arrayBuffer());
   const encrypted = encryptSensitiveBuffer(rawBuffer);
   const storageName = `payouts/${payoutId}/${documentType}-${Date.now()}.${extension}.enc`;
@@ -123,10 +111,5 @@ export async function uploadPayoutReceipt(
 }
 
 export async function deleteChildPhoto(url: string) {
-  if (isDemoMode()) {
-    console.log('DEMO_MODE: blob delete suppressed', { url });
-    return;
-  }
-
   await del(url);
 }

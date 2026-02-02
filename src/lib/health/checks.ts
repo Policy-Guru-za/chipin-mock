@@ -1,6 +1,5 @@
 import { sql } from 'drizzle-orm';
 
-import { isDemoMode } from '@/lib/demo';
 import { kvAdapter } from '@/lib/demo/kv-adapter';
 import { db } from '@/lib/db';
 
@@ -29,10 +28,6 @@ export const checkDb = async (): Promise<HealthCheckResult> => {
 };
 
 export const checkKv = async (): Promise<HealthCheckResult> => {
-  if (isDemoMode()) {
-    return { ok: true, detail: 'demo' };
-  }
-
   if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
     return { ok: false, detail: 'KV_REST_API_URL or KV_REST_API_TOKEN is not set' };
   }

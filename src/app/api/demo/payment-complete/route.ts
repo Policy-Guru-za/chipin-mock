@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
-import { isDemoMode } from '@/lib/demo';
+import { isMockPayments } from '@/lib/config/feature-flags';
 import { db } from '@/lib/db';
 import { contributions } from '@/lib/db/schema';
 import { markDreamBoardFundedIfNeeded, updateContributionStatus } from '@/lib/db/queries';
@@ -13,7 +13,7 @@ const requestSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  if (!isDemoMode()) {
+  if (!isMockPayments()) {
     return NextResponse.json({ error: 'not_found' }, { status: 404 });
   }
 
@@ -43,5 +43,5 @@ export async function POST(request: NextRequest) {
     await markDreamBoardFundedIfNeeded(contribution.dreamBoardId);
   }
 
-  return NextResponse.json({ ok: true, demo: true });
+  return NextResponse.json({ ok: true, mocked: true });
 }

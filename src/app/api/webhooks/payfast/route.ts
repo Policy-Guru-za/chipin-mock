@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { isDemoMode } from '@/lib/demo';
+import { isMockPaymentWebhooks } from '@/lib/config/feature-flags';
 import {
   mapPayfastStatus,
   parsePayfastAmountCents,
@@ -61,6 +61,9 @@ const rateLimitWebhook = async (context: WebhookContext) => {
 };
 
 const validateSignature = (rawBody: string, context: WebhookContext) => {
+  if (isMockPaymentWebhooks()) {
+    return null;
+  }
   if (!verifyPayfastSignature(rawBody)) {
     log('warn', 'payments.payfast_invalid_signature', undefined, context.requestId);
     return NextResponse.json({ error: 'invalid_signature' }, { status: 400 });
@@ -172,10 +175,6 @@ const validateContributionAmount = (
 };
 
 export async function POST(request: NextRequest) {
-  if (isDemoMode()) {
-    return NextResponse.json({ received: true, demo: true }, { status: 200 });
-  }
-
   const rawBody = await request.text();
   const context = getWebhookContext(request);
 

@@ -6,11 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { verifyMagicLink } from '@/lib/auth/magic-link';
 import { createSession } from '@/lib/auth/session';
 import { ensureHostForEmail } from '@/lib/db/queries';
-import { isDemoMode } from '@/lib/demo';
 
 export const dynamic = 'force-dynamic';
-
-const DEMO_EMAIL = 'sarah@demo.chipin.co.za';
 
 const tokenSchema = z.object({
   token: z.string().min(32),
@@ -21,12 +18,6 @@ type VerifySearchParams = {
 };
 
 export default async function VerifyPage({ searchParams }: { searchParams?: VerifySearchParams }) {
-  if (isDemoMode()) {
-    const host = await ensureHostForEmail(DEMO_EMAIL);
-    await createSession(host.id, host.email);
-    redirect('/create/child');
-  }
-
   const tokenParam = searchParams?.token;
   const token = Array.isArray(tokenParam) ? tokenParam[0] : tokenParam;
 

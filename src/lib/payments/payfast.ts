@@ -1,7 +1,5 @@
 import crypto from 'crypto';
 
-import { isDemoMode } from '@/lib/demo';
-
 import { isIpInRanges } from '../utils/ip';
 
 const PAYFAST_IP_RANGES = [
@@ -159,10 +157,6 @@ export const validatePayfastSource = (ipAddress?: string | null) => {
 };
 
 export const validatePayfastItn = async (rawBody: string) => {
-  if (isDemoMode()) {
-    return true;
-  }
-
   const config = getPayfastConfig();
   const { fields } = parsePayfastBody(rawBody);
   const response = await fetch(getValidationUrl(config.sandbox), {

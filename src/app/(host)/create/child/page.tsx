@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { requireSession } from '@/lib/auth/session';
-import { isDemoMode } from '@/lib/demo';
+import { isMockSentry } from '@/lib/config/feature-flags';
 import { getDreamBoardDraft, saveDreamBoardDraft } from '@/lib/dream-boards/draft';
 import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
 import { deleteChildPhoto, UploadChildPhotoError, uploadChildPhoto } from '@/lib/integrations/blob';
@@ -56,7 +56,7 @@ async function saveChildDetailsAction(formData: FormData) {
       hostId: session.hostId,
       error: error instanceof Error ? error.message : 'unknown',
     });
-    if (!isDemoMode()) {
+    if (!isMockSentry()) {
       Sentry.captureException(error, {
         tags: { area: 'upload', step: 'child' },
         extra: { hostId: session.hostId },

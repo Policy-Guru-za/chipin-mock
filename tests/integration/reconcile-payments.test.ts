@@ -7,8 +7,7 @@ const loadHandler = async () => {
 
 const originalEnv = {
   INTERNAL_JOB_SECRET: process.env.INTERNAL_JOB_SECRET,
-  DEMO_MODE: process.env.DEMO_MODE,
-  NEXT_PUBLIC_DEMO_MODE: process.env.NEXT_PUBLIC_DEMO_MODE,
+  MOCK_PAYMENTS: process.env.MOCK_PAYMENTS,
   RECONCILIATION_ALERTS_ENABLED: process.env.RECONCILIATION_ALERTS_ENABLED,
   RECONCILIATION_ALERT_EMAIL: process.env.RECONCILIATION_ALERT_EMAIL,
   RECONCILIATION_LONG_TAIL_HOURS: process.env.RECONCILIATION_LONG_TAIL_HOURS,
@@ -25,15 +24,10 @@ afterEach(() => {
   process.env.RECONCILIATION_ALERTS_ENABLED = originalEnv.RECONCILIATION_ALERTS_ENABLED;
   process.env.RECONCILIATION_ALERT_EMAIL = originalEnv.RECONCILIATION_ALERT_EMAIL;
   process.env.RECONCILIATION_LONG_TAIL_HOURS = originalEnv.RECONCILIATION_LONG_TAIL_HOURS;
-  if (originalEnv.DEMO_MODE === undefined) {
-    delete process.env.DEMO_MODE;
+  if (originalEnv.MOCK_PAYMENTS === undefined) {
+    delete process.env.MOCK_PAYMENTS;
   } else {
-    process.env.DEMO_MODE = originalEnv.DEMO_MODE;
-  }
-  if (originalEnv.NEXT_PUBLIC_DEMO_MODE === undefined) {
-    delete process.env.NEXT_PUBLIC_DEMO_MODE;
-  } else {
-    process.env.NEXT_PUBLIC_DEMO_MODE = originalEnv.NEXT_PUBLIC_DEMO_MODE;
+    process.env.MOCK_PAYMENTS = originalEnv.MOCK_PAYMENTS;
   }
   vi.unmock('@/lib/db/queries');
   vi.unmock('@/lib/dream-boards/cache');
@@ -43,10 +37,10 @@ afterEach(() => {
   vi.resetModules();
 });
 
-describe('payments reconciliation job - demo mode', () => {
+describe('payments reconciliation job - mock payments', () => {
   it('returns empty results and skips provider and DB calls', async () => {
     process.env.INTERNAL_JOB_SECRET = 'job-secret';
-    process.env.DEMO_MODE = 'true';
+    process.env.MOCK_PAYMENTS = 'true';
 
     const listContributionsForReconciliation = vi.fn(async () => []);
     const listContributionsForLongTailReconciliation = vi.fn(async () => []);
