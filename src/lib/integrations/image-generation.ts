@@ -1,7 +1,6 @@
 import { put } from '@vercel/blob';
 import { nanoid } from 'nanoid';
 
-import { isDemoMode } from '@/lib/demo';
 import { log } from '@/lib/observability/logger';
 
 export type GeneratedImage = {
@@ -10,29 +9,36 @@ export type GeneratedImage = {
 };
 
 const STYLE_DIRECTIVE =
-  'Create a whimsical, playful illustration in a watercolor and hand-drawn style. ' +
-  'The image should feel warm, celebratory, and child-friendly. ' +
-  'Do not create photorealistic images. Use soft colors and gentle shapes. ' +
-  'The subject is: ';
+  'Create a whimsical, joyful illustration in a soft watercolor and hand-drawn style, ' +
+  "perfect for a child's birthday celebration. The artwork should feel magical and " +
+  'dream-like, as if depicting a cherished birthday wish come true. Use warm, ' +
+  'cheerful colors with gentle shapes. Center the subject prominently. ' +
+  'Do NOT create photorealistic images. ' +
+  'The dream gift is: ';
 
 const MAX_ATTEMPTS = 3;
 const BASE_DELAY_MS = 500;
-const DEFAULT_MODEL = 'dall-e-3';
+const MAX_ERROR_BODY_LENGTH = 500;
+const DEFAULT_MODEL = 'gemini-2.5-flash-image';
+const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 const getImageGenerationConfig = () => {
-  const apiUrl = process.env.IMAGE_GENERATION_API_URL;
-  const apiKey = process.env.IMAGE_GENERATION_API_KEY;
-  if (!apiUrl || !apiKey) {
-    throw new Error('IMAGE_GENERATION_API_URL and IMAGE_GENERATION_API_KEY are required');
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error('GEMINI_API_KEY is required');
   }
   return {
-    apiUrl,
     apiKey,
-    model: process.env.IMAGE_GENERATION_MODEL ?? DEFAULT_MODEL,
+    model: process.env.GEMINI_IMAGE_MODEL ?? DEFAULT_MODEL,
   };
 };
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const trimErrorBody = (value: string) =>
+  value.length > MAX_ERROR_BODY_LENGTH
+    ? `${value.slice(0, MAX_ERROR_BODY_LENGTH)}...`
+    : value;
 
 const fetchWithRetry = async (request: () => Promise<Response>) => {
   let lastError: Error | null = null;
@@ -43,13 +49,33 @@ const fetchWithRetry = async (request: () => Promise<Response>) => {
         return response;
       }
 
-      if (![429, 500, 502, 503].includes(response.status) || attempt === MAX_ATTEMPTS) {
-        const message = await response.text().catch(() => 'Image generation failed');
-        throw new Error(message || `Image generation failed (${response.status})`);
+      const errorBody = await response.text().catch(() => 'Image generation failed');
+      const errorMessage = errorBody || `Image generation failed (${response.status})`;
+      const shouldRetry = [429, 500, 502, 503].includes(response.status);
+
+      if (!shouldRetry || attempt === MAX_ATTEMPTS) {
+        log('warn', 'image_generation.request_failed', {
+          status: response.status,
+          attempt,
+          body: errorBody ? trimErrorBody(errorBody) : null,
+        });
+        throw new Error(errorMessage);
       }
+
+      if (attempt < MAX_ATTEMPTS) {
+        log('debug', 'image_generation.retry', {
+          attempt,
+          status: response.status,
+        });
+      }
+      lastError = new Error(errorMessage);
     } catch (error) {
       lastError = error instanceof Error ? error : new Error('Image generation failed');
       if (attempt < MAX_ATTEMPTS) {
+        log('debug', 'image_generation.retry', {
+          attempt,
+          error: lastError.message,
+        });
         await delay(BASE_DELAY_MS * attempt);
       }
     }
@@ -58,62 +84,61 @@ const fetchWithRetry = async (request: () => Promise<Response>) => {
   throw lastError ?? new Error('Image generation failed');
 };
 
-const resolveImageBuffer = async (payload: { url?: string; b64_json?: string }) => {
-  if (payload.url) {
-    const imageResponse = await fetch(payload.url);
-    if (!imageResponse.ok) {
-      throw new Error('Failed to download generated image');
-    }
-    const arrayBuffer = await imageResponse.arrayBuffer();
-    return Buffer.from(arrayBuffer);
+const resolveImageBuffer = (payload?: { inlineData?: { data?: string } }) => {
+  const inlineData = payload?.inlineData?.data;
+  if (!inlineData) {
+    throw new Error('Image generation response missing image payload');
   }
-
-  if (payload.b64_json) {
-    return Buffer.from(payload.b64_json, 'base64');
-  }
-
-  throw new Error('Image generation response missing image payload');
+  return Buffer.from(inlineData, 'base64');
 };
 
 export async function generateGiftArtwork(giftDescription: string): Promise<GeneratedImage> {
   const fullPrompt = `${STYLE_DIRECTIVE}${giftDescription}`;
 
-  if (isDemoMode()) {
-    return {
-      imageUrl: 'https://images.unsplash.com/photo-1520694478169-84f29f7c44c5?auto=format&fit=crop&w=1200&q=80',
-      prompt: fullPrompt,
-    };
-  }
-
-  const { apiUrl, apiKey, model } = getImageGenerationConfig();
+  const { apiKey, model } = getImageGenerationConfig();
 
   const response = await fetchWithRetry(() =>
-    fetch(apiUrl, {
+    fetch(`${GEMINI_BASE_URL}/${model}:generateContent`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        'x-goog-api-key': apiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model,
-        prompt: fullPrompt,
-        n: 1,
-        size: '1024x1024',
+        contents: [
+          {
+            parts: [{ text: fullPrompt }],
+          },
+        ],
+        generationConfig: {
+          responseModalities: ['IMAGE'],
+        },
       }),
     })
   );
 
   const payload = (await response.json()) as {
-    data?: Array<{ url?: string; b64_json?: string }>;
-    usage?: Record<string, number>;
+    candidates?: Array<{
+      content?: {
+        parts?: Array<{
+          inlineData?: {
+            mimeType?: string;
+            data?: string;
+          };
+        }>;
+      };
+    }>;
+    usageMetadata?: Record<string, number>;
   };
 
-  const imagePayload = payload.data?.[0];
+  const imagePayload = payload.candidates?.[0]?.content?.parts?.find(
+    (part) => Boolean(part.inlineData?.data)
+  );
   if (!imagePayload) {
     throw new Error('Image generation response missing data');
   }
 
-  const buffer = await resolveImageBuffer(imagePayload);
+  const buffer = resolveImageBuffer(imagePayload);
   const { url } = await put(`artwork/${nanoid()}.png`, buffer, {
     access: 'public',
     contentType: 'image/png',
@@ -121,7 +146,7 @@ export async function generateGiftArtwork(giftDescription: string): Promise<Gene
 
   log('info', 'image_generation.completed', {
     model,
-    usage: payload.usage ?? null,
+    usage: payload.usageMetadata ?? null,
   });
 
   return { imageUrl: url, prompt: fullPrompt };
