@@ -1,5 +1,5 @@
 import { decryptSensitiveValue } from '@/lib/utils/encryption';
-import { serializeGiftData, serializeOverflowGiftData } from '@/lib/api/gifts';
+import { serializeGiftData } from '@/lib/api/gifts';
 
 type PayoutApiRecord = {
   id: string;
@@ -35,25 +35,23 @@ const getCardLast4 = (encrypted?: string | null) => {
 const serializeRecipientBasics = (record: Record<string, unknown>) => {
   const payload: Record<string, unknown> = {};
   if (typeof record.email === 'string') payload.email = record.email;
-  if (typeof record.donorEmail === 'string') payload.donor_email = record.donorEmail;
-  if (typeof record.donorName === 'string') payload.donor_name = record.donorName;
   if (typeof record.childName === 'string') payload.child_name = record.childName;
   if (typeof record.payoutMethod === 'string') payload.payout_method = record.payoutMethod;
-  if (typeof record.giftType === 'string') payload.gift_type = record.giftType;
-  if (typeof record.productUrl === 'string') payload.product_url = record.productUrl;
-  if (typeof record.causeId === 'string') payload.cause_id = record.causeId;
+  if (typeof record.karriCardHolderName === 'string') {
+    payload.karri_card_holder_name = record.karriCardHolderName;
+  }
   return payload;
 };
 
 const serializeRecipientGiftData = (record: Record<string, unknown>) => {
-  if (!record.giftData || typeof record.giftData !== 'object') return {};
-  const giftType = typeof record.giftType === 'string' ? record.giftType : 'takealot_product';
-  return { gift_data: serializeGiftData({ giftType, giftData: record.giftData }) };
-};
-
-const serializeRecipientOverflowData = (record: Record<string, unknown>) => {
-  if (!record.overflowGiftData || typeof record.overflowGiftData !== 'object') return {};
-  return { overflow_gift_data: serializeOverflowGiftData(record.overflowGiftData) };
+  return {
+    gift_data: serializeGiftData({
+      giftName: typeof record.giftName === 'string' ? record.giftName : null,
+      giftImageUrl: typeof record.giftImageUrl === 'string' ? record.giftImageUrl : null,
+      giftImagePrompt:
+        typeof record.giftImagePrompt === 'string' ? record.giftImagePrompt : null,
+    }),
+  };
 };
 
 const serializeRecipientCardData = (record: Record<string, unknown>) => {
@@ -71,7 +69,6 @@ const serializeRecipientData = (recipientData: unknown) => {
   return {
     ...serializeRecipientBasics(record),
     ...serializeRecipientGiftData(record),
-    ...serializeRecipientOverflowData(record),
     ...serializeRecipientCardData(record),
   };
 };

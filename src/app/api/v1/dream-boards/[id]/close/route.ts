@@ -13,7 +13,7 @@ import { createPayoutsForDreamBoard } from '@/lib/payouts/service';
 import { getClientIp } from '@/lib/utils/request';
 
 const closeSchema = z.object({
-  reason: z.enum(['manual', 'deadline_reached', 'goal_reached']),
+  reason: z.enum(['manual', 'party_date_reached', 'goal_reached']),
 });
 
 export const POST = withApiAuth(

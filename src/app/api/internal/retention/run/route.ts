@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
 
   const now = new Date();
   const { ipCutoff, boardCutoff } = getRetentionCutoffs(now);
+  const boardCutoffDate = boardCutoff.toISOString().split('T')[0];
 
   const ipScrubbed = await db
     .update(contributions)
@@ -51,7 +52,7 @@ export async function POST(request: NextRequest) {
     .from(dreamBoards)
     .where(
       and(
-        lt(dreamBoards.deadline, boardCutoff),
+        lt(dreamBoards.partyDate, boardCutoffDate),
         inArray(dreamBoards.status, [...RETENTION_ELIGIBLE_STATUSES])
       )
     );

@@ -22,6 +22,12 @@ describe('encryption utilities', () => {
     expect(decrypted).toBe('4111111111111111');
   });
 
+  it('produces encrypted values longer than 20 characters', () => {
+    process.env.CARD_DATA_ENCRYPTION_KEY = 'test-key';
+    const encrypted = encryptSensitiveValue('4111111111111111');
+    expect(encrypted.length).toBeGreaterThan(20);
+  });
+
   it('encrypts and decrypts buffers', () => {
     process.env.CARD_DATA_ENCRYPTION_KEY = 'test-key';
     const source = Buffer.from('receipt-data');

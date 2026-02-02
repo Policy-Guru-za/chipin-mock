@@ -86,11 +86,13 @@ describe('PayFast webhook integration - success', () => {
     const getContributionByPaymentRef = vi.fn(async () => contribution);
     const updateContributionStatus = vi.fn(async () => undefined);
     const markDreamBoardFundedIfNeeded = vi.fn(async () => undefined);
+    const getDreamBoardNotificationContext = vi.fn(async () => null);
 
     vi.doMock('@/lib/db/queries', () => ({
       getContributionByPaymentRef,
       updateContributionStatus,
       markDreamBoardFundedIfNeeded,
+      getDreamBoardNotificationContext,
     }));
 
     vi.doMock('@/lib/payments/payfast', async () => {
@@ -175,11 +177,13 @@ describe('PayFast webhook integration - errors', () => {
     const getContributionByPaymentRef = vi.fn(async () => contribution);
     const updateContributionStatus = vi.fn(async () => undefined);
     const markDreamBoardFundedIfNeeded = vi.fn(async () => undefined);
+    const getDreamBoardNotificationContext = vi.fn(async () => null);
 
     vi.doMock('@/lib/db/queries', () => ({
       getContributionByPaymentRef,
       updateContributionStatus,
       markDreamBoardFundedIfNeeded,
+      getDreamBoardNotificationContext,
     }));
 
     vi.doMock('@/lib/payments/payfast', async () => {

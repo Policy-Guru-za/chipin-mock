@@ -6,7 +6,6 @@ type GiftPreview = {
   title: string;
   subtitle?: string;
   imageUrl: string;
-  priceLabel?: string;
 };
 
 export type CreateFlowViewModel = {
@@ -40,33 +39,22 @@ const getStepTitle = (step: CreateFlowStep, childName?: string) => {
 };
 
 const getStepSubtitle = (step: CreateFlowStep) => {
-  if (step === 'gift') return 'Choose one special item to fund.';
+  if (step === 'gift') return 'Describe the dream gift and generate artwork.';
   return undefined;
 };
 
 const buildGiftPreview = (draft?: DreamBoardDraft): GiftPreview | undefined => {
-  if (!draft?.giftData) return undefined;
-
-  if (draft.giftData.type === 'takealot_product') {
-    return {
-      title: draft.giftData.productName,
-      imageUrl: draft.giftData.productImage,
-      priceLabel: `R${(draft.giftData.productPrice / 100).toFixed(2)}`,
-    };
-  }
+  if (!draft?.giftName || !draft?.giftImageUrl) return undefined;
 
   return {
-    title: draft.giftData.causeName,
-    subtitle: draft.giftData.impactDescription,
-    imageUrl: draft.giftData.causeImage,
+    title: draft.giftName,
+    subtitle: draft.giftDescription,
+    imageUrl: draft.giftImageUrl,
   };
 };
 
 const getGiftTitle = (draft?: DreamBoardDraft) => {
-  if (!draft?.giftData) return undefined;
-  return draft.giftData.type === 'takealot_product'
-    ? draft.giftData.productName
-    : draft.giftData.causeName;
+  return draft?.giftName;
 };
 
 const getGoalLabel = (draft?: DreamBoardDraft) => {
@@ -75,17 +63,19 @@ const getGoalLabel = (draft?: DreamBoardDraft) => {
 };
 
 const isChildComplete = (draft?: DreamBoardDraft | null) =>
-  [draft?.childName, draft?.birthdayDate, draft?.childPhotoUrl].every(Boolean);
+  [draft?.childName, draft?.childPhotoUrl].every(Boolean);
 
 const isGiftComplete = (draft?: DreamBoardDraft | null) =>
-  [draft?.giftType, draft?.giftData, draft?.goalCents].every(Boolean);
-
-const isKarriComplete = (draft?: DreamBoardDraft | null) =>
-  draft?.payoutMethod !== 'karri_card_topup' || Boolean(draft?.karriCardNumberEncrypted);
+  [draft?.giftName, draft?.giftImageUrl, draft?.goalCents].every(Boolean);
 
 const isDetailsComplete = (draft?: DreamBoardDraft | null) =>
-  [draft?.payoutEmail, draft?.deadline, draft?.payoutMethod].every(Boolean) &&
-  isKarriComplete(draft);
+  [
+    draft?.payoutEmail,
+    draft?.partyDate,
+    draft?.karriCardNumberEncrypted,
+    draft?.karriCardHolderName,
+    draft?.hostWhatsAppNumber,
+  ].every(Boolean);
 
 const getCompletionState = (draft?: DreamBoardDraft | null) => ({
   childComplete: isChildComplete(draft),

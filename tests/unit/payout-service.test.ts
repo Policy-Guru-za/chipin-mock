@@ -28,7 +28,7 @@ describe('payout service', () => {
               id: 'payout-1',
               status: 'pending',
               dreamBoardId: 'board-1',
-              type: 'takealot_gift_card',
+              type: 'karri_card',
             },
           ]),
         })),

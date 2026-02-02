@@ -15,21 +15,13 @@ const makeBoard = (overrides: Partial<DreamBoardRecord> = {}) =>
     hostId: 'host-1',
     childName: 'Maya',
     childPhotoUrl: 'https://example.com/child.jpg',
-    birthdayDate: new Date('2026-02-01'),
-    giftType: 'takealot_product',
-    giftData: {
-      productName: 'Scooter',
-      productImage: 'https://example.com/scooter.jpg',
-    },
+    partyDate: new Date('2026-02-01'),
+    giftName: 'Scooter',
+    giftImageUrl: 'https://example.com/scooter.jpg',
+    giftImagePrompt: 'A mint green scooter',
     goalCents: 5000,
-    payoutMethod: 'takealot_gift_card',
-    overflowGiftData: {
-      causeId: 'food-forward',
-      causeName: 'Feed Hungry Children',
-      impactDescription: 'Feed a class',
-    },
+    payoutMethod: 'karri_card',
     message: 'Let’s do it',
-    deadline: new Date('2026-02-05'),
     status: 'active',
     payoutEmail: 'maya@example.com',
     createdAt: new Date('2026-01-01'),
@@ -40,53 +32,31 @@ const makeBoard = (overrides: Partial<DreamBoardRecord> = {}) =>
   }) as DreamBoardRecord;
 
 describe('buildGuestViewModel', () => {
-  it('builds a takealot gift view with subtitle override', () => {
-    const view = buildGuestViewModel(makeBoard(), { takealotSubtitle: 'Her dream gift' });
+  it('builds a gift view model', () => {
+    const view = buildGuestViewModel(makeBoard());
 
     expect(view.giftTitle).toBe('Scooter');
-    expect(view.giftSubtitle).toBe('Her dream gift');
+    expect(view.giftSubtitle).toBe('Dream gift');
     expect(view.displayTitle).toBe('Scooter');
-    expect(view.displaySubtitle).toBe('Her dream gift');
+    expect(view.displaySubtitle).toBe('Dream gift');
     expect(view.displayImage).toBe('https://example.com/scooter.jpg');
-    expect(view.showCharityOverflow).toBe(false);
   });
 
   it('uses the injected clock for days left', () => {
     const view = buildGuestViewModel(
-      makeBoard({ deadline: new Date('2026-02-05T00:00:00.000Z') }),
+      makeBoard({ partyDate: new Date('2026-02-05T00:00:00.000Z') }),
       { now: new Date('2026-02-03T00:00:00.000Z') }
     );
 
     expect(view.daysLeft).toBe(2);
   });
 
-  it('switches to overflow display when funded', () => {
+  it('keeps the gift display when funded', () => {
     const view = buildGuestViewModel(makeBoard({ raisedCents: 6000 }));
 
-    expect(view.showCharityOverflow).toBe(true);
-    expect(view.displayTitle).toBe('Feed Hungry Children');
-    expect(view.displaySubtitle).toBe('Feed a class');
-    expect(view.displayImage).toBe('/causes/food-forward.jpg');
-  });
-
-  it('builds philanthropy gift display data', () => {
-    const view = buildGuestViewModel(
-      makeBoard({
-        giftType: 'philanthropy',
-        payoutMethod: 'philanthropy_donation',
-        giftData: {
-          causeName: 'Plant Trees',
-          causeImage: 'https://example.com/trees.jpg',
-          impactDescription: 'Plant 10 trees',
-        },
-        overflowGiftData: null,
-      })
-    );
-
-    expect(view.giftTitle).toBe('Plant Trees');
-    expect(view.giftSubtitle).toBe('Plant 10 trees');
-    expect(view.displayTitle).toBe('Plant Trees');
-    expect(view.showCharityOverflow).toBe(false);
+    expect(view.displayTitle).toBe('Scooter');
+    expect(view.displaySubtitle).toBe('Dream gift');
+    expect(view.displayImage).toBe('https://example.com/scooter.jpg');
   });
 });
 
@@ -94,20 +64,13 @@ describe('buildContributionViewModel', () => {
   it('builds a standard contribution headline', () => {
     const view = buildContributionViewModel(makeBoard());
 
-    expect(view.headline).toBe("Contribute to Maya's gift");
-    expect(view.cardTag).toBeUndefined();
-    expect(view.overflowNoticeBody).toBeUndefined();
+    expect(view.headline).toBe("Contribute to Maya's dream gift");
   });
 
-  it('builds overflow contribution copy when funded', () => {
+  it('keeps the standard contribution copy when funded', () => {
     const view = buildContributionViewModel(makeBoard({ raisedCents: 7000 }));
 
-    expect(view.headline).toBe('Support Feed Hungry Children');
-    expect(view.cardTag).toBe('Charity overflow');
-    expect(view.overflowNoticeTitle).toBe('Gift fully funded!');
-    expect(view.overflowNoticeBody).toBe(
-      'Contributions now support Feed Hungry Children: Feed a class.'
-    );
+    expect(view.headline).toBe("Contribute to Maya's dream gift");
   });
 });
 
@@ -127,7 +90,7 @@ describe('buildThankYouViewModel', () => {
     });
 
     expect(view.headline).toBe('Thank you, Ava!');
-    expect(view.message).toMatch(/Your R\s*25 contribution is helping Maya get their dream gift\./);
+    expect(view.message).toMatch(/Your contribution is helping Maya get their dream gift\./);
     expect(view.percentage).toBe(20);
   });
 
@@ -149,18 +112,9 @@ describe('buildThankYouViewModel', () => {
     expect(view.message).toBe('We’ll update this page once your payment is confirmed.');
   });
 
-  it('builds a philanthropy thank-you message', () => {
+  it('builds a gift thank-you message even when funded', () => {
     const view = buildThankYouViewModel({
-      board: makeBoard({
-        giftType: 'philanthropy',
-        payoutMethod: 'philanthropy_donation',
-        giftData: {
-          causeName: 'Plant Trees',
-          causeImage: 'https://example.com/trees.jpg',
-          impactDescription: 'Plant 10 trees',
-        },
-        overflowGiftData: null,
-      }),
+      board: makeBoard({ raisedCents: 7000 }),
       contribution: {
         id: 'contrib-3',
         dreamBoardId: 'board-1',
@@ -172,23 +126,6 @@ describe('buildThankYouViewModel', () => {
       },
     });
 
-    expect(view.message).toMatch(/supporting Plant Trees: Plant 10 trees\./);
-  });
-
-  it('builds an overflow thank-you message', () => {
-    const view = buildThankYouViewModel({
-      board: makeBoard({ raisedCents: 7000 }),
-      contribution: {
-        id: 'contrib-4',
-        dreamBoardId: 'board-1',
-        contributorName: 'Ava',
-        amountCents: 2500,
-        feeCents: 0,
-        netCents: 2500,
-        paymentStatus: 'completed',
-      },
-    });
-
-    expect(view.message).toMatch(/supporting Feed Hungry Children: Feed a class\./);
+    expect(view.message).toMatch(/helping Maya get their dream gift\./);
   });
 });

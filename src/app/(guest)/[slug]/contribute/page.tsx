@@ -81,16 +81,8 @@ export default async function ContributionPage({
         imageUrl={view.displayImage}
         title={view.displayTitle}
         subtitle={view.displaySubtitle}
-        tag={view.cardTag}
         imagePriority
       />
-
-      {view.overflowNoticeBody ? (
-        <div className="rounded-3xl border border-accent/40 bg-accent/10 p-6 text-sm text-text">
-          <p className="font-semibold">{view.overflowNoticeTitle}</p>
-          <p className="mt-2 text-text-muted">{view.overflowNoticeBody}</p>
-        </div>
-      ) : null}
 
       {availableProviders.length === 0 ? (
         <StateCard

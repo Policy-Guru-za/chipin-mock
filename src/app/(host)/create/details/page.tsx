@@ -9,7 +9,7 @@ import { requireSession } from '@/lib/auth/session';
 import { isDemoMode } from '@/lib/demo';
 import { getDreamBoardDraft, updateDreamBoardDraft } from '@/lib/dream-boards/draft';
 import type { DreamBoardDraft } from '@/lib/dream-boards/draft';
-import { isDeadlineWithinRange } from '@/lib/dream-boards/validation';
+import { isPartyDateWithinRange, SA_MOBILE_REGEX } from '@/lib/dream-boards/validation';
 import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
 import { verifyKarriCard } from '@/lib/integrations/karri';
 import { log } from '@/lib/observability/logger';
@@ -18,16 +18,16 @@ import * as Sentry from '@sentry/nextjs';
 
 const detailsSchema = z.object({
   payoutEmail: z.string().email(),
+  karriCardHolderName: z.string().min(2).max(100),
+  hostWhatsAppNumber: z.string().regex(SA_MOBILE_REGEX, 'Must be a valid SA mobile number'),
   message: z.string().max(280).optional(),
-  deadline: z.string().min(1),
+  partyDate: z.string().min(1),
 });
-
-const payoutMethodSchema = z.enum(['takealot_gift_card', 'karri_card_topup']);
 
 const detailsErrorMessages: Record<string, string> = {
   invalid: 'Please complete all required fields.',
-  deadline: 'Deadline must be within the next 90 days.',
-  payout: 'Please select a payout method.',
+  party_date: 'Party date must be within the next 6 months.',
+  whatsapp: 'Enter a valid South African WhatsApp number.',
   karri: 'Enter a valid Karri Card number to continue.',
   karri_invalid: 'Karri Card number could not be verified. Please try again.',
   karri_unavailable: 'Karri verification is unavailable right now. Please try again later.',
@@ -37,27 +37,11 @@ const detailsErrorMessages: Record<string, string> = {
 const getDetailsErrorMessage = (error?: string) =>
   error ? (detailsErrorMessages[error] ?? null) : null;
 
-const getDefaultDeadline = (draft: DreamBoardDraft) => {
-  if (draft.deadline) return draft.deadline;
-  if (draft.birthdayDate && isDeadlineWithinRange(draft.birthdayDate)) {
-    return draft.birthdayDate;
-  }
+const getDefaultPartyDate = (draft: DreamBoardDraft) => {
+  if (draft.partyDate) return draft.partyDate;
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   return tomorrow.toISOString().split('T')[0];
-};
-
-const resolvePayoutMethod = (draft: DreamBoardDraft, formData: FormData) => {
-  if (draft.giftType === 'philanthropy') {
-    return 'philanthropy_donation' as const;
-  }
-
-  const methodValue = formData.get('payoutMethod');
-  const parsed = payoutMethodSchema.safeParse(methodValue);
-  if (!parsed.success) {
-    redirect('/create/details?error=payout');
-  }
-  return parsed.data;
 };
 
 const getRawKarriCardNumber = (formData: FormData) => {
@@ -67,14 +51,7 @@ const getRawKarriCardNumber = (formData: FormData) => {
   return sanitizedCard.length > 0 ? sanitizedCard : null;
 };
 
-const resolveKarriCardNumber = (
-  payoutMethod: 'takealot_gift_card' | 'karri_card_topup' | 'philanthropy_donation',
-  rawCardNumber: string | null,
-  draft: DreamBoardDraft
-) => {
-  if (payoutMethod !== 'karri_card_topup') {
-    return undefined;
-  }
+const resolveKarriCardNumber = (rawCardNumber: string | null, draft: DreamBoardDraft) => {
   if (!process.env.CARD_DATA_ENCRYPTION_KEY) {
     redirect('/create/details?error=secure');
   }
@@ -86,15 +63,10 @@ const resolveKarriCardNumber = (
 };
 
 const verifyKarriCardIfNeeded = async (params: {
-  payoutMethod: 'takealot_gift_card' | 'karri_card_topup' | 'philanthropy_donation';
   rawKarriCardNumber: string | null;
   hostId: string;
 }) => {
-  if (
-    params.payoutMethod !== 'karri_card_topup' ||
-    !params.rawKarriCardNumber ||
-    process.env.KARRI_AUTOMATION_ENABLED !== 'true'
-  ) {
+  if (!params.rawKarriCardNumber || process.env.KARRI_AUTOMATION_ENABLED !== 'true') {
     return;
   }
 
@@ -120,11 +92,10 @@ const verifyKarriCardIfNeeded = async (params: {
 
 type DetailsFormProps = {
   draft: DreamBoardDraft;
-  defaultDeadline: string;
-  isNonPhilanthropyGift: boolean;
+  defaultPartyDate: string;
 };
 
-const DetailsForm = ({ draft, defaultDeadline, isNonPhilanthropyGift }: DetailsFormProps) => (
+const DetailsForm = ({ draft, defaultPartyDate }: DetailsFormProps) => (
   <form action={saveDetailsAction} className="space-y-5">
     <div className="space-y-2">
       <label htmlFor="payoutEmail" className="text-sm font-medium text-text">
@@ -138,59 +109,61 @@ const DetailsForm = ({ draft, defaultDeadline, isNonPhilanthropyGift }: DetailsF
         required
         defaultValue={draft.payoutEmail ?? ''}
       />
+      <p className="text-xs text-text-muted">We’ll email the Karri Card credit confirmation.</p>
+    </div>
+
+    <div className="space-y-2">
+      <label htmlFor="partyDate" className="text-sm font-medium text-text">
+        Party date
+      </label>
+      <Input id="partyDate" name="partyDate" type="date" required defaultValue={defaultPartyDate} />
+      <p className="text-xs text-text-muted">We’ll automatically close the pot on this date.</p>
+    </div>
+
+    <div className="space-y-2">
+      <label htmlFor="hostWhatsAppNumber" className="text-sm font-medium text-text">
+        Host WhatsApp number
+      </label>
+      <Input
+        id="hostWhatsAppNumber"
+        name="hostWhatsAppNumber"
+        placeholder="e.g. +27821234567"
+        defaultValue={draft.hostWhatsAppNumber ?? ''}
+        required
+      />
+      <p className="text-xs text-text-muted">We’ll send contribution and payout updates here.</p>
+    </div>
+
+    <div className="space-y-2">
+      <label htmlFor="karriCardNumber" className="text-sm font-medium text-text">
+        Karri Card number
+      </label>
+      <Input
+        id="karriCardNumber"
+        name="karriCardNumber"
+        placeholder="16-digit card number"
+        autoComplete="off"
+        required={!draft.karriCardNumberEncrypted}
+      />
       <p className="text-xs text-text-muted">
-        {draft.giftType === 'philanthropy'
-          ? 'We’ll email the donation confirmation.'
-          : 'We’ll email the gift card or Karri confirmation.'}
+        {draft.karriCardNumberEncrypted
+          ? 'Card number saved. Re-enter to update.'
+          : 'We only use this to load Karri top-ups.'}
       </p>
     </div>
 
-    {isNonPhilanthropyGift ? (
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-text">Payout method</label>
-        <div className="grid gap-3">
-          <label className="flex items-center gap-3 rounded-2xl border border-border bg-white p-4">
-            <input
-              type="radio"
-              name="payoutMethod"
-              value="takealot_gift_card"
-              defaultChecked={draft.payoutMethod === 'takealot_gift_card'}
-              required
-            />
-            <span className="text-sm text-text">Takealot gift card</span>
-          </label>
-          <label className="flex items-center gap-3 rounded-2xl border border-border bg-white p-4">
-            <input
-              type="radio"
-              name="payoutMethod"
-              value="karri_card_topup"
-              defaultChecked={draft.payoutMethod === 'karri_card_topup'}
-              required
-            />
-            <span className="text-sm text-text">Karri Card top-up</span>
-          </label>
-        </div>
-      </div>
-    ) : null}
-
-    {isNonPhilanthropyGift ? (
-      <div className="space-y-2">
-        <label htmlFor="karriCardNumber" className="text-sm font-medium text-text">
-          Karri Card number
-        </label>
-        <Input
-          id="karriCardNumber"
-          name="karriCardNumber"
-          placeholder="Only required for Karri top-ups"
-          autoComplete="off"
-        />
-        <p className="text-xs text-text-muted">
-          {draft.karriCardNumberEncrypted
-            ? 'Card number saved. Re-enter to update.'
-            : 'We only use this to load Karri top-ups.'}
-        </p>
-      </div>
-    ) : null}
+    <div className="space-y-2">
+      <label htmlFor="karriCardHolderName" className="text-sm font-medium text-text">
+        Karri Card holder name
+      </label>
+      <Input
+        id="karriCardHolderName"
+        name="karriCardHolderName"
+        placeholder="Name on the Karri Card"
+        defaultValue={draft.karriCardHolderName ?? ''}
+        required
+      />
+    </div>
 
     <div className="space-y-2">
       <label htmlFor="message" className="text-sm font-medium text-text">
@@ -204,13 +177,6 @@ const DetailsForm = ({ draft, defaultDeadline, isNonPhilanthropyGift }: DetailsF
       />
     </div>
 
-    <div className="space-y-2">
-      <label htmlFor="deadline" className="text-sm font-medium text-text">
-        Contribution deadline
-      </label>
-      <Input id="deadline" name="deadline" type="date" required defaultValue={defaultDeadline} />
-    </div>
-
     <Button type="submit">Review & create</Button>
   </form>
 );
@@ -220,39 +186,49 @@ async function saveDetailsAction(formData: FormData) {
 
   const session = await requireSession();
   const draft = await getDreamBoardDraft(session.hostId);
-  if (!draft?.giftType) {
+  if (!draft?.giftName) {
     redirect('/create/gift');
   }
 
   const payoutEmail = formData.get('payoutEmail');
+  const karriCardHolderName = formData.get('karriCardHolderName');
+  const hostWhatsAppNumber = formData.get('hostWhatsAppNumber');
   const message = formData.get('message');
-  const deadline = formData.get('deadline');
+  const partyDate = formData.get('partyDate');
 
-  const result = detailsSchema.safeParse({ payoutEmail, message, deadline });
+  const result = detailsSchema.safeParse({
+    payoutEmail,
+    karriCardHolderName,
+    hostWhatsAppNumber,
+    message,
+    partyDate,
+  });
   if (!result.success) {
     redirect('/create/details?error=invalid');
   }
 
-  if (!isDeadlineWithinRange(result.data.deadline)) {
-    redirect('/create/details?error=deadline');
+  if (!isPartyDateWithinRange(result.data.partyDate)) {
+    redirect('/create/details?error=party_date');
+  }
+  if (!SA_MOBILE_REGEX.test(result.data.hostWhatsAppNumber)) {
+    redirect('/create/details?error=whatsapp');
   }
 
-  const payoutMethod = resolvePayoutMethod(draft, formData);
   const rawKarriCardNumber = getRawKarriCardNumber(formData);
   await verifyKarriCardIfNeeded({
-    payoutMethod,
     rawKarriCardNumber,
     hostId: session.hostId,
   });
 
-  const karriCardNumberEncrypted = resolveKarriCardNumber(payoutMethod, rawKarriCardNumber, draft);
+  const karriCardNumberEncrypted = resolveKarriCardNumber(rawKarriCardNumber, draft);
 
   await updateDreamBoardDraft(session.hostId, {
     payoutEmail: result.data.payoutEmail,
-    payoutMethod,
     karriCardNumberEncrypted,
+    karriCardHolderName: result.data.karriCardHolderName,
+    hostWhatsAppNumber: result.data.hostWhatsAppNumber,
     message: result.data.message?.trim() || undefined,
-    deadline: result.data.deadline,
+    partyDate: result.data.partyDate,
   });
 
   redirect('/create/review');
@@ -279,8 +255,7 @@ export default async function CreateDetailsPage({
 
   const error = searchParams?.error;
   const errorMessage = getDetailsErrorMessage(error);
-  const defaultDeadline = getDefaultDeadline(draft);
-  const isNonPhilanthropyGift = draft.giftType !== 'philanthropy';
+  const defaultPartyDate = getDefaultPartyDate(draft);
 
   return (
     <CreateFlowShell stepLabel={view.stepLabel} title={view.title} subtitle={view.subtitle}>
@@ -300,8 +275,7 @@ export default async function CreateDetailsPage({
 
           <DetailsForm
             draft={draft}
-            defaultDeadline={defaultDeadline}
-            isNonPhilanthropyGift={isNonPhilanthropyGift}
+            defaultPartyDate={defaultPartyDate}
           />
         </CardContent>
       </Card>

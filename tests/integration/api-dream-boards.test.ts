@@ -11,29 +11,18 @@ const mockAuth = (result: { ok: boolean; response?: Response; context?: any }) =
   }));
 };
 
-const baseTakealotBoard = {
+const baseBoard = {
   id: 'board-1',
   slug: 'maya-birthday',
   childName: 'Maya',
   childPhotoUrl: 'https://images.example/photo.jpg',
-  birthdayDate: new Date('2026-02-15T00:00:00.000Z'),
-  giftType: 'takealot_product',
-  giftData: {
-    type: 'takealot_product',
-    productUrl: 'https://takealot.com/product',
-    productName: 'Train set',
-    productImage: 'https://images.example/product.jpg',
-    productPrice: 35000,
-  },
-  overflowGiftData: {
-    causeId: 'food-forward',
-    causeName: 'Feed Hungry Children',
-    impactDescription: 'Feed a class',
-  },
+  partyDate: new Date('2026-02-15T00:00:00.000Z'),
+  giftName: 'Train set',
+  giftImageUrl: 'https://images.example/product.jpg',
+  giftImagePrompt: 'A bright train set',
   goalCents: 35000,
-  payoutMethod: 'takealot_gift_card',
+  payoutMethod: 'karri_card',
   message: 'Make it happen',
-  deadline: new Date('2026-02-14T12:00:00.000Z'),
   status: 'active',
   createdAt: new Date('2026-01-10T10:00:00.000Z'),
   updatedAt: new Date('2026-01-11T11:00:00.000Z'),
@@ -41,8 +30,8 @@ const baseTakealotBoard = {
   contributionCount: 2,
 };
 
-const buildTakealotBoard = (overrides: Partial<typeof baseTakealotBoard> = {}) => ({
-  ...baseTakealotBoard,
+const buildBoard = (overrides: Partial<typeof baseBoard> = {}) => ({
+  ...baseBoard,
   ...overrides,
 });
 
@@ -179,7 +168,7 @@ describe('GET /api/v1/dream-boards/[id] responses - payloads', () => {
     });
 
     vi.doMock('@/lib/db/queries', () => ({
-      getDreamBoardByPublicId: vi.fn(async () => buildTakealotBoard()),
+      getDreamBoardByPublicId: vi.fn(async () => buildBoard()),
       markApiKeyUsed: vi.fn(async () => undefined),
     }));
 
@@ -194,12 +183,12 @@ describe('GET /api/v1/dream-boards/[id] responses - payloads', () => {
 
     expect(response.status).toBe(200);
     expect(payload.data.child_name).toBe('Maya');
-    expect(payload.data.gift_data.product_url).toBe('https://takealot.com/product');
+    expect(payload.data.gift_data.gift_name).toBe('Train set');
     expect(payload.data.display_mode).toBe('gift');
     expect(payload.meta.request_id).toBe('req-123');
   });
 
-  it('returns takealot payloads when overflow data is missing', async () => {
+  it('returns null prompts when gift prompts are missing', async () => {
     mockAuth({
       ok: true,
       context: {
@@ -211,11 +200,11 @@ describe('GET /api/v1/dream-boards/[id] responses - payloads', () => {
 
     vi.doMock('@/lib/db/queries', () => ({
       getDreamBoardByPublicId: vi.fn(async () =>
-        buildTakealotBoard({
+        buildBoard({
           id: 'board-3',
           slug: 'legacy-board',
           childName: 'Lebo',
-          overflowGiftData: null,
+          giftImagePrompt: null,
         })
       ),
       markApiKeyUsed: vi.fn(async () => undefined),
@@ -228,63 +217,8 @@ describe('GET /api/v1/dream-boards/[id] responses - payloads', () => {
     const payload = await response.json();
 
     expect(response.status).toBe(200);
-    expect(payload.data.overflow_gift_data).toBeNull();
+    expect(payload.data.gift_data.gift_image_prompt).toBeNull();
     expect(payload.data.display_mode).toBe('gift');
-  });
-
-  it('returns philanthropy gift data without extra fields', async () => {
-    mockAuth({
-      ok: true,
-      context: {
-        requestId: 'req-4',
-        apiKey: { id: 'api-key-4', partnerId: 'partner-1', rateLimit: 1000 },
-        rateLimitHeaders: new Headers(),
-      },
-    });
-
-    vi.doMock('@/lib/db/queries', () => ({
-      getDreamBoardByPublicId: vi.fn(async () => ({
-        id: 'board-2',
-        slug: 'seedlings',
-        childName: 'Maya',
-        childPhotoUrl: 'https://images.example/photo.jpg',
-        birthdayDate: new Date('2026-02-15T00:00:00.000Z'),
-        giftType: 'philanthropy',
-        giftData: {
-          type: 'philanthropy',
-          causeId: 'plant-trees',
-          causeName: 'Plant Trees',
-          causeDescription: 'Plant indigenous trees across South Africa',
-          causeImage: 'https://images.example/trees.jpg',
-          impactDescription: 'Plant 10 trees',
-          amountCents: 25000,
-        },
-        overflowGiftData: null,
-        goalCents: 25000,
-        payoutMethod: 'philanthropy_donation',
-        message: null,
-        deadline: new Date('2026-02-14T12:00:00.000Z'),
-        status: 'active',
-        createdAt: new Date('2026-01-10T10:00:00.000Z'),
-        updatedAt: new Date('2026-01-11T11:00:00.000Z'),
-        raisedCents: 5000,
-        contributionCount: 2,
-      })),
-      markApiKeyUsed: vi.fn(async () => undefined),
-    }));
-
-    const { GET } = await loadHandler();
-    const response = await GET(new Request('http://localhost/api/v1/dream-boards/seedlings'), {
-      params: { id: 'seedlings' },
-    });
-    const payload = await response.json();
-
-    expect(payload.data.gift_data).toEqual({
-      cause_id: 'plant-trees',
-      cause_name: 'Plant Trees',
-      impact_description: 'Plant 10 trees',
-      amount_cents: 25000,
-    });
   });
 });
 

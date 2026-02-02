@@ -7,15 +7,14 @@ export type DreamBoardWithTotals = {
   slug: string;
   childName: string;
   childPhotoUrl: string;
-  birthdayDate: Date;
-  giftType: 'takealot_product' | 'philanthropy';
-  giftData: unknown;
-  payoutMethod: 'takealot_gift_card' | 'karri_card_topup' | 'philanthropy_donation';
-  overflowGiftData: unknown | null;
+  partyDate: Date;
+  giftName: string;
+  giftImageUrl: string;
+  giftImagePrompt: string | null;
+  payoutMethod: 'karri_card';
   goalCents: number;
   payoutEmail: string;
   message: string | null;
-  deadline: Date;
   status: string;
   createdAt: Date;
   updatedAt: Date;
@@ -27,7 +26,7 @@ export type ExpiringDreamBoard = {
   id: string;
   slug: string;
   childName: string;
-  deadline: Date;
+  partyDate: Date;
   status: string;
 };
 
@@ -38,15 +37,14 @@ export const getDreamBoardWithTotals = async (id: string): Promise<DreamBoardWit
       slug,
       child_name as "childName",
       child_photo_url as "childPhotoUrl",
-      birthday_date as "birthdayDate",
-      gift_type as "giftType",
-      gift_data as "giftData",
+      party_date as "partyDate",
+      gift_name as "giftName",
+      gift_image_url as "giftImageUrl",
+      gift_image_prompt as "giftImagePrompt",
       payout_method as "payoutMethod",
-      overflow_gift_data as "overflowGiftData",
       goal_cents as "goalCents",
       payout_email as "payoutEmail",
       message,
-      deadline,
       status,
       created_at as "createdAt",
       updated_at as "updatedAt",
@@ -66,10 +64,10 @@ export const getExpiringDreamBoards = async (limit = 6): Promise<ExpiringDreamBo
       id,
       slug,
       child_name as "childName",
-      deadline,
+      party_date as "partyDate",
       status
     FROM expiring_dream_boards
-    ORDER BY deadline ASC
+    ORDER BY party_date ASC
     LIMIT ${limit}
   `);
 

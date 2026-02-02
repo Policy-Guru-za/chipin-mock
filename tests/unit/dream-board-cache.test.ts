@@ -20,21 +20,13 @@ const makeBoard = (overrides: Record<string, unknown> = {}) => ({
   slug: 'maya-birthday-123',
   childName: 'Maya',
   childPhotoUrl: 'https://example.com/child.jpg',
-  birthdayDate: new Date('2026-02-01T00:00:00.000Z'),
-  giftType: 'takealot_product',
-  giftData: {
-    productName: 'Scooter',
-    productImage: 'https://example.com/scooter.jpg',
-  },
-  overflowGiftData: {
-    causeId: 'food-forward',
-    causeName: 'Feed Hungry Children',
-    impactDescription: 'Feed a class',
-  },
+  partyDate: '2026-02-01',
+  giftName: 'Scooter',
+  giftImageUrl: 'https://example.com/scooter.jpg',
+  giftImagePrompt: 'A mint green scooter',
   goalCents: 5000,
-  payoutMethod: 'takealot_gift_card',
+  payoutMethod: 'karri_card',
   message: 'Let’s do it',
-  deadline: new Date('2026-02-05T00:00:00.000Z'),
   status: 'active',
   createdAt: new Date('2026-01-01T00:00:00.000Z'),
   updatedAt: new Date('2026-01-02T00:00:00.000Z'),
@@ -53,8 +45,7 @@ describe('getCachedDreamBoardBySlug', () => {
   it('hydrates cached dates on cache hit', async () => {
     const cachedBoard = {
       ...makeBoard(),
-      birthdayDate: new Date('2026-02-01T00:00:00.000Z').toISOString(),
-      deadline: new Date('2026-02-05T00:00:00.000Z').toISOString(),
+      partyDate: '2026-02-01',
       createdAt: new Date('2026-01-01T00:00:00.000Z').toISOString(),
       updatedAt: new Date('2026-01-02T00:00:00.000Z').toISOString(),
     };
@@ -72,7 +63,7 @@ describe('getCachedDreamBoardBySlug', () => {
     const result = await getCachedDreamBoardBySlug('maya-birthday-123');
 
     expect(getDreamBoardBySlug).not.toHaveBeenCalled();
-    expect(result?.deadline).toBeInstanceOf(Date);
+    expect(result?.partyDate).toBe('2026-02-01');
     expect(result?.createdAt).toBeInstanceOf(Date);
     expect(result?.updatedAt).toBeInstanceOf(Date);
   });
@@ -96,7 +87,7 @@ describe('getCachedDreamBoardBySlug', () => {
     expect(kvMock.set).toHaveBeenCalledWith('dream-board:maya-birthday-123', board, {
       ex: 300,
     });
-    expect(result?.deadline).toBeInstanceOf(Date);
+    expect(result?.partyDate).toBe('2026-02-01');
   });
 });
 

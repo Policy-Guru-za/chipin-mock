@@ -18,7 +18,7 @@ const HOW_IT_WORKS_STEPS = [
   {
     icon: <SparkleIcon size="lg" />,
     title: '3. Celebrate',
-    description: 'We deliver the payout and unlock overflow giving.',
+    description: 'We deliver the payout to the host’s Karri Card.',
   },
 ];
 
@@ -69,7 +69,7 @@ export default function MarketingPage() {
             <h2 className="font-display text-3xl text-text">How it works</h2>
             <p className="text-base text-text-muted">
               Create a Dream Board, share the link, and let friends contribute. Once the goal is
-              reached, we handle the payout and switch to a charity overflow view.
+              reached, we handle the payout straight to the host’s Karri Card.
             </p>
             <div className="grid gap-4 md:grid-cols-3">
               {HOW_IT_WORKS_STEPS.map((step, index) => (

@@ -8,7 +8,7 @@ import { serializePayout } from '@/lib/api/payouts';
 import { listPendingPayoutsForApi } from '@/lib/db/api-queries';
 
 const querySchema = z.object({
-  type: z.enum(['takealot_gift_card', 'philanthropy_donation', 'karri_card_topup']).optional(),
+  type: z.enum(['karri_card']).optional(),
   limit: z.coerce.number().int().min(1).max(100).default(20),
   after: z.string().optional(),
 });

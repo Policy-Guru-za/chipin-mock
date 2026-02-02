@@ -18,22 +18,13 @@ type Contributor = Awaited<ReturnType<typeof listRecentContributors>>[number];
 
 const getBoard = cache(async (slug: string) => getCachedDreamBoardBySlug(slug));
 
-const getHeroCopy = (view: GuestViewModel) => {
-  if (view.showCharityOverflow) {
-    return {
-      title: 'Gift fully funded!',
-      subtitle: `${view.childName} chose to support a charity next.`,
-    };
-  }
-
-  return {
-    title: 'Help make this gift happen',
-    subtitle: '',
-  };
-};
+const getHeroCopy = () => ({
+  title: 'Help make this gift happen',
+  subtitle: '',
+});
 
 const HeroCard = ({ view }: { view: GuestViewModel }) => {
-  const heroCopy = getHeroCopy(view);
+  const heroCopy = getHeroCopy();
 
   return (
     <div className="flex flex-col items-center gap-6 rounded-3xl border border-border bg-white p-6 text-center shadow-soft">
@@ -58,31 +49,15 @@ const HeroCard = ({ view }: { view: GuestViewModel }) => {
   );
 };
 
-const GiftCardSection = ({ view }: { view: GuestViewModel }) => {
-  const cardContent = view.showCharityOverflow
-    ? {
-        imageUrl: view.overflowImage,
-        title: view.overflowTitle,
-        subtitle: view.overflowSubtitle,
-        tag: 'Charity overflow',
-      }
-    : {
-        imageUrl: view.giftImage,
-        title: view.giftTitle,
-        subtitle: view.giftSubtitle,
-        tag: view.giftType === 'takealot_product' ? 'Dream gift' : 'Gift of giving',
-      };
-
-  return (
-    <DreamBoardCard
-      imageUrl={cardContent.imageUrl}
-      title={cardContent.title}
-      subtitle={cardContent.subtitle}
-      tag={cardContent.tag}
-      imagePriority
-    />
-  );
-};
+const GiftCardSection = ({ view }: { view: GuestViewModel }) => (
+  <DreamBoardCard
+    imageUrl={view.giftImage}
+    title={view.giftTitle}
+    subtitle={view.giftSubtitle}
+    tag="Dream gift"
+    imagePriority
+  />
+);
 
 const GoalProgressCard = ({ view }: { view: GuestViewModel }) => (
   <div className="space-y-4 rounded-3xl border border-border bg-white p-6">
@@ -103,45 +78,20 @@ const GoalProgressCard = ({ view }: { view: GuestViewModel }) => (
   </div>
 );
 
-const OpenEndedProgressCard = ({ view }: { view: GuestViewModel }) => (
-  <div className="space-y-4 rounded-3xl border border-border bg-white p-6">
-    <div className="space-y-2">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-text-muted">
-        Charity contributions
-      </p>
-      <p className="text-2xl font-semibold text-text">
-        {formatZar(view.raisedCents)} raised so far{' '}
-        <span className="text-sm font-normal text-text-muted">(open-ended)</span>
-      </p>
-    </div>
-    <div className="flex items-center justify-between text-sm text-text-muted">
-      <span>{view.daysLeft} days left</span>
-      <span>{view.contributionCount} contributions</span>
-    </div>
-    {view.message ? (
-      <p className="rounded-2xl bg-subtle px-4 py-3 text-sm text-text">“{view.message}”</p>
-    ) : null}
-  </div>
+const ProgressSection = ({ view }: { view: GuestViewModel }) => (
+  <GoalProgressCard view={view} />
 );
 
-const ProgressSection = ({ view }: { view: GuestViewModel }) =>
-  view.showCharityOverflow ? (
-    <OpenEndedProgressCard view={view} />
-  ) : (
-    <GoalProgressCard view={view} />
-  );
-
 const FundedBanner = ({ view }: { view: GuestViewModel }) => {
-  if (!view.funded || !view.overflowData) {
+  if (!view.funded) {
     return null;
   }
 
   return (
     <div className="rounded-3xl border border-accent/40 bg-accent/10 p-6 text-sm text-text">
-      <p className="font-semibold">Gift fully funded!</p>
+      <p className="font-semibold">Goal reached!</p>
       <p className="mt-2 text-text-muted">
-        Additional contributions will support {view.overflowData.causeName}:{' '}
-        {view.overflowData.impactDescription}.
+        Extra contributions still help cover the dream gift.
       </p>
     </div>
   );
@@ -156,12 +106,10 @@ const ContributionCta = ({ view }: { view: GuestViewModel }) => {
     );
   }
 
-  const ctaLabel = view.showCharityOverflow ? 'Contribute to the charity →' : 'Contribute now';
-
   return (
     <div className="rounded-3xl border border-border bg-white p-6 text-center">
       <Link href={`/${view.slug}/contribute`}>
-        <Button className="w-full">{ctaLabel}</Button>
+        <Button className="w-full">Contribute now</Button>
       </Link>
       <p className="mt-3 text-xs text-text-muted">Secure payments powered by PayFast.</p>
     </div>
@@ -216,7 +164,7 @@ export default async function DreamBoardPage({
   if (!board) {
     notFound();
   }
-  const view = buildGuestViewModel(board, { takealotSubtitle: 'Her dream gift' });
+  const view = buildGuestViewModel(board);
   const contributors = await listRecentContributors(board.id, 6);
 
   return (

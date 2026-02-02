@@ -14,9 +14,14 @@ const payoutQueryMocks = vi.hoisted(() => ({
   listPayoutsForDreamBoard: vi.fn(),
 }));
 
+const karriBatchMocks = vi.hoisted(() => ({
+  queueKarriCredit: vi.fn(),
+}));
+
 vi.mock('@/lib/db', () => ({ db: dbMock }));
 vi.mock('@/lib/audit', () => auditMocks);
 vi.mock('@/lib/payouts/queries', () => payoutQueryMocks);
+vi.mock('@/lib/integrations/karri-batch', () => karriBatchMocks);
 
 import { payoutItems, payouts } from '@/lib/db/schema';
 import { createPayoutsForDreamBoard } from '@/lib/payouts/service';
@@ -29,12 +34,16 @@ describe('payout service creation', () => {
   it('skips payout creation when nothing raised', async () => {
     payoutQueryMocks.getDreamBoardPayoutContext.mockResolvedValue({
       id: 'board-1',
+      partnerId: 'partner-1',
       status: 'closed',
-      giftType: 'takealot_product',
-      payoutMethod: 'takealot_gift_card',
-      goalCents: 10000,
+      payoutMethod: 'karri_card',
+      giftName: 'Train set',
+      giftImageUrl: 'https://images.example/product.jpg',
+      giftImagePrompt: 'A bright train set',
       payoutEmail: 'host@chipin.co.za',
-      overflowGiftData: null,
+      karriCardNumber: 'encrypted-card',
+      karriCardHolderName: 'Host Parent',
+      hostWhatsAppNumber: '+27821234567',
       childName: 'Maya',
       hostEmail: 'host@chipin.co.za',
       hostId: 'host-1',
@@ -57,16 +66,19 @@ describe('payout service creation', () => {
   it('rejects payouts for funded boards', async () => {
     payoutQueryMocks.getDreamBoardPayoutContext.mockResolvedValue({
       id: 'board-1',
+      partnerId: 'partner-1',
       status: 'funded',
-      giftType: 'takealot_product',
-      payoutMethod: 'takealot_gift_card',
-      goalCents: 10000,
+      payoutMethod: 'karri_card',
+      giftName: 'Train set',
+      giftImageUrl: 'https://images.example/product.jpg',
+      giftImagePrompt: 'A bright train set',
       payoutEmail: 'host@chipin.co.za',
-      overflowGiftData: null,
+      karriCardNumber: 'encrypted-card',
+      karriCardHolderName: 'Host Parent',
+      hostWhatsAppNumber: '+27821234567',
       childName: 'Maya',
       hostEmail: 'host@chipin.co.za',
       hostId: 'host-1',
-      giftData: { productName: 'Train set' },
     });
 
     await expect(
@@ -77,15 +89,19 @@ describe('payout service creation', () => {
     ).rejects.toThrow('Dream Board is not ready for payout');
   });
 
-  it('creates gift and overflow payouts when goal exceeded', async () => {
+  it('creates a karri card payout when funds are raised', async () => {
     payoutQueryMocks.getDreamBoardPayoutContext.mockResolvedValue({
       id: 'board-2',
+      partnerId: 'partner-1',
       status: 'closed',
-      giftType: 'takealot_product',
-      payoutMethod: 'takealot_gift_card',
-      goalCents: 10000,
+      payoutMethod: 'karri_card',
+      giftName: 'Scooter',
+      giftImageUrl: 'https://images.example/scooter.jpg',
+      giftImagePrompt: 'A fun scooter',
       payoutEmail: 'host@chipin.co.za',
-      overflowGiftData: { causeId: 'cause-1' },
+      karriCardNumber: 'encrypted-card',
+      karriCardHolderName: 'Host Parent',
+      hostWhatsAppNumber: '+27821234567',
       childName: 'Luca',
       hostEmail: 'host@chipin.co.za',
       hostId: 'host-2',
@@ -96,18 +112,16 @@ describe('payout service creation', () => {
     });
     payoutQueryMocks.listPayoutsForDreamBoard.mockResolvedValue([]);
 
-    let createdCount = 0;
     const insert = vi.fn((table: unknown) => {
       if (table === payouts) {
         return {
           values: vi.fn(() => ({
             onConflictDoNothing: vi.fn(() => ({
               returning: vi.fn(async () => {
-                createdCount += 1;
                 return [
                   {
-                    id: `payout-${createdCount}`,
-                    type: createdCount === 1 ? 'takealot_gift_card' : 'philanthropy_donation',
+                    id: 'payout-1',
+                    type: 'karri_card',
                   },
                 ];
               }),
@@ -128,7 +142,15 @@ describe('payout service creation', () => {
       actor: { type: 'admin' },
     });
 
-    expect(result.created).toHaveLength(2);
-    expect(auditMocks.recordAuditEvent).toHaveBeenCalledTimes(2);
+    expect(result.created).toHaveLength(1);
+    expect(karriBatchMocks.queueKarriCredit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        dreamBoardId: 'board-2',
+        reference: 'payout-1',
+        amountCents: 14000,
+      }),
+      expect.anything()
+    );
+    expect(auditMocks.recordAuditEvent).toHaveBeenCalledTimes(1);
   });
 });

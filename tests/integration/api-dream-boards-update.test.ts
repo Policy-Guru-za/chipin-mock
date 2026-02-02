@@ -27,24 +27,13 @@ const buildBoard = (overrides: Record<string, unknown> = {}) => {
     slug: 'maya-birthday',
     childName: 'Maya',
     childPhotoUrl: 'https://images.example/photo.jpg',
-    birthdayDate: new Date(now + 10 * DAY_MS),
-    giftType: 'takealot_product',
-    giftData: {
-      type: 'takealot_product',
-      productUrl: 'https://takealot.com/product',
-      productName: 'Train set',
-      productImage: 'https://images.example/product.jpg',
-      productPrice: 35000,
-    },
-    overflowGiftData: {
-      causeId: 'food-forward',
-      causeName: 'Feed Hungry Children',
-      impactDescription: 'Feed a class',
-    },
+    partyDate: new Date(now + 10 * DAY_MS).toISOString().split('T')[0],
+    giftName: 'Train set',
+    giftImageUrl: 'https://images.example/product.jpg',
+    giftImagePrompt: 'A bright train set',
     goalCents: 35000,
-    payoutMethod: 'takealot_gift_card',
+    payoutMethod: 'karri_card',
     message: 'Make it happen',
-    deadline: new Date(now + 10 * DAY_MS),
     status: 'active',
     createdAt: new Date(now - DAY_MS),
     updatedAt: new Date(now - DAY_MS / 2),
@@ -96,11 +85,11 @@ describe('PATCH /api/v1/dream-boards/[id]', () => {
     expect(update).not.toHaveBeenCalled();
   });
 
-  it('rejects deadlines that are not extensions', async () => {
+  it('rejects party dates that are not extensions', async () => {
     mockAuth();
     const update = mockDb();
     const now = Date.now();
-    const board = buildBoard({ deadline: new Date(now + 10 * DAY_MS) });
+    const board = buildBoard({ partyDate: new Date(now + 10 * DAY_MS).toISOString().split('T')[0] });
 
     vi.doMock('@/lib/db/queries', () => ({
       getDreamBoardByPublicId: vi.fn(async () => board),
@@ -112,7 +101,7 @@ describe('PATCH /api/v1/dream-boards/[id]', () => {
       new Request('http://localhost/api/v1/dream-boards/board-1', {
         method: 'PATCH',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ deadline: new Date(now + 5 * DAY_MS).toISOString() }),
+        body: JSON.stringify({ party_date: new Date(now + 5 * DAY_MS).toISOString().split('T')[0] }),
       }),
       { params: { id: 'board-1' } }
     );

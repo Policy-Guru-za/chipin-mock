@@ -9,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { requireSession } from '@/lib/auth/session';
 import { isDemoMode } from '@/lib/demo';
 import { getDreamBoardDraft, saveDreamBoardDraft } from '@/lib/dream-boards/draft';
-import { isDateWithinRange } from '@/lib/dream-boards/validation';
 import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
 import { deleteChildPhoto, UploadChildPhotoError, uploadChildPhoto } from '@/lib/integrations/blob';
 import { log } from '@/lib/observability/logger';
@@ -21,7 +20,6 @@ const childSchema = z.object({
     .min(2)
     .max(30)
     .regex(/^[a-zA-Z\s'-]+$/, 'Letters only'),
-  birthdayDate: z.string().min(1),
 });
 
 async function saveChildDetailsAction(formData: FormData) {
@@ -29,16 +27,11 @@ async function saveChildDetailsAction(formData: FormData) {
 
   const session = await requireSession();
   const childName = formData.get('childName');
-  const birthdayDate = formData.get('birthdayDate');
   const photo = formData.get('photo');
 
-  const result = childSchema.safeParse({ childName, birthdayDate });
+  const result = childSchema.safeParse({ childName });
   if (!result.success) {
     redirect('/create/child?error=invalid');
-  }
-
-  if (!isDateWithinRange(result.data.birthdayDate)) {
-    redirect('/create/child?error=date_range');
   }
 
   if (!(photo instanceof File) || photo.size === 0) {
@@ -54,7 +47,6 @@ async function saveChildDetailsAction(formData: FormData) {
     }
     await saveDreamBoardDraft(session.hostId, {
       childName: result.data.childName,
-      birthdayDate: result.data.birthdayDate,
       childPhotoUrl: upload.url,
       photoFilename: upload.filename,
     });
@@ -88,7 +80,6 @@ type ChildSearchParams = {
 
 const childErrorMessages: Record<string, string> = {
   invalid: 'Please complete all required fields.',
-  date_range: 'Choose a birthday within the next 90 days.',
   invalid_type: 'Photos must be JPG, PNG, or WebP.',
   file_too_large: 'Photo must be under 5MB.',
   upload_failed: 'Upload failed. Please try again.',
@@ -153,18 +144,6 @@ export default async function CreateChildPage({
                 placeholder="e.g. Maya"
                 required
                 defaultValue={draft?.childName ?? ''}
-              />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="birthdayDate" className="text-sm font-medium text-text">
-                Birthday date
-              </label>
-              <Input
-                id="birthdayDate"
-                name="birthdayDate"
-                type="date"
-                required
-                defaultValue={draft?.birthdayDate ?? ''}
               />
             </div>
             <div className="space-y-2">

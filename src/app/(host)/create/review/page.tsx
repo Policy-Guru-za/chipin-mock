@@ -10,9 +10,12 @@ import { clearDreamBoardDraft, getDreamBoardDraft } from '@/lib/dream-boards/dra
 import { dreamBoardDraftSchema } from '@/lib/dream-boards/schema';
 import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
 import { generateSlug } from '@/lib/utils/slug';
+import { parseDateOnly } from '@/lib/utils/date';
 import { db } from '@/lib/db';
 import { dreamBoards } from '@/lib/db/schema';
 import { DEFAULT_PARTNER_ID } from '@/lib/db/partners';
+import { sendDreamBoardLink } from '@/lib/integrations/whatsapp';
+import { log } from '@/lib/observability/logger';
 
 async function createDreamBoardAction() {
   'use server';
@@ -34,19 +37,31 @@ async function createDreamBoardAction() {
       slug,
       childName: parsed.data.childName,
       childPhotoUrl: parsed.data.childPhotoUrl,
-      birthdayDate: parsed.data.birthdayDate,
-      giftType: parsed.data.giftType,
-      giftData: parsed.data.giftData,
+      partyDate: parsed.data.partyDate,
+      giftName: parsed.data.giftName,
+      giftImageUrl: parsed.data.giftImageUrl,
+      giftImagePrompt: parsed.data.giftImagePrompt,
       goalCents: parsed.data.goalCents,
-      payoutMethod: parsed.data.payoutMethod,
-      overflowGiftData: parsed.data.overflowGiftData,
-      karriCardNumber: parsed.data.karriCardNumberEncrypted ?? null,
+      payoutMethod: 'karri_card',
+      karriCardNumber: parsed.data.karriCardNumberEncrypted,
+      karriCardHolderName: parsed.data.karriCardHolderName,
+      hostWhatsAppNumber: parsed.data.hostWhatsAppNumber,
       message: parsed.data.message,
-      deadline: new Date(parsed.data.deadline),
-      status: 'active',
       payoutEmail: parsed.data.payoutEmail,
+      status: 'active',
     })
     .returning({ id: dreamBoards.id });
+
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const dreamBoardUrl = `${baseUrl}/${slug}`;
+  try {
+    await sendDreamBoardLink(parsed.data.hostWhatsAppNumber, dreamBoardUrl, parsed.data.childName);
+  } catch (error) {
+    log('error', 'whatsapp.dream_board_link_failed', {
+      hostId: session.hostId,
+      error: error instanceof Error ? error.message : 'unknown_error',
+    });
+  }
 
   await clearDreamBoardDraft(session.hostId);
   redirect(`/dashboard/${created.id}`);
@@ -66,6 +81,14 @@ export default async function CreateReviewPage() {
   }
 
   const giftTitle = view.giftTitle ?? '';
+  const partyDate = parseDateOnly(parsed.data.partyDate);
+  const partyDateLabel = partyDate
+    ? partyDate.toLocaleDateString('en-ZA', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      })
+    : parsed.data.partyDate;
 
   return (
     <CreateFlowShell stepLabel={view.stepLabel} title={view.title} subtitle={view.subtitle}>
@@ -89,7 +112,17 @@ export default async function CreateReviewPage() {
                   {parsed.data.childName}&apos;s Dream Gift
                 </p>
                 <p className="text-sm text-text-muted">{giftTitle}</p>
+                <p className="text-xs text-text-muted">Party date: {partyDateLabel}</p>
               </div>
+            </div>
+            <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-white">
+              <Image
+                src={parsed.data.giftImageUrl}
+                alt={parsed.data.giftName}
+                width={800}
+                height={600}
+                className="h-48 w-full object-cover"
+              />
             </div>
             <div className="mt-4 text-sm text-text">
               Goal: {view.goalLabel ?? `R${(parsed.data.goalCents / 100).toFixed(2)}`}

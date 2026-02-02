@@ -41,9 +41,7 @@ type AuditLog = Awaited<ReturnType<typeof listAuditLogsForTarget>>[number];
 
 const payoutTypeLabel = (type: string) =>
   ({
-    takealot_gift_card: 'Takealot Gift Card',
-    karri_card_topup: 'Karri Card Top-up',
-    philanthropy_donation: 'Philanthropy Donation',
+    karri_card: 'Karri Card Credit',
   })[type] ?? type;
 
 const payoutStatusLabel = (status: string) =>
@@ -92,7 +90,7 @@ const SummaryCard = ({ payout }: { payout: PayoutDetail }) => (
 const RecipientCard = ({ payout }: { payout: PayoutDetail }) => (
   <Card className="space-y-3 p-6">
     <h2 className="text-lg font-semibold">Recipient data</h2>
-    {payout.type === 'karri_card_topup' ? (
+    {payout.type === 'karri_card' ? (
       <div className="rounded-xl border border-border bg-subtle px-4 py-3 text-xs text-text">
         Karri card:{' '}
         {(() => {
@@ -111,22 +109,10 @@ const RecipientCard = ({ payout }: { payout: PayoutDetail }) => (
     <pre className="whitespace-pre-wrap rounded-xl bg-subtle px-4 py-3 text-xs text-text">
       {JSON.stringify(payout.recipientData, null, 2)}
     </pre>
-    {payout.giftData ? (
-      <div className="space-y-2">
-        <h3 className="text-sm font-semibold text-text">Gift details</h3>
-        <pre className="whitespace-pre-wrap rounded-xl bg-subtle px-4 py-3 text-xs text-text">
-          {JSON.stringify(payout.giftData, null, 2)}
-        </pre>
-      </div>
-    ) : null}
-    {payout.overflowGiftData ? (
-      <div className="space-y-2">
-        <h3 className="text-sm font-semibold text-text">Overflow cause</h3>
-        <pre className="whitespace-pre-wrap rounded-xl bg-subtle px-4 py-3 text-xs text-text">
-          {JSON.stringify(payout.overflowGiftData, null, 2)}
-        </pre>
-      </div>
-    ) : null}
+    <div className="space-y-1 text-sm text-text">
+      <div>Gift: {payout.giftName}</div>
+      <div>Gift image: {payout.giftImageUrl}</div>
+    </div>
   </Card>
 );
 
@@ -155,7 +141,7 @@ const StatusActions = ({ payoutId, status }: { payoutId: string; status: string 
       <input type="hidden" name="payoutId" value={payoutId} />
       <div>
         <label className="text-sm font-semibold">External reference</label>
-        <Input name="externalRef" placeholder="Gift card code / receipt ID" />
+        <Input name="externalRef" placeholder="Karri transaction ID" />
       </div>
       <Button type="submit" size="sm" disabled={status === 'completed'}>
         Mark as completed
@@ -218,13 +204,13 @@ const AutomationCard = ({ payout }: { payout: PayoutDetail }) => {
       <h2 className="text-lg font-semibold">Automation</h2>
       <p className="text-sm text-text-muted">
         {automationEnabled
-          ? 'Trigger automated payout execution with the configured provider.'
+          ? 'Trigger the Karri credit workflow for this payout.'
           : 'Automation is disabled for this payout type.'}
       </p>
       <form action={automationAction}>
         <input type="hidden" name="payoutId" value={payout.id} />
         <Button type="submit" size="sm" disabled={disabled}>
-          Run automated payout
+          Run Karri credit
         </Button>
       </form>
     </Card>

@@ -51,10 +51,11 @@ export async function getDreamBoardById(id: string, hostId: string) {
       slug: dreamBoards.slug,
       childName: dreamBoards.childName,
       childPhotoUrl: dreamBoards.childPhotoUrl,
-      giftData: dreamBoards.giftData,
+      partyDate: dreamBoards.partyDate,
+      giftName: dreamBoards.giftName,
+      giftImageUrl: dreamBoards.giftImageUrl,
       goalCents: dreamBoards.goalCents,
       status: dreamBoards.status,
-      deadline: dreamBoards.deadline,
     })
     .from(dreamBoards)
     .where(and(eq(dreamBoards.id, id), eq(dreamBoards.hostId, hostId)))
@@ -80,14 +81,13 @@ export async function getDreamBoardBySlug(slug: string, partnerId?: string) {
       slug: dreamBoards.slug,
       childName: dreamBoards.childName,
       childPhotoUrl: dreamBoards.childPhotoUrl,
-      birthdayDate: dreamBoards.birthdayDate,
-      giftType: dreamBoards.giftType,
-      giftData: dreamBoards.giftData,
-      overflowGiftData: dreamBoards.overflowGiftData,
+      partyDate: dreamBoards.partyDate,
+      giftName: dreamBoards.giftName,
+      giftImageUrl: dreamBoards.giftImageUrl,
+      giftImagePrompt: dreamBoards.giftImagePrompt,
       goalCents: dreamBoards.goalCents,
       payoutMethod: dreamBoards.payoutMethod,
       message: dreamBoards.message,
-      deadline: dreamBoards.deadline,
       status: dreamBoards.status,
       createdAt: dreamBoards.createdAt,
       updatedAt: dreamBoards.updatedAt,
@@ -124,14 +124,13 @@ export const getDreamBoardByPublicId = async (identifier: string, partnerId?: st
       slug: dreamBoards.slug,
       childName: dreamBoards.childName,
       childPhotoUrl: dreamBoards.childPhotoUrl,
-      birthdayDate: dreamBoards.birthdayDate,
-      giftType: dreamBoards.giftType,
-      giftData: dreamBoards.giftData,
-      overflowGiftData: dreamBoards.overflowGiftData,
+      partyDate: dreamBoards.partyDate,
+      giftName: dreamBoards.giftName,
+      giftImageUrl: dreamBoards.giftImageUrl,
+      giftImagePrompt: dreamBoards.giftImagePrompt,
       goalCents: dreamBoards.goalCents,
       payoutMethod: dreamBoards.payoutMethod,
       message: dreamBoards.message,
-      deadline: dreamBoards.deadline,
       status: dreamBoards.status,
       createdAt: dreamBoards.createdAt,
       updatedAt: dreamBoards.updatedAt,
@@ -164,11 +163,11 @@ export async function listDreamBoardsForHost(hostId: string) {
       slug: dreamBoards.slug,
       childName: dreamBoards.childName,
       childPhotoUrl: dreamBoards.childPhotoUrl,
-      giftType: dreamBoards.giftType,
-      giftData: dreamBoards.giftData,
+      giftName: dreamBoards.giftName,
+      giftImageUrl: dreamBoards.giftImageUrl,
+      partyDate: dreamBoards.partyDate,
       goalCents: dreamBoards.goalCents,
       status: dreamBoards.status,
-      deadline: dreamBoards.deadline,
       raisedCents: sql<number>`COALESCE(SUM(${contributions.netCents}), 0)`.as('raised_cents'),
       contributionCount: sql<number>`COUNT(${contributions.id})`.as('contribution_count'),
     })
@@ -192,14 +191,16 @@ export async function getDreamBoardDetailForHost(id: string, hostId: string) {
       slug: dreamBoards.slug,
       childName: dreamBoards.childName,
       childPhotoUrl: dreamBoards.childPhotoUrl,
-      birthdayDate: dreamBoards.birthdayDate,
-      giftType: dreamBoards.giftType,
-      giftData: dreamBoards.giftData,
-      overflowGiftData: dreamBoards.overflowGiftData,
+      partyDate: dreamBoards.partyDate,
+      giftName: dreamBoards.giftName,
+      giftImageUrl: dreamBoards.giftImageUrl,
+      giftImagePrompt: dreamBoards.giftImagePrompt,
       goalCents: dreamBoards.goalCents,
       payoutMethod: dreamBoards.payoutMethod,
+      karriCardHolderName: dreamBoards.karriCardHolderName,
+      hostWhatsAppNumber: dreamBoards.hostWhatsAppNumber,
+      payoutEmail: dreamBoards.payoutEmail,
       message: dreamBoards.message,
-      deadline: dreamBoards.deadline,
       status: dreamBoards.status,
       raisedCents: sql<number>`COALESCE(SUM(${contributions.netCents}), 0)`.as('raised_cents'),
       contributionCount: sql<number>`COUNT(${contributions.id})`.as('contribution_count'),
@@ -288,6 +289,31 @@ export async function getContributionByPaymentRef(
     .limit(1);
 
   return contribution ?? null;
+}
+
+export async function getDreamBoardNotificationContext(dreamBoardId: string) {
+  const [board] = await db
+    .select({
+      id: dreamBoards.id,
+      childName: dreamBoards.childName,
+      hostWhatsAppNumber: dreamBoards.hostWhatsAppNumber,
+      goalCents: dreamBoards.goalCents,
+      karriCardNumber: dreamBoards.karriCardNumber,
+      raisedCents: sql<number>`COALESCE(SUM(${contributions.netCents}), 0)`.as('raised_cents'),
+    })
+    .from(dreamBoards)
+    .leftJoin(
+      contributions,
+      and(
+        eq(contributions.dreamBoardId, dreamBoards.id),
+        eq(contributions.paymentStatus, 'completed')
+      )
+    )
+    .where(eq(dreamBoards.id, dreamBoardId))
+    .groupBy(dreamBoards.id)
+    .limit(1);
+
+  return board ?? null;
 }
 
 export async function updateContributionStatus(

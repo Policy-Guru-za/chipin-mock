@@ -1,11 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import {
-  checkKv,
-  checkGivenGainAutomation,
-  checkKarriAutomation,
-  checkTakealotGiftCards,
-} from '@/lib/health/checks';
+import { checkKarriAutomation, checkKv } from '@/lib/health/checks';
 import { kvAdapter } from '@/lib/demo/kv-adapter';
 
 describe('health checks', () => {
@@ -46,36 +41,6 @@ describe('health checks', () => {
     process.env.CARD_DATA_ENCRYPTION_KEY = 'secret';
     const result = await checkKarriAutomation();
     expect(result.ok).toBe(true);
-  });
-
-  it('flags missing Takealot gift card configuration', async () => {
-    process.env.TAKEALOT_GIFTCARD_AUTOMATION_ENABLED = 'true';
-    process.env.TAKEALOT_GIFTCARD_API_URL = '';
-    process.env.TAKEALOT_GIFTCARD_API_KEY = '';
-    const result = await checkTakealotGiftCards();
-    expect(result.ok).toBe(false);
-  });
-
-  it('returns disabled when Takealot automation is off', async () => {
-    process.env.TAKEALOT_GIFTCARD_AUTOMATION_ENABLED = 'false';
-    const result = await checkTakealotGiftCards();
-    expect(result.ok).toBe(true);
-    expect(result.detail).toBe('disabled');
-  });
-
-  it('flags missing GivenGain configuration', async () => {
-    process.env.GIVENGAIN_AUTOMATION_ENABLED = 'true';
-    process.env.GIVENGAIN_API_URL = '';
-    process.env.GIVENGAIN_API_KEY = '';
-    const result = await checkGivenGainAutomation();
-    expect(result.ok).toBe(false);
-  });
-
-  it('returns disabled when GivenGain automation is off', async () => {
-    process.env.GIVENGAIN_AUTOMATION_ENABLED = 'false';
-    const result = await checkGivenGainAutomation();
-    expect(result.ok).toBe(true);
-    expect(result.detail).toBe('disabled');
   });
 
   it('returns demo when checking KV in demo mode', async () => {

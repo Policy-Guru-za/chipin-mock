@@ -14,12 +14,19 @@ import { enforceRateLimit } from '@/lib/auth/rate-limit';
 import { extractTimestampValue, validateWebhookTimestamp } from '@/lib/payments/webhook-utils';
 import {
   getContributionByPaymentRef,
+  getDreamBoardNotificationContext,
   markDreamBoardFundedIfNeeded,
   updateContributionStatus,
 } from '@/lib/db/queries';
 import { invalidateDreamBoardCacheById } from '@/lib/dream-boards/cache';
+import {
+  sendContributionNotification,
+  sendFundingCompleteNotification,
+} from '@/lib/integrations/whatsapp';
 import { log } from '@/lib/observability/logger';
+import { LEGACY_PLACEHOLDER } from '@/lib/constants';
 import { getClientIp } from '@/lib/utils/request';
+import { decryptSensitiveValue } from '@/lib/utils/encryption';
 import { emitWebhookEventForPartner } from '@/lib/webhooks';
 import {
   buildContributionWebhookPayload,
@@ -216,6 +223,44 @@ export async function POST(request: NextRequest) {
       contribution: { ...contribution, paymentStatus: status },
       baseUrl,
     });
+
+    const notificationContext = await getDreamBoardNotificationContext(contribution.dreamBoardId);
+    if (notificationContext?.hostWhatsAppNumber) {
+      const contributorName = contribution.contributorName ?? 'A guest';
+      const percentage = notificationContext.goalCents
+        ? Math.min(
+            100,
+            Math.round((notificationContext.raisedCents / notificationContext.goalCents) * 100)
+          )
+        : 0;
+      try {
+        await sendContributionNotification(
+          notificationContext.hostWhatsAppNumber,
+          contributorName,
+          notificationContext.childName,
+          percentage
+        );
+
+        if (
+          wasFunded &&
+          notificationContext.karriCardNumber &&
+          notificationContext.karriCardNumber !== LEGACY_PLACEHOLDER
+        ) {
+          const cardLast4 = decryptSensitiveValue(notificationContext.karriCardNumber).slice(-4);
+          await sendFundingCompleteNotification(
+            notificationContext.hostWhatsAppNumber,
+            notificationContext.childName,
+            notificationContext.raisedCents,
+            cardLast4
+          );
+        }
+      } catch (error) {
+        log('error', 'whatsapp.notification_failed', {
+          dreamBoardId: contribution.dreamBoardId,
+          message: error instanceof Error ? error.message : 'unknown_error',
+        });
+      }
+    }
 
     const eventIds = await emitWebhookEventForPartner(
       contribution.partnerId,

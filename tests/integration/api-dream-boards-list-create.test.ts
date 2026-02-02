@@ -23,24 +23,13 @@ const baseBoard = {
   slug: 'maya-birthday',
   childName: 'Maya',
   childPhotoUrl: 'https://images.example/photo.jpg',
-  birthdayDate: new Date('2026-02-15T00:00:00.000Z'),
-  giftType: 'takealot_product',
-  giftData: {
-    type: 'takealot_product',
-    productUrl: 'https://takealot.com/product',
-    productName: 'Train set',
-    productImage: 'https://images.example/product.jpg',
-    productPrice: 35000,
-  },
-  overflowGiftData: {
-    causeId: 'food-forward',
-    causeName: 'Feed Hungry Children',
-    impactDescription: 'Feed a class',
-  },
+  partyDate: new Date('2026-02-15T00:00:00.000Z'),
+  giftName: 'Train set',
+  giftImageUrl: 'https://images.example/product.jpg',
+  giftImagePrompt: 'A bright train set',
   goalCents: 35000,
-  payoutMethod: 'takealot_gift_card',
+  payoutMethod: 'karri_card',
   message: 'Make it happen',
-  deadline: new Date('2026-02-14T12:00:00.000Z'),
   status: 'active',
   createdAt: new Date('2026-01-10T10:00:00.000Z'),
   updatedAt: new Date('2026-01-11T11:00:00.000Z'),
@@ -120,6 +109,9 @@ describe('POST /api/v1/dream-boards', () => {
     }));
 
     vi.doMock('@/lib/utils/slug', () => ({ generateSlug: () => 'maya-birthday-abc123' }));
+    vi.doMock('@/lib/utils/encryption', () => ({
+      encryptSensitiveValue: vi.fn(() => 'encrypted-card'),
+    }));
 
     const returning = vi.fn(async () => [
       { id: 'board-1', slug: 'maya-birthday-abc123', createdAt: new Date(), updatedAt: new Date() },
@@ -137,23 +129,15 @@ describe('POST /api/v1/dream-boards', () => {
         body: JSON.stringify({
           child_name: 'Maya',
           child_photo_url: 'https://images.example/photo.jpg',
-          birthday_date: new Date().toISOString().split('T')[0],
-          gift_type: 'takealot_product',
-          gift_data: {
-            product_url: 'https://takealot.com/product',
-            product_name: 'Train set',
-            product_image: 'https://images.example/product.jpg',
-            product_price: 35000,
-          },
-          payout_method: 'takealot_gift_card',
-          overflow_gift_data: {
-            cause_id: 'food-forward',
-            cause_name: 'Feed Hungry Children',
-            impact_description: 'Feed a class',
-          },
+          party_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          gift_name: 'Train set',
+          gift_image_url: 'https://images.example/product.jpg',
+          gift_image_prompt: 'A bright train set',
           goal_cents: 35000,
           payout_email: 'parent@example.com',
-          deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          host_whatsapp_number: '+27821234567',
+          karri_card_number: '1234567890123456',
+          karri_card_holder_name: 'Maya Parent',
         }),
       })
     );
@@ -176,6 +160,9 @@ describe('POST /api/v1/dream-boards', () => {
 
     const insert = vi.fn();
     vi.doMock('@/lib/db', () => ({ db: { insert } }));
+    vi.doMock('@/lib/utils/encryption', () => ({
+      encryptSensitiveValue: vi.fn(() => 'encrypted-card'),
+    }));
 
     const { POST } = await loadHandler();
     const response = await POST(
@@ -184,24 +171,14 @@ describe('POST /api/v1/dream-boards', () => {
         body: JSON.stringify({
           child_name: 'Maya',
           child_photo_url: 'https://images.example/photo.jpg',
-          birthday_date: new Date().toISOString().split('T')[0],
-          gift_type: 'takealot_product',
-          gift_data: {
-            product_url: 'https://takealot.com/product',
-            product_name: 'Train set',
-            product_image: 'https://images.example/product.jpg',
-            product_price: 35000,
-          },
-          payout_method: 'karri_card_topup',
-          overflow_gift_data: {
-            cause_id: 'food-forward',
-            cause_name: 'Feed Hungry Children',
-            impact_description: 'Feed a class',
-          },
+          party_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          gift_name: 'Train set',
+          gift_image_url: 'https://images.example/product.jpg',
           goal_cents: 35000,
           payout_email: 'parent@example.com',
-          deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          host_whatsapp_number: '+27821234567',
           karri_card_number: '  - -  ',
+          karri_card_holder_name: 'Maya Parent',
         }),
       })
     );

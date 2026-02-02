@@ -8,7 +8,8 @@ import { jsonError, jsonSuccess } from '@/lib/api/response';
 import { db } from '@/lib/db';
 import { getDreamBoardByPublicId } from '@/lib/db/queries';
 import { dreamBoards } from '@/lib/db/schema';
-import { isDeadlineWithinRange } from '@/lib/dream-boards/validation';
+import { isPartyDateWithinRange } from '@/lib/dream-boards/validation';
+import { formatDateOnly, parseDateOnly } from '@/lib/utils/date';
 
 type DreamBoardStatus = (typeof dreamBoards.$inferSelect)['status'];
 type UpdatePayload = z.infer<typeof updateSchema>;
@@ -17,12 +18,12 @@ type DreamBoardRecord = NonNullable<Awaited<ReturnType<typeof getDreamBoardByPub
 const updateSchema = z
   .object({
     message: z.string().min(1).max(280).nullable().optional(),
-    deadline: z.string().min(1).optional(),
+    party_date: z.string().min(1).optional(),
     status: z
       .enum(['draft', 'active', 'funded', 'closed', 'paid_out', 'expired', 'cancelled'])
       .optional(),
   })
-  .refine((value) => value.message !== undefined || value.deadline || value.status, {
+  .refine((value) => value.message !== undefined || value.party_date || value.status, {
     message: 'No updates provided',
   });
 
@@ -55,39 +56,39 @@ const buildValidationError = (message: string, requestId: string, headers: Heade
     headers,
   });
 
-const resolveDeadlineUpdate = (params: {
+const resolvePartyDateUpdate = (params: {
   value: string;
-  currentDeadline: Date | null; // v2.0: nullable during migration
+  currentPartyDate: Date | null;
   requestId: string;
   headers: HeadersInit;
 }) => {
-  if (!isDeadlineWithinRange(params.value)) {
+  if (!isPartyDateWithinRange(params.value)) {
     return {
       ok: false as const,
       response: buildValidationError(
-        'Deadline must be within the next 90 days',
+        'Party date must be within the next 6 months',
         params.requestId,
         params.headers
       ),
     };
   }
 
-  const deadline = new Date(params.value);
-  if (Number.isNaN(deadline.getTime())) {
+  const partyDate = parseDateOnly(params.value);
+  if (!partyDate) {
     return {
       ok: false as const,
-      response: buildValidationError('Invalid deadline', params.requestId, params.headers),
+      response: buildValidationError('Invalid party date', params.requestId, params.headers),
     };
   }
 
-  if (params.currentDeadline && deadline.getTime() <= params.currentDeadline.getTime()) {
+  if (params.currentPartyDate && partyDate.getTime() <= params.currentPartyDate.getTime()) {
     return {
       ok: false as const,
-      response: buildConflict('Deadline can only be extended', params.requestId, params.headers),
+      response: buildConflict('Party date can only be extended', params.requestId, params.headers),
     };
   }
 
-  return { ok: true as const, deadline };
+  return { ok: true as const, partyDate: formatDateOnly(partyDate) };
 };
 
 const resolveStatusUpdate = (params: {
@@ -134,19 +135,19 @@ const buildUpdatePayload = (params: {
     updates.message = params.data.message ?? null;
   }
 
-  if (params.data.deadline) {
-    const deadlineResult = resolveDeadlineUpdate({
-      value: params.data.deadline,
-      currentDeadline: params.board.deadline ? new Date(params.board.deadline) : null,
+  if (params.data.party_date) {
+    const partyDateResult = resolvePartyDateUpdate({
+      value: params.data.party_date,
+      currentPartyDate: parseDateOnly(params.board.partyDate ?? undefined),
       requestId: params.requestId,
       headers: params.headers,
     });
 
-    if (!deadlineResult.ok) {
-      return { ok: false as const, response: deadlineResult.response };
+    if (!partyDateResult.ok) {
+      return { ok: false as const, response: partyDateResult.response };
     }
 
-    updates.deadline = deadlineResult.deadline;
+    updates.partyDate = partyDateResult.partyDate;
   }
 
   const statusResult = resolveStatusUpdate({

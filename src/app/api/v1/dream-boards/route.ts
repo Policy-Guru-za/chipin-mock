@@ -9,8 +9,7 @@ import { listDreamBoardsForApi } from '@/lib/db/api-queries';
 import { ensureHostForEmail } from '@/lib/db/queries';
 import { db } from '@/lib/db';
 import { dreamBoards } from '@/lib/db/schema';
-import { getCauseById } from '@/lib/dream-boards/causes';
-import { isDateWithinRange, isDeadlineWithinRange } from '@/lib/dream-boards/validation';
+import { isPartyDateWithinRange, SA_MOBILE_REGEX } from '@/lib/dream-boards/validation';
 import { encryptSensitiveValue } from '@/lib/utils/encryption';
 import { generateSlug } from '@/lib/utils/slug';
 
@@ -24,144 +23,36 @@ const listQuerySchema = z.object({
   after: z.string().optional(),
 });
 
-const takealotGiftSchema = z.object({
-  product_url: z.string().url(),
-  product_name: z.string().min(1),
-  product_image: z.string().url(),
-  product_price: z.number().int().positive(),
-});
-
-const philanthropyGiftSchema = z.object({
-  cause_id: z.string().min(1),
-  cause_name: z.string().min(1),
-  impact_description: z.string().min(1),
-  amount_cents: z.number().int().positive(),
-  cause_description: z.string().min(1).optional(),
-  cause_image: z.string().min(1).optional(),
-});
-
-const overflowGiftSchema = z.object({
-  cause_id: z.string().min(1),
-  cause_name: z.string().min(1),
-  impact_description: z.string().min(1),
-});
-
 const createSchema = z
   .object({
     child_name: z.string().min(2).max(50),
     child_photo_url: z.string().url(),
-    birthday_date: z.string().min(1),
-    gift_type: z.enum(['takealot_product', 'philanthropy']),
-    gift_data: z.union([takealotGiftSchema, philanthropyGiftSchema]),
-    payout_method: z.enum(['takealot_gift_card', 'karri_card_topup', 'philanthropy_donation']),
-    overflow_gift_data: overflowGiftSchema.optional(),
+    party_date: z.string().min(1),
+    gift_name: z.string().min(2).max(200),
+    gift_image_url: z.string().url(),
+    gift_image_prompt: z.string().min(1).optional(),
     goal_cents: z.number().int().min(2000),
     payout_email: z.string().email(),
+    host_whatsapp_number: z
+      .string()
+      .regex(SA_MOBILE_REGEX, 'Must be a valid SA mobile number'),
+    karri_card_number: z.string().regex(/^\d{16}$/, 'Must be 16 digits'),
+    karri_card_holder_name: z.string().min(2).max(100),
     message: z.string().max(280).optional(),
-    deadline: z.string().min(1),
-    karri_card_number: z.string().min(1).optional(),
   })
   .superRefine((value, ctx) => {
-    ensureTakealotGiftData(value, ctx);
-    ensurePhilanthropyGiftData(value, ctx);
-    ensureOverflowGiftData(value, ctx);
-    ensurePayoutMethod(value, ctx);
-    ensureKarriCardNumber(value, ctx);
     ensureDateRanges(value, ctx);
   });
 
 type CreatePayload = z.infer<typeof createSchema>;
-type TakealotGiftPayload = z.infer<typeof takealotGiftSchema>;
-type PhilanthropyGiftPayload = z.infer<typeof philanthropyGiftSchema>;
-
-const ensureTakealotGiftData = (value: CreatePayload, ctx: z.RefinementCtx) => {
-  if (value.gift_type === 'takealot_product' && !('product_url' in value.gift_data)) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['gift_data'],
-      message: 'Gift data must be takealot_product',
-    });
-  }
-};
-
-const ensurePhilanthropyGiftData = (value: CreatePayload, ctx: z.RefinementCtx) => {
-  if (value.gift_type === 'philanthropy' && !('cause_id' in value.gift_data)) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['gift_data'],
-      message: 'Gift data must be philanthropy',
-    });
-  }
-};
-
-const ensureOverflowGiftData = (value: CreatePayload, ctx: z.RefinementCtx) => {
-  if (value.gift_type === 'takealot_product' && !value.overflow_gift_data) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['overflow_gift_data'],
-      message: 'Overflow gift is required for takealot_product',
-    });
-  }
-};
-
-const ensurePayoutMethod = (value: CreatePayload, ctx: z.RefinementCtx) => {
-  if (value.gift_type === 'philanthropy' && value.payout_method !== 'philanthropy_donation') {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['payout_method'],
-      message: 'Payout method must be philanthropy_donation',
-    });
-  }
-};
-
-const ensureKarriCardNumber = (value: CreatePayload, ctx: z.RefinementCtx) => {
-  if (value.payout_method === 'karri_card_topup' && !value.karri_card_number) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['karri_card_number'],
-      message: 'Karri card number is required for karri_card_topup',
-    });
-  }
-};
-
 const ensureDateRanges = (value: CreatePayload, ctx: z.RefinementCtx) => {
-  if (!isDateWithinRange(value.birthday_date)) {
+  if (!isPartyDateWithinRange(value.party_date)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: ['birthday_date'],
-      message: 'Birthday must be within the next 90 days',
+      path: ['party_date'],
+      message: 'Party date must be within the next 6 months',
     });
   }
-
-  if (!isDeadlineWithinRange(value.deadline)) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['deadline'],
-      message: 'Deadline must be within the next 90 days',
-    });
-  }
-};
-
-const buildPhilanthropyGiftData = (payload: CreatePayload['gift_data']) => {
-  if (!('cause_id' in payload)) return null;
-  const data = payload as PhilanthropyGiftPayload;
-  const cause = getCauseById(data.cause_id);
-  const causeDescription = data.cause_description ?? cause?.description;
-  const causeImage = data.cause_image ?? cause?.imageUrl;
-
-  if (!causeDescription || !causeImage) {
-    return null;
-  }
-
-  return {
-    type: 'philanthropy' as const,
-    causeId: data.cause_id,
-    causeName: data.cause_name,
-    causeDescription,
-    causeImage,
-    impactDescription: data.impact_description,
-    amountCents: data.amount_cents,
-  };
 };
 
 const parseCreatePayload = async (request: NextRequest, requestId: string, headers: Headers) => {
@@ -172,70 +63,10 @@ const parseCreatePayload = async (request: NextRequest, requestId: string, heade
   });
 };
 
-const resolveGiftData = (payload: CreatePayload, requestId: string, headers: Headers) => {
-  if (payload.gift_type === 'takealot_product') {
-    const data = payload.gift_data as TakealotGiftPayload;
-    return {
-      ok: true as const,
-      giftData: {
-        type: 'takealot_product' as const,
-        productUrl: data.product_url,
-        productName: data.product_name,
-        productImage: data.product_image,
-        productPrice: data.product_price,
-      },
-      overflowGiftData: payload.overflow_gift_data
-        ? {
-            causeId: payload.overflow_gift_data.cause_id,
-            causeName: payload.overflow_gift_data.cause_name,
-            impactDescription: payload.overflow_gift_data.impact_description,
-          }
-        : undefined,
-    };
-  }
-
-  const philanthropyGiftData = buildPhilanthropyGiftData(payload.gift_data);
-  if (!philanthropyGiftData) {
-    return {
-      ok: false as const,
-      response: jsonError({
-        error: { code: 'validation_error', message: 'Invalid philanthropy gift data' },
-        status: 400,
-        requestId,
-        headers,
-      }),
-    };
-  }
-
-  return {
-    ok: true as const,
-    giftData: philanthropyGiftData,
-    overflowGiftData: undefined,
-  };
-};
-
 const insertDreamBoard = async (params: {
   payload: CreatePayload;
-  giftData:
-    | {
-        type: 'takealot_product';
-        productUrl: string;
-        productName: string;
-        productImage: string;
-        productPrice: number;
-      }
-    | {
-        type: 'philanthropy';
-        causeId: string;
-        causeName: string;
-        causeDescription: string;
-        causeImage: string;
-        impactDescription: string;
-        amountCents: number;
-      };
-  overflowGiftData?: { causeId: string; causeName: string; impactDescription: string };
   hostId: string;
-  karriCardNumber: string | null;
+  karriCardNumber: string;
   partnerId: string;
 }) => {
   let created: null | { id: string; slug: string; createdAt: Date; updatedAt: Date } = null;
@@ -249,15 +80,16 @@ const insertDreamBoard = async (params: {
         slug,
         childName: params.payload.child_name,
         childPhotoUrl: params.payload.child_photo_url,
-        birthdayDate: params.payload.birthday_date,
-        giftType: params.payload.gift_type,
-        giftData: params.giftData,
+        partyDate: params.payload.party_date,
+        giftName: params.payload.gift_name,
+        giftImageUrl: params.payload.gift_image_url,
+        giftImagePrompt: params.payload.gift_image_prompt ?? null,
         goalCents: params.payload.goal_cents,
-        payoutMethod: params.payload.payout_method,
-        overflowGiftData: params.overflowGiftData ?? null,
+        payoutMethod: 'karri_card',
         karriCardNumber: params.karriCardNumber,
+        karriCardHolderName: params.payload.karri_card_holder_name,
+        hostWhatsAppNumber: params.payload.host_whatsapp_number,
         message: params.payload.message ?? null,
-        deadline: new Date(params.payload.deadline),
         status: 'active',
         payoutEmail: params.payload.payout_email,
       })
@@ -341,7 +173,6 @@ export const POST = withApiAuth('dreamboards:write', async (request: NextRequest
   if (!parsed.ok) return parsed.response;
 
   const karriVerification = await verifyKarriCardForApi({
-    payoutMethod: parsed.data.payout_method,
     cardNumber: parsed.data.karri_card_number,
     requestId,
     headers: rateLimitHeaders,
@@ -351,19 +182,11 @@ export const POST = withApiAuth('dreamboards:write', async (request: NextRequest
     return karriVerification.response;
   }
 
-  const giftDataResult = resolveGiftData(parsed.data, requestId, rateLimitHeaders);
-  if (!giftDataResult.ok) return giftDataResult.response;
-
   const host = await ensureHostForEmail(parsed.data.payout_email);
-  const karriCardNumber =
-    parsed.data.payout_method === 'karri_card_topup' && karriVerification.cardNumber
-      ? encryptSensitiveValue(karriVerification.cardNumber)
-      : null;
+  const karriCardNumber = encryptSensitiveValue(karriVerification.cardNumber);
 
   const created = await insertDreamBoard({
     payload: parsed.data,
-    giftData: giftDataResult.giftData,
-    overflowGiftData: giftDataResult.overflowGiftData,
     hostId: host.id,
     karriCardNumber,
     partnerId: context.apiKey.partnerId,
@@ -384,15 +207,14 @@ export const POST = withApiAuth('dreamboards:write', async (request: NextRequest
       slug: created.slug,
       childName: parsed.data.child_name,
       childPhotoUrl: parsed.data.child_photo_url,
-      birthdayDate: parsed.data.birthday_date,
-      giftType: parsed.data.gift_type,
-      giftData: giftDataResult.giftData,
-      payoutMethod: parsed.data.payout_method,
-      overflowGiftData: giftDataResult.overflowGiftData ?? null,
+      partyDate: parsed.data.party_date,
+      giftName: parsed.data.gift_name,
+      giftImageUrl: parsed.data.gift_image_url,
+      giftImagePrompt: parsed.data.gift_image_prompt ?? null,
+      payoutMethod: 'karri_card',
       goalCents: parsed.data.goal_cents,
       raisedCents: 0,
       message: parsed.data.message ?? null,
-      deadline: parsed.data.deadline,
       status: 'active',
       contributionCount: 0,
       createdAt: created.createdAt,

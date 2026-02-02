@@ -7,25 +7,29 @@ const DREAM_BOARD_CACHE_TTL_SECONDS = 5 * 60;
 const dreamBoardCacheKey = (slug: string) => `dream-board:${slug}`;
 
 type DreamBoardRecord = Awaited<ReturnType<typeof getDreamBoardBySlug>>;
+type HydratedDreamBoardRecord = DreamBoardRecord extends null
+  ? null
+  : Omit<NonNullable<DreamBoardRecord>, 'createdAt' | 'updatedAt'> & {
+      createdAt: Date;
+      updatedAt: Date;
+    };
 
 const hydrateDate = (value: Date | string): Date =>
   value instanceof Date ? value : new Date(value);
 
-const hydrateDateOrNull = (value: Date | string | null): Date | null =>
-  value ? hydrateDate(value) : null;
-
-const hydrateDreamBoard = (board: DreamBoardRecord): DreamBoardRecord => {
+const hydrateDreamBoard = (board: DreamBoardRecord): HydratedDreamBoardRecord => {
   if (!board) return board;
 
   return {
     ...board,
-    deadline: hydrateDateOrNull(board.deadline),
     createdAt: hydrateDate(board.createdAt),
     updatedAt: hydrateDate(board.updatedAt),
   };
 };
 
-export const getCachedDreamBoardBySlug = async (slug: string): Promise<DreamBoardRecord> => {
+export const getCachedDreamBoardBySlug = async (
+  slug: string
+): Promise<HydratedDreamBoardRecord> => {
   const cached = await kvAdapter.get<DreamBoardRecord>(dreamBoardCacheKey(slug));
   if (cached) {
     return hydrateDreamBoard(cached);

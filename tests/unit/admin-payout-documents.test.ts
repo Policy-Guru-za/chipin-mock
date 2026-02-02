@@ -28,7 +28,7 @@ const mockArrayBuffer = () => {
 
 const basePayout = {
   id: 'payout-1',
-  type: 'philanthropy_donation',
+  type: 'karri_card',
   recipientData: {
     receiptUrl: 'https://blob.example/receipt.enc',
     receiptContentType: 'application/pdf',
@@ -51,7 +51,7 @@ afterEach(() => {
 });
 
 describe('admin payout documents route', () => {
-  it('returns decrypted receipt', async () => {
+  it('returns not found for receipt requests', async () => {
     payoutMocks.getPayoutDetail.mockResolvedValue(basePayout);
     vi.stubGlobal(
       'fetch',
@@ -63,12 +63,10 @@ describe('admin payout documents route', () => {
       params: { id: 'payout-1', type: 'receipt' },
     });
 
-    const body = await response.arrayBuffer();
+    const payload = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(response.headers.get('Content-Type')).toBe('application/pdf');
-    expect(response.headers.get('Content-Disposition')).toContain('receipt.pdf');
-    expect(Buffer.from(body).toString()).toBe('decrypted');
+    expect(response.status).toBe(404);
+    expect(payload.error).toBe('not_found');
   });
 
   it('returns 404 for invalid document type', async () => {

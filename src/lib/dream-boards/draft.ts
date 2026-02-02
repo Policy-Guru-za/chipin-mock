@@ -2,62 +2,38 @@ import { kvAdapter } from '@/lib/demo/kv-adapter';
 
 const DRAFT_EXPIRY_SECONDS = 60 * 60 * 24 * 7;
 
-export type DreamBoardGiftType = 'takealot_product' | 'philanthropy';
-
-export type TakealotGiftData = {
-  type: 'takealot_product';
-  productUrl: string;
-  productName: string;
-  productImage: string;
-  productPrice: number;
-};
-
-export type PhilanthropyGiftData = {
-  type: 'philanthropy';
-  causeId: string;
-  causeName: string;
-  causeDescription: string;
-  causeImage: string;
-  impactDescription: string;
-  amountCents: number;
-};
-
-export type OverflowGiftData = {
-  causeId: string;
-  causeName: string;
-  impactDescription: string;
-};
-
 export type DreamBoardDraftInput = {
   childName?: string;
-  birthdayDate?: string;
+  partyDate?: string;
   childPhotoUrl?: string;
   photoFilename?: string;
-  giftType?: DreamBoardGiftType;
-  giftData?: TakealotGiftData | PhilanthropyGiftData;
-  overflowGiftData?: OverflowGiftData;
+  giftName?: string;
+  giftDescription?: string;
+  giftImageUrl?: string;
+  giftImagePrompt?: string;
   goalCents?: number;
   payoutEmail?: string;
-  payoutMethod?: 'takealot_gift_card' | 'karri_card_topup' | 'philanthropy_donation';
   karriCardNumberEncrypted?: string;
+  karriCardHolderName?: string;
+  hostWhatsAppNumber?: string;
   message?: string;
-  deadline?: string;
 };
 
 export type DreamBoardDraft = {
   childName?: string;
-  birthdayDate?: string;
+  partyDate?: string;
   childPhotoUrl?: string;
   photoFilename?: string;
-  giftType?: DreamBoardGiftType;
-  giftData?: TakealotGiftData | PhilanthropyGiftData;
-  overflowGiftData?: OverflowGiftData;
+  giftName?: string;
+  giftDescription?: string;
+  giftImageUrl?: string;
+  giftImagePrompt?: string;
   goalCents?: number;
   payoutEmail?: string;
-  payoutMethod?: 'takealot_gift_card' | 'karri_card_topup' | 'philanthropy_donation';
   karriCardNumberEncrypted?: string;
+  karriCardHolderName?: string;
+  hostWhatsAppNumber?: string;
   message?: string;
-  deadline?: string;
   updatedAt: string;
 };
 

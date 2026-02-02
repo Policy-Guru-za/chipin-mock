@@ -52,7 +52,7 @@ describe('payout queries', () => {
     expect(result).toHaveLength(1);
   });
 
-  it('includes boards missing overflow payouts', async () => {
+  it('includes boards missing karri card payouts', async () => {
     dbMock.select
       .mockReturnValueOnce(
         makeBoardQuery([
@@ -60,9 +60,8 @@ describe('payout queries', () => {
             id: 'board-1',
             slug: 'maya',
             childName: 'Maya',
-            giftType: 'takealot_product',
             status: 'closed',
-            payoutMethod: 'takealot_gift_card',
+            payoutMethod: 'karri_card',
             payoutEmail: 'host@chipin.co.za',
             goalCents: 10000,
             raisedCents: 12000,
@@ -72,9 +71,7 @@ describe('payout queries', () => {
           },
         ])
       )
-      .mockReturnValueOnce(
-        makePayoutQuery([{ dreamBoardId: 'board-1', type: 'takealot_gift_card' }])
-      );
+      .mockReturnValueOnce(makePayoutQuery([]));
 
     const result = await listDreamBoardsReadyForPayouts();
 

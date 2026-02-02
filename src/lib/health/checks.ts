@@ -67,26 +67,3 @@ export const checkKarriAutomation = async (): Promise<HealthCheckResult> => {
   }
   return { ok: true };
 };
-
-export const checkTakealotGiftCards = async (): Promise<HealthCheckResult> => {
-  if (!isEnabledFlag(process.env.TAKEALOT_GIFTCARD_AUTOMATION_ENABLED)) {
-    return { ok: true, detail: 'disabled' };
-  }
-  if (!process.env.TAKEALOT_GIFTCARD_API_URL || !process.env.TAKEALOT_GIFTCARD_API_KEY) {
-    return {
-      ok: false,
-      detail: 'TAKEALOT_GIFTCARD_API_URL or TAKEALOT_GIFTCARD_API_KEY is not set',
-    };
-  }
-  return { ok: true };
-};
-
-export const checkGivenGainAutomation = async (): Promise<HealthCheckResult> => {
-  if (!isEnabledFlag(process.env.GIVENGAIN_AUTOMATION_ENABLED)) {
-    return { ok: true, detail: 'disabled' };
-  }
-  if (!process.env.GIVENGAIN_API_URL || !process.env.GIVENGAIN_API_KEY) {
-    return { ok: false, detail: 'GIVENGAIN_API_URL or GIVENGAIN_API_KEY is not set' };
-  }
-  return { ok: true };
-};

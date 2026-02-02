@@ -26,9 +26,7 @@ const payoutStatusLabel = (status: string) =>
 
 const payoutTypeLabel = (type: string) =>
   ({
-    takealot_gift_card: 'Takealot Gift Card',
-    karri_card_topup: 'Karri Card Top-up',
-    philanthropy_donation: 'Philanthropy Donation',
+    karri_card: 'Karri Card Credit',
   })[type] ?? type;
 
 const dateFormatter = new Intl.DateTimeFormat('en-ZA', {
@@ -142,7 +140,7 @@ export default async function AdminPayoutsPage({
               <Card key={board.id} className="space-y-2 p-5">
                 <div className="text-lg font-semibold">{board.childName}</div>
                 <div className="text-sm text-text-muted">/{board.slug}</div>
-                <div className="text-sm text-text">Deadline: {formatDate(board.deadline)}</div>
+                <div className="text-sm text-text">Party date: {formatDate(board.partyDate)}</div>
               </Card>
             ))}
           </div>

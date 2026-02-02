@@ -54,11 +54,11 @@ describe('GET /api/v1/payouts/pending', () => {
       {
         id: 'payout-1',
         dreamBoardId: 'board-1',
-        type: 'takealot_gift_card',
+        type: 'karri_card',
         grossCents: 20000,
         feeCents: 0,
         netCents: 20000,
-        recipientData: { email: 'parent@example.com', productUrl: 'https://takealot.com' },
+        recipientData: { email: 'parent@example.com', payoutMethod: 'karri_card' },
         status: 'pending',
         externalRef: null,
         errorMessage: null,
@@ -68,11 +68,11 @@ describe('GET /api/v1/payouts/pending', () => {
       {
         id: 'payout-2',
         dreamBoardId: 'board-2',
-        type: 'philanthropy_donation',
+        type: 'karri_card',
         grossCents: 15000,
         feeCents: 0,
         netCents: 15000,
-        recipientData: { email: 'parent@example.com' },
+        recipientData: { email: 'parent@example.com', payoutMethod: 'karri_card' },
         status: 'pending',
         externalRef: null,
         errorMessage: null,
@@ -107,13 +107,13 @@ describe('POST /api/v1/payouts/[id]/confirm', () => {
     const getPayoutForApi = vi.fn(async () => ({
       id: '00000000-0000-4000-8000-000000000000',
       dreamBoardId: 'board-1',
-      type: 'takealot_gift_card',
+      type: 'karri_card',
       grossCents: 20000,
       feeCents: 0,
       netCents: 20000,
       recipientData: { email: 'parent@example.com' },
       status: 'completed',
-      externalRef: 'TKL_123',
+      externalRef: 'KARRI_123',
       errorMessage: null,
       createdAt: new Date('2026-01-10T10:00:00.000Z'),
       completedAt: new Date('2026-01-11T10:00:00.000Z'),
@@ -128,14 +128,14 @@ describe('POST /api/v1/payouts/[id]/confirm', () => {
     const response = await POST(
       new Request('http://localhost/api/v1/payouts/00000000-0000-4000-8000-000000000000/confirm', {
         method: 'POST',
-        body: JSON.stringify({ external_ref: 'TKL_123' }),
+        body: JSON.stringify({ external_ref: 'KARRI_123' }),
       }),
       { params: { id: '00000000-0000-4000-8000-000000000000' } }
     );
     const payload = await response.json();
 
     expect(response.status).toBe(200);
-    expect(payload.data.external_ref).toBe('TKL_123');
+    expect(payload.data.external_ref).toBe('KARRI_123');
     expect(markApiKeyUsed).toHaveBeenCalledWith('api-key-3');
   });
 
@@ -155,7 +155,7 @@ describe('POST /api/v1/payouts/[id]/confirm', () => {
     const response = await POST(
       new Request(`http://localhost/api/v1/payouts/${id}/confirm`, {
         method: 'POST',
-        body: JSON.stringify({ external_ref: 'TKL_123' }),
+        body: JSON.stringify({ external_ref: 'KARRI_123' }),
       }),
       { params: { id } }
     );
@@ -175,7 +175,7 @@ describe('GET /api/v1/payouts/[id]', () => {
     const getPayoutForApi = vi.fn(async () => ({
       id: '00000000-0000-4000-8000-000000000000',
       dreamBoardId: 'board-1',
-      type: 'takealot_gift_card',
+      type: 'karri_card',
       grossCents: 20000,
       feeCents: 0,
       netCents: 20000,
@@ -232,7 +232,7 @@ describe('POST /api/v1/payouts/[id]/fail', () => {
     const getPayoutForApi = vi.fn(async () => ({
       id: '00000000-0000-4000-8000-000000000000',
       dreamBoardId: 'board-1',
-      type: 'takealot_gift_card',
+      type: 'karri_card',
       grossCents: 20000,
       feeCents: 0,
       netCents: 20000,

@@ -2,12 +2,14 @@ import * as Sentry from '@sentry/nextjs';
 import { eq, sql } from 'drizzle-orm';
 
 import { recordAuditEvent, type AuditActor } from '@/lib/audit';
+import { LEGACY_PLACEHOLDER } from '@/lib/constants';
 import { isDemoMode } from '@/lib/demo';
 import { db } from '@/lib/db';
 import { dreamBoards, payoutItems, payouts } from '@/lib/db/schema';
 import { log } from '@/lib/observability/logger';
 
 import { calculatePayoutTotals } from './calculation';
+import { queueKarriCredit } from '@/lib/integrations/karri-batch';
 import {
   getContributionTotalsForDreamBoard,
   getDreamBoardPayoutContext,
@@ -21,6 +23,9 @@ type PayoutItemRecord = typeof payoutItems.$inferSelect;
 type PayoutType = PayoutRecord['type'];
 type PayoutItemType = PayoutItemRecord['type'];
 
+const isLegacyPlaceholder = (value?: string | null) =>
+  !value || value === LEGACY_PLACEHOLDER;
+
 const normalizeRecipientData = (payload: unknown): PayoutRecipientData => {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
     return {};
@@ -32,42 +37,27 @@ const getRecipientDataForGift = (params: {
   payoutEmail: string;
   childName: string;
   payoutMethod: string;
-  giftType: string | null; // v2.0: nullable during migration
-  giftData?: Record<string, unknown> | null;
+  giftName: string;
+  giftImageUrl: string;
+  giftImagePrompt?: string | null;
   karriCardNumber?: string | null;
-}) => ({
-  ...(params.payoutMethod === 'karri_card_topup'
-    ? (() => {
-        if (!params.karriCardNumber) {
-          throw new Error('Karri card number is missing');
-        }
-        return {
-          cardNumberEncrypted: params.karriCardNumber,
-          cardholderName: params.childName,
-        };
-      })()
-    : {
-        email: params.payoutEmail,
-        giftData: params.giftData ?? null,
-        productUrl: params.giftData?.productUrl ?? null,
-      }),
-  payoutMethod: params.payoutMethod,
-  giftType: params.giftType,
-  childName: params.childName,
-});
+  karriCardHolderName?: string | null;
+}) => {
+  if (isLegacyPlaceholder(params.karriCardNumber)) {
+    throw new Error('Karri card number is missing');
+  }
 
-const getRecipientDataForOverflow = (params: {
-  payoutEmail: string;
-  childName: string;
-  overflowGiftData?: Record<string, unknown> | null;
-}) => ({
-  email: params.payoutEmail,
-  donorEmail: params.payoutEmail,
-  donorName: params.childName,
-  causeId: params.overflowGiftData?.causeId ?? null,
-  childName: params.childName,
-  overflowGiftData: params.overflowGiftData ?? null,
-});
+  return {
+    email: params.payoutEmail,
+    payoutMethod: params.payoutMethod,
+    childName: params.childName,
+    giftName: params.giftName,
+    giftImageUrl: params.giftImageUrl,
+    giftImagePrompt: params.giftImagePrompt ?? null,
+    karriCardHolderName: params.karriCardHolderName ?? null,
+    cardNumberEncrypted: params.karriCardNumber,
+  };
+};
 
 const ensureBoardReady = (status: string) => {
   const readyStatuses = ['closed'] as const;
@@ -75,18 +65,6 @@ const ensureBoardReady = (status: string) => {
     throw new Error('Dream Board is not ready for payout');
   }
 };
-
-const getAdjustedCalculation = (
-  giftType: string | null, // v2.0: nullable during migration
-  calculation: ReturnType<typeof calculatePayoutTotals>
-) =>
-  giftType === 'philanthropy'
-    ? {
-        ...calculation,
-        giftCents: calculation.raisedCents,
-        overflowCents: 0,
-      }
-    : calculation;
 
 const buildPayoutPlans = (params: {
   board: Awaited<ReturnType<typeof getDreamBoardPayoutContext>>;
@@ -117,22 +95,11 @@ const buildPayoutPlans = (params: {
         payoutEmail: board.payoutEmail,
         childName: board.childName,
         payoutMethod: board.payoutMethod,
-        giftType: board.giftType,
-        giftData: board.giftData as Record<string, unknown> | null,
+        giftName: board.giftName,
+        giftImageUrl: board.giftImageUrl,
+        giftImagePrompt: board.giftImagePrompt,
         karriCardNumber: board.karriCardNumber,
-      }),
-    });
-  }
-
-  if (calculation.overflowCents > 0 && !existingTypes.has('philanthropy_donation')) {
-    payoutPlans.push({
-      type: 'philanthropy_donation',
-      itemType: 'overflow',
-      amountCents: calculation.overflowCents,
-      recipientData: getRecipientDataForOverflow({
-        payoutEmail: board.payoutEmail,
-        childName: board.childName,
-        overflowGiftData: board.overflowGiftData as Record<string, unknown> | null,
+        karriCardHolderName: board.karriCardHolderName,
       }),
     });
   }
@@ -154,26 +121,31 @@ export async function createPayoutsForDreamBoard(params: {
   const totals = await getContributionTotalsForDreamBoard(board.id);
   const calculation = calculatePayoutTotals({
     raisedCents: totals.raisedCents,
-    goalCents: board.goalCents,
     platformFeeCents: totals.platformFeeCents,
   });
+
+  if (isLegacyPlaceholder(board.karriCardNumber)) {
+    log('error', 'payout_missing_karri_card', {
+      dreamBoardId: board.id,
+      payoutEmail: board.payoutEmail,
+    });
+    return { created: [], calculation, skipped: true };
+  }
 
   if (calculation.raisedCents === 0) {
     return { created: [], calculation, skipped: true };
   }
 
-  const adjustedCalculation = getAdjustedCalculation(board.giftType, calculation);
-
   const existing = await listPayoutsForDreamBoard(board.id);
   const existingTypes = new Set(existing.map((payout) => payout.type));
   const payoutPlans = buildPayoutPlans({
     board,
-    calculation: adjustedCalculation,
+    calculation,
     existingTypes,
   });
 
   if (!payoutPlans.length) {
-    return { created: [], calculation: adjustedCalculation, skipped: true };
+    return { created: [], calculation, skipped: true };
   }
 
   const createdPayouts: Array<{ id: string; type: string }> = [];
@@ -206,8 +178,18 @@ export async function createPayoutsForDreamBoard(params: {
           dreamBoardId: board.id,
           type: plan.itemType,
           amountCents: plan.amountCents,
-          metadata: { calculation: adjustedCalculation },
+          metadata: { calculation },
         });
+
+        await queueKarriCredit(
+          {
+            dreamBoardId: board.id,
+            karriCardNumber: board.karriCardNumber,
+            amountCents: plan.amountCents,
+            reference: created.id,
+          },
+          tx
+        );
 
         await recordAuditEvent({
           actor: params.actor,
@@ -237,7 +219,7 @@ export async function createPayoutsForDreamBoard(params: {
 
   return {
     created: createdPayouts,
-    calculation: adjustedCalculation,
+    calculation,
     skipped: createdPayouts.length === 0,
   };
 }

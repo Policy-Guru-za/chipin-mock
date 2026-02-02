@@ -6,13 +6,12 @@ const normalizeCardNumber = (value?: string | null) =>
   value ? value.replace(/\s+/g, '').replace(/-/g, '') : null;
 
 export const verifyKarriCardForApi = async (params: {
-  payoutMethod: string;
   cardNumber?: string | null;
   requestId: string;
   headers: Headers;
 }) => {
   const normalizedCardNumber = normalizeCardNumber(params.cardNumber);
-  if (params.payoutMethod === 'karri_card_topup' && !normalizedCardNumber) {
+  if (!normalizedCardNumber) {
     return {
       ok: false as const,
       response: jsonError({
@@ -22,10 +21,6 @@ export const verifyKarriCardForApi = async (params: {
         headers: params.headers,
       }),
     };
-  }
-
-  if (params.payoutMethod !== 'karri_card_topup' || !normalizedCardNumber) {
-    return { ok: true as const, cardNumber: normalizedCardNumber };
   }
 
   if (process.env.KARRI_AUTOMATION_ENABLED !== 'true') {

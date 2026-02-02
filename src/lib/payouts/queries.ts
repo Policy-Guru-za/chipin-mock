@@ -10,13 +10,15 @@ export const getDreamBoardPayoutContext = async (dreamBoardId: string) => {
       partnerId: dreamBoards.partnerId,
       slug: dreamBoards.slug,
       childName: dreamBoards.childName,
-      giftType: dreamBoards.giftType,
-      giftData: dreamBoards.giftData,
+      giftName: dreamBoards.giftName,
+      giftImageUrl: dreamBoards.giftImageUrl,
+      giftImagePrompt: dreamBoards.giftImagePrompt,
       goalCents: dreamBoards.goalCents,
       payoutMethod: dreamBoards.payoutMethod,
       payoutEmail: dreamBoards.payoutEmail,
-      overflowGiftData: dreamBoards.overflowGiftData,
       karriCardNumber: dreamBoards.karriCardNumber,
+      karriCardHolderName: dreamBoards.karriCardHolderName,
+      hostWhatsAppNumber: dreamBoards.hostWhatsAppNumber,
       status: dreamBoards.status,
       hostEmail: hosts.email,
       hostId: hosts.id,
@@ -72,23 +74,7 @@ type PayoutRecord = typeof payouts.$inferSelect;
 type PayoutStatus = PayoutRecord['status'];
 type PayoutType = PayoutRecord['type'];
 
-const getExpectedPayoutTypes = (board: {
-  giftType: string | null; // v2.0: nullable during migration
-  payoutMethod: PayoutType;
-  raisedCents: number;
-  goalCents: number;
-}) => {
-  if (board.giftType === 'philanthropy') {
-    return ['philanthropy_donation'] as PayoutType[];
-  }
-
-  const expected: PayoutType[] = [board.payoutMethod];
-  if (board.raisedCents > board.goalCents) {
-    expected.push('philanthropy_donation');
-  }
-
-  return expected;
-};
+const getExpectedPayoutTypes = () => ['karri_card'] as PayoutType[];
 
 export const listDreamBoardsReadyForPayouts = async () => {
   const boards = await db
@@ -96,7 +82,6 @@ export const listDreamBoardsReadyForPayouts = async () => {
       id: dreamBoards.id,
       slug: dreamBoards.slug,
       childName: dreamBoards.childName,
-      giftType: dreamBoards.giftType,
       status: dreamBoards.status,
       payoutMethod: dreamBoards.payoutMethod,
       payoutEmail: dreamBoards.payoutEmail,
@@ -142,12 +127,7 @@ export const listDreamBoardsReadyForPayouts = async () => {
       return false;
     }
 
-    const expected = getExpectedPayoutTypes({
-      giftType: board.giftType,
-      payoutMethod: board.payoutMethod as PayoutType,
-      raisedCents: board.raisedCents,
-      goalCents: board.goalCents,
-    });
+    const expected = getExpectedPayoutTypes();
     const existing = payoutMap.get(board.id) ?? new Set<PayoutType>();
 
     return expected.some((type) => !existing.has(type));
@@ -220,10 +200,10 @@ export const getPayoutDetail = async (payoutId: string) => {
       dreamBoardSlug: dreamBoards.slug,
       childName: dreamBoards.childName,
       payoutEmail: dreamBoards.payoutEmail,
-      giftData: dreamBoards.giftData,
-      overflowGiftData: dreamBoards.overflowGiftData,
+      giftName: dreamBoards.giftName,
+      giftImageUrl: dreamBoards.giftImageUrl,
+      giftImagePrompt: dreamBoards.giftImagePrompt,
       payoutMethod: dreamBoards.payoutMethod,
-      giftType: dreamBoards.giftType,
       goalCents: dreamBoards.goalCents,
       statusLabel: dreamBoards.status,
       hostEmail: hosts.email,

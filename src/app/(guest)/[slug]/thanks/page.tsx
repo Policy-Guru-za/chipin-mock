@@ -7,6 +7,7 @@ import { getContributionByPaymentRef } from '@/lib/db/queries';
 import { getCachedDreamBoardBySlug } from '@/lib/dream-boards/cache';
 import { buildThankYouViewModel } from '@/lib/dream-boards/view-model';
 import type { PaymentProvider } from '@/lib/payments';
+import { formatZar } from '@/lib/utils/money';
 
 type ThanksPageProps = {
   params: Promise<{ slug: string }>;
@@ -45,7 +46,7 @@ export default async function ThankYouPage({ params, searchParams }: ThanksPageP
         <div className="mt-4 flex items-center justify-between text-sm text-text">
           <span>{view.percentage}% funded</span>
           <span>
-            {view.raisedLabel} of {view.goalLabel}
+            {formatZar(board.raisedCents)} of {formatZar(board.goalCents)}
           </span>
         </div>
       </div>

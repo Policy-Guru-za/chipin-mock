@@ -972,66 +972,30 @@ export const openApiSpec = {
       },
       GiftType: {
         type: 'string',
-        enum: ['takealot_product', 'philanthropy'],
+        enum: ['manual'],
       },
       PayoutMethod: {
         type: 'string',
-        enum: ['takealot_gift_card', 'karri_card_topup', 'philanthropy_donation'],
+        enum: ['karri_card'],
       },
       DisplayMode: {
         type: 'string',
-        enum: ['gift', 'charity'],
+        enum: ['gift'],
       },
-      TakealotGift: {
+      GiftData: {
         type: 'object',
-        required: ['product_url', 'product_name', 'product_image', 'product_price'],
+        required: ['gift_name', 'gift_image_url'],
         properties: {
-          product_url: {
+          gift_name: {
+            type: 'string',
+          },
+          gift_image_url: {
             type: 'string',
             format: 'uri',
           },
-          product_name: {
+          gift_image_prompt: {
             type: 'string',
-          },
-          product_image: {
-            type: 'string',
-            format: 'uri',
-          },
-          product_price: {
-            type: 'integer',
-          },
-        },
-      },
-      PhilanthropyGift: {
-        type: 'object',
-        required: ['cause_id', 'cause_name', 'impact_description', 'amount_cents'],
-        properties: {
-          cause_id: {
-            type: 'string',
-          },
-          cause_name: {
-            type: 'string',
-          },
-          impact_description: {
-            type: 'string',
-          },
-          amount_cents: {
-            type: 'integer',
-          },
-        },
-      },
-      OverflowGift: {
-        type: 'object',
-        required: ['cause_id', 'cause_name', 'impact_description'],
-        properties: {
-          cause_id: {
-            type: 'string',
-          },
-          cause_name: {
-            type: 'string',
-          },
-          impact_description: {
-            type: 'string',
+            nullable: true,
           },
         },
       },
@@ -1042,14 +1006,11 @@ export const openApiSpec = {
           'slug',
           'child_name',
           'child_photo_url',
-          'birthday_date',
-          'gift_type',
           'gift_data',
           'payout_method',
           'goal_cents',
           'raised_cents',
-          'overflow_cents',
-          'deadline',
+          'party_date',
           'status',
           'display_mode',
           'contribution_count',
@@ -1072,29 +1033,15 @@ export const openApiSpec = {
             type: 'string',
             format: 'uri',
           },
-          birthday_date: {
+          party_date: {
             type: 'string',
             format: 'date',
           },
-          gift_type: {
-            $ref: '#/components/schemas/GiftType',
-          },
           gift_data: {
-            oneOf: [
-              {
-                $ref: '#/components/schemas/TakealotGift',
-              },
-              {
-                $ref: '#/components/schemas/PhilanthropyGift',
-              },
-            ],
+            $ref: '#/components/schemas/GiftData',
           },
           payout_method: {
             $ref: '#/components/schemas/PayoutMethod',
-          },
-          overflow_gift_data: {
-            $ref: '#/components/schemas/OverflowGift',
-            nullable: true,
           },
           goal_cents: {
             type: 'integer',
@@ -1102,16 +1049,9 @@ export const openApiSpec = {
           raised_cents: {
             type: 'integer',
           },
-          overflow_cents: {
-            type: 'integer',
-          },
           message: {
             type: 'string',
             nullable: true,
-          },
-          deadline: {
-            type: 'string',
-            format: 'date-time',
           },
           status: {
             $ref: '#/components/schemas/DreamBoardStatus',
@@ -1141,13 +1081,14 @@ export const openApiSpec = {
         required: [
           'child_name',
           'child_photo_url',
-          'birthday_date',
-          'gift_type',
-          'gift_data',
-          'payout_method',
+          'party_date',
+          'gift_name',
+          'gift_image_url',
           'goal_cents',
           'payout_email',
-          'deadline',
+          'host_whatsapp_number',
+          'karri_card_number',
+          'karri_card_holder_name',
         ],
         properties: {
           child_name: {
@@ -1159,49 +1100,21 @@ export const openApiSpec = {
             type: 'string',
             format: 'uri',
           },
-          birthday_date: {
+          party_date: {
             type: 'string',
             format: 'date',
           },
-          gift_type: {
-            $ref: '#/components/schemas/GiftType',
+          gift_name: {
+            type: 'string',
+            minLength: 2,
+            maxLength: 200,
           },
-          gift_data: {
-            oneOf: [
-              {
-                $ref: '#/components/schemas/TakealotGift',
-              },
-              {
-                type: 'object',
-                required: ['cause_id', 'cause_name', 'impact_description', 'amount_cents'],
-                properties: {
-                  cause_id: {
-                    type: 'string',
-                  },
-                  cause_name: {
-                    type: 'string',
-                  },
-                  impact_description: {
-                    type: 'string',
-                  },
-                  amount_cents: {
-                    type: 'integer',
-                  },
-                  cause_description: {
-                    type: 'string',
-                  },
-                  cause_image: {
-                    type: 'string',
-                  },
-                },
-              },
-            ],
+          gift_image_url: {
+            type: 'string',
+            format: 'uri',
           },
-          payout_method: {
-            $ref: '#/components/schemas/PayoutMethod',
-          },
-          overflow_gift_data: {
-            $ref: '#/components/schemas/OverflowGift',
+          gift_image_prompt: {
+            type: 'string',
           },
           goal_cents: {
             type: 'integer',
@@ -1211,20 +1124,21 @@ export const openApiSpec = {
             type: 'string',
             format: 'email',
           },
-          message: {
+          host_whatsapp_number: {
             type: 'string',
-            maxLength: 280,
-          },
-          deadline: {
-            type: 'string',
-            format: 'date-time',
           },
           karri_card_number: {
             type: 'string',
           },
+          karri_card_holder_name: {
+            type: 'string',
+          },
+          message: {
+            type: 'string',
+            maxLength: 280,
+          },
         },
-        description:
-          'Overflow gift data is required for takealot_product. karri_card_number is required for karri_card_topup.',
+        description: 'Creates a dream board with a single gift and Karri card payout.',
       },
       DreamBoardResponse: {
         type: 'object',
@@ -1337,7 +1251,7 @@ export const openApiSpec = {
       },
       PayoutType: {
         type: 'string',
-        enum: ['takealot_gift_card', 'philanthropy_donation', 'karri_card_topup'],
+        enum: ['karri_card'],
       },
       PayoutStatus: {
         type: 'string',
@@ -1350,41 +1264,17 @@ export const openApiSpec = {
             type: 'string',
             format: 'email',
           },
-          donor_email: {
-            type: 'string',
-            format: 'email',
-          },
-          donor_name: {
-            type: 'string',
-          },
           child_name: {
             type: 'string',
           },
           payout_method: {
             $ref: '#/components/schemas/PayoutMethod',
           },
-          gift_type: {
-            $ref: '#/components/schemas/GiftType',
-          },
-          product_url: {
-            type: 'string',
-            format: 'uri',
-          },
-          cause_id: {
+          karri_card_holder_name: {
             type: 'string',
           },
           gift_data: {
-            oneOf: [
-              {
-                $ref: '#/components/schemas/TakealotGift',
-              },
-              {
-                $ref: '#/components/schemas/PhilanthropyGift',
-              },
-            ],
-          },
-          overflow_gift_data: {
-            $ref: '#/components/schemas/OverflowGift',
+            $ref: '#/components/schemas/GiftData',
           },
           card_number_last4: {
             type: 'string',
