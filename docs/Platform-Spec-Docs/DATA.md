@@ -1,14 +1,22 @@
 # ChipIn Data Models
 
-> **Version:** 1.0.0  
-> **Last Updated:** January 28, 2026  
-> **Status:** Ready for Development
+> **Version:** 2.0.0  
+> **Last Updated:** February 2026  
+> **Status:** Platform Simplification In Progress
 
 ---
 
 ## Overview
 
 ChipIn uses PostgreSQL (via Neon) with Drizzle ORM. This document defines all data models, relationships, and constraints.
+
+**Key Changes in v2.0:**
+- Removed `gift_type` enum values: `takealot_product`, `philanthropy`
+- Removed `payout_method` enum values: `takealot_gift_card`, `philanthropy_donation`
+- Karri Card is now the sole payout method
+- Added new columns: `gift_name`, `gift_image_url`, `gift_image_prompt`, `karri_card_holder_name`, `host_whatsapp_number`, `party_date`
+- Removed `overflow_gift_data` column
+- Added new table: `karri_credit_queue`
 
 ---
 
@@ -171,15 +179,10 @@ CREATE TYPE dream_board_status AS ENUM (
   'cancelled'
 );
 
-CREATE TYPE gift_type AS ENUM (
-  'takealot_product',
-  'philanthropy'
-);
+-- gift_type enum removed in v2.0 (manual gift definition only)
 
 CREATE TYPE payout_method AS ENUM (
-  'takealot_gift_card',
-  'karri_card_topup',
-  'philanthropy_donation'
+  'karri_card'  -- Sole payout method in v2.0
 );
 
 CREATE TABLE dream_boards (
@@ -191,46 +194,43 @@ CREATE TABLE dream_boards (
   -- Child details
   child_name VARCHAR(50) NOT NULL,
   child_photo_url TEXT NOT NULL,
-  birthday_date DATE NOT NULL,
+  party_date DATE NOT NULL,  -- v2.0: renamed from birthday_date, serves as pot close date
   
-  -- Gift details
-  gift_type gift_type NOT NULL,
-  gift_data JSONB NOT NULL,
+  -- Gift details (v2.0: manual definition + AI artwork)
+  gift_name VARCHAR(200) NOT NULL,
+  gift_image_url TEXT NOT NULL,
+  gift_image_prompt TEXT,  -- Prompt used for AI generation (for regeneration)
   goal_cents INTEGER NOT NULL,
-  payout_method payout_method NOT NULL,
-  overflow_gift_data JSONB, -- Required for takealot_product
-  karri_card_number TEXT,
+  
+  -- Payout details (v2.0: Karri Card only)
+  payout_method payout_method NOT NULL DEFAULT 'karri_card',
+  karri_card_number VARCHAR(20) NOT NULL,
+  karri_card_holder_name VARCHAR(100) NOT NULL,
+  payout_email VARCHAR(255) NOT NULL,
+  
+  -- Host contact (v2.0: WhatsApp notifications)
+  host_whatsapp_number VARCHAR(20) NOT NULL,
 
   -- Content
   message TEXT,
   
-  -- Timing
-  deadline TIMESTAMPTZ NOT NULL,
-  
   -- Status
   status dream_board_status NOT NULL DEFAULT 'draft',
-  
-  -- Payout details (private)
-  payout_email VARCHAR(255) NOT NULL,
   
   -- Timestamps
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   
+  -- Legacy columns (deprecated, kept for migration)
+  gift_type VARCHAR(50),  -- Deprecated in v2.0
+  gift_data JSONB,  -- Deprecated in v2.0
+  overflow_gift_data JSONB,  -- Deprecated in v2.0
+  birthday_date DATE,  -- Deprecated, use party_date
+  deadline TIMESTAMPTZ,  -- Deprecated, use party_date
+  
   -- Constraints
-  CONSTRAINT valid_goal CHECK (goal_cents >= 2000), -- Minimum R20 goal
-  CONSTRAINT valid_deadline CHECK (deadline > created_at),
-  CONSTRAINT payout_method_valid CHECK (
-    (gift_type = 'takealot_product' AND payout_method IN ('takealot_gift_card', 'karri_card_topup')) OR
-    (gift_type = 'philanthropy' AND payout_method = 'philanthropy_donation')
-  ),
-  CONSTRAINT karri_card_required CHECK (
-    (payout_method != 'karri_card_topup' OR karri_card_number IS NOT NULL)
-  ),
-  CONSTRAINT overflow_required CHECK (
-    (gift_type = 'takealot_product' AND overflow_gift_data IS NOT NULL) OR
-    (gift_type = 'philanthropy')
-  )
+  CONSTRAINT valid_goal CHECK (goal_cents >= 10000), -- Minimum R100 goal
+  CONSTRAINT valid_party_date CHECK (party_date > CURRENT_DATE)
 );
 
 CREATE INDEX idx_dream_boards_host ON dream_boards(host_id);
@@ -249,12 +249,10 @@ export const dreamBoardStatusEnum = pgEnum('dream_board_status', [
   'draft', 'active', 'funded', 'closed', 'paid_out', 'expired', 'cancelled'
 ]);
 
-export const giftTypeEnum = pgEnum('gift_type', [
-  'takealot_product', 'philanthropy'
-]);
+// giftTypeEnum removed in v2.0 (manual gift definition only)
 
 export const payoutMethodEnum = pgEnum('payout_method', [
-  'takealot_gift_card', 'karri_card_topup', 'philanthropy_donation'
+  'karri_card'  // Sole payout method in v2.0
 ]);
 
 export const dreamBoards = pgTable('dream_boards', {
@@ -266,27 +264,28 @@ export const dreamBoards = pgTable('dream_boards', {
   // Child details
   childName: varchar('child_name', { length: 50 }).notNull(),
   childPhotoUrl: text('child_photo_url').notNull(),
-  birthdayDate: date('birthday_date').notNull(),
+  partyDate: date('party_date').notNull(),  // v2.0: serves as pot close date
   
-  // Gift details
-  giftType: giftTypeEnum('gift_type').notNull(),
-  giftData: jsonb('gift_data').notNull(),
+  // Gift details (v2.0: manual definition + AI artwork)
+  giftName: varchar('gift_name', { length: 200 }).notNull(),
+  giftImageUrl: text('gift_image_url').notNull(),
+  giftImagePrompt: text('gift_image_prompt'),
   goalCents: integer('goal_cents').notNull(),
-  payoutMethod: payoutMethodEnum('payout_method').notNull(),
-  overflowGiftData: jsonb('overflow_gift_data'),
-  karriCardNumber: text('karri_card_number'),
+  
+  // Payout details (v2.0: Karri Card only)
+  payoutMethod: payoutMethodEnum('payout_method').notNull().default('karri_card'),
+  karriCardNumber: varchar('karri_card_number', { length: 20 }).notNull(),
+  karriCardHolderName: varchar('karri_card_holder_name', { length: 100 }).notNull(),
+  payoutEmail: varchar('payout_email', { length: 255 }).notNull(),
+  
+  // Host contact (v2.0: WhatsApp notifications)
+  hostWhatsAppNumber: varchar('host_whatsapp_number', { length: 20 }).notNull(),
   
   // Content
   message: text('message'),
   
-  // Timing
-  deadline: timestamp('deadline', { withTimezone: true }).notNull(),
-  
   // Status
   status: dreamBoardStatusEnum('status').notNull().default('draft'),
-  
-  // Payout details
-  payoutEmail: varchar('payout_email', { length: 255 }).notNull(),
   
   // Timestamps
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -294,38 +293,27 @@ export const dreamBoards = pgTable('dream_boards', {
 });
 ```
 
-**gift_data JSON Structures:**
+**Field Details (v2.0):**
 
-```typescript
-// For gift_type = 'takealot_product'
-interface TakealotGiftData {
-  type: 'takealot_product';
-  productUrl: string;
-  productId?: string;      // If we can extract it
-  productName: string;
-  productImage: string;
-  productPrice: number;    // In cents, at time of selection
-}
+| Field | Type | Description |
+|-------|------|-------------|
+| gift_name | VARCHAR(200) | Parent's description of the dream gift |
+| gift_image_url | TEXT | URL to AI-generated artwork (Vercel Blob) |
+| gift_image_prompt | TEXT | Full prompt used for AI generation |
+| party_date | DATE | Birthday party date, serves as pot close date |
+| karri_card_number | VARCHAR(20) | Host's Karri Card number (encrypted) |
+| karri_card_holder_name | VARCHAR(100) | Cardholder name for verification |
+| host_whatsapp_number | VARCHAR(20) | Host's WhatsApp for notifications |
 
-// For gift_type = 'philanthropy'
-interface PhilanthropyGiftData {
-  type: 'philanthropy';
-  causeId: string;
-  causeName: string;
-  causeDescription: string;
-  causeImage: string;
-  impactDescription: string;  // e.g., "Feed 10 children for a week"
-}
+**Deprecated Fields (kept for migration):**
 
-type GiftData = TakealotGiftData | PhilanthropyGiftData;
-
-// Charity overflow shown after gift is funded (required when gift_type = 'takealot_product')
-interface OverflowGiftData {
-  causeId: string;
-  causeName: string;
-  impactDescription: string;
-}
-```
+| Field | Replacement |
+|-------|-------------|
+| gift_type | Removed (manual definition only) |
+| gift_data | Replaced by gift_name + gift_image_url |
+| overflow_gift_data | Removed (no charity overflow) |
+| birthday_date | Renamed to party_date |
+| deadline | Use party_date instead |
 
 ---
 
@@ -564,6 +552,58 @@ CREATE INDEX idx_payout_items_dream_board ON payout_items(dream_board_id);
 CREATE INDEX idx_payout_items_type ON payout_items(type);
 CREATE UNIQUE INDEX unique_payout_item_type ON payout_items(payout_id, type);
 ```
+
+---
+
+### karri_credit_queue (v2.0)
+
+Queue for batch processing Karri Card credits. When a pot closes, an entry is created here. A daily batch job processes pending credits.
+
+```sql
+CREATE TABLE karri_credit_queue (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  dream_board_id UUID NOT NULL REFERENCES dream_boards(id),
+  karri_card_number VARCHAR(20) NOT NULL,
+  amount_cents INTEGER NOT NULL,
+  reference VARCHAR(100) NOT NULL UNIQUE,  -- Idempotency key
+  status VARCHAR(20) NOT NULL DEFAULT 'pending',  -- pending, processing, completed, failed
+  attempts INTEGER NOT NULL DEFAULT 0,
+  last_attempt_at TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ,
+  error_message TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_karri_queue_status ON karri_credit_queue(status);
+CREATE INDEX idx_karri_queue_created ON karri_credit_queue(created_at);
+CREATE INDEX idx_karri_queue_dream_board ON karri_credit_queue(dream_board_id);
+```
+
+**Drizzle Schema:**
+
+```typescript
+export const karriCreditQueue = pgTable('karri_credit_queue', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  dreamBoardId: uuid('dream_board_id').notNull().references(() => dreamBoards.id),
+  karriCardNumber: varchar('karri_card_number', { length: 20 }).notNull(),
+  amountCents: integer('amount_cents').notNull(),
+  reference: varchar('reference', { length: 100 }).notNull().unique(),
+  status: varchar('status', { length: 20 }).notNull().default('pending'),
+  attempts: integer('attempts').notNull().default(0),
+  lastAttemptAt: timestamp('last_attempt_at', { withTimezone: true }),
+  completedAt: timestamp('completed_at', { withTimezone: true }),
+  errorMessage: text('error_message'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+```
+
+**Status Flow:**
+```
+pending → processing → completed
+                   ↘ → failed (after 3 attempts)
+```
+
+**Reference Format:** `chipin-{dreamBoardId}-{timestamp}`
 
 ---
 

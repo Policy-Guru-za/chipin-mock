@@ -1,8 +1,8 @@
 # ChipIn Technical Architecture
 
-> **Version:** 1.0.0  
-> **Last Updated:** January 28, 2026  
-> **Status:** Ready for Development
+> **Version:** 2.0.0  
+> **Last Updated:** February 2026  
+> **Status:** Platform Simplification In Progress
 
 ---
 
@@ -45,13 +45,18 @@ ChipIn follows a **modern serverless architecture** optimized for:
 ┌─────────────────────────────────────────────────────────────────┐
 │                    EXTERNAL SERVICES                            │
 ├─────────────────┬─────────────────┬─────────────────────────────┤
-│  Payment        │  Product Data   │  Notifications              │
+│  Payments       │  Payout         │  Notifications              │
 │  ┌───────────┐  │  ┌───────────┐  │  ┌───────────┐              │
-│  │ PayFast   │  │  │ Takealot  │  │  │ Resend    │              │
-│  │ Ozow      │  │  │ (scrape/  │  │  │ (email)   │              │
-│  │ SnapScan  │  │  │  API/URL) │  │  └───────────┘              │
-│  └───────────┘  │  └───────────┘  │                             │
-└─────────────────┴─────────────────┴─────────────────────────────┘
+│  │ PayFast   │  │  │ Karri     │  │  │ WhatsApp  │              │
+│  │ Ozow      │  │  │ Card      │  │  │ Business  │              │
+│  │ SnapScan  │  │  │ (batch)   │  │  │ Resend    │              │
+│  └───────────┘  │  └───────────┘  │  └───────────┘              │
+├─────────────────┴─────────────────┴─────────────────────────────┤
+│  AI Services                                                    │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ OpenAI DALL-E (Gift Artwork Generation)                   │  │
+│  └───────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -84,9 +89,9 @@ ChipIn follows a **modern serverless architecture** optimized for:
 
 | Service | Purpose | Integration Status |
 |---------|---------|-------------------|
-| **Takealot** | Product data for Dream Gifts | TBD (URL parsing fallback) |
-| **Philanthropic Partner** | Charitable giving options | Placeholder |
-| **Karri** | Optional card payout | Manual or API integration |
+| **OpenAI DALL-E** | AI-generated gift artwork | API integration |
+| **WhatsApp Business** | Transactional notifications | API integration |
+| **Karri Card** | Sole payout method (daily batch) | API integration |
 
 ---
 

@@ -1,58 +1,95 @@
 # Karri Card Integration
 
-> **Status:** Optional  
-> **Priority:** P1 (manual MVP, API later)
+> **Status:** Core (Sole Payout Method)  
+> **Priority:** P0 (Required for MVP)  
+> **Updated:** February 2026
 
 ---
 
 ## Strategic Context
 
-Karri is positioned as an **optional** payout method, not a dependency.
+Karri Card is the **sole payout method** for ChipIn v2.0. This simplifies the platform by removing fulfillment complexity.
 
-**Why optional, not required:**
-1. Takealot gift cards work without any partnership
-2. Better unit economics (affiliate commission vs. revenue share)
-3. No external dependency for MVP launch
-4. Karri partnership can be additive, not blocking
+**Why Karri Card only:**
+1. We are in the **pooling business**, not the fulfillment business
+2. Single, predictable payout flow
+3. Parent controls how to use the funds
+4. No need to manage product catalogs or gift card logistics
+5. Regulatory simplicity (card-to-card transfer)
 
-**What Karri would add:**
-1. Flexibility for non-Takealot purchases
-2. Trusted SA fintech brand ("Powered by Karri")
-3. Viral loop (guests discover Karri, become future hosts)
-4. Regulatory cover if needed
+**What Karri provides:**
+1. Flexible spending for any gift
+2. Trusted SA fintech brand
+3. Parental controls built in
+4. Viral loop (guests discover Karri, become future hosts)
 
 ---
 
-## Proposed Integration
+## Integration Model: Immediate Debit, Daily Batch Credit
+
+ChipIn follows an **immediate debit, daily batch credit** model:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     Contribution Flow                           │
+│                                                                 │
+│   Guest ──► PayFast/Ozow/SnapScan ──► Contribution Record      │
+│              (Immediate Debit)         (Status: completed)      │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              │ (Pot closes on party date)
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     Karri Credit Queue                          │
+│                                                                 │
+│   Closed Pot ──► karri_credit_queue ──► Daily Batch Job        │
+│                  (Status: pending)      (6 AM SAST)             │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     Karri Card Credit                           │
+│                                                                 │
+│   Batch Job ──► Karri API ──► Status: completed                │
+│                              ──► WhatsApp confirmation          │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Key principle:** We never hold funds. Money flows through us, not to us.
+
+---
+
+## API Requirements
 
 ### What We Need from Karri
 
 ```typescript
 interface KarriAPI {
-  // Verify a Karri Card is valid before pot closes
+  // Verify a Karri Card is valid
   verifyCard(cardNumber: string): Promise<CardVerification>;
   
-  // Top up a Karri Card with pot funds
-  topUpCard(params: TopUpParams): Promise<TopUpResult>;
+  // Credit a Karri Card with pot funds
+  creditCard(params: CreditParams): Promise<CreditResult>;
   
-  // Check top-up status (if async)
-  getTopUpStatus(transactionId: string): Promise<TopUpStatus>;
+  // Check credit status (if async)
+  getCreditStatus(transactionId: string): Promise<CreditStatus>;
 }
 
 interface CardVerification {
   valid: boolean;
-  cardholderFirstName?: string;  // For display: "Load to Maya's Karri Card"
+  cardholderFirstName?: string;  // For display: "Credit to Maya's Karri Card"
+  last4?: string;                // For confirmation messages
   errorCode?: string;            // If invalid
 }
 
-interface TopUpParams {
+interface CreditParams {
   cardNumber: string;
   amountCents: number;
-  reference: string;             // ChipIn payout ID
-  description: string;           // "Maya's Birthday Gift"
+  reference: string;             // Idempotency key: "chipin-{dreamBoardId}-{timestamp}"
+  description: string;           // "Maya's 7th Birthday Gift"
 }
 
-interface TopUpResult {
+interface CreditResult {
   transactionId: string;
   status: 'completed' | 'pending' | 'failed';
   completedAt?: Date;
@@ -60,106 +97,145 @@ interface TopUpResult {
 }
 ```
 
-### What We Expose to Karri
-
-Karri can integrate with our public API to:
-1. Receive webhook notifications for `payout.ready` events
-2. Confirm payout completion via `POST /v1/payouts/{id}/confirm`
-
-This means ChipIn is the source of truth; Karri integrates with us.
-
 ---
 
 ## User Experience
 
-### Host: Selecting Payout Method
+### Host: Entering Karri Card Details
 
-During Dream Board creation, for a Takealot gift goal:
+During Dream Board creation (Step 3: Details):
 
 ```
 ┌─────────────────────────────────────┐
-│  Choose payout method               │
+│  Where should we send the funds?   │
 │                                     │
-│  ○ Takealot Gift Card              │
-│    Best for the exact item          │
-│                                     │
-│  ● Fund my Karri Card              │
-│    Flexible spending with parental │
-│    controls                         │
-│                                     │
-│  Karri Card Number:                 │
+│  Karri Card Number:                │
 │  ┌─────────────────────────────────┐│
-│  │ 5234 •••• •••• 1234             ││
+│  │ 5234 1234 5678 1234             ││
 │  └─────────────────────────────────┘│
-│  ✓ Card verified: Maya's Card      │
+│                                     │
+│  Cardholder Name:                  │
+│  ┌─────────────────────────────────┐│
+│  │ Maya Thompson                   ││
+│  └─────────────────────────────────┘│
+│                                     │
+│  ✓ Card verified                   │
+│                                     │
+│  ℹ️ Funds will be credited to this │
+│     card when the pot closes       │
+│     (on party date)                │
 │                                     │
 └─────────────────────────────────────┘
 ```
 
-### Guest: Post-Contribution
+### Host: Payout Confirmation
 
-After contributing, show subtle Karri promotion:
+After pot closes and credit is processed:
 
 ```
-┌─────────────────────────────────────┐
-│                                     │
-│         🎉 Thank you!               │
-│                                     │
-│  Your R200 helps fund Maya's        │
-│  dream gift.                        │
-│                                     │
-│  ─────────────────────────────────  │
-│                                     │
-│  💳 Get a Karri Card for your      │
-│     child                           │
-│                                     │
-│     Safe spending with parental     │
-│     controls. Used by 500,000+      │
-│     SA families.                    │
-│                                     │
-│     [Learn more →]                  │
-│                                     │
-└─────────────────────────────────────┘
+WhatsApp:
+✅ R2,400 has been credited to your Karri Card ending in 1234.
+
+Thank you for using ChipIn! 🎁
 ```
 
 ---
 
-## Data Flow
+## Batch Processing
 
+### Queue Table: `karri_credit_queue`
+
+```sql
+CREATE TABLE karri_credit_queue (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  dream_board_id UUID NOT NULL REFERENCES dream_boards(id),
+  karri_card_number VARCHAR(20) NOT NULL,
+  amount_cents INTEGER NOT NULL,
+  reference VARCHAR(100) NOT NULL UNIQUE,
+  status VARCHAR(20) NOT NULL DEFAULT 'pending',
+  attempts INTEGER NOT NULL DEFAULT 0,
+  last_attempt_at TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ,
+  error_message TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 ```
-Host creates Dream Board
-  └── Selects "Karri Card" payout
-  └── Enters card number
-        │
-        ▼
-ChipIn → Karri: verifyCard(number)
-        │
-        ▼
-Karri returns: { valid: true, cardholderFirstName: "Maya" }
-        │
-        ▼
-[Pot collects contributions]
-        │
-        ▼
-Pot closes
-        │
-        ▼
-ChipIn → Karri: topUpCard({
-  cardNumber,
-  amountCents: netPayout,
-  reference: "po_abc123",
-  description: "Maya's 7th Birthday Gift"
-})
-        │
-        ▼
-Karri returns: { transactionId: "K123", status: "completed" }
-        │
-        ▼
-ChipIn marks payout complete
-        │
-        ▼
-Email to host: "R2,400 loaded to Maya's Karri Card!"
+
+### Daily Batch Job
+
+Runs daily at 6 AM SAST:
+
+```typescript
+async function processDailyKarriBatch(): Promise<BatchResult> {
+  const pending = await db
+    .select()
+    .from(karriCreditQueue)
+    .where(eq(karriCreditQueue.status, 'pending'));
+
+  const results = { processed: 0, succeeded: 0, failed: 0, errors: [] };
+
+  for (const entry of pending) {
+    results.processed++;
+    
+    await db
+      .update(karriCreditQueue)
+      .set({ status: 'processing', lastAttemptAt: new Date() })
+      .where(eq(karriCreditQueue.id, entry.id));
+
+    try {
+      const result = await karri.creditCard({
+        cardNumber: entry.karriCardNumber,
+        amountCents: entry.amountCents,
+        reference: entry.reference,
+        description: `ChipIn Birthday Gift`,
+      });
+
+      if (result.status === 'completed') {
+        await db
+          .update(karriCreditQueue)
+          .set({ status: 'completed', completedAt: new Date() })
+          .where(eq(karriCreditQueue.id, entry.id));
+        
+        results.succeeded++;
+        
+        // Send WhatsApp confirmation
+        await sendPayoutConfirmation(entry);
+      }
+    } catch (error) {
+      const attempts = entry.attempts + 1;
+      
+      if (attempts >= 3) {
+        await db
+          .update(karriCreditQueue)
+          .set({ status: 'failed', attempts, errorMessage: error.message })
+          .where(eq(karriCreditQueue.id, entry.id));
+        
+        results.failed++;
+        results.errors.push({ dreamBoardId: entry.dreamBoardId, error: error.message });
+        
+        // Alert admin
+        await sendAdminAlert(entry, error);
+      } else {
+        await db
+          .update(karriCreditQueue)
+          .set({ status: 'pending', attempts, errorMessage: error.message })
+          .where(eq(karriCreditQueue.id, entry.id));
+      }
+    }
+  }
+
+  return results;
+}
 ```
+
+### Idempotency
+
+Each credit has a unique `reference` format: `chipin-{dreamBoardId}-{timestamp}`
+
+Karri API must:
+1. Accept the reference as an idempotency key
+2. Reject duplicate references (return success for already-processed)
+3. Return the original transaction result if retried
 
 ---
 
@@ -167,74 +243,94 @@ Email to host: "R2,400 loaded to Maya's Karri Card!"
 
 ### Card Number Handling
 
-- Card numbers transmitted over HTTPS
-- Stored encrypted at rest (if stored at all)
-- Consider tokenization: store token, not raw number
-- PCI implications: Karri is the custodian, we just pass through
+| Concern | Approach |
+|---------|----------|
+| Transmission | HTTPS only |
+| Storage | Encrypted at rest using `CARD_DATA_ENCRYPTION_KEY` |
+| Display | Show only last 4 digits (`****1234`) |
+| Validation | Luhn checksum validation before API call |
 
-### Verification
+### Verification Flow
 
-- Verify card before pot closes (not at creation time only)
-- Handle case where card becomes invalid between creation and payout
-- Fallback option if card payout fails
+1. Host enters card number during Dream Board creation
+2. Call `karri.verifyCard()` before allowing proceed
+3. Store encrypted card number and cardholder name
+4. Re-verify before processing payout (card may have been cancelled)
+
+### Failure Handling
+
+| Scenario | Handling |
+|----------|----------|
+| Card verification fails | Block Dream Board creation, show error |
+| Credit fails (transient) | Retry in next batch (up to 3 attempts) |
+| Credit fails (permanent) | Mark as failed, alert admin, email host |
+| Card cancelled after creation | Alert host, request new card details |
 
 ---
 
-## Commercial Terms (To Negotiate)
+## Environment Variables
 
-| Item | Our Position |
-|------|-------------|
-| Revenue share | We keep majority (we bring the volume) |
-| API access | Free or minimal cost |
-| Branding | "Powered by Karri" acceptable |
-| Exclusivity | We want non-exclusive (can add other cards) |
-| Support | Karri handles card-related support |
-| SLA | 99.9% uptime on API |
+```bash
+# Karri Card API
+KARRI_API_URL=""
+KARRI_API_KEY=""
+
+# Batch Processing
+KARRI_BATCH_ENABLED="true"
+KARRI_BATCH_SCHEDULE="0 6 * * *"  # 6 AM SAST daily
+
+# Card Data Encryption
+CARD_DATA_ENCRYPTION_KEY=""  # 32-byte key for AES-256
+```
 
 ---
 
 ## Implementation Phases
 
-### Phase 1: Manual (MVP)
+### Phase 1: Manual (Current)
 
 1. Host enters Karri Card number
-2. On pot close, admin receives alert
-3. Admin manually tops up card via Karri merchant portal
-4. Admin marks payout complete in ChipIn
-5. System emails host
+2. On pot close, entry created in `karri_credit_queue`
+3. Admin manually processes credits via Karri portal
+4. Admin marks entries as completed
+5. System sends WhatsApp confirmation
 
-### Phase 2: API Integration
+### Phase 2: API Integration (Target)
 
-1. Implement `KarriAPI` interface
-2. Automated card verification
-3. Automated top-up on pot close
-4. Webhook confirmation
+1. Automated card verification on entry
+2. Daily batch job calls Karri API
+3. Automated retry logic
+4. WhatsApp + email notifications
+5. Admin dashboard for monitoring
 
-### Phase 3: Deep Integration
+### Phase 3: Deep Integration (Future)
 
-1. "Sign up for Karri" flow for non-cardholders
-2. Karri Card as default for return hosts
-3. Karri promotional placement in guest flow
-4. Analytics on Karri conversion
-
----
-
-## Risks
-
-| Risk | Likelihood | Mitigation |
-|------|------------|------------|
-| Karri declines partnership | Medium | Proceed with Takealot-only; revisit later |
-| Karri API unavailable | Low | Manual fallback process |
-| Card top-up fails | Low | Retry logic; manual escalation |
-| Regulatory change | Low | Karri absorbs compliance burden |
+1. Real-time verification with cardholder name display
+2. Instant credits (if Karri supports)
+3. "Sign up for Karri" flow for non-cardholders
+4. Analytics on Karri adoption
 
 ---
 
-## Next Steps (If Pursuing)
+## Commercial Terms
 
-1. [ ] Complete partnership thesis document (DONE)
-2. [ ] Identify Karri contact / warm introduction
-3. [ ] Schedule exploratory call
-4. [ ] Request API documentation
-5. [ ] Negotiate commercial terms
-6. [ ] Technical integration (if terms agreed)
+| Item | Status |
+|------|--------|
+| Revenue share | To be negotiated |
+| API access | Required for v2.0 |
+| Branding | "Powered by Karri" acceptable |
+| SLA | 99.9% uptime required |
+| Support | Karri handles card-related support |
+
+---
+
+## Removed Features
+
+The following Karri-related features from v1.0 have been removed:
+
+| Feature | Reason |
+|---------|--------|
+| Karri as optional payout | Now sole payout method |
+| Takealot gift card payout | Removed in simplification |
+| Philanthropy donation payout | Removed in simplification |
+| Guest Karri promotion | Deferred to post-MVP |

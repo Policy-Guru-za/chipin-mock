@@ -1,8 +1,8 @@
 # ChipIn User Journeys
 
-> **Version:** 1.0.0  
-> **Last Updated:** January 2026  
-> **Status:** Ready for Development
+> **Version:** 2.0.0  
+> **Last Updated:** February 2026  
+> **Status:** Platform Simplification In Progress
 
 ---
 
@@ -15,6 +15,13 @@ ChipIn has two primary user journeys:
 
 Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 
+**Key Changes in v2.0:**
+- Gift is defined manually by parent (not from Takealot catalog)
+- AI generates whimsical artwork for the gift
+- Guests see % funded only (not Rand amounts)
+- Karri Card is the sole payout method
+- WhatsApp notifications throughout the journey
+
 ---
 
 ## Host Journey: Creating a Dream Board
@@ -25,8 +32,8 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 ┌─────────┐   ┌─────────┐   ┌─────────┐   ┌─────────┐   ┌─────────┐   ┌─────────┐
 │  LAND   │──▶│  AUTH   │──▶│  CHILD  │──▶│  GIFT   │──▶│ DETAILS │──▶│  SHARE  │
 │         │   │         │   │         │   │         │   │         │   │         │
-│ Welcome │   │ Magic   │   │ Photo + │   │ Takealot│   │ Payout  │   │ Get     │
-│ + CTA   │   │ Link    │   │ Name    │   │ or Give │   │ + Date  │   │ Link    │
+│ Welcome │   │ Magic   │   │ Photo + │   │ Gift +  │   │ Karri + │   │ Get     │
+│ + CTA   │   │ Link    │   │ Name    │   │ Artwork │   │WhatsApp │   │ Link    │
 └─────────┘   └─────────┘   └─────────┘   └─────────┘   └─────────┘   └─────────┘
 ```
 
@@ -105,7 +112,7 @@ This link expires in 1 hour.
 |-------|------|------------|----------|
 | Child's first name | Text input | 2-30 chars, letters only | Yes |
 | Child's photo | Image upload | Max 5MB, jpg/png/webp | Yes |
-| Birthday date | Date picker | Future date within 90 days | Yes |
+| Party date | Date picker | Future date within 6 months | Yes |
 
 **Photo Upload UX:**
 - Tap area shows camera icon + "Add photo"
@@ -129,93 +136,78 @@ This link expires in 1 hour.
 
 ---
 
-### Step 4: Dream Gift Selection
+### Step 4: Dream Gift Definition
 
 **URL:** `chipin.co.za/create/gift`
 
 **Screen Elements:**
 - Progress indicator: Step 2 of 4
 - Heading: "What's {childName}'s dream gift?"
-- Subheading: "Choose one special item to fund"
+- Subheading: "Describe the gift in your own words"
 
-**Two Options (Tab/Toggle):**
+**Form Fields:**
 
-#### Option A: Takealot Product
+| Field | Type | Validation | Required |
+|-------|------|------------|----------|
+| Gift name | Text input | 2-200 chars | Yes |
+| Gift description | Textarea | 10-500 chars (for AI artwork) | Yes |
+| Goal amount | Currency input | R100 - R50,000 | Yes |
 
-**Flow:**
+**AI Artwork Generation:**
+
 ```
-1. Search input: "Search Takealot for a product"
-2. User types product name
-3. Show search results (fetched from Takealot)
-4. User selects product
-5. Product card appears with:
-   - Image
-   - Name
-   - Price (becomes the goal)
-   - "Selected ✓" indicator
-```
-
-**Takealot Product Card:**
-```
-┌─────────────────────────────────┐
-│  [Product Image]                │
-│                                 │
-│  LEGO Star Wars Death Star     │
-│  R2,499.00                      │
-│                                 │
-│  [✓ Selected]                   │
-└─────────────────────────────────┘
-```
-
-**Alternative Flow (URL Paste):**
-- "Or paste a Takealot link"
-- User pastes URL
-- System fetches product details
-- Product card appears
-
-**Charity Overflow (required for Takealot gifts):**
-- Prompt: "If the gift is fully funded early, which charity should we support?"
-- Host selects a cause from curated list
-- This charity replaces the gift in guest view once the goal is reached
-
-#### Option B: Gift of Giving (Philanthropic)
-
-**Flow:**
-```
-1. "Give the gift of giving" toggle/tab
-2. Show curated list of causes
-3. User selects cause
-4. Amount selector (predefined impacts):
-   - R250: "Feed 5 children for a week"
-   - R500: "School supplies for 10 kids"
-   - R1,000: "Sponsor a child's education for a month"
-5. Cause card appears with selected impact
+┌─────────────────────────────────────┐
+│  Gift description:                  │
+│  ┌─────────────────────────────────┐│
+│  │ A shiny red mountain bike with  ││
+│  │ training wheels and a bell      ││
+│  └─────────────────────────────────┘│
+│                                     │
+│  ┌───────────────────────────────┐  │
+│  │   ✨ Generate Artwork         │  │
+│  └───────────────────────────────┘  │
+│                                     │
+│  [Loading animation while generating]│
+│                                     │
+│  ┌─────────────────────────────────┐│
+│  │     [AI Generated Artwork]      ││
+│  │                                 ││
+│  │  Whimsical watercolor-style    ││
+│  │  illustration of the gift      ││
+│  │                                 ││
+│  └─────────────────────────────────┘│
+│                                     │
+│  [🔄 Regenerate]                    │
+│                                     │
+└─────────────────────────────────────┘
 ```
 
-**Cause Card:**
+**Gift Preview Card:**
 ```
 ┌─────────────────────────────────┐
-│  [Charity Logo]                 │
+│  [AI Generated Artwork]         │
 │                                 │
-│  Gift of Learning              │
-│  School supplies for 10 kids   │
-│  Goal: R500                     │
+│  Mountain Bike with Bells      │
+│  Goal: R2,500                   │
 │                                 │
-│  [✓ Selected]                   │
+│  [✓ Artwork Generated]          │
 └─────────────────────────────────┘
 ```
 
 **Validation:**
-- Must select one gift option
-- "Please choose a dream gift to continue"
+- Gift name required (2-200 chars)
+- Gift description required (10-500 chars)
+- AI artwork must be generated
+- Goal amount required (R100 minimum)
+- "Please generate artwork before continuing"
 
-**User Action:** Selects gift, clicks "Continue"
+**User Action:** Enters gift details, generates artwork, clicks "Continue"
 
 **Transition:** → Step 5
 
 ---
 
-### Step 5: Payout & Final Details
+### Step 5: Payout & Contact Details
 
 **URL:** `chipin.co.za/create/details`
 
@@ -227,25 +219,56 @@ This link expires in 1 hour.
 
 | Field | Type | Validation | Required |
 |-------|------|------------|----------|
-| Payout email | Email input | Valid email format | Yes |
-| Payout method | Radio/select | Takealot gift card or Karri Card | Required for Takealot gifts |
+| Karri Card number | Card input | 16 digits, Luhn valid | Yes |
+| Cardholder name | Text input | 2-100 chars | Yes |
+| WhatsApp number | Phone input | Valid SA mobile (07x/08x/06x) | Yes |
+| Email address | Email input | Valid email format | Yes |
 | Personal message | Textarea | Max 280 chars | No |
-| Contribution deadline | Date picker | 1-90 days from now | Yes |
 
-**Payout Email Explanation:**
-- Helper text: "We'll send the payout to this email when the pot closes"
-- If payout method is Takealot: "We'll email a Takealot gift card"
-- If payout method is Karri: "We'll top up the Karri Card and confirm by email"
-- If gift type is philanthropy: "We'll email the donation confirmation"
+**Karri Card Section:**
+```
+┌─────────────────────────────────────┐
+│  Where should we send the funds?   │
+│                                     │
+│  Karri Card Number:                │
+│  ┌─────────────────────────────────┐│
+│  │ •••• •••• •••• 1234             ││
+│  └─────────────────────────────────┘│
+│                                     │
+│  Cardholder Name:                  │
+│  ┌─────────────────────────────────┐│
+│  │ Maya Thompson                   ││
+│  └─────────────────────────────────┘│
+│                                     │
+│  ℹ️ Funds will be credited to this │
+│     card when the pot closes       │
+│                                     │
+└─────────────────────────────────────┘
+```
+
+**WhatsApp Notifications:**
+```
+┌─────────────────────────────────────┐
+│  Get notified via WhatsApp         │
+│                                     │
+│  WhatsApp Number:                  │
+│  ┌─────────────────────────────────┐│
+│  │ +27 82 123 4567                 ││
+│  └─────────────────────────────────┘│
+│                                     │
+│  ✅ Notify me when someone         │
+│     contributes                     │
+│  ✅ Notify me when pot is funded   │
+│  ✅ Notify me when payout is sent  │
+│                                     │
+└─────────────────────────────────────┘
+```
 
 **Personal Message:**
 - Placeholder: "E.g., Maya would love your contribution toward her dream bike!"
 - Character counter: "0/280"
 
-**Deadline:**
-- Default: Birthday date from Step 3
-- Options: "1 week", "2 weeks", "1 month", "Custom"
-- Helper: "Contributors will see a countdown"
+**Note:** Party date from Step 3 serves as the pot close date.
 
 **User Action:** Fills form, clicks "Review & Create"
 
@@ -267,20 +290,23 @@ This link expires in 1 hour.
 │        [Child Photo]            │
 │                                 │
 │    Maya's 7th Birthday          │
-│    Dream Gift: LEGO Death Star  │
 │                                 │
-│    Goal: R2,499                 │
-│    ████░░░░░░ R0 raised         │
+│    [AI Generated Gift Artwork]  │
+│    Mountain Bike with Bells     │
+│                                 │
+│    ████░░░░░░ 0% funded         │
 │                                 │
 │    "Maya would love your        │
 │     contribution toward her     │
-│     dream Lego set!"            │
+│     dream bike!"                │
 │                                 │
-│    ⏰ Closes in 14 days         │
+│    ⏰ Party in 14 days          │
 │                                 │
 │    [Contribute →]               │
 └─────────────────────────────────┘
 ```
+
+**Note:** Guests see percentage funded only. Rand amounts are visible to host only.
 
 **Actions:**
 - "Edit" links next to each section (→ back to respective step)
@@ -311,11 +337,21 @@ This link expires in 1 hour.
 ```
 🎂 Maya's 7th Birthday!
 
-Help fund Maya's dream gift — a LEGO Death Star!
+Help fund Maya's dream gift — a Mountain Bike with Bells!
 
 👉 chipin.co.za/maya-7th-birthday-abc123
 
 Every contribution helps! 💝
+```
+
+**WhatsApp Notification to Host:**
+```
+🎉 Your Dream Board is live!
+
+Share this link with party guests:
+chipin.co.za/maya-7th-birthday-abc123
+
+You'll receive notifications when friends chip in.
 ```
 
 ---
@@ -347,8 +383,8 @@ Every contribution helps! 💝
 
 #### Overview Tab
 - Full preview of Dream Board
-- Progress visualization
-- Quick stats: Total raised, # contributors, days remaining
+- Progress visualization (% AND Rand amount - host view)
+- Quick stats: Total raised, # contributors, days until party
 
 #### Contributors Tab
 - List of contributions:
@@ -361,15 +397,15 @@ Every contribution helps! 💝
 
 #### Settings Tab
 - Edit message
-- Extend deadline
 - Close pot early
 - Cancel Dream Board
 
-#### Payout Tab (appears when pot is closeable)
-- "Your pot is ready for payout!"
+#### Payout Tab (appears when pot closes)
+- "Your pot has closed!"
 - Summary: Total raised, fees, payout amount
-- Payout method confirmation
-- "Request Payout" button
+- Karri Card confirmation (ending in ****1234)
+- Status: "Pending" / "Processing" / "Credited"
+- Note: "Funds are credited to your Karri Card within 24 hours"
 
 ---
 
@@ -417,18 +453,18 @@ Every contribution helps! 💝
 │         Maya's 7th Birthday         │
 │                                     │
 │  ┌───────────────────────────────┐  │
-│  │ [Product Image]               │  │
-│  │ LEGO Star Wars Death Star    │  │
+│  │ [AI Generated Gift Artwork]   │  │
+│  │ Mountain Bike with Bells      │  │
 │  │ Her dream gift               │  │
 │  └───────────────────────────────┘  │
 │                                     │
-│  ━━━━━━━━━━━━━━━━━━━━░░░░░░░░░░░░   │
+│  ━━━━━━━━━━━━━━━━━━━━░░░░░░░░░░░━   │
 │  48% funded                        │
 │                                     │
 │  "Maya would love your contribution │
-│   toward her dream Lego set!"       │
+│   toward her dream bike!"           │
 │                                     │
-│  ⏰ 5 days left                     │
+│  ⏰ Party in 5 days                 │
 │                                     │
 │  ┌───────────────────────────────┐  │
 │  │      Contribute Now →         │  │
@@ -439,6 +475,8 @@ Every contribution helps! 💝
 │                                     │
 └─────────────────────────────────────┘
 ```
+
+**Note:** Guests see percentage funded only (not Rand amounts). This creates social proof without money awkwardness.
 
 **Key Design Principles:**
 - Mobile-first (designed for phone screens)
@@ -465,7 +503,7 @@ Every contribution helps! 💝
 │  Choose an amount:                  │
 │                                     │
 │  ┌─────────┐ ┌─────────┐ ┌────────┐ │
-│  │  R100   │ │  R200   │ │  R500  │ │
+│  │   R50   │ │  R100   │ │  R200  │ │
 │  └─────────┘ └─────────┘ └────────┘ │
 │                                     │
 │  ┌─────────────────────────────────┐│
@@ -494,10 +532,11 @@ Every contribution helps! 💝
 ```
 
 **Amount Selection:**
-- Predefined buttons: R100, R200, R500
+- Predefined buttons: R50, R100, R200
 - "Other" input for custom amount
 - Minimum: R20 (below this, fees eat too much)
-- Maximum: R10,000 (fraud prevention)
+- Maximum: R5,000 (fraud prevention)
+- Default/highlighted: R100
 
 **Optional Fields:**
 - Name: Shown to host + in contributor list
@@ -664,41 +703,55 @@ Every contribution helps! 💝
 └─────────────────────────────────────┘
 ```
 
-### Gift Fully Funded (Charity Overflow View)
+### Gift Fully Funded
 
-**Screen replaces gift with selected charity:**
+**Screen shows success state:**
 ```
-🎉 Gift fully funded!
-
-Maya chose to support a charity next.
-
-[Charity Name]
-R350 raised so far (open-ended)
-
-[Contribute to the charity →]
+┌─────────────────────────────────────┐
+│                                     │
+│              🎉                     │
+│                                     │
+│     Maya's dream gift is funded!   │
+│                                     │
+│  100% of the goal has been         │
+│  reached. Thank you to everyone    │
+│  who contributed!                   │
+│                                     │
+│  The pot will close on the party   │
+│  date and funds will be credited   │
+│  to the family.                     │
+│                                     │
+└─────────────────────────────────────┘
 ```
 
 ---
 
 ## Notification Flows
 
-### Email Notifications
+### WhatsApp Notifications (Primary)
+
+| Event | Recipient | Message |
+|-------|-----------|---------|
+| Dream Board created | Host | "🎉 Your Dream Board is live! Share this link: {url}" |
+| Contribution received | Host | "💝 {name} just contributed to {childName}'s Dream Board! {percentage}% funded" |
+| Goal reached | Host | "🎊 Amazing! {childName}'s Dream Board is fully funded! R{amount} raised" |
+| Pot closed | Host | "Your pot has closed! R{amount} will be credited to Karri Card ending in {last4}" |
+| Payout credited | Host | "✅ R{amount} has been credited to your Karri Card ending in {last4}" |
+
+### Email Notifications (Backup)
 
 | Event | Recipient | Email Content |
 |-------|-----------|---------------|
 | Dream Board created | Host | "Your Dream Board is live! Here's your link..." |
-| First contribution | Host | "🎉 {name} just contributed R{amount}!" |
-| Goal reached | Host | "Amazing! Maya's dream gift is fully funded!" |
-| 24h before deadline | Host | "Your Dream Board closes tomorrow" |
-| Pot closed | Host | "Your pot has closed. Request your payout." |
-| Payout sent | Host | "Your Takealot gift card is on its way!" |
+| Payout credited | Host | "Funds have been credited to your Karri Card" |
+| Payout failed | Host | "We couldn't credit your Karri Card. Please contact support." |
 
 ### Optional: Push Notifications (Future)
 
 If host enables browser notifications:
 - New contribution received
 - Goal reached
-- Deadline approaching
+- Party date approaching
 
 ---
 
