@@ -1,4 +1,5 @@
 import { createHash } from 'crypto';
+import { eq } from 'drizzle-orm';
 
 import { buildDemoAssetUrl } from '@/lib/demo/urls';
 import { db } from './index';
@@ -16,6 +17,8 @@ import {
 import { DEFAULT_PARTNER_ID, DEFAULT_PARTNER_NAME } from './partners';
 
 export const DEMO_SEEDED_BOARD_SLUG = 'emma-birthday-demo';
+const DEMO_HOST_EMAIL = 'sarah@demo.chipin.co.za';
+const DEMO_HOST_NAME = 'Sarah Thompson';
 
 export async function seedDemoDatabase(): Promise<void> {
   await db.delete(webhookEvents);
@@ -33,13 +36,23 @@ export async function seedDemoDatabase(): Promise<void> {
     name: DEFAULT_PARTNER_NAME,
   });
 
-  const [host] = await db
+  await db
     .insert(hosts)
     .values({
-      email: 'sarah@demo.chipin.co.za',
-      name: 'Sarah Thompson',
+      email: DEMO_HOST_EMAIL,
+      name: DEMO_HOST_NAME,
     })
-    .returning({ id: hosts.id });
+    .onConflictDoNothing({ target: hosts.email });
+
+  const [host] = await db
+    .select({ id: hosts.id })
+    .from(hosts)
+    .where(eq(hosts.email, DEMO_HOST_EMAIL))
+    .limit(1);
+
+  if (!host) {
+    throw new Error('Demo host record missing after seed');
+  }
 
   // v2.0: Party date serves as pot close date
   const futurePartyDate = new Date();
@@ -70,7 +83,7 @@ export async function seedDemoDatabase(): Promise<void> {
       hostWhatsAppNumber: '+27821234567',
       message: "Let's make Emma's birthday magical.",
       status: 'active',
-      payoutEmail: 'sarah@demo.chipin.co.za',
+      payoutEmail: DEMO_HOST_EMAIL,
     })
     .returning({ id: dreamBoards.id });
 
