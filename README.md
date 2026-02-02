@@ -1,8 +1,8 @@
 # ChipIn Technical Documentation
 
-> **Version:** 1.0.0  
-> **Last Updated:** January 28, 2026  
-> **Status:** Ready for Development
+> **Version:** 2.0.0  
+> **Last Updated:** February 2026  
+> **Status:** Platform Simplification In Progress
 
 ---
 
@@ -15,17 +15,24 @@
 - File structure requirements
 - Frontend aesthetics guidelines (NO "AI slop")
 
+**Read [`docs/implementation-docs/chipin-simplification-spec.md`](./docs/implementation-docs/chipin-simplification-spec.md)** for the current implementation specification.
+
 ---
 
 ## What We're Building
 
-**ChipIn** is a social gifting platform where:
-1. Parent creates a "Dream Board" with ONE gift item from Takealot
+**ChipIn** is a social coordination tool for birthday gifting where:
+1. Parent creates a "Dream Board" describing ONE dream gift (AI generates artwork)
 2. Shares link with party guests via WhatsApp
-3. Guests contribute money toward the gift
-4. When pot closes, funds convert to a Takealot gift card
+3. Guests contribute money toward the gift (see % funded, not Rands)
+4. When pot closes, funds are credited to the parent's Karri Card
 
 **Tagline:** *Friends chip in together to turn birthday clutter into one dream gift.*
+
+**Core Philosophy:**
+- We are in the **pooling business**, not the fulfillment business
+- Money flows from contributors to Karri Card — we never hold funds
+- Immediate debit from contributor, daily batch credit to host
 
 ---
 
@@ -58,9 +65,7 @@
 
 | Document | Status | Description |
 |----------|--------|-------------|
-| [`docs/Platform-Spec-Docs/TAKEALOT.md`](./docs/Platform-Spec-Docs/TAKEALOT.md) | P0 - MVP | Product data + gift card payout |
-| [`docs/Platform-Spec-Docs/PHILANTHROPY.md`](./docs/Platform-Spec-Docs/PHILANTHROPY.md) | P0 - MVP | Philanthropy Dream Boards + charity overflow |
-| [`docs/Platform-Spec-Docs/KARRI.md`](./docs/Platform-Spec-Docs/KARRI.md) | P1 - Optional | Karri Card payout |
+| [`docs/Platform-Spec-Docs/KARRI.md`](./docs/Platform-Spec-Docs/KARRI.md) | P0 - Core | Karri Card payout (sole payout method) |
 
 ---
 
@@ -75,8 +80,11 @@
 | Styling | Tailwind CSS (customized) |
 | Components | shadcn/ui (customized) |
 | Hosting | Vercel |
-| Payments | PayFast, Ozow, SnapScan |
+| Payments (Inbound) | PayFast, Ozow, SnapScan |
+| Payout | Karri Card (sole method) |
 | Email | Resend |
+| Notifications | WhatsApp Business API |
+| AI Image Generation | OpenAI DALL-E |
 | Storage | Vercel Blob |
 | Cache | Vercel KV |
 
@@ -85,20 +93,20 @@
 ## MVP Scope
 
 ### In Scope
-- ✅ Dream Board creation with Takealot URL
-- ✅ Philanthropy-only Dream Boards (primary charity goal)
+- ✅ Dream Board creation with manual gift name + AI-generated artwork
 - ✅ Magic link authentication
 - ✅ Guest contribution via PayFast, Ozow (EFT), SnapScan (QR)
-- ✅ Optional payout method: Fund my Karri Card
-- ✅ Charity overflow selection (used when gift is fully funded)
-- ✅ Progress tracking
+- ✅ Karri Card as sole payout method
+- ✅ Progress tracking (% for guests, Rands for host only)
+- ✅ WhatsApp notifications (contribution alerts, payout confirmation)
 - ✅ Email notifications
-- ✅ Takealot gift card or Karri top-up payout (manual process OK)
+- ✅ Daily batch Karri Card credits
 - ✅ Public Partner API (API keys, scopes, rate limiting)
 
 ### Out of Scope (Post-MVP)
-- ❌ Karri Card API automation (manual top-up OK for MVP)
+- ❌ Multiple gifts per Dream Board
 - ❌ Native mobile apps
+- ❌ Desktop-optimized layouts (mobile-first serves all)
 
 ---
 
@@ -106,10 +114,11 @@
 
 1. **One gift, not a registry** — Simplicity over flexibility
 2. **Mobile web, not native app** — Zero download friction for guests
-3. **Takealot-first** — Karri is optional, not a dependency
-4. **We expose APIs** — Partners integrate with us, not reverse
-5. **Manual payout OK for MVP** — Automation can come later
-6. **No "AI slop" UI** — Distinctive, opinionated design
+3. **Manual gift definition + AI artwork** — Parent describes gift, AI illustrates
+4. **Karri Card only** — Single payout method, no fulfillment complexity
+5. **We expose APIs** — Partners integrate with us, not reverse
+6. **Immediate debit, daily batch credit** — We never hold funds
+7. **No "AI slop" UI** — Distinctive, opinionated design
 
 ---
 

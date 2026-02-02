@@ -9,7 +9,12 @@
 ## Quick Reference
 
 ### What We're Building
-A mobile-web-first gift pooling platform where party hosts create a "Dream Board" with ONE gift item, share a link with guests, guests contribute money, and when the pot closes, funds convert to a Takealot gift card or a Karri Card top-up. If the gift is fully funded early, guests see a charity overflow view instead of the gift. Philanthropy-only Dream Boards (primary charity goal) are in scope by default.
+A mobile-web-first **social coordination tool** for birthday gifting where party hosts create a "Dream Board" describing ONE dream gift (AI generates artwork), share a link with guests, guests contribute money (seeing % funded, not Rands), and when the pot closes, funds are credited to the host's Karri Card.
+
+**Core Philosophy:**
+- We are in the **pooling business**, not the fulfillment business
+- Money flows from contributors to Karri Card — we never hold funds
+- Immediate debit from contributor, daily batch credit to host
 
 ### Tech Stack
 | Layer | Technology |
@@ -22,7 +27,10 @@ A mobile-web-first gift pooling platform where party hosts create a "Dream Board
 | UI Components | shadcn/ui |
 | Hosting | Vercel |
 | Email | Resend |
-| Payments | PayFast (primary), Ozow, SnapScan |
+| Notifications | WhatsApp Business API |
+| AI Images | OpenAI DALL-E |
+| Payments (Inbound) | PayFast (primary), Ozow, SnapScan |
+| Payout | Karri Card (sole method) |
 | Storage | Vercel Blob (images) |
 | Cache | Vercel KV (Redis) |
 
@@ -36,17 +44,18 @@ A mobile-web-first gift pooling platform where party hosts create a "Dream Board
 | `DATA.md` | Database schema, entity relationships |
 | `API.md` | Public API specification for partners |
 | `PAYMENTS.md` | Payment provider integration details |
-| `INTEGRATIONS.md` | Takealot, email, storage integrations |
+| `INTEGRATIONS.md` | AI images, WhatsApp, Karri Card, email, storage |
 | `UX.md` | Design system, components, screen specs |
 | `SECURITY.md` | Security requirements, POPIA compliance |
 | `NFR-OPERATIONS.md` | Non-functional requirements, operations |
+| `chipin-simplification-spec.md` | Current implementation specification |
 
 If any documents conflict, `CANONICAL.md` wins.
 
 ---
 
 ## Build Order
-Use `docs/implementation-docs/CHIPIN-IMPLEMENTATION-PLAN.md` as the single source of truth for phases, gates, and acceptance criteria. No deferrals.
+Use `docs/implementation-docs/chipin-simplification-spec.md` as the single source of truth for phases, gates, and acceptance criteria. No deferrals.
 
 ---
 
@@ -89,52 +98,34 @@ function calculateFee(amount) {
 ```typescript
 import { z } from 'zod';
 
+// SA mobile phone regex (07x, 08x, 06x prefixes)
+const saMobileRegex = /^(\+27|0)[6-8][0-9]{8}$/;
+
 export const createDreamBoardSchema = z.object({
+  // Child details
   childName: z.string().min(2).max(50),
   childPhotoUrl: z.string().url(),
-  birthdayDate: z.coerce.date(),
-  giftType: z.enum(['takealot_product', 'philanthropy']),
-  giftData: z.discriminatedUnion('type', [
-    z.object({
-      type: z.literal('takealot_product'),
-      productUrl: z.string().url(),
-      productName: z.string().min(2),
-      productImage: z.string().url(),
-      productPrice: z.number().int().positive(),
-    }),
-    z.object({
-      type: z.literal('philanthropy'),
-      causeId: z.string(),
-      causeName: z.string(),
-      impactDescription: z.string(),
-      amountCents: z.number().int().positive(),
-    }),
-  ]),
+  partyDate: z.coerce.date().refine(
+    (date) => date > new Date(),
+    'Party date must be in the future'
+  ),
+  
+  // Gift details (manual entry, AI-generated artwork)
+  giftName: z.string().min(2).max(200),
+  giftImageUrl: z.string().url(),
+  giftImagePrompt: z.string().optional(),
   goalCents: z.number().int().positive(),
-  payoutMethod: z.enum(['takealot_gift_card', 'karri_card_topup', 'philanthropy_donation']),
-  overflowGiftData: z.object({
-    causeId: z.string(),
-    causeName: z.string(),
-    impactDescription: z.string(),
-  }).optional(),
-  deadline: z.coerce.date(),
+  
+  // Karri Card payout (sole method)
+  karriCardNumber: z.string().length(16).regex(/^\d+$/, 'Must be 16 digits'),
+  karriCardHolderName: z.string().min(2).max(100),
+  
+  // Host contact
+  hostWhatsAppNumber: z.string().regex(saMobileRegex, 'Must be a valid SA mobile number'),
   payoutEmail: z.string().email(),
+  
+  // Optional
   message: z.string().max(280).optional(),
-}).superRefine((val, ctx) => {
-  if (val.giftType === 'takealot_product' && !val.overflowGiftData) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['overflowGiftData'],
-      message: 'Required when giftType is takealot_product',
-    });
-  }
-  if (val.giftType === 'philanthropy' && val.payoutMethod !== 'philanthropy_donation') {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['payoutMethod'],
-      message: 'Must be philanthropy_donation for philanthropy gifts',
-    });
-  }
 });
 
 export type CreateDreamBoardInput = z.infer<typeof createDreamBoardSchema>;
@@ -284,68 +275,57 @@ export function generateSlug(childName: string): string {
 // Output: "maya-birthday-x7k9m2"
 ```
 
-### 2. Takealot URL Parsing
+### 2. AI Gift Artwork Generation
 
-Extract product details from URL:
+Generate whimsical artwork from gift descriptions:
 
 ```typescript
-// lib/integrations/takealot.ts
+// lib/integrations/image-generation.ts
 
-export interface TakealotProduct {
-  url: string;
-  name: string;
-  priceCents: number;
-  imageUrl: string;
+const STYLE_DIRECTIVE = `Create a whimsical, playful illustration in a
+watercolor and hand-drawn style. The image should feel warm, celebratory,
+and child-friendly. DO NOT create photorealistic images. Use soft colors
+and gentle shapes. The subject is: `;
+
+export interface GeneratedImage {
+  imageUrl: string;  // Vercel Blob URL
+  prompt: string;    // Full prompt used
 }
 
-export async function fetchTakealotProduct(url: string): Promise<TakealotProduct> {
-  // Validate URL
-  if (!url.includes('takealot.com')) {
-    throw new Error('Invalid Takealot URL');
-  }
-
-  // Fetch the page
-  const response = await fetch(url, {
+export async function generateGiftArtwork(
+  giftDescription: string
+): Promise<GeneratedImage> {
+  const fullPrompt = STYLE_DIRECTIVE + giftDescription;
+  
+  const response = await fetch(process.env.IMAGE_GENERATION_API_URL!, {
+    method: 'POST',
     headers: {
-      'User-Agent': 'ChipIn/1.0 (+https://chipin.co.za)',
+      'Authorization': `Bearer ${process.env.IMAGE_GENERATION_API_KEY}`,
+      'Content-Type': 'application/json',
     },
+    body: JSON.stringify({
+      model: process.env.IMAGE_GENERATION_MODEL || 'dall-e-3',
+      prompt: fullPrompt,
+      n: 1,
+      size: '1024x1024',
+    }),
   });
 
   if (!response.ok) {
-    throw new Error('Failed to fetch product');
+    throw new Error('Failed to generate artwork');
   }
 
-  const html = await response.text();
-
-  // Extract JSON-LD structured data (preferred)
-  const jsonLdMatch = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
-  if (jsonLdMatch) {
-    const jsonLd = JSON.parse(jsonLdMatch[1]);
-    if (jsonLd['@type'] === 'Product') {
-      return {
-        url,
-        name: jsonLd.name,
-        priceCents: Math.round(parseFloat(jsonLd.offers?.price || 0) * 100),
-        imageUrl: jsonLd.image,
-      };
-    }
-  }
-
-  // Fallback to Open Graph tags
-  const ogTitle = html.match(/<meta property="og:title" content="([^"]+)"/)?.[1];
-  const ogImage = html.match(/<meta property="og:image" content="([^"]+)"/)?.[1];
-  const priceMatch = html.match(/R\s*([\d,]+(?:\.\d{2})?)/);
+  const data = await response.json();
+  const tempUrl = data.data[0].url;
   
-  if (!ogTitle || !priceMatch) {
-    throw new Error('Could not extract product details');
-  }
+  // Upload to Vercel Blob for permanent storage
+  const imageResponse = await fetch(tempUrl);
+  const imageBlob = await imageResponse.blob();
+  const { url } = await put(`artwork/${nanoid()}.png`, imageBlob, {
+    access: 'public',
+  });
 
-  return {
-    url,
-    name: ogTitle.replace(' | Takealot.com', ''),
-    priceCents: Math.round(parseFloat(priceMatch[1].replace(',', '')) * 100),
-    imageUrl: ogImage || '',
-  };
+  return { imageUrl: url, prompt: fullPrompt };
 }
 ```
 

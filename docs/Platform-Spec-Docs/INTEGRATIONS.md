@@ -1,18 +1,16 @@
 # ChipIn Third-Party Integrations
 
-> **Version:** 1.0.0  
-> **Last Updated:** January 2026  
-> **Status:** Ready for Development
+> **Version:** 2.0.0  
+> **Last Updated:** February 2026  
+> **Status:** Platform Simplification In Progress
 
 ---
 
 ## Overview
 
-ChipIn integrates with external services for product data, payments, and payouts. This document specifies the integration patterns and requirements.
+ChipIn integrates with external services for payments, payouts, notifications, and AI image generation. This document specifies the integration patterns and requirements.
 
-### Integration Philosophy
-
-**ChipIn exposes APIs; partners integrate with us.**
+### Integration Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -26,594 +24,432 @@ ChipIn integrates with external services for product data, payments, and payouts
 │                              │                                  │
 └──────────────────────────────┼──────────────────────────────────┘
                                │
-          ┌────────────────────┼────────────────────┐
-          │                    │                    │
-          ▼                    ▼                    ▼
-   ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-   │   Takealot  │     │   Payment   │     │   Future    │
-   │   Products  │     │  Providers  │     │  Partners   │
-   └─────────────┘     └─────────────┘     └─────────────┘
+    ┌──────────────┬───────────┼───────────┬──────────────┐
+    │              │           │           │              │
+    ▼              ▼           ▼           ▼              ▼
+┌────────┐  ┌──────────┐  ┌────────┐  ┌─────────┐  ┌──────────┐
+│  AI    │  │ WhatsApp │  │ Karri  │  │ Payment │  │  Email   │
+│ Images │  │ Business │  │  Card  │  │Providers│  │ (Resend) │
+└────────┘  └──────────┘  └────────┘  └─────────┘  └──────────┘
 ```
+
+### Integration Summary
+
+| Integration | Purpose | Status |
+|-------------|---------|--------|
+| AI Image Generation | Generate gift artwork from descriptions | **NEW** |
+| WhatsApp Business API | Transactional notifications | **NEW** |
+| Karri Card | Sole payout method (daily batch) | **ENHANCED** |
+| PayFast | Inbound card payments | Unchanged |
+| Ozow | Inbound EFT payments | Unchanged |
+| SnapScan | Inbound QR payments | Unchanged |
+| Resend | Email notifications | Unchanged |
+| Vercel Blob | Image storage | Unchanged |
+| Vercel KV | Session/cache storage | Unchanged |
 
 ---
 
-## Takealot Integration
+## AI Image Generation
 
 ### Purpose
 
-Fetch product data for Dream Board gift selection. The gift goal can payout via **Takealot gift card** or **Karri Card top-up** (payout method is separate from gift source).
+Generate whimsical, non-photorealistic artwork for gift descriptions. Parents describe their child's dream gift, and AI creates an illustration.
 
-### Integration Options (In Priority Order)
+### Provider
 
-#### Option 1: Takealot Partner API (Preferred)
+OpenAI DALL-E 3 (default), with flexibility for alternative providers.
 
-If Takealot provides partner/affiliate API access:
+### Environment Variables
+
+```bash
+IMAGE_GENERATION_API_KEY=""
+IMAGE_GENERATION_API_URL="https://api.openai.com/v1/images/generations"
+IMAGE_GENERATION_MODEL="dall-e-3"
+```
+
+### Interface
 
 ```typescript
-interface TakealotAPI {
-  searchProducts(query: string): Promise<TakealotProduct[]>;
-  getProduct(productId: string): Promise<TakealotProduct>;
-  getProductByUrl(url: string): Promise<TakealotProduct>;
+interface ImageGenerationService {
+  generateGiftArtwork(giftDescription: string): Promise<GeneratedImage>;
 }
 
-interface TakealotProduct {
-  id: string;
-  name: string;
-  description: string;
-  price: number;        // In cents
-  imageUrl: string;
-  productUrl: string;
-  inStock: boolean;
-  category: string;
+interface GeneratedImage {
+  imageUrl: string;   // Vercel Blob URL (permanent storage)
+  prompt: string;     // Full prompt used (for regeneration)
 }
 ```
 
-**Implementation:**
-```typescript
-class TakealotAPIClient implements TakealotAPI {
-  private apiKey: string;
-  private baseUrl = 'https://api.takealot.com/v1';
+### Implementation Requirements
 
-  async searchProducts(query: string): Promise<TakealotProduct[]> {
-    const response = await fetch(
-      `${this.baseUrl}/products/search?q=${encodeURIComponent(query)}`,
-      { headers: { 'Authorization': `Bearer ${this.apiKey}` } }
-    );
-    return response.json();
-  }
-
-  async getProductByUrl(url: string): Promise<TakealotProduct> {
-    // Extract product ID from URL and fetch
-    const productId = this.extractProductId(url);
-    return this.getProduct(productId);
-  }
-}
-```
-
-#### Option 2: URL-Based Product Fetching (Fallback)
-
-If no API available, fetch product data from URL:
+1. **Style Directive**: Prepend style instructions to ensure child-friendly, non-photorealistic output:
 
 ```typescript
-class TakealotScraper implements TakealotAPI {
-  async getProductByUrl(url: string): Promise<TakealotProduct> {
-    // Validate URL is from Takealot
-    if (!this.isValidTakealotUrl(url)) {
-      throw new Error('Invalid Takealot URL');
-    }
+const STYLE_DIRECTIVE = `Create a whimsical, playful illustration in a
+watercolor and hand-drawn style. The image should feel warm, celebratory,
+and child-friendly. DO NOT create photorealistic images. Use soft colors
+and gentle shapes. The subject is: `;
+```
 
-    // Fetch the page
-    const response = await fetch(url, {
-      headers: { 'User-Agent': 'ChipIn/1.0 (+https://chipin.co.za)' }
-    });
-    const html = await response.text();
+2. **Upload to Blob**: Generated images must be uploaded to Vercel Blob for permanent storage (AI provider URLs are temporary).
 
-    // Parse structured data (JSON-LD)
-    const jsonLd = this.extractJsonLd(html);
+3. **Rate Limiting**: Maximum 5 generations per session per hour.
 
-    // Or parse Open Graph / meta tags
-    const meta = this.extractMetaTags(html);
+4. **Cost Tracking**: Log token/credit usage for monitoring.
 
-    return {
-      id: this.extractProductId(url),
-      name: jsonLd?.name || meta.title,
-      description: jsonLd?.description || meta.description,
-      price: this.parsePrice(jsonLd?.offers?.price || meta.price),
-      imageUrl: jsonLd?.image || meta.image,
-      productUrl: url,
-      inStock: jsonLd?.offers?.availability === 'InStock',
-      category: jsonLd?.category || 'Unknown',
-    };
-  }
+5. **Retry Logic**: Exponential backoff on transient failures.
 
-  private extractJsonLd(html: string): any {
-    const match = html.match(/<script type="application\/ld\+json">(.*?)<\/script>/s);
-    if (match) {
-      try {
-        return JSON.parse(match[1]);
-      } catch {
-        return null;
-      }
-    }
-    return null;
-  }
+### API Route
 
-  private extractMetaTags(html: string): Record<string, string> {
-    const meta: Record<string, string> = {};
-    
-    // Open Graph
-    const ogMatches = html.matchAll(/<meta property="og:(\w+)" content="([^"]+)"/g);
-    for (const match of ogMatches) {
-      meta[match[1]] = match[2];
-    }
+```
+POST /api/internal/artwork/generate
+```
 
-    // Twitter cards
-    const twitterMatches = html.matchAll(/<meta name="twitter:(\w+)" content="([^"]+)"/g);
-    for (const match of twitterMatches) {
-      meta[match[1]] = match[2];
-    }
-
-    return meta;
-  }
+**Request:**
+```json
+{
+  "description": "A shiny red mountain bike with training wheels"
 }
 ```
 
-#### Option 3: Manual Entry (Ultimate Fallback)
-
-If scraping becomes unreliable:
-
-```typescript
-interface ManualProductInput {
-  productUrl: string;
-  productName: string;
-  productPrice: number;
-  productImage: string;  // Host uploads screenshot
+**Response:**
+```json
+{
+  "imageUrl": "https://xxx.public.blob.vercel-storage.com/artwork/abc123.png",
+  "prompt": "Create a whimsical, playful illustration... A shiny red mountain bike with training wheels"
 }
 ```
 
-Host pastes URL and manually enters:
-- Product name
-- Price
-- Uploads product image
+### Error Handling
 
-### Product Data Caching
-
-Cache product data to reduce load:
-
-```typescript
-const PRODUCT_CACHE_TTL = 60 * 60 * 24; // 24 hours
-
-async function getProduct(url: string): Promise<TakealotProduct> {
-  const cacheKey = `product:${hashUrl(url)}`;
-  
-  // Check cache
-  const cached = await kv.get(cacheKey);
-  if (cached) {
-    return JSON.parse(cached);
-  }
-
-  // Fetch fresh
-  const product = await takealot.getProductByUrl(url);
-  
-  // Cache
-  await kv.set(cacheKey, JSON.stringify(product), { ex: PRODUCT_CACHE_TTL });
-
-  return product;
-}
-```
-
-### Product Search UI Flow
-
-```
-┌─────────────────────────────────────┐
-│  Search for a product on Takealot  │
-│  ┌─────────────────────────────────┐│
-│  │ 🔍 lego star wars               ││
-│  └─────────────────────────────────┘│
-│                                     │
-│  ─── OR ───                        │
-│                                     │
-│  Paste a Takealot link:            │
-│  ┌─────────────────────────────────┐│
-│  │ https://www.takealot.com/...    ││
-│  └─────────────────────────────────┘│
-│                                     │
-│  [Fetch Product]                    │
-└─────────────────────────────────────┘
-```
-
-### Takealot Gift Card Payout
-
-**Investigation Required:** Does Takealot offer:
-- Affiliate program with gift card API?
-- Corporate gift card purchase API?
-- Bulk gift card purchasing?
-
-**Fallback Process:**
-1. Admin receives payout alert
-2. Admin purchases gift card on takealot.com
-3. Admin enters gift card code in ChipIn admin
-4. ChipIn emails code to host
+| Error | Status | User Message |
+|-------|--------|--------------|
+| Rate limit exceeded | 429 | "You've generated too many images. Please wait a bit." |
+| Invalid description | 400 | "Please provide a description between 10-500 characters." |
+| API failure | 500 | "We couldn't generate artwork right now. Please try again." |
+| Content policy violation | 400 | "We couldn't illustrate that description. Please try different words." |
 
 ---
 
-## Philanthropic Integration
+## WhatsApp Business API
 
 ### Purpose
 
-Enable "Gift of Giving" — contribute to charitable causes instead of physical gifts. Also used as **charity overflow** after a Takealot gift is fully funded.
+Send transactional notifications to hosts via WhatsApp. More immediate and reliable than email for time-sensitive updates.
 
-### Status: Placeholder
+### Provider
 
-Requires investigation into:
-- **GivenGain** — SA-based giving platform
-- **BackaBuddy** — SA crowdfunding for causes
-- **Direct charity partnerships** — Curated list of vetted causes
+Meta WhatsApp Business API (via official API or approved BSP).
 
-### Proposed Interface
+### Environment Variables
+
+```bash
+WHATSAPP_BUSINESS_API_URL=""
+WHATSAPP_BUSINESS_API_TOKEN=""
+WHATSAPP_PHONE_NUMBER_ID=""
+```
+
+### Message Templates
+
+All messages must use pre-approved templates in WhatsApp Business Manager.
+
+#### Template: `dream_board_created`
+```
+🎉 {{child_name}}'s Dream Board is live!
+
+Share this link with party guests:
+{{dream_board_url}}
+
+You'll receive notifications when friends chip in.
+```
+
+#### Template: `contribution_received`
+```
+💝 {{contributor_name}} just contributed to {{child_name}}'s Dream Board!
+
+Progress: {{percentage}}% funded
+```
+
+#### Template: `funding_complete`
+```
+🎊 Amazing news! {{child_name}}'s Dream Board is fully funded!
+
+Total raised: R{{amount}}
+
+Funds will be credited to your Karri Card ending in {{card_last4}} within 24 hours.
+```
+
+#### Template: `payout_confirmed`
+```
+✅ R{{amount}} has been credited to your Karri Card ending in {{card_last4}}.
+
+Thank you for using ChipIn! 🎁
+```
+
+### Interface
 
 ```typescript
-interface PhilanthropyProvider {
-  getCauses(): Promise<Cause[]>;
-  getCause(id: string): Promise<Cause>;
-  createDonation(params: DonationParams): Promise<Donation>;
-}
+interface WhatsAppService {
+  sendDreamBoardLink(
+    phoneNumber: string,
+    dreamBoardUrl: string,
+    childName: string
+  ): Promise<void>;
 
-interface Cause {
-  id: string;
-  name: string;
-  description: string;
-  imageUrl: string;
-  impacts: Impact[];     // Predefined impact levels
-  minimumDonation: number;
-}
+  sendContributionNotification(
+    phoneNumber: string,
+    contributorName: string,
+    childName: string,
+    percentage: number
+  ): Promise<void>;
 
-interface Impact {
-  amount: number;
-  description: string;   // "Feed 10 children for a week"
-}
+  sendFundingCompleteNotification(
+    phoneNumber: string,
+    childName: string,
+    totalRaisedCents: number,
+    cardLast4: string
+  ): Promise<void>;
 
-interface DonationParams {
-  causeId: string;
-  amount: number;
-  donorName: string;     // Child's name
-  donorEmail: string;    // For certificate
-}
-
-interface Donation {
-  id: string;
-  certificateUrl: string;
-  status: 'pending' | 'completed';
+  sendPayoutConfirmation(
+    phoneNumber: string,
+    amountCents: number,
+    cardLast4: string
+  ): Promise<void>;
 }
 ```
 
-### Curated Cause Categories (Proposed)
+### Phone Number Validation
 
-| Category | Example Causes |
-|----------|---------------|
-| Education | School supplies, scholarships |
-| Food Security | Meals for children |
-| Animal Welfare | Wildlife conservation, shelters |
-| Environment | Tree planting, ocean cleanup |
-| Children's Health | Medical equipment, hospital support |
+South African mobile numbers only:
+- Format: `+27XXXXXXXXX` (international) or `0XXXXXXXXX` (local)
+- Normalize to international format before sending
+- Validate against SA mobile prefixes (06x, 07x, 08x)
 
-### Integration Flow
+### Error Handling
 
-```
-Host selects "Gift of Giving"
-         │
-         ▼
-Browse curated causes (ChipIn-selected)
-         │
-         ▼
-Select cause + impact level
-         │
-         ▼
-Pot collects contributions
-         │
-         ▼
-Pot closes → Donation executed
-         │
-         ▼
-Certificate sent to host
-```
+| Error | Handling |
+|-------|----------|
+| Invalid phone number | Skip WhatsApp, fall back to email |
+| Template not approved | Log error, fall back to email |
+| Rate limited | Queue and retry |
+| Delivery failed | Log, no retry (user may have blocked) |
 
 ---
 
-## Karri Integration (Optional)
+## Karri Card Integration
 
 ### Purpose
 
-Optional payout route to child's Karri Card.
+Credit pooled funds to the host's Karri Card. This is the **sole payout method**.
 
-### Status: Optional Phase
+### Flow: Immediate Debit, Daily Batch Credit
 
-Depends on partnership discussions with Karri Payments.
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     Contribution Flow                           │
+│                                                                 │
+│   Guest ──► PayFast/Ozow/SnapScan ──► Contribution Record      │
+│              (Immediate Debit)         (Status: completed)      │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              │ (Pot closes)
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     Payout Queue                                │
+│                                                                 │
+│   Closed Pot ──► karri_credit_queue ──► Daily Batch Job        │
+│                  (Status: pending)      (6 AM SAST)             │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     Karri Card Credit                           │
+│                                                                 │
+│   Batch Job ──► Karri API ──► Status: completed                │
+│                              ──► WhatsApp confirmation          │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-### Proposed Integration
+### Environment Variables
 
-**What ChipIn Needs:**
+```bash
+KARRI_API_URL=""
+KARRI_API_KEY=""
+KARRI_BATCH_ENABLED="true"
+KARRI_BATCH_SCHEDULE="0 6 * * *"  # 6 AM SAST daily
+```
+
+### Interface
+
 ```typescript
-interface KarriAPI {
-  // Top up a Karri Card
-  topUpCard(params: TopUpParams): Promise<TopUpResult>;
-  
-  // Verify card is valid (before pot closes)
-  verifyCard(cardNumber: string): Promise<CardVerification>;
+interface KarriBatchService {
+  queueKarriCredit(
+    karriCardNumber: string,
+    amountCents: number,
+    reference: string,
+    dreamBoardId: string
+  ): Promise<void>;
+
+  processDailyKarriBatch(): Promise<BatchResult>;
 }
 
-interface TopUpParams {
-  cardNumber: string;
-  amount: number;        // In cents
-  reference: string;     // Our payout ID
-  description: string;   // "Maya's Birthday Gift"
+interface BatchResult {
+  processed: number;
+  succeeded: number;
+  failed: number;
+  errors: BatchError[];
 }
 
-interface TopUpResult {
-  transactionId: string;
-  status: 'completed' | 'pending' | 'failed';
-  completedAt?: Date;
+interface BatchError {
+  dreamBoardId: string;
+  karriCardNumber: string;
+  error: string;
+  attempts: number;
 }
 ```
 
-**What ChipIn Exposes to Karri:**
+### Database: `karri_credit_queue`
 
-Karri can integrate with our public API to:
-- Receive `payout.ready` webhooks
-- Confirm payout execution via `/payouts/{id}/confirm`
-
-### Data Flow
-
+```sql
+CREATE TABLE karri_credit_queue (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  dream_board_id UUID NOT NULL REFERENCES dream_boards(id),
+  karri_card_number VARCHAR(20) NOT NULL,
+  amount_cents INTEGER NOT NULL,
+  reference VARCHAR(100) NOT NULL UNIQUE,
+  status VARCHAR(20) NOT NULL DEFAULT 'pending',  -- pending, processing, completed, failed
+  attempts INTEGER NOT NULL DEFAULT 0,
+  last_attempt_at TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ,
+  error_message TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 ```
-ChipIn: Pot closes
-         │
-         ▼
-ChipIn → Karri API: topUpCard(cardNumber, amount)
-         │
-         ▼
-Karri: Tops up card, returns transactionId
-         │
-         ▼
-ChipIn: Marks payout completed
-         │
-         ▼
-ChipIn → Host: "Funds loaded to Karri Card!"
-```
+
+### Batch Processing Logic
+
+1. Query all `pending` entries
+2. For each entry:
+   - Update status to `processing`
+   - Call Karri Card API
+   - On success: status = `completed`, set `completed_at`, send WhatsApp
+   - On failure: status = `pending`, increment `attempts`, set `error_message`
+3. If `attempts >= 3`: status = `failed`, send alert email to admin
+
+### Idempotency
+
+Each credit has a unique `reference` (format: `chipin-{dreamBoardId}-{timestamp}`). Karri API must reject duplicate references.
+
+### Karri Card Number Validation
+
+- 16-digit card number
+- Validate Luhn checksum
+- Store only last 4 digits for display (`****1234`)
 
 ---
 
-## Email Integration (Resend)
+## Payment Providers (Inbound)
 
-### Purpose
+Payment providers handle contributions from guests. No changes from previous implementation.
 
-Transactional emails for authentication and notifications.
+### PayFast
+- Card payments
+- See `docs/payment-docs/payfast-developer-reference.md`
 
-### Configuration
+### Ozow
+- EFT payments
+- See `docs/payment-docs/ozow-oneapi-developer-reference.md`
 
-```env
-RESEND_API_KEY=re_xxxxxxxxxxxx
-RESEND_FROM_EMAIL=noreply@chipin.co.za
-RESEND_FROM_NAME=ChipIn
-```
+### SnapScan
+- QR code payments
+- See `docs/payment-docs/snapscan-developer-reference.md`
 
-### Implementation
+### Webhook Security
 
-```typescript
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// Email templates
-const templates = {
-  magicLink: (link: string) => ({
-    subject: 'Your ChipIn magic link ✨',
-    html: `
-      <h1>Welcome to ChipIn!</h1>
-      <p>Click below to continue:</p>
-      <a href="${link}" style="...">Continue to ChipIn →</a>
-      <p>This link expires in 1 hour.</p>
-    `,
-  }),
-
-  contributionReceived: (data: ContributionNotificationData) => ({
-    subject: `🎉 ${data.contributorName} just contributed to ${data.childName}'s Dream Gift!`,
-    html: `
-      <h1>New contribution!</h1>
-      <p>${data.contributorName} contributed R${(data.amount / 100).toFixed(2)}</p>
-      <p>Total raised: R${(data.totalRaised / 100).toFixed(2)} of R${(data.goal / 100).toFixed(2)}</p>
-      <a href="${data.dashboardUrl}">View your Dream Board →</a>
-    `,
-  }),
-
-  potFunded: (data: PotFundedData) => ({
-    subject: `🎉 ${data.childName}'s Dream Gift is fully funded!`,
-    html: `
-      <h1>Goal reached!</h1>
-      <p>${data.childName}'s dream gift is fully funded.</p>
-      <a href="${data.dashboardUrl}">Request your payout →</a>
-    `,
-  }),
-
-  payoutReady: (data: PayoutReadyData) => ({
-    subject: `Your Takealot gift card is ready!`,
-    html: `
-      <h1>Time to shop! 🛒</h1>
-      <p>The contributions for ${data.childName}'s Dream Gift have been converted to a Takealot gift card.</p>
-      <p><strong>Gift Card Value:</strong> R${(data.amount / 100).toFixed(2)}</p>
-      <p><strong>Gift Card Code:</strong> ${data.giftCardCode}</p>
-      <p>Redeem at takealot.com</p>
-    `,
-  }),
-};
-
-// Send email
-async function sendEmail(to: string, template: keyof typeof templates, data: any) {
-  const { subject, html } = templates[template](data);
-  
-  await resend.emails.send({
-    from: `${process.env.RESEND_FROM_NAME} <${process.env.RESEND_FROM_EMAIL}>`,
-    to,
-    subject,
-    html,
-  });
-}
-```
-
-### Email Types
-
-| Email | Trigger | Recipient |
-|-------|---------|-----------|
-| Magic Link | Auth request | Host |
-| Dream Board Created | Board goes live | Host |
-| Contribution Received | Payment confirmed | Host |
-| Goal Reached | Total >= goal | Host |
-| Deadline Reminder | 24h before deadline | Host |
-| Pot Closed | Manual or auto close | Host |
-| Payout Ready | Gift card issued | Host |
+All webhooks must verify signatures before processing. See `PAYMENTS.md` for details.
 
 ---
 
-## Image Storage (Vercel Blob)
+## Email (Resend)
 
-### Purpose
+Email remains for:
+- Magic link authentication
+- Backup notifications (when WhatsApp fails)
+- Host receipts and summaries
 
-Store child photos uploaded during Dream Board creation.
+### Environment Variables
 
-### Implementation
-
-```typescript
-import { put, del } from '@vercel/blob';
-
-async function uploadChildPhoto(file: File, dreamBoardId: string): Promise<string> {
-  // Validate file
-  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-    throw new Error('Invalid file type');
-  }
-  
-  if (file.size > 5 * 1024 * 1024) { // 5MB
-    throw new Error('File too large');
-  }
-
-  // Upload with unique path
-  const filename = `photos/${dreamBoardId}/${Date.now()}.${getExtension(file.type)}`;
-  const { url } = await put(filename, file, {
-    access: 'public',
-    contentType: file.type,
-  });
-
-  return url;
-}
-
-async function deleteChildPhoto(url: string): Promise<void> {
-  await del(url);
-}
+```bash
+RESEND_API_KEY=""
+RESEND_FROM_EMAIL="noreply@chipin.co.za"
+RESEND_FROM_NAME="ChipIn"
 ```
 
-### Image Processing
-
-For MVP, use Vercel's automatic image optimization:
-
-```typescript
-// In Next.js, use the Image component
-import Image from 'next/image';
-
-<Image
-  src={childPhotoUrl}
-  alt={`${childName}'s photo`}
-  width={200}
-  height={200}
-  className="rounded-full object-cover"
-/>
-```
+No changes to existing email implementation.
 
 ---
 
-## Analytics Integration (Future)
+## Storage (Vercel Blob)
 
-### Proposed: PostHog or Plausible
+Used for:
+- Child photos (uploaded by host)
+- AI-generated gift artwork
 
-For privacy-respecting analytics:
+### Environment Variables
 
-```typescript
-// Track key events
-analytics.capture('dream_board_created', {
-  giftType: 'takealot_product',
-  goalAmount: 249900,
-});
-
-analytics.capture('contribution_received', {
-  dreamBoardId: 'db_xxx',
-  amount: 20000,
-  paymentProvider: 'payfast',
-});
-
-analytics.capture('payout_completed', {
-  dreamBoardId: 'db_xxx',
-  payoutType: 'takealot_gift_card',
-  amount: 240000,
-});
+```bash
+BLOB_READ_WRITE_TOKEN=""
 ```
+
+No changes to existing blob implementation.
 
 ---
 
-## Integration Testing
+## Cache (Vercel KV)
 
-### Mock Providers
+Used for:
+- Session storage
+- Magic link tokens
+- Rate limiting counters
+- Dream board draft state
 
-For development and testing:
+### Environment Variables
 
-```typescript
-// Mock Takealot provider
-class MockTakealotProvider implements TakealotAPI {
-  async searchProducts(query: string): Promise<TakealotProduct[]> {
-    return [
-      {
-        id: 'MOCK001',
-        name: 'LEGO Star Wars Death Star',
-        price: 249900,
-        imageUrl: '/mock/lego-death-star.jpg',
-        productUrl: 'https://www.takealot.com/mock-product',
-        inStock: true,
-        category: 'Toys',
-      },
-    ];
-  }
-}
-
-// Use mock in development
-const takealot = process.env.NODE_ENV === 'production'
-  ? new TakealotAPIClient()
-  : new MockTakealotProvider();
+```bash
+KV_REST_API_URL=""
+KV_REST_API_TOKEN=""
 ```
 
-### Integration Test Suite
-
-```typescript
-describe('Takealot Integration', () => {
-  it('should fetch product by URL', async () => {
-    const product = await takealot.getProductByUrl(
-      'https://www.takealot.com/lego-star-wars-death-star/PLID12345'
-    );
-    
-    expect(product.name).toBeDefined();
-    expect(product.price).toBeGreaterThan(0);
-    expect(product.imageUrl).toMatch(/^https?:\/\//);
-  });
-
-  it('should handle invalid URL', async () => {
-    await expect(
-      takealot.getProductByUrl('https://amazon.com/product')
-    ).rejects.toThrow('Invalid Takealot URL');
-  });
-});
-```
+No changes to existing KV implementation.
 
 ---
 
-## Document References
+## Health Checks
 
-| Document | Purpose |
-|----------|---------|
-| [API.md](./API.md) | ChipIn API that partners integrate with |
-| [PAYMENTS.md](./PAYMENTS.md) | Payment provider integrations |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | System architecture |
+Integration health is monitored via `/health/ready`:
+
+| Check | Integration | Criticality |
+|-------|-------------|-------------|
+| Database | Neon PostgreSQL | Critical |
+| Cache | Vercel KV | Critical |
+| Storage | Vercel Blob | Warning |
+| Email | Resend | Warning |
+| WhatsApp | WhatsApp Business | Warning |
+| AI Images | OpenAI | Warning |
+| Karri | Karri Card API | Warning |
+
+Critical failures return 503. Warning failures log but return 200.
+
+---
+
+## Removed Integrations
+
+The following integrations have been removed in the platform simplification:
+
+| Integration | Reason |
+|-------------|--------|
+| Takealot Product Scraping | Gifts now defined manually by parent |
+| Takealot Gift Card API | Karri Card is sole payout method |
+| GivenGain Philanthropy | Charity features removed from scope |
+
+Historical code and documentation have been archived.

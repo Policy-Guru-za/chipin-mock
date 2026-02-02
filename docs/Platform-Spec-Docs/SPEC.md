@@ -1,17 +1,22 @@
 # ChipIn Product Specification
 
-> **Version:** 1.0.0  
-> **Last Updated:** January 2026  
-> **Status:** Ready for Development
+> **Version:** 2.0.0  
+> **Last Updated:** February 2026  
+> **Status:** Platform Simplification In Progress
 
 ---
 
 ## Executive Summary
 
-ChipIn is a social gifting platform that transforms children's birthday gift-giving from chaotic cash requests into meaningful contributions toward a child's dream gift.
+ChipIn is a **social coordination tool** for birthday gifting that transforms chaotic cash requests into meaningful contributions toward a child's dream gift.
 
 **The One-Sentence Pitch:**
 > Friends chip in together to turn birthday clutter into one dream gift.
+
+**Core Philosophy:**
+- We are in the **pooling business**, not the fulfillment business
+- Money flows from contributors to Karri Card — we never hold funds
+- Gift definition is manual (parent describes it), not catalog-based
 
 ---
 
@@ -47,18 +52,23 @@ This is not a wedding registry. Each Dream Board has **one item** — a single, 
 ### 2. Mobile Web First
 60-80% of guests won't download an app. The guest experience is **entirely browser-based** — click link, view, contribute, done. Zero friction.
 
-### 3. Takealot-First Gift, Flexible Payout
-Default gift goal is a Takealot product, with payout via Takealot gift card **or** Karri Card top-up. This creates:
-- Perfect alignment (child gets exactly what they wished for)
-- Potential affiliate revenue (5-10% commission)
-- Regulatory simplicity (gift cards or regulated card top-ups)
-  
-If the gift is fully funded early, guests see a **charity overflow** view instead of the gift.
+### 3. Manual Gift Definition + AI Artwork
+Parent describes the dream gift in their own words. AI generates whimsical, non-photorealistic artwork to illustrate it. This creates:
+- No dependency on external product catalogs
+- Personalized, child-friendly visual experience
+- Flexibility — any gift the parent envisions
 
-### 4. API-First Architecture
+### 4. Karri Card as Sole Payout
+All funds are credited to the host's Karri Card. This creates:
+- Simple, predictable payout flow
+- No fulfillment complexity (we don't buy or ship anything)
+- Regulatory simplicity (card-to-card transfer)
+- Parent controls how to use the funds
+
+### 5. API-First Architecture
 ChipIn exposes APIs that partners integrate with — not the reverse. We control the product; partners adapt to us.
 
-### 5. Privacy by Default
+### 6. Privacy by Default
 - Child's first name only (no surnames)
 - Contribution amounts not displayed publicly
 - Contributor names optional
@@ -72,35 +82,38 @@ ChipIn exposes APIs that partners integrate with — not the reverse. We control
 
 | Feature | Description | Priority |
 |---------|-------------|----------|
-| Dream Board Creation | Host creates board with child photo, name, one gift item | P0 |
-| Takealot Product Selection | Search and select specific Takealot product as dream gift | P0 |
-| Charity Overflow Selection | Host selects a charity shown after gift is funded | P0 |
+| Dream Board Creation | Host creates board with child photo, name, gift description | P0 |
+| AI Gift Artwork | Generate whimsical illustration from gift description | P0 |
+| Karri Card Setup | Host provides Karri Card details during creation | P0 |
+| WhatsApp Number | Host provides WhatsApp for notifications | P0 |
 | Shareable Link Generation | Unique URL for distribution via any channel | P0 |
-| Guest Contribution Flow | Mobile web experience for viewing and contributing | P0 |
+| Guest Contribution Flow | Mobile web experience showing % funded (not Rands) | P0 |
 | Payment Processing | Accept contributions via PayFast, Ozow, SnapScan | P0 |
-| Contribution Tracking | Progress bar, contributor list (names only, no amounts) | P0 |
-| Pot Closure & Payout | Automatic/manual closure, Takealot gift card or Karri top-up | P0 |
-| Host Dashboard | View contributions, manage Dream Board, trigger payout | P0 |
+| Contribution Tracking | Progress bar (%), contributor list (names only) | P0 |
+| WhatsApp Notifications | Alert host on contributions and payout | P0 |
+| Pot Closure & Payout | Automatic on party date, daily batch Karri credit | P0 |
+| Host Dashboard | View Rand amounts, manage Dream Board | P0 |
 
 ### Post-MVP Features (v1.x)
 
 | Feature | Description | Priority |
 |---------|-------------|----------|
-| Philanthropic Gifting | "Gift of Giving" option — donate to curated causes | P1 |
-| Karri Card Payout | Optional payout to child's Karri Card | P1 |
 | Custom Thank You Messages | Host sends personalized thanks to contributors | P1 |
 | Photo Gallery | Post-party photos showing child with gift | P2 |
 | Recurring Events | "Set up next year's birthday" prompt | P2 |
-| Class Circle | Optional persistent group for repeat invitations | P2 |
 
 ### Explicitly Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Shared Calendar | Research shows this is a "vitamin" — low retention, network effect trap |
+| Product Catalog Integration | We're a pooling tool, not a commerce platform |
+| Charity/Philanthropy | Removed in simplification — focus on core gifting |
+| Multiple Payout Methods | Karri Card only — single, predictable flow |
+| Shared Calendar | Research shows this is a "vitamin" — low retention |
 | Party Planning Tools | We're a gifting wallet, not a party planner |
 | Native Mobile Apps | Mobile web is sufficient; apps add friction for guests |
-| Multiple Gift Items | One item creates focus and urgency; registry behavior dilutes this |
+| Multiple Gift Items | One item creates focus and urgency |
+| Desktop-Optimized Layouts | Mobile-first serves all users |
 | Social Feed / Timeline | We're not building a social network |
 | Chat / Messaging | WhatsApp handles this better than we ever could |
 
@@ -124,7 +137,7 @@ ChipIn exposes APIs that partners integrate with — not the reverse. We control
 | Host Satisfaction | NPS score from hosts | >50 |
 | Guest Satisfaction | Post-contribution rating | >4.5/5 |
 | Viral Coefficient | New hosts generated per Dream Board | >0.3 |
-| Takealot Conversion | % of payouts as Takealot gift cards | >80% |
+| Karri Payout Success | % of payouts successfully credited | >99% |
 
 ---
 
@@ -220,17 +233,20 @@ ChipIn occupies a unique position: **purpose-built for parents** + **seamless lo
 ### Critical Dependencies
 | Dependency | Risk Level | Mitigation |
 |------------|------------|------------|
-| Takealot product data | Medium | URL-based fallback if API unavailable |
+| Karri Card API | Medium | Daily batch processing with retry logic |
 | Payment providers | Low | Multiple providers (PayFast, Ozow, SnapScan) |
+| AI Image Generation | Low | Multiple model options, graceful fallback |
+| WhatsApp Business API | Low | Email fallback for notifications |
 | Vercel/Neon availability | Low | Standard cloud SLAs |
 
 ### Key Risks
 | Risk | Likelihood | Impact | Mitigation |
 |------|------------|--------|------------|
 | Low adoption | Medium | High | Strong UX, viral mechanics, founder network seeding |
-| Takealot blocks integration | Low | Medium | URL-based product linking as fallback |
+| Karri API unavailable | Low | Medium | Queue and retry, manual fallback |
 | Payment fraud | Medium | Medium | Provider fraud detection + our own rules |
-| Regulatory change | Low | High | Gift card model has favorable treatment |
+| AI generates inappropriate image | Low | Low | Style directive + human review option |
+| WhatsApp template rejection | Medium | Low | Pre-approved templates, email fallback |
 
 ---
 
@@ -239,11 +255,12 @@ ChipIn occupies a unique position: **purpose-built for parents** + **seamless lo
 | Term | Definition |
 |------|------------|
 | **Dream Board** | The single-page representation of a child's birthday gift goal |
-| **Dream Gift** | The one item (Takealot product or philanthropic cause) being funded |
+| **Dream Gift** | The gift described by the parent, illustrated with AI-generated artwork |
 | **Pot** | The accumulated contributions toward a Dream Gift |
 | **Host** | The parent creating the Dream Board |
 | **Guest** | A party invitee who may contribute |
-| **Payout** | The disbursement of pot funds (as gift card or donation) |
+| **Payout** | The disbursement of pot funds (credited to host's Karri Card) |
+| **Party Date** | The birthday party date, also serves as automatic pot close date |
 
 ---
 
