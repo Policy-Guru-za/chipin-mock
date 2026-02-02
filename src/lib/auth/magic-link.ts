@@ -96,9 +96,17 @@ export async function sendMagicLink(email: string, context?: MagicLinkContext) {
 
     const token = randomBytes(32).toString('hex');
     const tokenHash = hashIdentifier(token);
+    const tokenHashPrefix = tokenHash.slice(0, 12);
 
     const record: MagicLinkRecord = { email: normalizedEmail, usedAt: null };
     await kvAdapter.set(`magic:${tokenHash}`, record, { ex: MAGIC_LINK_EXPIRY_SECONDS });
+    const storedRecord = await kvAdapter.get<MagicLinkRecord | string>(`magic:${tokenHash}`);
+    log(
+      'info',
+      'auth.magic_link_stored',
+      { tokenHashPrefix, stored: Boolean(storedRecord) },
+      context?.requestId
+    );
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
     const magicLink = `${baseUrl}/auth/verify?token=${token}`;
@@ -131,8 +139,11 @@ export async function sendMagicLink(email: string, context?: MagicLinkContext) {
 
 export async function verifyMagicLink(token: string) {
   const tokenHash = createHash('sha256').update(token).digest('hex');
+  const tokenHashPrefix = tokenHash.slice(0, 12);
+  log('info', 'auth.magic_link_lookup', { tokenHashPrefix });
   const stored = await kvAdapter.get<MagicLinkRecord | string>(`magic:${tokenHash}`);
   const record = normalizeMagicLinkRecord(stored);
+  log('info', 'auth.magic_link_lookup_result', { tokenHashPrefix, found: Boolean(record) });
   if (!record) {
     return null;
   }
