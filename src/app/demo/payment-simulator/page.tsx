@@ -5,7 +5,11 @@ import { isDemoMode } from '@/lib/demo';
 import { PaymentSimulatorClient } from './PaymentSimulatorClient';
 
 type PaymentSimulatorPageProps = {
-  searchParams?: { contributionId?: string; returnTo?: string };
+  searchParams?: {
+    contributionId?: string;
+    contribution_id?: string;
+    returnTo?: string;
+  };
 };
 
 const normalizeReturnTo = (value: string | undefined) =>
@@ -16,7 +20,7 @@ export default function PaymentSimulatorPage({ searchParams }: PaymentSimulatorP
     notFound();
   }
 
-  const contributionId = searchParams?.contributionId;
+  const contributionId = searchParams?.contributionId ?? searchParams?.contribution_id;
   const returnTo = normalizeReturnTo(searchParams?.returnTo);
 
   return (
