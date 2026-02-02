@@ -51,6 +51,8 @@ The following fields/concepts are being deprecated:
 - `giftType` enum: Remove `'takealot_product'` and `'philanthropy'` values.
 - `giftData` JSONB: Simplify structure (remove product URLs, Takealot IDs).
 - `payoutMethod` enum: Remove `'takealot_gift_card'` and `'philanthropy_donation'`.
+- `payoutType` enum: Remove `'takealot_gift_card'` and `'philanthropy_donation'` values, keep only `'karri_card'`.
+- `payoutItemType` enum: Remove `'overflow'` value (no charity overflow).
 - `overflowGiftData`: Remove entirely.
 
 The following fields are being **ADDED**:
