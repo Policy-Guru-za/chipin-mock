@@ -7,7 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { sendMagicLink } from '@/lib/auth/magic-link';
-import { getSession } from '@/lib/auth/session';
+import { getClerkConfigStatus, getClerkUrls } from '@/lib/auth/clerk-config';
+import { getHostAuth } from '@/lib/auth/clerk-wrappers';
+import { deleteSession } from '@/lib/auth/session';
 
 const emailSchema = z.object({
   email: z.string().email(),
@@ -151,7 +153,19 @@ export default async function CreateDreamBoardPage({
 }: {
   searchParams?: CreateSearchParams;
 }) {
-  const session = await getSession();
+  const clerkConfig = getClerkConfigStatus();
+  if (clerkConfig.isEnabled) {
+    await deleteSession();
+    const auth = await getHostAuth();
+    if (auth) {
+      redirect('/create/child');
+    }
+    const { signInUrl } = getClerkUrls();
+    const redirectUrl = `${signInUrl}${signInUrl.includes('?') ? '&' : '?'}redirect_url=${encodeURIComponent('/create/child')}`;
+    redirect(redirectUrl);
+  }
+
+  const session = await getHostAuth();
   if (session) {
     redirect('/create/child');
   }

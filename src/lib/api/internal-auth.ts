@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import type { AuditActor } from '@/lib/audit';
 import { getClientIp } from '@/lib/utils/request';
 
-export const requireInternalAuth = (request: NextRequest) => {
+export const requireInternalJobAuth = (request: NextRequest) => {
   const secret = process.env.INTERNAL_JOB_SECRET;
   if (!secret) {
     return { ok: false, status: 503, error: 'misconfigured' } as const;

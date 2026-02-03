@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { recordAuditEvent } from '@/lib/audit';
-import { requireInternalAuth, getInternalActor } from '@/lib/api/internal-auth';
+import { getInternalActor, requireInternalJobAuth } from '@/lib/api/internal-auth';
 import { jsonInternalError } from '@/lib/api/internal-response';
 import { buildApiKeyRecord, generateApiKeyToken, resolveRateLimit } from '@/lib/api/keys';
 import { createApiKeyRecord, deactivateApiKey, getApiKeyById } from '@/lib/db/api-key-queries';
@@ -30,7 +30,7 @@ export async function POST(
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
-  const auth = requireInternalAuth(request);
+  const auth = requireInternalJobAuth(request);
   if (!auth.ok) {
     return jsonInternalError({ code: auth.error, status: auth.status });
   }

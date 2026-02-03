@@ -1,10 +1,10 @@
 import Link from 'next/link';
 
 import { buttonVariants } from '@/components/ui/button';
-import { requireAdminSession } from '@/lib/auth/session';
+import { requireAdminAuth } from '@/lib/auth/clerk-wrappers';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  await requireAdminSession();
+  await requireAdminAuth();
 
   return (
     <div className="min-h-screen bg-subtle text-text">

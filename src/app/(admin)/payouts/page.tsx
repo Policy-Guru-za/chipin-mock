@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { requireAdminSession } from '@/lib/auth/session';
+import { requireAdminAuth } from '@/lib/auth/clerk-wrappers';
 import { getExpiringDreamBoards } from '@/lib/db/views';
 import { getPayoutQueueErrorMessage } from '@/lib/payouts/admin-copy';
 import { formatZar } from '@/lib/utils/money';
@@ -36,7 +36,7 @@ const formatDate = (value: Date) => dateFormatter.format(value);
 
 async function createPayoutsAction(formData: FormData) {
   'use server';
-  const session = await requireAdminSession();
+  const session = await requireAdminAuth();
   const parsed = createPayoutSchema.safeParse({
     dreamBoardId: formData.get('dreamBoardId'),
   });

@@ -5,7 +5,7 @@ import { CreateFlowShell } from '@/components/layout/CreateFlowShell';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { requireSession } from '@/lib/auth/session';
+import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
 import { isMockSentry } from '@/lib/config/feature-flags';
 import { getDreamBoardDraft, updateDreamBoardDraft } from '@/lib/dream-boards/draft';
 import type { DreamBoardDraft } from '@/lib/dream-boards/draft';
@@ -184,7 +184,7 @@ const DetailsForm = ({ draft, defaultPartyDate }: DetailsFormProps) => (
 async function saveDetailsAction(formData: FormData) {
   'use server';
 
-  const session = await requireSession();
+  const session = await requireHostAuth();
   const draft = await getDreamBoardDraft(session.hostId);
   if (!draft?.giftName) {
     redirect('/create/gift');
@@ -243,7 +243,7 @@ export default async function CreateDetailsPage({
 }: {
   searchParams?: DetailsSearchParams;
 }) {
-  const session = await requireSession();
+  const session = await requireHostAuth();
   const draft = await getDreamBoardDraft(session.hostId);
   const view = buildCreateFlowViewModel({ step: 'details', draft });
   if (view.redirectTo) {

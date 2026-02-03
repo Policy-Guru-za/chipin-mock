@@ -5,7 +5,7 @@ import { ContributorList } from '@/components/dream-board/ContributorList';
 import { ProgressBar } from '@/components/dream-board/ProgressBar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { requireSession } from '@/lib/auth/session';
+import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
 import { getDreamBoardDetailForHost, listContributionsForDreamBoard } from '@/lib/db/queries';
 import { buildDashboardViewModel } from '@/lib/host/dashboard-view-model';
 
@@ -15,7 +15,7 @@ export default async function DreamBoardDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const session = await requireSession();
+  const session = await requireHostAuth();
   const board = await getDreamBoardDetailForHost(id, session.hostId);
 
   if (!board) {

@@ -8,10 +8,17 @@ import { apiKeys, contributions, dreamBoards, hosts } from './schema';
 
 export const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
+export const hostSelect = {
+  id: hosts.id,
+  email: hosts.email,
+  name: hosts.name,
+  clerkUserId: hosts.clerkUserId,
+};
+
 export async function getHostByEmail(email: string) {
   const normalizedEmail = normalizeEmail(email);
   const [host] = await db
-    .select({ id: hosts.id, email: hosts.email, name: hosts.name })
+    .select(hostSelect)
     .from(hosts)
     .where(eq(hosts.email, normalizedEmail))
     .limit(1);
@@ -32,7 +39,7 @@ export async function ensureHostForEmail(email: string) {
     .onConflictDoNothing({ target: hosts.email });
 
   const [created] = await db
-    .select({ id: hosts.id, email: hosts.email, name: hosts.name })
+    .select(hostSelect)
     .from(hosts)
     .where(eq(hosts.email, normalizedEmail))
     .limit(1);

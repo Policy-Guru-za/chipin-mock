@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { requireAdminSession } from '@/lib/auth/session';
+import { requireAdminAuth } from '@/lib/auth/clerk-wrappers';
 import { listPayoutsForAdmin } from '@/lib/payouts/queries';
 
 const BATCH_SIZE = 500;
@@ -47,7 +47,7 @@ const CSV_HEADER =
   ].join(',') + '\n';
 
 export async function GET(request: Request) {
-  await requireAdminSession();
+  await requireAdminAuth();
 
   const now = new Date();
   const defaultFrom = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);

@@ -6,7 +6,7 @@ import { CreateFlowShell } from '@/components/layout/CreateFlowShell';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { requireSession } from '@/lib/auth/session';
+import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
 import { isMockSentry } from '@/lib/config/feature-flags';
 import { getDreamBoardDraft, saveDreamBoardDraft } from '@/lib/dream-boards/draft';
 import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
@@ -25,7 +25,7 @@ const childSchema = z.object({
 async function saveChildDetailsAction(formData: FormData) {
   'use server';
 
-  const session = await requireSession();
+  const session = await requireHostAuth();
   const childName = formData.get('childName');
   const photo = formData.get('photo');
 
@@ -98,7 +98,7 @@ export default async function CreateChildPage({
 }: {
   searchParams?: ChildSearchParams;
 }) {
-  const session = await requireSession();
+  const session = await requireHostAuth();
   const draft = await getDreamBoardDraft(session.hostId);
   const error = searchParams?.error;
   const errorMessage = getChildErrorMessage(error);

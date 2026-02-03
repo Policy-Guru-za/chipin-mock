@@ -4,13 +4,13 @@ import { ProgressBar } from '@/components/dream-board/ProgressBar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StateCard } from '@/components/ui/state-card';
-import { requireSession } from '@/lib/auth/session';
+import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
 import { listDreamBoardsForHost } from '@/lib/db/queries';
 import { buildDashboardViewModel } from '@/lib/host/dashboard-view-model';
 import { uiCopy } from '@/lib/ui/copy';
 
 export default async function HostDashboardPage() {
-  const session = await requireSession();
+  const session = await requireHostAuth();
   const boards = await listDreamBoardsForHost(session.hostId);
 
   return (

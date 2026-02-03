@@ -6,7 +6,7 @@ import { GiftArtworkGenerator } from '@/components/gift/GiftArtworkGenerator';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { requireSession } from '@/lib/auth/session';
+import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
 import { getDreamBoardDraft, updateDreamBoardDraft } from '@/lib/dream-boards/draft';
 import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
 
@@ -42,7 +42,7 @@ const resolveDefaultGoal = (draft?: Awaited<ReturnType<typeof getDreamBoardDraft
 async function saveManualGiftAction(formData: FormData) {
   'use server';
 
-  const session = await requireSession();
+  const session = await requireHostAuth();
   const draft = await getDreamBoardDraft(session.hostId);
   const view = buildCreateFlowViewModel({ step: 'gift', draft });
   if (view.redirectTo) {
@@ -88,7 +88,7 @@ export default async function CreateGiftPage({
 }: {
   searchParams?: GiftSearchParams;
 }) {
-  const session = await requireSession();
+  const session = await requireHostAuth();
   const draft = await getDreamBoardDraft(session.hostId);
   const view = buildCreateFlowViewModel({ step: 'gift', draft });
   if (view.redirectTo) {

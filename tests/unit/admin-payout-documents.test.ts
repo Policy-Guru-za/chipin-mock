@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const authMocks = vi.hoisted(() => ({
-  requireAdminSession: vi.fn(),
+  requireAdminAuth: vi.fn(),
 }));
 
 const payoutMocks = vi.hoisted(() => ({
@@ -12,7 +12,7 @@ const encryptionMocks = vi.hoisted(() => ({
   decryptSensitiveBuffer: vi.fn(),
 }));
 
-vi.mock('@/lib/auth/session', () => authMocks);
+vi.mock('@/lib/auth/clerk-wrappers', () => authMocks);
 vi.mock('@/lib/payouts/queries', () => payoutMocks);
 vi.mock('@/lib/utils/encryption', () => encryptionMocks);
 
@@ -38,7 +38,7 @@ const basePayout = {
 };
 
 beforeEach(() => {
-  authMocks.requireAdminSession.mockResolvedValue({
+  authMocks.requireAdminAuth.mockResolvedValue({
     hostId: 'admin-1',
     email: 'admin@chipin.co.za',
   });

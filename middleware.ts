@@ -14,7 +14,12 @@ const isPublicRoute = createRouteMatcher([
   '/api/webhooks(.*)',
   '/api/v1(.*)',
   '/v1(.*)',
+  // Job-secret endpoints (must enforce INTERNAL_JOB_SECRET in handler):
   '/api/internal/webhooks/process',
+  '/api/internal/retention/run',
+  '/api/internal/karri/batch',
+  '/api/internal/payments/reconcile',
+  '/api/internal/api-keys(.*)',
   // Guest pages (route groups are not in URL):
   /^\/(?!api|_next|sign-in|sign-up|create|dashboard|admin|health)([^/]+)$/,
   /^\/(?!api|_next|sign-in|sign-up|create|dashboard|admin|health)([^/]+)\/(contribute|thanks|payment-failed)$/,

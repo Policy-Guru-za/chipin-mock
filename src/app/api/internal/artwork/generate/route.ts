@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { enforceRateLimit } from '@/lib/auth/rate-limit';
-import { getSession } from '@/lib/auth/session';
+import { getInternalHostAuth } from '@/lib/auth/clerk-wrappers';
 import { jsonInternalError } from '@/lib/api/internal-response';
 import { generateGiftArtwork } from '@/lib/integrations/image-generation';
 import { log } from '@/lib/observability/logger';
@@ -25,7 +25,7 @@ const enforceArtworkRateLimit = async (hostId: string) => {
 };
 
 export async function POST(request: NextRequest) {
-  const session = await getSession();
+  const session = await getInternalHostAuth();
   if (!session) {
     return jsonInternalError({ code: 'unauthorized', status: 401 });
   }

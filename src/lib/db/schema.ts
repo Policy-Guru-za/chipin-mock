@@ -59,12 +59,14 @@ export const hosts = pgTable(
   {
     id: uuid('id').primaryKey().defaultRandom(),
     email: varchar('email', { length: 255 }).notNull().unique(),
+    clerkUserId: varchar('clerk_user_id', { length: 255 }),
     name: varchar('name', { length: 100 }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => ({
     emailIdx: index('idx_hosts_email').on(table.email),
+    clerkUserIdIdx: uniqueIndex('unique_hosts_clerk_user_id').on(table.clerkUserId),
   })
 );
 

@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { requireAdminSession } from '@/lib/auth/session';
+import { requireAdminAuth } from '@/lib/auth/clerk-wrappers';
 import { listAuditLogsForTarget } from '@/lib/audit';
 import { formatZar, formatZarWithCents } from '@/lib/utils/money';
 import { decryptSensitiveValue } from '@/lib/utils/encryption';
@@ -219,7 +219,7 @@ const AutomationCard = ({ payout }: { payout: PayoutDetail }) => {
 
 async function completeAction(formData: FormData) {
   'use server';
-  const session = await requireAdminSession();
+  const session = await requireAdminAuth();
   const parsed = completeSchema.safeParse({
     payoutId: formData.get('payoutId'),
     externalRef: formData.get('externalRef'),
@@ -245,7 +245,7 @@ async function completeAction(formData: FormData) {
 
 async function failAction(formData: FormData) {
   'use server';
-  const session = await requireAdminSession();
+  const session = await requireAdminAuth();
   const parsed = failSchema.safeParse({
     payoutId: formData.get('payoutId'),
     reason: formData.get('reason'),
@@ -271,7 +271,7 @@ async function failAction(formData: FormData) {
 
 async function noteAction(formData: FormData) {
   'use server';
-  const session = await requireAdminSession();
+  const session = await requireAdminAuth();
   const parsed = noteSchema.safeParse({
     payoutId: formData.get('payoutId'),
     note: formData.get('note'),
@@ -297,7 +297,7 @@ async function noteAction(formData: FormData) {
 
 async function automationAction(formData: FormData) {
   'use server';
-  const session = await requireAdminSession();
+  const session = await requireAdminAuth();
   const parsed = automationSchema.safeParse({
     payoutId: formData.get('payoutId'),
   });

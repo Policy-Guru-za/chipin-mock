@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { recordAuditEvent } from '@/lib/audit';
-import { requireInternalAuth, getInternalActor } from '@/lib/api/internal-auth';
+import { getInternalActor, requireInternalJobAuth } from '@/lib/api/internal-auth';
 import { deactivateApiKey, getApiKeyById } from '@/lib/db/api-key-queries';
 import { isValidUuid } from '@/lib/api/validation';
 
@@ -10,7 +10,7 @@ export async function DELETE(
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
-  const auth = requireInternalAuth(request);
+  const auth = requireInternalJobAuth(request);
   if (!auth.ok) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }

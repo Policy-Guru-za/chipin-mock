@@ -8,14 +8,16 @@ const loadHandler = async () => {
 const createFile = () => new File([new Uint8Array(10)], 'photo.jpg', { type: 'image/jpeg' });
 
 afterEach(() => {
-  vi.unmock('@/lib/auth/session');
+  vi.unmock('@/lib/auth/clerk-wrappers');
   vi.unmock('@/lib/integrations/blob');
   vi.resetModules();
 });
 
 describe('POST /api/internal/upload', () => {
   it('returns unauthorized without a session', async () => {
-    vi.doMock('@/lib/auth/session', () => ({ getSession: vi.fn(async () => null) }));
+    vi.doMock('@/lib/auth/clerk-wrappers', () => ({
+      getInternalHostAuth: vi.fn(async () => null),
+    }));
 
     const { POST } = await loadHandler();
     const response = await POST(
@@ -26,8 +28,8 @@ describe('POST /api/internal/upload', () => {
   });
 
   it('uploads a child photo when valid', async () => {
-    vi.doMock('@/lib/auth/session', () => ({
-      getSession: vi.fn(async () => ({ hostId: 'host-1', email: 'host@example.com' })),
+    vi.doMock('@/lib/auth/clerk-wrappers', () => ({
+      getInternalHostAuth: vi.fn(async () => ({ hostId: 'host-1', email: 'host@example.com' })),
     }));
 
     const uploadChildPhoto = vi.fn(async () => ({ url: 'https://blob.example/photo.jpg' }));
@@ -55,8 +57,8 @@ describe('POST /api/internal/upload', () => {
   });
 
   it('returns a validation error when upload fails', async () => {
-    vi.doMock('@/lib/auth/session', () => ({
-      getSession: vi.fn(async () => ({ hostId: 'host-1', email: 'host@example.com' })),
+    vi.doMock('@/lib/auth/clerk-wrappers', () => ({
+      getInternalHostAuth: vi.fn(async () => ({ hostId: 'host-1', email: 'host@example.com' })),
     }));
 
     vi.doMock('@/lib/integrations/blob', async () => {

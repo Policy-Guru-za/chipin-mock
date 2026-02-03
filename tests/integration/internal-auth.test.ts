@@ -17,7 +17,7 @@ const loadMeHandler = async () => {
 
 afterEach(() => {
   vi.unmock('@/lib/auth/magic-link');
-  vi.unmock('@/lib/auth/session');
+  vi.unmock('@/lib/auth/clerk-wrappers');
   vi.unmock('@/lib/db/queries');
   vi.resetModules();
 });
@@ -96,7 +96,9 @@ describe('POST /api/internal/auth/verify', () => {
 
 describe('GET /api/internal/auth/me', () => {
   it('returns unauthorized when no session exists', async () => {
-    vi.doMock('@/lib/auth/session', () => ({ getSession: vi.fn(async () => null) }));
+    vi.doMock('@/lib/auth/clerk-wrappers', () => ({
+      getInternalHostAuth: vi.fn(async () => null),
+    }));
 
     const { GET } = await loadMeHandler();
     const response = await GET();

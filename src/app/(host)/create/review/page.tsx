@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { CreateFlowShell } from '@/components/layout/CreateFlowShell';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { requireSession } from '@/lib/auth/session';
+import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
 import { clearDreamBoardDraft, getDreamBoardDraft } from '@/lib/dream-boards/draft';
 import { dreamBoardDraftSchema } from '@/lib/dream-boards/schema';
 import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
@@ -20,7 +20,7 @@ import { log } from '@/lib/observability/logger';
 async function createDreamBoardAction() {
   'use server';
 
-  const session = await requireSession();
+  const session = await requireHostAuth();
   const draft = await getDreamBoardDraft(session.hostId);
   const parsed = dreamBoardDraftSchema.safeParse(draft);
 
@@ -68,7 +68,7 @@ async function createDreamBoardAction() {
 }
 
 export default async function CreateReviewPage() {
-  const session = await requireSession();
+  const session = await requireHostAuth();
   const draft = await getDreamBoardDraft(session.hostId);
   const view = buildCreateFlowViewModel({ step: 'review', draft });
   if (view.redirectTo) {
