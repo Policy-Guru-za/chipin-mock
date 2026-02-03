@@ -8,10 +8,18 @@ import { ensureHostForEmail } from '@/lib/db/queries';
 
 const tokenSchema = z.object({ token: z.string().min(32) });
 
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const token = searchParams.get('token');
-  const parsed = tokenSchema.safeParse({ token });
+export async function GET() {
+  return jsonInternalError({
+    code: 'method_not_allowed',
+    status: 405,
+    message: 'Use POST with a JSON body containing { token }.',
+    headers: { Allow: 'POST' },
+  });
+}
+
+export async function POST(request: NextRequest) {
+  const body = await request.json().catch(() => null);
+  const parsed = tokenSchema.safeParse(body);
 
   if (!parsed.success) {
     return jsonInternalError({ code: 'invalid_request', status: 400 });

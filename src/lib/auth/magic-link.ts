@@ -268,21 +268,18 @@ export async function verifyMagicLink(token: string, options?: VerifyMagicLinkOp
     return null;
   }
 
-  const ttl = await kvAdapter.ttl(`magic:${tokenHash}`);
-  if (ttl === -2) {
-    return null;
-  }
-
   if (!consume) {
     return record.email;
   }
 
-  const expiresIn = ttl > 0 ? ttl : MAGIC_LINK_EXPIRY_SECONDS;
-  await kvAdapter.set(
+  const updated = await kvAdapter.set(
     `magic:${tokenHash}`,
     { ...record, usedAt: Date.now() },
-    { ex: expiresIn }
+    { keepTtl: true, xx: true }
   );
+  if (!updated) {
+    return null;
+  }
 
   await cleanupOtherMagicLinks(record.email, tokenHash);
 

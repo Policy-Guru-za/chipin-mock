@@ -69,7 +69,7 @@ describe('POST /api/internal/auth/magic-link', () => {
   });
 });
 
-describe('GET /api/internal/auth/verify', () => {
+describe('POST /api/internal/auth/verify', () => {
   it('creates a session when token is valid', async () => {
     const verifyMagicLink = vi.fn(async () => 'host@example.com');
     const createSession = vi.fn(async () => undefined);
@@ -79,9 +79,13 @@ describe('GET /api/internal/auth/verify', () => {
     vi.doMock('@/lib/auth/session', () => ({ createSession }));
     vi.doMock('@/lib/db/queries', () => ({ ensureHostForEmail }));
 
-    const { GET } = await loadVerifyHandler();
-    const response = await GET(
-      new Request(`http://localhost/api/internal/auth/verify?token=${'a'.repeat(32)}`)
+    const { POST } = await loadVerifyHandler();
+    const response = await POST(
+      new Request('http://localhost/api/internal/auth/verify', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ token: 'a'.repeat(32) }),
+      })
     );
 
     expect(response.status).toBe(200);

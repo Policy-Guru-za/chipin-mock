@@ -1,5 +1,8 @@
 type KvSetOptions = {
   ex?: number;
+  keepTtl?: boolean;
+  nx?: boolean;
+  xx?: boolean;
 };
 
 type KvZaddInput = {
@@ -45,7 +48,18 @@ export const createInMemoryKvAdapter = () => {
   const exists = (key: string) => store.has(key) || sortedSets.has(key);
 
   const set = async (key: string, value: unknown, options?: KvSetOptions) => {
+    purgeExpired(key, store, sortedSets, expiries);
+
+    const hasKey = exists(key);
+    if (options?.nx && hasKey) return null;
+    if (options?.xx && !hasKey) return null;
+
     store.set(key, value);
+
+    if (options?.keepTtl) {
+      return 'OK';
+    }
+
     if (options?.ex) {
       expiries.set(key, now() + options.ex * 1000);
     } else {
