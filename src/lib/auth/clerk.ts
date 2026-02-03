@@ -2,7 +2,7 @@ import { auth, clerkClient } from '@clerk/nextjs/server';
 import { notFound, redirect } from 'next/navigation';
 
 import { getClerkUrls } from '@/lib/auth/clerk-config';
-import { isAdminEmail } from '@/lib/auth/session';
+import { isAdminEmail } from '@/lib/auth/admin-allowlist';
 
 type ClerkUserRecord = {
   id: string;

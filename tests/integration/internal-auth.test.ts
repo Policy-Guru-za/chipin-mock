@@ -1,97 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-const loadMagicLinkHandler = async () => {
-  vi.resetModules();
-  return import('@/app/api/internal/auth/magic-link/route');
-};
-
-const loadVerifyHandler = async () => {
-  vi.resetModules();
-  return import('@/app/api/internal/auth/verify/route');
-};
-
 const loadMeHandler = async () => {
   vi.resetModules();
   return import('@/app/api/internal/auth/me/route');
 };
 
 afterEach(() => {
-  vi.unmock('@/lib/auth/magic-link');
   vi.unmock('@/lib/auth/clerk-wrappers');
-  vi.unmock('@/lib/db/queries');
   vi.resetModules();
-});
-
-describe('POST /api/internal/auth/magic-link', () => {
-  it('returns ok even when rate limited', async () => {
-    vi.doMock('@/lib/auth/magic-link', () => ({
-      sendMagicLink: vi.fn(async () => ({
-        ok: false,
-        reason: 'rate_limited',
-        retryAfterSeconds: 120,
-      })),
-    }));
-
-    const { POST } = await loadMagicLinkHandler();
-    const response = await POST(
-      new Request('http://localhost/api/internal/auth/magic-link', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ email: 'host@example.com' }),
-      })
-    );
-
-    const payload = await response.json();
-    expect(response.status).toBe(200);
-    expect(payload.ok).toBe(true);
-    expect(payload.throttled).toBe(true);
-    expect(payload.retryAfterSeconds).toBe(120);
-    expect(response.headers.get('retry-after')).toBe('120');
-  });
-
-  it('returns ok when magic link is sent', async () => {
-    vi.doMock('@/lib/auth/magic-link', () => ({
-      sendMagicLink: vi.fn(async () => ({ ok: true })),
-    }));
-
-    const { POST } = await loadMagicLinkHandler();
-    const response = await POST(
-      new Request('http://localhost/api/internal/auth/magic-link', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ email: 'host@example.com' }),
-      })
-    );
-
-    const payload = await response.json();
-    expect(response.status).toBe(200);
-    expect(payload.ok).toBe(true);
-  });
-});
-
-describe('POST /api/internal/auth/verify', () => {
-  it('creates a session when token is valid', async () => {
-    const verifyMagicLink = vi.fn(async () => 'host@example.com');
-    const createSession = vi.fn(async () => undefined);
-    const ensureHostForEmail = vi.fn(async () => ({ id: 'host-1', email: 'host@example.com' }));
-
-    vi.doMock('@/lib/auth/magic-link', () => ({ verifyMagicLink }));
-    vi.doMock('@/lib/auth/session', () => ({ createSession }));
-    vi.doMock('@/lib/db/queries', () => ({ ensureHostForEmail }));
-
-    const { POST } = await loadVerifyHandler();
-    const response = await POST(
-      new Request('http://localhost/api/internal/auth/verify', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ token: 'a'.repeat(32) }),
-      })
-    );
-
-    expect(response.status).toBe(200);
-    expect(verifyMagicLink).toHaveBeenCalled();
-    expect(createSession).toHaveBeenCalledWith('host-1', 'host@example.com');
-  });
 });
 
 describe('GET /api/internal/auth/me', () => {
@@ -104,5 +20,18 @@ describe('GET /api/internal/auth/me', () => {
     const response = await GET();
 
     expect(response.status).toBe(401);
+  });
+
+  it('returns the host payload when authenticated', async () => {
+    vi.doMock('@/lib/auth/clerk-wrappers', () => ({
+      getInternalHostAuth: vi.fn(async () => ({ hostId: 'host-1', email: 'host@example.com' })),
+    }));
+
+    const { GET } = await loadMeHandler();
+    const response = await GET();
+
+    expect(response.status).toBe(200);
+    const payload = await response.json();
+    expect(payload.data).toEqual({ id: 'host-1', email: 'host@example.com' });
   });
 });

@@ -1,6 +1,9 @@
 import { createHash } from 'crypto';
+
+import * as Sentry from '@sentry/nextjs';
 import { eq } from 'drizzle-orm';
 
+import { isMockSentry } from '@/lib/config/feature-flags';
 import { db } from '@/lib/db';
 import { getHostByEmail, hostSelect, normalizeEmail } from '@/lib/db/queries';
 import { hosts } from '@/lib/db/schema';
@@ -43,12 +46,28 @@ export async function ensureHostForClerkUser(params: {
     if (!byEmail.clerkUserId) {
       updates.clerkUserId = params.clerkUserId;
     } else if (byEmail.clerkUserId !== params.clerkUserId) {
+      const emailHash = hashPrefix(normalizedEmail);
+      const previousClerkUserIdHash = hashPrefix(byEmail.clerkUserId);
+      const newClerkUserIdHash = hashPrefix(params.clerkUserId);
+
       log('warn', 'auth.clerk_user_mismatch', {
         hostId: byEmail.id,
-        emailHash: hashPrefix(normalizedEmail),
-        previousClerkUserIdHash: hashPrefix(byEmail.clerkUserId),
-        newClerkUserIdHash: hashPrefix(params.clerkUserId),
+        emailHash,
+        previousClerkUserIdHash,
+        newClerkUserIdHash,
       });
+      if (!isMockSentry()) {
+        Sentry.captureMessage('auth.clerk_user_mismatch', {
+          level: 'warning',
+          tags: { area: 'auth', action: 'clerk_user_mismatch' },
+          extra: {
+            hostId: byEmail.id,
+            emailHash,
+            previousClerkUserIdHash,
+            newClerkUserIdHash,
+          },
+        });
+      }
       updates.clerkUserId = params.clerkUserId;
     }
 

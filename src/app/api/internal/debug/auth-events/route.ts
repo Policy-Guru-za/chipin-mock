@@ -71,7 +71,7 @@ const tabularToRows = (table: AxiomTabularTable): Array<Record<string, unknown>>
 
 const buildAplQuery = (dataset: string, tokenHashPrefix: string | undefined, limit: number) => {
   const quotedDataset = `['${dataset.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}']`;
-  const baseWhere = `| where message contains "auth.magic_link_"`;
+  const baseWhere = `| where message contains "auth.clerk_"`;
   const prefixWhere = tokenHashPrefix ? `\n| where message contains "${tokenHashPrefix}"` : '';
   return `${quotedDataset}\n${baseWhere}${prefixWhere}\n| project _time, message\n| sort by _time desc\n| limit ${limit}`;
 };

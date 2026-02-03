@@ -73,9 +73,9 @@ describe('POST /api/internal/debug/auth-events', () => {
               [
                 JSON.stringify({
                   level: 'info',
-                  message: 'auth.magic_link_lookup_result',
+                  message: 'auth.clerk_user_mismatch',
                   timestamp: '2026-02-03T10:00:00Z',
-                  data: { tokenHashPrefix: 'b'.repeat(12), found: true },
+                  data: { hostId: 'host-1' },
                 }),
               ],
             ],
@@ -104,7 +104,7 @@ describe('POST /api/internal/debug/auth-events', () => {
     expect(payload.ok).toBe(true);
     expect(payload.tokenHashPrefix).toBe('b'.repeat(12));
     expect(payload.events).toHaveLength(1);
-    expect(payload.events[0].message).toContain('auth.magic_link_lookup_result');
+    expect(payload.events[0].message).toContain('auth.clerk_user_mismatch');
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     const fetchArgs = fetchSpy.mock.calls[0];
@@ -154,7 +154,7 @@ describe('POST /api/internal/debug/auth-events', () => {
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     const fetchArgs = fetchSpy.mock.calls[0];
     const body = JSON.parse(fetchArgs[1].body);
-    expect(body.apl).toContain('auth.magic_link_');
+    expect(body.apl).toContain('auth.clerk_');
     expect(body.apl).not.toContain('and message contains');
   });
 });

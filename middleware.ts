@@ -8,6 +8,8 @@ const isPublicRoute = createRouteMatcher([
   '/',
   '/sign-in(.*)',
   '/sign-up(.*)',
+  '/auth(.*)',
+  '/create',
   '/health/live',
   '/health/ready',
   '/api/health',
@@ -36,15 +38,51 @@ export default clerkMiddleware(async (auth, req) => {
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-request-id', requestId);
   const clerkConfig = getClerkConfigStatus();
+  const pathname = req.nextUrl.pathname;
 
-  if (clerkConfig.flagEnabled && !clerkConfig.isEnabled && !missingClerkKeysLogged) {
-    missingClerkKeysLogged = true;
-    console.error(
-      'AUTH_CLERK_ENABLED is true but Clerk keys are missing. Set NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY.'
-    );
-  }
+  if (!clerkConfig.flagEnabled) {
+    if (!isPublicRoute(req)) {
+      if (req.nextUrl.pathname.startsWith('/api')) {
+        return NextResponse.json(
+          { error: 'auth_disabled' },
+          { status: 503, headers: { 'x-request-id': requestId } }
+        );
+      }
 
-  if (!isPublicRoute(req) && clerkConfig.isEnabled) {
+      return new NextResponse('Authentication unavailable', {
+        status: 503,
+        headers: { 'x-request-id': requestId },
+      });
+    }
+  } else if (!clerkConfig.isEnabled) {
+    if (pathname.startsWith('/sign-in') || pathname.startsWith('/sign-up')) {
+      return new NextResponse('Authentication unavailable', {
+        status: 503,
+        headers: { 'x-request-id': requestId },
+      });
+    }
+
+    if (!missingClerkKeysLogged) {
+      missingClerkKeysLogged = true;
+      console.error(
+        'Clerk keys are missing. Set NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY.'
+      );
+    }
+
+    if (!isPublicRoute(req)) {
+      if (req.nextUrl.pathname.startsWith('/api')) {
+        return NextResponse.json(
+          { error: 'auth_unavailable' },
+          { status: 503, headers: { 'x-request-id': requestId } }
+        );
+      }
+
+      return new NextResponse('Authentication unavailable', {
+        status: 503,
+        headers: { 'x-request-id': requestId },
+      });
+    }
+  } else if (!isPublicRoute(req)) {
     const protectResponse = await auth().protect();
     if (protectResponse) {
       protectResponse.headers.set('x-request-id', requestId);

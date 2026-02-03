@@ -1,14 +1,8 @@
 import { SignIn } from '@clerk/nextjs';
 
-import { getClerkConfigStatus, getClerkUrls } from '@/lib/auth/clerk-config';
-import { deleteSession } from '@/lib/auth/session';
+import { getClerkUrls } from '@/lib/auth/clerk-config';
 
-export default async function SignInPage() {
-  const clerkConfig = getClerkConfigStatus();
-  if (clerkConfig.isEnabled) {
-    await deleteSession();
-  }
-
+export default function SignInPage() {
   const { signInUrl, signUpUrl, afterSignInUrl } = getClerkUrls();
 
   return (
