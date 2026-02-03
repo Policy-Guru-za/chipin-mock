@@ -8,8 +8,7 @@ import { sendEmail } from '@/lib/integrations/email';
 import { log } from '@/lib/observability/logger';
 import { enforceRateLimit } from './rate-limit';
 
-const MAGIC_LINK_EXPIRY_SECONDS = 60 * 60;
-const MAGIC_LINK_REUSE_WINDOW_SECONDS = 60 * 5;
+const MAGIC_LINK_EXPIRY_SECONDS = 60 * 15;
 const parseBooleanFlag = (value: string | undefined) => {
   if (!value) return false;
   const normalized = value.trim().toLowerCase();
@@ -17,7 +16,8 @@ const parseBooleanFlag = (value: string | undefined) => {
 };
 
 const isMagicLinkRateLimitDisabled = () =>
-  parseBooleanFlag(process.env.MAGIC_LINK_RATE_LIMIT_DISABLED);
+  parseBooleanFlag(process.env.MAGIC_LINK_RATE_LIMIT_DISABLED) &&
+  process.env.NODE_ENV !== 'production';
 
 const parseRateLimitValue = (value: string | undefined, fallback: number) => {
   const parsed = Number(value?.trim());
@@ -36,25 +36,51 @@ export type MagicLinkResult =
 
 type MagicLinkContext = {
   ip?: string;
+  userAgent?: string;
   requestId?: string;
 };
 
 type MagicLinkRecord = {
   email: string;
+  createdAt: number;
   usedAt: number | null;
+  ip?: string;
+  userAgent?: string;
 };
 
 const hashIdentifier = (value: string) => createHash('sha256').update(value).digest('hex');
 
+const getEmailIndexKey = (emailHash: string) => `magic:email:${emailHash}`;
+
+const resolveBaseUrl = () => {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (!baseUrl) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('NEXT_PUBLIC_APP_URL is required in production');
+    }
+    return 'http://localhost:3000';
+  }
+  if (process.env.NODE_ENV === 'production' && !baseUrl.startsWith('https://')) {
+    throw new Error('NEXT_PUBLIC_APP_URL must use https:// in production');
+  }
+  return baseUrl;
+};
+
 const normalizeMagicLinkRecord = (value: unknown): MagicLinkRecord | null => {
   if (!value) return null;
   if (typeof value === 'string') {
-    return { email: value, usedAt: null };
+    return { email: value, createdAt: 0, usedAt: null };
   }
   if (typeof value === 'object' && value !== null) {
     const record = value as Partial<MagicLinkRecord>;
     if (typeof record.email === 'string') {
-      return { email: record.email, usedAt: record.usedAt ?? null };
+      return {
+        email: record.email,
+        createdAt: typeof record.createdAt === 'number' ? record.createdAt : 0,
+        usedAt: record.usedAt ?? null,
+        ip: typeof record.ip === 'string' ? record.ip : undefined,
+        userAgent: typeof record.userAgent === 'string' ? record.userAgent : undefined,
+      };
     }
   }
   return null;
@@ -101,6 +127,8 @@ export async function sendMagicLink(email: string, context?: MagicLinkContext) {
   const normalizedEmail = email.trim().toLowerCase();
   const emailHash = hashIdentifier(normalizedEmail);
   const ipHash = context?.ip ? hashIdentifier(context.ip) : undefined;
+  let tokenHash: string | null = null;
+  let tokenStored = false;
 
   try {
     log(
@@ -126,12 +154,21 @@ export async function sendMagicLink(email: string, context?: MagicLinkContext) {
       return rateLimit;
     }
 
+    const baseUrl = resolveBaseUrl();
     const token = randomBytes(32).toString('hex');
-    const tokenHash = hashIdentifier(token);
+    tokenHash = hashIdentifier(token);
     const tokenHashPrefix = tokenHash.slice(0, 12);
+    const createdAt = Date.now();
 
-    const record: MagicLinkRecord = { email: normalizedEmail, usedAt: null };
+    const record: MagicLinkRecord = {
+      email: normalizedEmail,
+      createdAt,
+      usedAt: null,
+      ip: context?.ip,
+      userAgent: context?.userAgent,
+    };
     await kvAdapter.set(`magic:${tokenHash}`, record, { ex: MAGIC_LINK_EXPIRY_SECONDS });
+    tokenStored = true;
     const storedRecord = await kvAdapter.get<MagicLinkRecord | string>(`magic:${tokenHash}`);
     log(
       'info',
@@ -139,8 +176,6 @@ export async function sendMagicLink(email: string, context?: MagicLinkContext) {
       { tokenHashPrefix, stored: Boolean(storedRecord) },
       context?.requestId
     );
-
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
     const magicLink = `${baseUrl}/auth/verify?token=${token}`;
 
     log('info', 'auth.magic_link_sending', { emailHash }, context?.requestId);
@@ -151,14 +186,48 @@ export async function sendMagicLink(email: string, context?: MagicLinkContext) {
         <p>Hi there!</p>
         <p>Click below to create your Dream Board:</p>
         <a href="${magicLink}" style="display:inline-block;padding:12px 24px;background:#0D9488;color:white;text-decoration:none;border-radius:12px;font-weight:600;">Continue to ChipIn →</a>
-        <p>This link expires in 1 hour.</p>
+        <p>This link expires in 15 minutes.</p>
         <p>— The ChipIn Team</p>
       `,
+      text: `Hi there!\n\nUse this link to continue: ${magicLink}\n\nThis link expires in 15 minutes.\n\n— The ChipIn Team`,
+      tags: [
+        { name: 'category', value: 'authentication' },
+        { name: 'type', value: 'magic_link' },
+      ],
     });
+
+    const indexKey = getEmailIndexKey(emailHash);
+    try {
+      await kvAdapter.zadd(indexKey, { score: createdAt, member: tokenHash });
+      await kvAdapter.expire(indexKey, MAGIC_LINK_EXPIRY_SECONDS);
+    } catch (indexError) {
+      await kvAdapter.del(indexKey);
+      log(
+        'warn',
+        'auth.magic_link_index_update_failed',
+        {
+          emailHash,
+          error: indexError instanceof Error ? indexError.message : 'unknown_error',
+        },
+        context?.requestId
+      );
+    }
 
     return { ok: true } as const;
   } catch (error) {
-    log('error', 'auth.magic_link_failed', { emailHash }, context?.requestId);
+    if (tokenHash && tokenStored) {
+      try {
+        await kvAdapter.del(`magic:${tokenHash}`);
+      } catch {
+        // ignore cleanup failures
+      }
+    }
+    log(
+      'error',
+      'auth.magic_link_failed',
+      { emailHash, error: error instanceof Error ? error.message : 'unknown_error' },
+      context?.requestId
+    );
     if (!isMockSentry()) {
       Sentry.captureException(error, {
         tags: { area: 'auth', action: 'magic_link' },
@@ -169,7 +238,22 @@ export async function sendMagicLink(email: string, context?: MagicLinkContext) {
   }
 }
 
-export async function verifyMagicLink(token: string) {
+type VerifyMagicLinkOptions = {
+  consume?: boolean;
+};
+
+const cleanupOtherMagicLinks = async (email: string, tokenHash: string) => {
+  const emailHash = hashIdentifier(email);
+  const indexKey = getEmailIndexKey(emailHash);
+  const tokens = await kvAdapter.zrange(indexKey, 0, -1);
+  const toDelete = tokens.filter((candidate) => candidate !== tokenHash);
+
+  await Promise.all(toDelete.map((hash) => kvAdapter.del(`magic:${hash}`)));
+  await kvAdapter.del(indexKey);
+};
+
+export async function verifyMagicLink(token: string, options?: VerifyMagicLinkOptions) {
+  const consume = options?.consume ?? true;
   const tokenHash = createHash('sha256').update(token).digest('hex');
   const tokenHashPrefix = tokenHash.slice(0, 12);
   log('info', 'auth.magic_link_lookup', { tokenHashPrefix });
@@ -181,16 +265,16 @@ export async function verifyMagicLink(token: string) {
   }
 
   if (record.usedAt) {
-    const elapsedSeconds = (Date.now() - record.usedAt) / 1000;
-    if (elapsedSeconds > MAGIC_LINK_REUSE_WINDOW_SECONDS) {
-      await kvAdapter.del(`magic:${tokenHash}`);
-      return null;
-    }
+    return null;
   }
 
   const ttl = await kvAdapter.ttl(`magic:${tokenHash}`);
   if (ttl === -2) {
     return null;
+  }
+
+  if (!consume) {
+    return record.email;
   }
 
   const expiresIn = ttl > 0 ? ttl : MAGIC_LINK_EXPIRY_SECONDS;
@@ -199,6 +283,8 @@ export async function verifyMagicLink(token: string) {
     { ...record, usedAt: Date.now() },
     { ex: expiresIn }
   );
+
+  await cleanupOtherMagicLinks(record.email, tokenHash);
 
   return record.email;
 }

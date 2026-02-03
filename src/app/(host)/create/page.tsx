@@ -25,21 +25,10 @@ const errorNoticeStyles: Record<NoticeTone, string> = {
   warning: 'border-amber-200 bg-amber-50 text-amber-700',
 };
 
-const getErrorNotice = (error: string, retryMinutes: number | null): ErrorNotice | null => {
+const getErrorNotice = (error: string): ErrorNotice | null => {
   if (!error) return null;
   if (error === 'invalid') {
     return { tone: 'error', message: 'Please enter a valid email address.' };
-  }
-  if (error === 'rate_limited') {
-    return {
-      tone: 'warning',
-      message: `You’ve requested too many links. ${
-        retryMinutes ? `Try again in ${retryMinutes} minutes.` : 'Please try again shortly.'
-      }`,
-    };
-  }
-  if (error === 'send_failed') {
-    return { tone: 'error', message: 'We couldn’t send your link. Please try again.' };
   }
   return null;
 };
@@ -72,14 +61,11 @@ async function sendMagicLinkAction(formData: FormData) {
   const forwardedFor = headerStore.get('x-forwarded-for');
   const ip = forwardedFor?.split(',')[0]?.trim() ?? headerStore.get('x-real-ip') ?? undefined;
   const requestId = headerStore.get('x-request-id') ?? undefined;
+  const userAgent = headerStore.get('user-agent') ?? undefined;
 
-  const outcome = await sendMagicLink(normalizedEmail, { ip, requestId });
+  const outcome = await sendMagicLink(normalizedEmail, { ip, requestId, userAgent });
   if (!outcome.ok) {
-    const params = new URLSearchParams({ error: outcome.reason, email: normalizedEmail });
-    if (outcome.reason === 'rate_limited' && outcome.retryAfterSeconds) {
-      params.set('retry', outcome.retryAfterSeconds.toString());
-    }
-    redirect(`/create?${params.toString()}`);
+    redirect(`/create?sent=1&email=${encodeURIComponent(normalizedEmail)}`);
   }
 
   redirect(`/create?sent=1&email=${encodeURIComponent(normalizedEmail)}`);
@@ -89,7 +75,6 @@ type CreateSearchParams = {
   sent?: string;
   email?: string;
   error?: string;
-  retry?: string;
 };
 
 type CreatePageState = {
@@ -102,13 +87,11 @@ const getCreatePageState = (searchParams?: CreateSearchParams): CreatePageState 
   const sent = searchParams?.sent === '1';
   const email = searchParams?.email ?? '';
   const error = searchParams?.error ?? '';
-  const retryAfterSeconds = Number(searchParams?.retry ?? 0);
-  const retryMinutes = retryAfterSeconds > 0 ? Math.ceil(retryAfterSeconds / 60) : null;
 
   return {
     sent,
     email,
-    errorNotice: getErrorNotice(error, retryMinutes),
+    errorNotice: getErrorNotice(error),
   };
 };
 
@@ -149,6 +132,9 @@ const CreateDreamBoardView = ({ sent, email, errorNotice }: CreatePageState) => 
           </form>
         ) : null}
         <p className="text-xs text-text-muted">We never share your email.</p>
+        <p className="text-xs text-text-muted">
+          If it doesn’t arrive within a few minutes, check spam or request a new link.
+        </p>
         <p className="text-sm text-text-muted">
           Curious first?{' '}
           <Link href="/" className="font-semibold text-text">

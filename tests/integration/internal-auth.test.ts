@@ -23,7 +23,7 @@ afterEach(() => {
 });
 
 describe('POST /api/internal/auth/magic-link', () => {
-  it('returns 429 when rate limited', async () => {
+  it('returns ok even when rate limited', async () => {
     vi.doMock('@/lib/auth/magic-link', () => ({
       sendMagicLink: vi.fn(async () => ({
         ok: false,
@@ -42,8 +42,11 @@ describe('POST /api/internal/auth/magic-link', () => {
     );
 
     const payload = await response.json();
-    expect(response.status).toBe(429);
-    expect(payload.error).toBe('rate_limited');
+    expect(response.status).toBe(200);
+    expect(payload.ok).toBe(true);
+    expect(payload.throttled).toBe(true);
+    expect(payload.retryAfterSeconds).toBe(120);
+    expect(response.headers.get('retry-after')).toBe('120');
   });
 
   it('returns ok when magic link is sent', async () => {

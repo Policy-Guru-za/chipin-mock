@@ -18,18 +18,26 @@ export async function POST(request: NextRequest) {
 
   const requestId = request.headers.get('x-request-id') ?? undefined;
   const ip = getClientIp(request) ?? undefined;
-  const result = await sendMagicLink(parsed.data.email, { ip, requestId });
+  const userAgent = request.headers.get('user-agent') ?? undefined;
+  const result = await sendMagicLink(parsed.data.email, { ip, requestId, userAgent });
 
   if (!result.ok) {
+    const payload: {
+      ok: true;
+      throttled?: boolean;
+      retryAfterSeconds?: number;
+    } = { ok: true };
+    let headers: HeadersInit | undefined;
+
     if (result.reason === 'rate_limited') {
-      return jsonInternalError({
-        code: 'rate_limited',
-        status: 429,
-        retryAfterSeconds: result.retryAfterSeconds,
-      });
+      payload.throttled = true;
+      if (result.retryAfterSeconds) {
+        payload.retryAfterSeconds = result.retryAfterSeconds;
+        headers = { 'Retry-After': result.retryAfterSeconds.toString() };
+      }
     }
 
-    return jsonInternalError({ code: 'send_failed', status: 500 });
+    return NextResponse.json(payload, { headers });
   }
 
   return NextResponse.json({ ok: true });

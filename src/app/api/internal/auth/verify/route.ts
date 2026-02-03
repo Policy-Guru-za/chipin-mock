@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     return jsonInternalError({ code: 'invalid_request', status: 400 });
   }
 
-  const email = await verifyMagicLink(parsed.data.token);
+  const email = await verifyMagicLink(parsed.data.token, { consume: true });
   if (!email) {
     return jsonInternalError({ code: 'invalid_token', status: 400 });
   }
