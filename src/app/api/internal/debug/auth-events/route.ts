@@ -9,7 +9,7 @@ import { enforceRateLimit } from '@/lib/auth/rate-limit';
 export const runtime = 'nodejs';
 
 const requestSchema = z.object({
-  tokenHashPrefix: z.string().regex(/^[a-f0-9]{12}$/),
+  tokenHashPrefix: z.string().regex(/^[a-f0-9]{12}$/).optional(),
   minutesBack: z.number().int().min(1).max(180).default(30),
   limit: z.number().int().min(1).max(100).default(30),
 });
@@ -69,17 +69,18 @@ const tabularToRows = (table: AxiomTabularTable): Array<Record<string, unknown>>
   return rows;
 };
 
-const buildAplQuery = (dataset: string, tokenHashPrefix: string, limit: number) => {
+const buildAplQuery = (dataset: string, tokenHashPrefix: string | undefined, limit: number) => {
   const quotedDataset = `['${dataset.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}']`;
-  const prefix = tokenHashPrefix;
-  return `${quotedDataset}\n| where message contains "auth.magic_link_" and message contains "${prefix}"\n| project _time, message\n| sort by _time desc\n| limit ${limit}`;
+  const baseWhere = `| where message contains "auth.magic_link_"`;
+  const prefixWhere = tokenHashPrefix ? `\n| where message contains "${tokenHashPrefix}"` : '';
+  return `${quotedDataset}\n${baseWhere}${prefixWhere}\n| project _time, message\n| sort by _time desc\n| limit ${limit}`;
 };
 
 export async function GET() {
   return jsonInternalError({
     code: 'method_not_allowed',
     status: 405,
-    message: 'Use POST with a JSON body containing { tokenHashPrefix }.',
+    message: 'Use POST with a JSON body containing { tokenHashPrefix?, minutesBack?, limit? }.',
     headers: { Allow: 'POST' },
   });
 }
@@ -174,5 +175,10 @@ export async function POST(request: NextRequest) {
     })
     .filter((event) => Boolean(event.message));
 
-  return NextResponse.json({ ok: true, tokenHashPrefix, partial: axiomPayload?.status?.isPartial ?? false, events });
+  return NextResponse.json({
+    ok: true,
+    tokenHashPrefix: tokenHashPrefix ?? null,
+    partial: axiomPayload?.status?.isPartial ?? false,
+    events,
+  });
 }

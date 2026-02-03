@@ -111,4 +111,50 @@ describe('POST /api/internal/debug/auth-events', () => {
     expect(fetchArgs[0]).toContain('https://api.axiom.co/v1/datasets/_apl?format=tabular');
     expect(fetchArgs[1].headers['x-axiom-org-id']).toBe('chipin-ov5c');
   });
+
+  it('allows querying without tokenHashPrefix', async () => {
+    process.env.NODE_ENV = 'production';
+    process.env.DEBUG_ENDPOINTS_ENABLED = 'true';
+    process.env.DEBUG_API_KEY = 'supersecret';
+    process.env.AXIOM_API_TOKEN = 'xaat-test-token';
+    process.env.AXIOM_ORG_ID = 'chipin-ov5c';
+    process.env.AXIOM_DATASET = 'vercel';
+
+    vi.doMock('@/lib/auth/rate-limit', () => ({
+      enforceRateLimit: vi.fn(async () => ({ allowed: true })),
+    }));
+
+    const fetchSpy = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({ status: { isPartial: false }, tables: [] }),
+      text: async () => '',
+    }));
+    vi.stubGlobal('fetch', fetchSpy);
+
+    const { POST } = await loadHandler();
+    const response = await POST(
+      new Request('http://localhost/api/internal/debug/auth-events', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-debug-key': 'supersecret',
+          'x-forwarded-for': '1.2.3.4',
+        },
+        body: JSON.stringify({ minutesBack: 30, limit: 10 }),
+      }) as any
+    );
+
+    expect(response.status).toBe(200);
+    const payload = await response.json();
+    expect(payload.ok).toBe(true);
+    expect(payload.tokenHashPrefix).toBeNull();
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    const fetchArgs = fetchSpy.mock.calls[0];
+    const body = JSON.parse(fetchArgs[1].body);
+    expect(body.apl).toContain('auth.magic_link_');
+    expect(body.apl).not.toContain('and message contains');
+  });
 });
