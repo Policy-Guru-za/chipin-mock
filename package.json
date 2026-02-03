@@ -24,6 +24,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.37.1",
     "@neondatabase/serverless": "^0.9.4",
     "@opentelemetry/api": "1.8.0",
     "@opentelemetry/auto-instrumentations-node": "^0.49.0",

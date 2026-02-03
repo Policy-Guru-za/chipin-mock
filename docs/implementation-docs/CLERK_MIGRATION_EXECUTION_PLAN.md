@@ -16,7 +16,7 @@ Translate `CLERK_MIGRATION_PLAN.md` into an execution-ready, staged program with
 
 **Deliverables**
 - Updated route inventory and auth touchpoints list.
-- Confirmed `AUTH_CLERK_ENABLED` defaults per environment.
+- Confirmed `AUTH_CLERK_ENABLED` staging: Stage 2–3 = false everywhere; Stage 4 = true in preview only first; production only after preview sign-off.
 - QA checklist for guest, host, admin, and webhook flows.
 
 **Exit Criteria**
@@ -30,7 +30,8 @@ Translate `CLERK_MIGRATION_PLAN.md` into an execution-ready, staged program with
 
 **Deliverables**
 - `@clerk/nextjs` installed.
-- `middleware.ts` wired with Edge‑safe request-id and explicit public/protected matcher.
+- `middleware.ts` wired with Edge‑safe request-id and the exact public/protected routing matrix from `CLERK_MIGRATION_PLAN.md` (incl. `/v1/*`, `/api/v1/*`, `/api/webhooks/*`, and allowlisting `/api/internal/webhooks/process`).
+- Middleware must be no-op when `AUTH_CLERK_ENABLED=false` (no `auth().protect`), so Stage 2 cannot change behavior.
 - `ClerkProvider` in root layout.
 - `/sign-in` and `/sign-up` pages (prebuilt).
 - Header updates gated by `AUTH_CLERK_ENABLED`.
@@ -48,14 +49,14 @@ Translate `CLERK_MIGRATION_PLAN.md` into an execution-ready, staged program with
 **Deliverables**
 - `lib/auth/clerk.ts` helpers (`requireClerkUser`, `requireAdminClerkUser`).
 - `hosts.clerkUserId` (nullable unique) + `ensureHostForClerkUser`.
-- Replace `requireSession/getSession` in host/admin/internal routes.
-- `/create` entry flow redirected to Clerk when signed out.
+- Introduce dual-mode auth wrappers (e.g. `requireHostAuth` / `requireAdminAuth` / `requireInternalAuth`) that use `chipin_session` when `AUTH_CLERK_ENABLED=false` and Clerk when `AUTH_CLERK_ENABLED=true`; migrate host/admin/internal routes to these wrappers.
+- `/create` entry flow: when `AUTH_CLERK_ENABLED=true` and signed out → redirect to `/sign-in` (with `redirect_url`); when `AUTH_CLERK_ENABLED=false` → preserve current magic-link entry behavior.
 - Legacy `chipin_session` cleanup on `/sign-in` or `/create`.
 
 **Exit Criteria**
-- All host/admin/internal routes use Clerk helpers.
-- Tests updated with Clerk mocks.
-- No runtime regressions with flag still OFF.
+- All host/admin/internal routes use the dual-mode auth wrappers (legacy session when flag OFF; Clerk when flag ON).
+- Tests updated with Clerk mocks (and coverage proving flag-OFF uses legacy session path).
+- With `AUTH_CLERK_ENABLED=false`: magic-link/session flows still work end-to-end (including host/admin/internal).
 
 ---
 
@@ -109,5 +110,5 @@ Translate `CLERK_MIGRATION_PLAN.md` into an execution-ready, staged program with
 - Manual QA checklist per stage
 
 ## Rollback Plan
-- Toggle `AUTH_CLERK_ENABLED=false` to revert to legacy behavior during Stages 2–4.
+- Toggle `AUTH_CLERK_ENABLED=false` to revert to legacy behavior during Stages 2–4 (requires Stage 3 dual-mode wrappers to be in place).
 - Revert to last known-good commit if post-cutover issues arise.

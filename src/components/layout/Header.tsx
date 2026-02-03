@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from 'react';
 import Link from 'next/link';
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 
 import { buttonVariants } from '@/components/ui/button';
 import { MenuIcon } from '@/components/icons';
@@ -9,7 +10,11 @@ import { MobileNav } from '@/components/layout/MobileNav';
 import { trackNavDrawerOpened } from '@/lib/analytics/metrics';
 const navLinkClasses = 'text-sm font-medium text-text-muted transition hover:text-text';
 
-export function Header() {
+interface HeaderProps {
+  isClerkEnabled?: boolean;
+}
+
+export function Header({ isClerkEnabled = false }: HeaderProps) {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   const handleOpenMobileNav = useCallback(() => {
@@ -40,6 +45,21 @@ export function Header() {
             <Link href="/create" className={buttonVariants({ size: 'sm' })}>
               Create a Dream Board
             </Link>
+            {isClerkEnabled ? (
+              <>
+                <SignedOut>
+                  <Link
+                    href="/sign-in"
+                    className={buttonVariants({ variant: 'outline', size: 'sm' })}
+                  >
+                    Sign in
+                  </Link>
+                </SignedOut>
+                <SignedIn>
+                  <UserButton afterSignOutUrl="/" />
+                </SignedIn>
+              </>
+            ) : null}
           </nav>
 
           {/* Mobile hamburger */}
@@ -56,7 +76,11 @@ export function Header() {
         </div>
       </header>
 
-      <MobileNav isOpen={isMobileNavOpen} onClose={handleCloseMobileNav} />
+      <MobileNav
+        isOpen={isMobileNavOpen}
+        onClose={handleCloseMobileNav}
+        isClerkEnabled={isClerkEnabled}
+      />
     </>
   );
 }

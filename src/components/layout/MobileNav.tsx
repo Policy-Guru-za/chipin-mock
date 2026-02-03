@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion';
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 
 import { buttonVariants } from '@/components/ui/button';
 import { XIcon } from '@/components/icons';
@@ -11,6 +12,7 @@ import { useReducedMotion } from '@/hooks/useReducedMotion';
 interface MobileNavProps {
   isOpen: boolean;
   onClose: () => void;
+  isClerkEnabled?: boolean;
 }
 
 const navLinks = [
@@ -18,7 +20,7 @@ const navLinks = [
   { href: '/#safety', label: 'Trust & safety' },
 ];
 
-export function MobileNav({ isOpen, onClose }: MobileNavProps) {
+export function MobileNav({ isOpen, onClose, isClerkEnabled = false }: MobileNavProps) {
   const prefersReducedMotion = useReducedMotion();
   const drawerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -157,6 +159,22 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
 
                 {/* CTA */}
                 <div className="border-t border-border px-6 py-6">
+                  {isClerkEnabled ? (
+                    <div className="mb-4 flex items-center justify-center">
+                      <SignedOut>
+                        <Link
+                          href="/sign-in"
+                          onClick={handleLinkClick}
+                          className={buttonVariants({ variant: 'outline', size: 'lg' })}
+                        >
+                          Sign in
+                        </Link>
+                      </SignedOut>
+                      <SignedIn>
+                        <UserButton afterSignOutUrl="/" />
+                      </SignedIn>
+                    </div>
+                  ) : null}
                   <Link
                     href="/create"
                     onClick={handleLinkClick}
