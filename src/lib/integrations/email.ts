@@ -15,6 +15,20 @@ export type EmailPayload = {
   tags?: Array<{ name: string; value: string }>;
 };
 
+export class ResendApiError extends Error {
+  readonly details: string;
+
+  constructor(details: string) {
+    super(`Resend send failed: ${details}`);
+    this.name = 'ResendApiError';
+    this.details = details;
+  }
+}
+
+type SendEmailOptions = {
+  idempotencyKey?: string;
+};
+
 const getResendClient = () => {
   if (!process.env.RESEND_API_KEY) {
     throw new Error('RESEND_API_KEY is required');
@@ -22,25 +36,32 @@ const getResendClient = () => {
   return new Resend(process.env.RESEND_API_KEY);
 };
 
-export async function sendEmail(payload: EmailPayload) {
+export async function sendEmail(payload: EmailPayload, options?: SendEmailOptions) {
   const resend = getResendClient();
 
-  const { data, error } = await resend.emails.send({
-    from: `${fromName} <${fromEmail}>`,
-    to: payload.to,
-    subject: payload.subject,
-    html: payload.html,
-    text: payload.text,
-    cc: payload.cc,
-    bcc: payload.bcc,
-    replyTo: payload.replyTo,
-    headers: payload.headers,
-    tags: payload.tags,
-  });
+  const requestOptions = options?.idempotencyKey
+    ? { idempotencyKey: options.idempotencyKey }
+    : undefined;
+
+  const { data, error } = await resend.emails.send(
+    {
+      from: `${fromName} <${fromEmail}>`,
+      to: payload.to,
+      subject: payload.subject,
+      html: payload.html,
+      text: payload.text,
+      cc: payload.cc,
+      bcc: payload.bcc,
+      replyTo: payload.replyTo,
+      headers: payload.headers,
+      tags: payload.tags,
+    },
+    requestOptions
+  );
 
   if (error) {
     const details = typeof error === 'object' ? JSON.stringify(error) : String(error);
-    throw new Error(`Resend send failed: ${details}`);
+    throw new ResendApiError(details);
   }
 
   return data;
