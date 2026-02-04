@@ -16,7 +16,7 @@ const isPublicRoute = createRouteMatcher([
   '/api/webhooks(.*)',
   '/api/v1(.*)',
   '/v1(.*)',
-  '/api/internal/contributions/create', // Public guest checkout endpoint.
+  '/api/internal/contributions/create', // Public guest checkout endpoint; do not add job-secret auth.
   // Job-secret endpoints (must enforce INTERNAL_JOB_SECRET in handler):
   '/api/internal/webhooks/process',
   '/api/internal/retention/run',
@@ -80,7 +80,7 @@ const createClerkHandler = (requestId: string) =>
     const pathname = req.nextUrl.pathname;
 
     if (!isPublicRoute(req)) {
-      const protectResponse = await auth().protect();
+      const protectResponse = await auth.protect();
       if (protectResponse) {
         if (pathname.startsWith('/api')) {
           return new NextResponse(null, { status: 404, headers: { 'x-request-id': requestId } });

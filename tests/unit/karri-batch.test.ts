@@ -214,4 +214,31 @@ describe('karri batch queue', () => {
     expect(payoutServiceMocks.completePayout).not.toHaveBeenCalled();
     expect(payoutServiceMocks.failPayout).not.toHaveBeenCalled();
   });
+
+  it('skips pending credits within backoff window', async () => {
+    const queueEntry = {
+      id: 'queue-3',
+      dreamBoardId: 'board-3',
+      karriCardNumber: 'encrypted-card',
+      amountCents: 8200,
+      reference: 'payout-3',
+      status: 'pending',
+      attempts: 1,
+      lastAttemptAt: new Date(Date.now() - 5 * 60 * 1000),
+      completedAt: null,
+      errorMessage: null,
+      createdAt: new Date('2026-01-03T00:00:00.000Z'),
+    };
+
+    dbMock.select.mockReturnValueOnce(makeSelect([queueEntry]));
+
+    const result = await processKarriCreditByReference({
+      reference: 'payout-3',
+      actor: { type: 'system', id: 'karri_batch' },
+    });
+
+    expect(result).toEqual({ status: 'pending' });
+    expect(dbMock.update).not.toHaveBeenCalled();
+    expect(karriMocks.topUpKarriCard).not.toHaveBeenCalled();
+  });
 });

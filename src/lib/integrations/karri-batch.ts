@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull, lt, or } from 'drizzle-orm';
 
 import { recordAuditEvent, type AuditActor } from '@/lib/audit';
 import { LEGACY_PLACEHOLDER } from '@/lib/constants';
@@ -11,6 +11,12 @@ import { completePayout, failPayout } from '@/lib/payouts/service';
 import { decryptSensitiveValue } from '@/lib/utils/encryption';
 
 const MAX_ATTEMPTS = 3;
+const PENDING_RETRY_BACKOFF_MS = 15 * 60 * 1000;
+
+const isPendingRetryDue = (lastAttemptAt: Date | null) => {
+  if (!lastAttemptAt) return true;
+  return lastAttemptAt.getTime() <= Date.now() - PENDING_RETRY_BACKOFF_MS;
+};
 
 type QueueRecord = typeof karriCreditQueue.$inferSelect;
 
@@ -203,10 +209,19 @@ export const processDailyKarriBatch = async (): Promise<BatchResult> => {
   const batchSize = 50;
 
   while (true) {
+    const retryCutoff = new Date(Date.now() - PENDING_RETRY_BACKOFF_MS);
     const pending = await db
       .select()
       .from(karriCreditQueue)
-      .where(eq(karriCreditQueue.status, 'pending'))
+      .where(
+        and(
+          eq(karriCreditQueue.status, 'pending'),
+          or(
+            isNull(karriCreditQueue.lastAttemptAt),
+            lt(karriCreditQueue.lastAttemptAt, retryCutoff)
+          )
+        )
+      )
       .orderBy(karriCreditQueue.createdAt)
       .limit(batchSize);
 
@@ -252,6 +267,10 @@ export const processKarriCreditByReference = async (params: {
 
   if (entry.status !== 'pending') {
     return { status: entry.status };
+  }
+
+  if (!isPendingRetryDue(entry.lastAttemptAt ?? null)) {
+    return { status: 'pending' as const };
   }
 
   return processQueueEntry(entry, params.actor);

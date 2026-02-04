@@ -13,7 +13,7 @@ import { log } from '@/lib/observability/logger';
 import { jsonInternalError } from '@/lib/api/internal-response';
 import { getClientIp } from '@/lib/utils/request';
 
-// Public guest endpoint; intentionally allowlisted in middleware.
+// Public guest endpoint; intentionally allowlisted in middleware and not job-secret gated.
 
 const requestSchema = z.object({
   dreamBoardId: z.string().uuid(),
