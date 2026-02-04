@@ -15,7 +15,7 @@ const manualGiftSchema = z.object({
   giftDescription: z.string().min(10).max(500),
   giftImageUrl: z.string().url(),
   giftImagePrompt: z.string().min(1),
-  goalAmount: z.coerce.number().int().positive(),
+  goalAmount: z.coerce.number().int().min(20),
 });
 
 type GiftSearchParams = {
@@ -145,7 +145,7 @@ export default async function CreateGiftPage({
                 id="goalAmount"
                 name="goalAmount"
                 type="number"
-                min={1}
+                min={20}
                 step={1}
                 defaultValue={defaultGoal}
                 required

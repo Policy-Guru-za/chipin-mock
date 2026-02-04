@@ -150,4 +150,68 @@ describe('karri batch queue', () => {
       '1111'
     );
   });
+
+  it('requeues pending Karri credits when provider is pending', async () => {
+    const queueEntry = {
+      id: 'queue-2',
+      dreamBoardId: 'board-2',
+      karriCardNumber: 'encrypted-card',
+      amountCents: 7500,
+      reference: 'payout-2',
+      status: 'pending',
+      attempts: 0,
+      lastAttemptAt: null,
+      completedAt: null,
+      errorMessage: null,
+      createdAt: new Date('2026-01-02T00:00:00.000Z'),
+    };
+
+    dbMock.select.mockReturnValueOnce(makeSelect([queueEntry]));
+
+    const updateProcessingChain = {
+      set: vi.fn(() => ({
+        where: vi.fn(() => ({
+          returning: vi.fn(async () => [{ id: 'queue-2', attempts: 1 }]),
+        })),
+      })),
+    };
+    const updatePayoutChain = {
+      set: vi.fn(() => ({
+        where: vi.fn(async () => undefined),
+      })),
+    };
+    const updateQueueChain = {
+      set: vi.fn(() => ({
+        where: vi.fn(async () => undefined),
+      })),
+    };
+
+    let queueUpdates = 0;
+    dbMock.update.mockImplementation((table) => {
+      if (table === karriCreditQueue) {
+        queueUpdates += 1;
+        return queueUpdates === 1 ? updateProcessingChain : updateQueueChain;
+      }
+      return updatePayoutChain;
+    });
+
+    karriMocks.topUpKarriCard.mockResolvedValue({
+      status: 'pending',
+      transactionId: 'TX-2',
+    });
+
+    const result = await processKarriCreditByReference({
+      reference: 'payout-2',
+      actor: { type: 'system', id: 'karri_batch' },
+    });
+
+    expect(result).toEqual({ status: 'pending' });
+    expect(updateQueueChain.set).toHaveBeenCalledWith({
+      status: 'pending',
+      errorMessage: null,
+      attempts: queueEntry.attempts,
+    });
+    expect(payoutServiceMocks.completePayout).not.toHaveBeenCalled();
+    expect(payoutServiceMocks.failPayout).not.toHaveBeenCalled();
+  });
 });

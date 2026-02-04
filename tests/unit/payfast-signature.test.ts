@@ -33,4 +33,9 @@ describe('PayFast signature verification', () => {
     expect(parsed.payload.m_payment_id).toBe('CONTRIB-TEST');
     expect(verifyPayfastSignature(rawBody)).toBe(true);
   });
+
+  it('returns false for malformed signatures', () => {
+    const rawBody = 'merchant_id=10000100&merchant_key=46f0cd694581a&signature=zzzz';
+    expect(verifyPayfastSignature(rawBody)).toBe(false);
+  });
 });

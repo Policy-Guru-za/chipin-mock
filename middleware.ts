@@ -1,8 +1,8 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import type { NextFetchEvent, NextRequest } from 'next/server';
 
-import { getClerkConfigStatus } from '@/lib/auth/clerk-config';
+import { getClerkConfigStatus, getClerkUrls } from '@/lib/auth/clerk-config';
 
 const isPublicRoute = createRouteMatcher([
   '/',
@@ -16,6 +16,7 @@ const isPublicRoute = createRouteMatcher([
   '/api/webhooks(.*)',
   '/api/v1(.*)',
   '/v1(.*)',
+  '/api/internal/contributions/create', // Public guest checkout endpoint.
   // Job-secret endpoints (must enforce INTERNAL_JOB_SECRET in handler):
   '/api/internal/webhooks/process',
   '/api/internal/retention/run',
@@ -27,41 +28,83 @@ const isPublicRoute = createRouteMatcher([
   /^\/(?!api|_next|sign-in|sign-up|create|dashboard|admin|health)([^/]+)\/(contribute|thanks|payment-failed)$/,
 ]);
 
+
+const bypassExactPaths = new Set([
+  '/health/live',
+  '/health/ready',
+  '/api/health',
+  // Job-secret endpoints (must enforce INTERNAL_JOB_SECRET in handler):
+  '/api/internal/webhooks/process',
+  '/api/internal/retention/run',
+  '/api/internal/karri/batch',
+  '/api/internal/payments/reconcile',
+]);
+
+const isBypassRouteWhenAuthUnavailable = (pathname: string): boolean => {
+  if (bypassExactPaths.has(pathname)) {
+    return true;
+  }
+
+  if (pathname.startsWith('/api/webhooks')) {
+    return true;
+  }
+
+  if (pathname.startsWith('/api/internal/api-keys')) {
+    return true;
+  }
+
+  return false;
+};
 let missingClerkKeysLogged = false;
 
 const getRequestId = (request: NextRequest): string => {
   return request.headers.get('x-request-id') ?? globalThis.crypto.randomUUID();
 };
 
-export default clerkMiddleware(async (auth, req) => {
-  const requestId = getRequestId(req);
+const nextResponseWithRequestId = (req: NextRequest, requestId: string) => {
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-request-id', requestId);
+
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set('x-request-id', requestId);
+  return response;
+};
+
+const getSafeRedirectPath = (req: NextRequest): string => {
+  const target = `${req.nextUrl.pathname}${req.nextUrl.search}`;
+  return target.startsWith('/') ? target : `/${target}`;
+};
+
+const createClerkHandler = (requestId: string) =>
+  clerkMiddleware(async (auth, req) => {
+    const pathname = req.nextUrl.pathname;
+
+    if (!isPublicRoute(req)) {
+      const protectResponse = await auth().protect();
+      if (protectResponse) {
+        if (pathname.startsWith('/api')) {
+          return new NextResponse(null, { status: 404, headers: { 'x-request-id': requestId } });
+        }
+
+        const { signInUrl } = getClerkUrls();
+        const redirectUrl = new URL(signInUrl, req.nextUrl.origin);
+        redirectUrl.searchParams.set('redirect_url', getSafeRedirectPath(req));
+
+        const response = NextResponse.redirect(redirectUrl);
+        response.headers.set('x-request-id', requestId);
+        return response;
+      }
+    }
+
+    return nextResponseWithRequestId(req, requestId);
+  });
+
+export default async function middleware(req: NextRequest, event: NextFetchEvent) {
+  const requestId = getRequestId(req);
   const clerkConfig = getClerkConfigStatus();
   const pathname = req.nextUrl.pathname;
 
-  if (!clerkConfig.flagEnabled) {
-    if (!isPublicRoute(req)) {
-      if (req.nextUrl.pathname.startsWith('/api')) {
-        return NextResponse.json(
-          { error: 'auth_disabled' },
-          { status: 503, headers: { 'x-request-id': requestId } }
-        );
-      }
-
-      return new NextResponse('Authentication unavailable', {
-        status: 503,
-        headers: { 'x-request-id': requestId },
-      });
-    }
-  } else if (!clerkConfig.isEnabled) {
-    if (pathname.startsWith('/sign-in') || pathname.startsWith('/sign-up')) {
-      return new NextResponse('Authentication unavailable', {
-        status: 503,
-        headers: { 'x-request-id': requestId },
-      });
-    }
-
+  if (!clerkConfig.isEnabled) {
     if (!missingClerkKeysLogged) {
       missingClerkKeysLogged = true;
       console.error(
@@ -69,36 +112,30 @@ export default clerkMiddleware(async (auth, req) => {
       );
     }
 
-    if (!isPublicRoute(req)) {
-      if (req.nextUrl.pathname.startsWith('/api')) {
-        return NextResponse.json(
-          { error: 'auth_unavailable' },
-          { status: 503, headers: { 'x-request-id': requestId } }
-        );
-      }
+    if (isBypassRouteWhenAuthUnavailable(pathname)) {
+      return nextResponseWithRequestId(req, requestId);
+    }
 
-      return new NextResponse('Authentication unavailable', {
-        status: 503,
-        headers: { 'x-request-id': requestId },
-      });
+    if (pathname.startsWith('/api')) {
+      return NextResponse.json(
+        { error: 'auth_unavailable' },
+        { status: 503, headers: { 'x-request-id': requestId } }
+      );
     }
-  } else if (!isPublicRoute(req)) {
-    const protectResponse = await auth().protect();
-    if (protectResponse) {
-      protectResponse.headers.set('x-request-id', requestId);
-      return protectResponse;
-    }
+
+    return new NextResponse('Authentication unavailable', {
+      status: 503,
+      headers: { 'x-request-id': requestId },
+    });
   }
 
-  const response = NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
+  const response = (await createClerkHandler(requestId)(req, event)) as Response;
+  if (!response.headers.has('x-request-id')) {
+    response.headers.set('x-request-id', requestId);
+  }
 
-  response.headers.set('x-request-id', requestId);
   return response;
-});
+}
 
 export const config = {
   matcher: [

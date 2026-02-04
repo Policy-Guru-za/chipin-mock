@@ -15,4 +15,9 @@ describe('middleware public routes', () => {
     const middleware = readSource('middleware.ts');
     expect(middleware).toContain("'/create'");
   });
+
+  it('allowlists guest contribution create endpoint', () => {
+    const middleware = readSource('middleware.ts');
+    expect(middleware).toContain("'/api/internal/contributions/create'");
+  });
 });

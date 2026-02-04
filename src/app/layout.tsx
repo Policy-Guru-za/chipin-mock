@@ -40,7 +40,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const bannerText =
     activeMocks.length > 0 ? `SANDBOX MODE — mock ${activeMocks.join(', ')}` : null;
   const clerkConfig = getClerkConfigStatus();
-  const { signInUrl, signUpUrl, afterSignInUrl, afterSignUpUrl } = getClerkUrls();
+  const { signInUrl, signUpUrl, signInFallbackRedirectUrl, signUpFallbackRedirectUrl } =
+    getClerkUrls();
 
   const layoutContent = (
     <>
@@ -61,8 +62,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             publishableKey={clerkConfig.publishableKey ?? ''}
             signInUrl={signInUrl}
             signUpUrl={signUpUrl}
-            afterSignInUrl={afterSignInUrl}
-            afterSignUpUrl={afterSignUpUrl}
+            signInFallbackRedirectUrl={signInFallbackRedirectUrl}
+            signUpFallbackRedirectUrl={signUpFallbackRedirectUrl}
           >
             {layoutContent}
           </ClerkProvider>

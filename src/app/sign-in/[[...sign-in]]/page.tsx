@@ -3,7 +3,7 @@ import { SignIn } from '@clerk/nextjs';
 import { getClerkUrls } from '@/lib/auth/clerk-config';
 
 export default function SignInPage() {
-  const { signInUrl, signUpUrl, afterSignInUrl } = getClerkUrls();
+  const { signInUrl, signUpUrl, signInFallbackRedirectUrl } = getClerkUrls();
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-surface px-4 py-12">
@@ -11,7 +11,7 @@ export default function SignInPage() {
         path={signInUrl}
         routing="path"
         signUpUrl={signUpUrl}
-        afterSignInUrl={afterSignInUrl}
+        fallbackRedirectUrl={signInFallbackRedirectUrl}
       />
     </div>
   );

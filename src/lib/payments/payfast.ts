@@ -148,7 +148,14 @@ export const verifyPayfastSignature = (rawBody: string) => {
   if (!signature) return false;
   const expected = generateSignature(fields, config.passphrase);
   if (signature.length !== expected.length) return false;
-  return crypto.timingSafeEqual(Buffer.from(signature, 'hex'), Buffer.from(expected, 'hex'));
+  const isHex = (value: string) => /^[0-9a-f]+$/i.test(value) && value.length % 2 === 0;
+  if (!isHex(signature) || !isHex(expected)) return false;
+
+  try {
+    return crypto.timingSafeEqual(Buffer.from(signature, 'hex'), Buffer.from(expected, 'hex'));
+  } catch {
+    return false;
+  }
 };
 
 export const validatePayfastSource = (ipAddress?: string | null) => {

@@ -54,6 +54,13 @@ const markQueueCompleted = async (queueId: string) => {
     .where(eq(karriCreditQueue.id, queueId));
 };
 
+const markQueuePending = async (queueId: string, attempts: number) => {
+  await db
+    .update(karriCreditQueue)
+    .set({ status: 'pending', errorMessage: null, attempts })
+    .where(eq(karriCreditQueue.id, queueId));
+};
+
 const markQueueFailed = async (params: {
   queueId: string;
   attempts: number;
@@ -110,10 +117,7 @@ const processQueueEntry = async (entry: QueueRecord, actor: AuditActor) => {
 
     if (result.status === 'pending') {
       await markPayoutProcessing(entry.reference, result.transactionId);
-      await db
-        .update(karriCreditQueue)
-        .set({ status: 'processing', errorMessage: null })
-        .where(eq(karriCreditQueue.id, entry.id));
+      await markQueuePending(entry.id, entry.attempts);
       return { status: 'pending' as const };
     }
 

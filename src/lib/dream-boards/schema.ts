@@ -11,7 +11,7 @@ export const dreamBoardDraftSchema = z
     giftDescription: z.string().min(10).max(500).optional(),
     giftImageUrl: z.string().url(),
     giftImagePrompt: z.string().min(1).optional(),
-    goalCents: z.number().int().positive(),
+    goalCents: z.number().int().min(2000),
     payoutEmail: z.string().email(),
     karriCardNumberEncrypted: z.string().min(1),
     karriCardHolderName: z.string().min(2).max(100),
