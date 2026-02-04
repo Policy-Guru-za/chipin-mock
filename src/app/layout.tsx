@@ -1,6 +1,6 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Fraunces, Outfit } from 'next/font/google';
+import { DM_Sans, DM_Serif_Display, Fraunces, Nunito, Outfit } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 
 import {
@@ -23,9 +23,50 @@ const fraunces = Fraunces({
   display: 'swap',
 });
 
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  variable: '--font-dm-sans',
+  display: 'swap',
+});
+
+const dmSerifDisplay = DM_Serif_Display({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-dm-serif',
+  display: 'swap',
+});
+
+const nunito = Nunito({
+  subsets: ['latin'],
+  variable: '--font-nunito',
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
-  title: 'ChipIn',
-  description: 'A gift pooling platform for joyful celebrations.',
+  title: 'Gifta - Everyone Chips In. One Perfect Gift.',
+  description:
+    'Create a Dreamboard for your child\'s birthday. Friends and family chip in toward one meaningful gift — no more gift piles, no more guesswork.',
+  openGraph: {
+    type: 'website',
+    url: 'https://gifta.co.za',
+    title: 'Gifta',
+    description:
+      'Create a Dreamboard for your child\'s birthday. Friends and family chip in toward one meaningful gift — no more gift piles, no more guesswork.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Gifta',
+    description:
+      'Create a Dreamboard for your child\'s birthday. Friends and family chip in toward one meaningful gift — no more gift piles, no more guesswork.',
+    images: ['/og-image.png'],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -55,7 +96,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   );
 
   return (
-    <html lang="en" className={`${outfit.variable} ${fraunces.variable}`}>
+    <html lang="en" className={`${outfit.variable} ${fraunces.variable} ${dmSans.variable} ${dmSerifDisplay.variable} ${nunito.variable}`}>
       <body className="min-h-screen bg-surface text-text">
         {clerkConfig.isEnabled ? (
           <ClerkProvider

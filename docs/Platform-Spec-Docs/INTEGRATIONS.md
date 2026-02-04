@@ -45,7 +45,7 @@ ChipIn integrates with external services for payments, payouts, notifications, a
 | SnapScan | Inbound QR payments | Unchanged |
 | Resend | Email notifications | Unchanged |
 | Vercel Blob | Image storage | Unchanged |
-| Vercel KV | Session/cache storage | Unchanged |
+| Vercel KV | Cache & rate limiting | Unchanged |
 
 ---
 
@@ -57,14 +57,13 @@ Generate whimsical, non-photorealistic artwork for gift descriptions. Parents de
 
 ### Provider
 
-OpenAI DALL-E 3 (default), with flexibility for alternative providers.
+Google Gemini image generation (default), with flexibility for alternative providers.
 
 ### Environment Variables
 
 ```bash
-IMAGE_GENERATION_API_KEY=""
-IMAGE_GENERATION_API_URL="https://api.openai.com/v1/images/generations"
-IMAGE_GENERATION_MODEL="dall-e-3"
+GEMINI_API_KEY=""
+GEMINI_IMAGE_MODEL="gemini-2.5-flash-image"
 ```
 
 ### Interface
@@ -85,10 +84,10 @@ interface GeneratedImage {
 1. **Style Directive**: Prepend style instructions to ensure child-friendly, non-photorealistic output:
 
 ```typescript
-const STYLE_DIRECTIVE = `Create a whimsical, playful illustration in a
-watercolor and hand-drawn style. The image should feel warm, celebratory,
-and child-friendly. DO NOT create photorealistic images. Use soft colors
-and gentle shapes. The subject is: `;
+const STYLE_DIRECTIVE = `Create a whimsical, joyful illustration in a soft
+watercolor and hand-drawn style. The artwork should feel magical and
+dream-like, perfect for a child's birthday celebration. Do NOT create
+photorealistic images. The dream gift is: `;
 ```
 
 2. **Upload to Blob**: Generated images must be uploaded to Vercel Blob for permanent storage (AI provider URLs are temporary).
@@ -435,7 +434,7 @@ Integration health is monitored via `/health/ready`:
 | Storage | Vercel Blob | Warning |
 | Email | Resend | Warning |
 | WhatsApp | WhatsApp Business | Warning |
-| AI Images | OpenAI | Warning |
+| AI Images | Gemini | Warning |
 | Karri | Karri Card API | Warning |
 
 Critical failures return 503. Warning failures log but return 200.

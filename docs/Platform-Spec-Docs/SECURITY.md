@@ -56,33 +56,23 @@ Data we explicitly do not store:
 
 ### Host Authentication
 
-**Method:** Passwordless magic link
+**Method:** Clerk authentication (email + OTP/password)
 
 **Flow:**
-1. Host enters email
-2. System generates cryptographically random token (32 bytes)
-3. Token hash stored with 1-hour expiry
-4. Email sent with magic link
-5. Host clicks link → token verified → session created
-6. Session stored in HTTP-only, secure cookie
+1. Host signs in via Clerk UI (`/sign-in` or `/sign-up`)
+2. Clerk verifies identity and issues a session
+3. Session cookies set by Clerk
+4. Host redirected to `/create/child`
 
 **Session Management:**
-```typescript
-interface Session {
-  id: string;           // Random UUID
-  hostId: string;       // Reference to host
-  createdAt: Date;
-  expiresAt: Date;      // 7 days from creation
-  lastActiveAt: Date;   // Updated on each request
-}
-```
+- Managed entirely by Clerk
+- Session duration configured in Clerk dashboard
+- Revocation handled via Clerk UI/API
 
 **Security Controls:**
-- Token single-use (invalidated after verification)
-- Token expires after 1 hour
-- Sessions expire after 7 days of inactivity
-- One active session per device (new login invalidates old)
-- Session bound to user agent fingerprint
+- HttpOnly, secure cookies managed by Clerk
+- MFA/OTP options available in Clerk settings
+- Centralized session revocation
 
 ### Guest Authentication
 
@@ -266,10 +256,14 @@ All user input validated and sanitized:
 const createDreamBoardSchema = z.object({
   childName: z.string().min(2).max(50).regex(/^[a-zA-Z\s'-]+$/),
   childPhotoUrl: z.string().url().startsWith('https://'),
-  giftUrl: z.string().url().includes('takealot.com'),
+  giftName: z.string().min(2).max(200),
+  giftImageUrl: z.string().url().startsWith('https://'),
   message: z.string().max(280).optional(),
-  deadline: z.date().min(new Date()).max(addDays(new Date(), 90)),
+  partyDate: z.date().min(new Date()).max(addDays(new Date(), 180)),
   payoutEmail: z.string().email(),
+  hostWhatsAppNumber: z.string().regex(/^\+27[6-8]\d{8}$/),
+  karriCardNumber: z.string().regex(/^\d{16}$/),
+  karriCardHolderName: z.string().min(2).max(100),
 });
 ```
 
@@ -295,7 +289,7 @@ const createDreamBoardSchema = z.object({
 
 | Endpoint | Limit | Window |
 |----------|-------|--------|
-| Magic link send | 5 | 15 min |
+| Clerk auth attempts | 10 | 15 min |
 | Contribution attempt | 10 | 1 min |
 | Dream Board creation | 5 | 1 hour |
 | API (per key) | 1000 | 1 hour |
@@ -416,7 +410,7 @@ Logs retained for 90 days, searchable via Vercel Logs.
 | Check | Status | Notes |
 | --- | --- | --- |
 | Repo secrets scan | ✅ Complete | No secrets detected in tracked files. |
-| Rate limiting enforced | ✅ Complete | Auth magic links, contribution create, and all payment webhooks rate limited. |
+| Rate limiting enforced | ✅ Complete | Clerk auth endpoints, contribution create, and all payment webhooks rate limited. |
 | Vercel env verification | ⏳ Pending | Requires owner confirmation in Vercel dashboard. |
 
 ---

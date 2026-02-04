@@ -137,13 +137,16 @@ export async function POST(request: NextRequest) {
   const providerResponse = validatePaymentProvider(parsed.data.paymentProvider);
   if (providerResponse) return providerResponse;
 
+  let payload: ReturnType<typeof buildContributionPayload> | null = null;
   try {
-    const payload = buildContributionPayload({
+    payload = buildContributionPayload({
       board,
       data: parsed.data,
       ip,
       request,
     });
+    await db.insert(contributions).values(payload.contribution);
+
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
     const payment = await createPaymentIntent(parsed.data.paymentProvider, {
       amountCents: payload.payment.totalCents,
@@ -155,11 +158,24 @@ export async function POST(request: NextRequest) {
       notifyUrl: `${baseUrl}/api/webhooks/${parsed.data.paymentProvider}`,
       expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
     });
-
-    await db.insert(contributions).values(payload.contribution);
-
     return NextResponse.json(payment);
   } catch (error) {
+    if (payload) {
+      try {
+        await db
+          .update(contributions)
+          .set({
+            paymentStatus: 'failed',
+            paymentErrorMessage: error instanceof Error ? error.message : 'unknown_error',
+            updatedAt: new Date(),
+          })
+          .where(eq(contributions.id, payload.contribution.id));
+      } catch (updateError) {
+        log('error', 'payments.contribution_create_failed_update', {
+          error: updateError instanceof Error ? updateError.message : 'unknown_error',
+        });
+      }
+    }
     log('error', 'payments.contribution_create_failed', {
       error: error instanceof Error ? error.message : 'unknown_error',
     });

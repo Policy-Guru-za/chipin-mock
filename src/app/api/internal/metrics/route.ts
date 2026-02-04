@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
+import { enforceRateLimit } from '@/lib/auth/rate-limit';
 import { log } from '@/lib/observability/logger';
 import { getClientIp } from '@/lib/utils/request';
 
@@ -35,23 +36,8 @@ const customMetricSchema = z.object({
   properties: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
 });
 
-// Simple in-memory rate limiter for metrics (100 requests per minute per IP)
-const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 100;
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return false;
-  }
-
-  entry.count++;
-  return entry.count > RATE_LIMIT_MAX;
-}
+const RATE_LIMIT_WINDOW_SECONDS = 60;
 
 function isValidOrigin(request: NextRequest): boolean {
   const origin = request.headers.get('origin');
@@ -92,7 +78,11 @@ export async function POST(request: NextRequest) {
 
   // Rate limiting
   const ip = getClientIp(request) ?? 'unknown';
-  if (isRateLimited(ip)) {
+  const rateLimit = await enforceRateLimit(`metrics:${ip}`, {
+    limit: RATE_LIMIT_MAX,
+    windowSeconds: RATE_LIMIT_WINDOW_SECONDS,
+  });
+  if (!rateLimit.allowed) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 

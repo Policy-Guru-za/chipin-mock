@@ -1,3 +1,5 @@
+import { LEGACY_PLACEHOLDER } from '@/lib/constants';
+
 export const RETENTION_WINDOWS_DAYS = {
   ipAddress: 30,
   boardGrace: 90,
@@ -9,6 +11,9 @@ export const NETWORK_METADATA_NULLS = { ipAddress: null, userAgent: null } as co
 export const ANONYMIZED_CHILD_NAME = 'Child';
 export const ANONYMIZED_CHILD_PHOTO_URL = '/images/child-placeholder.svg';
 export const ANONYMIZED_PAYOUT_EMAIL = 'anonymized@chipin.co.za';
+export const ANONYMIZED_WHATSAPP_NUMBER = '+27600000000';
+export const ANONYMIZED_KARRI_CARD_NUMBER = LEGACY_PLACEHOLDER;
+export const ANONYMIZED_KARRI_CARD_HOLDER = 'Redacted';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 

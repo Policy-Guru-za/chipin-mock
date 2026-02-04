@@ -2,7 +2,7 @@ const next = require('eslint-config-next');
 
 module.exports = [
   {
-    ignores: ['coverage/**', '.next/**', 'node_modules/**'],
+    ignores: ['coverage/**', '.next/**', 'node_modules/**', '.reference/**', 'tmp/**'],
   },
   ...next,
   {

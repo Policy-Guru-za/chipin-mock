@@ -5,6 +5,9 @@ import {
   NETWORK_METADATA_NULLS,
   RETENTION_ELIGIBLE_STATUSES,
   RETENTION_WINDOWS_DAYS,
+  ANONYMIZED_KARRI_CARD_NUMBER,
+  ANONYMIZED_KARRI_CARD_HOLDER,
+  ANONYMIZED_WHATSAPP_NUMBER,
 } from '@/lib/retention/retention';
 
 describe('retention cutoffs', () => {
@@ -26,5 +29,11 @@ describe('retention cutoffs', () => {
 
   it('nulls network metadata fields', () => {
     expect(NETWORK_METADATA_NULLS).toEqual({ ipAddress: null, userAgent: null });
+  });
+
+  it('provides anonymized placeholders for sensitive fields', () => {
+    expect(ANONYMIZED_KARRI_CARD_NUMBER).toBeTruthy();
+    expect(ANONYMIZED_KARRI_CARD_HOLDER).toBe('Redacted');
+    expect(ANONYMIZED_WHATSAPP_NUMBER).toBe('+27600000000');
   });
 });

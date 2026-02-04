@@ -4,6 +4,8 @@ import { isPaymentSimulatorEnabled } from '@/lib/config/feature-flags';
 
 import { PaymentSimulatorClient } from './PaymentSimulatorClient';
 
+export const dynamic = 'force-dynamic';
+
 type PaymentSimulatorPageProps = {
   searchParams?: {
     contributionId?: string;

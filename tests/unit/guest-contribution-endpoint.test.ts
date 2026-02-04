@@ -16,4 +16,14 @@ describe('guest contribution endpoint', () => {
     expect(handler).not.toContain('INTERNAL_JOB_SECRET');
     expect(handler).not.toContain('requireInternalJobAuth');
   });
+
+  it('persists the contribution before creating the payment intent', () => {
+    const handler = readSource('src/app/api/internal/contributions/create/route.ts');
+    const insertIndex = handler.indexOf('db.insert(contributions)');
+    const createIntentIndex = handler.indexOf('await createPaymentIntent');
+
+    expect(insertIndex).toBeGreaterThan(-1);
+    expect(createIntentIndex).toBeGreaterThan(-1);
+    expect(insertIndex).toBeLessThan(createIntentIndex);
+  });
 });

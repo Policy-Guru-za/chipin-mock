@@ -155,6 +155,7 @@ export const contributions = pgTable(
     paymentProvider: paymentProviderEnum('payment_provider').notNull(),
     paymentRef: varchar('payment_ref', { length: 255 }).notNull(),
     paymentStatus: paymentStatusEnum('payment_status').notNull().default('pending'),
+    paymentErrorMessage: text('payment_error_message'),
     ipAddress: inet('ip_address'),
     userAgent: text('user_agent'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

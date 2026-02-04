@@ -14,3 +14,9 @@ coverage/
 
 #DS Store
 .DS_Store
+
+# Temporary Files
+tmp/
+
+# Reference repositories
+.reference/

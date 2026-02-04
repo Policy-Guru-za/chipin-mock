@@ -172,31 +172,23 @@ POST /v1/dream-boards
 {
   "child_name": "Maya",
   "child_photo_url": "https://storage.chipin.co.za/photos/abc123.jpg",
-  "birthday_date": "2026-02-15",
-  "gift_type": "takealot_product",
-  "gift_data": {
-    "product_url": "https://www.takealot.com/lego-star-wars-death-star/PLID12345",
-    "product_name": "LEGO Star Wars Death Star",
-    "product_image": "https://media.takealot.com/...",
-    "product_price": 249900
-  },
-  "payout_method": "takealot_gift_card",
-  "overflow_gift_data": {
-    "cause_id": "food-forward",
-    "cause_name": "Feed Hungry Children",
-    "impact_description": "Feed 10 children for a week"
-  },
-  "goal_cents": 249900,
-  "message": "Maya would love your contribution toward her dream Lego set!",
-  "deadline": "2026-02-14T23:59:59Z",
-  "payout_email": "parent@example.com"
+  "party_date": "2026-02-15",
+  "gift_name": "Mountain Bike with Bells",
+  "gift_image_url": "https://storage.chipin.co.za/artwork/bike.png",
+  "gift_image_prompt": "A shiny red mountain bike with training wheels and a bell",
+  "goal_cents": 250000,
+  "payout_email": "parent@example.com",
+  "host_whatsapp_number": "+27821234567",
+  "karri_card_number": "1234567890123456",
+  "karri_card_holder_name": "Maya's Mom",
+  "message": "Maya would love your contribution toward her dream bike!"
 }
 ```
 
 **Notes:**
-- `overflow_gift_data` is required when `gift_type = takealot_product`.
-- For `gift_type = philanthropy`, set `payout_method = philanthropy_donation`.
-- When `raised_cents >= goal_cents`, `display_mode` switches to `charity` and gift details are hidden in guest view.
+- `gift_image_prompt` is optional; it stores the prompt used for AI artwork.
+- `payout_method` is always `karri_card`.
+- `party_date` must be within the next 6 months.
 
 **Response:** `201 Created`
 ```json
@@ -206,25 +198,16 @@ POST /v1/dream-boards
     "slug": "maya-7th-birthday-x7k9m2",
     "child_name": "Maya",
     "child_photo_url": "https://storage.chipin.co.za/photos/abc123.jpg",
-    "birthday_date": "2026-02-15",
-    "gift_type": "takealot_product",
+    "party_date": "2026-02-15",
     "gift_data": {
-      "product_url": "https://www.takealot.com/lego-star-wars-death-star/PLID12345",
-      "product_name": "LEGO Star Wars Death Star",
-      "product_image": "https://media.takealot.com/...",
-      "product_price": 249900
+      "gift_name": "Mountain Bike with Bells",
+      "gift_image_url": "https://storage.chipin.co.za/artwork/bike.png",
+      "gift_image_prompt": "A shiny red mountain bike with training wheels and a bell"
     },
-    "payout_method": "takealot_gift_card",
-    "overflow_gift_data": {
-      "cause_id": "food-forward",
-      "cause_name": "Feed Hungry Children",
-      "impact_description": "Feed 10 children for a week"
-    },
-    "goal_cents": 249900,
+    "payout_method": "karri_card",
+    "goal_cents": 250000,
     "raised_cents": 0,
-    "overflow_cents": 0,
-    "message": "Maya would love your contribution toward her dream Lego set!",
-    "deadline": "2026-02-14T23:59:59Z",
+    "message": "Maya would love your contribution toward her dream bike!",
     "status": "active",
     "display_mode": "gift",
     "contribution_count": 0,
@@ -252,16 +235,12 @@ GET /v1/dream-boards/{id}
     "slug": "maya-7th-birthday-x7k9m2",
     "child_name": "Maya",
     "child_photo_url": "https://storage.chipin.co.za/photos/abc123.jpg",
-    "birthday_date": "2026-02-15",
-    "gift_type": "takealot_product",
+    "party_date": "2026-02-15",
     "gift_data": { ... },
-    "payout_method": "takealot_gift_card",
-    "overflow_gift_data": { ... },
-    "goal_cents": 249900,
+    "payout_method": "karri_card",
+    "goal_cents": 250000,
     "raised_cents": 125000,
-    "overflow_cents": 0,
     "message": "...",
-    "deadline": "2026-02-14T23:59:59Z",
     "status": "active",
     "display_mode": "gift",
     "contribution_count": 8,
@@ -309,13 +288,13 @@ PATCH /v1/dream-boards/{id}
 ```json
 {
   "message": "Updated message",
-  "deadline": "2026-02-20T23:59:59Z"
+  "party_date": "2026-02-20"
 }
 ```
 
 **Updatable Fields:**
 - `message`
-- `deadline` (can only extend, not shorten)
+- `party_date` (can only extend, not shorten)
 - `status` (only certain transitions allowed)
 
 **Response:** `200 OK` with updated Dream Board
@@ -329,7 +308,7 @@ POST /v1/dream-boards/{id}/close
 **Request Body:**
 ```json
 {
-  "reason": "manual"  // or "deadline_reached", "goal_reached"
+  "reason": "manual"  // or "party_date_reached", "goal_reached"
 }
 ```
 
@@ -343,7 +322,7 @@ POST /v1/dream-boards/{id}/close
     "payouts": [
       {
         "id": "po_xyz789",
-        "type": "takealot_gift_card",
+        "type": "karri_card",
         "status": "pending",
         "net_cents": 121250  // After fees
       }
@@ -401,7 +380,7 @@ GET /v1/contributions/{id}
 
 ### Payouts
 
-**Note:** A Dream Board can have multiple payouts (gift + charity overflow).
+**Note:** Each Dream Board has a single Karri payout.
 
 #### List Pending Payouts
 
@@ -424,14 +403,15 @@ GET /v1/payouts/pending
     {
       "id": "po_abc123",
       "dream_board_id": "db_xyz789",
-      "type": "takealot_gift_card",
+      "type": "karri_card",
       "gross_cents": 125000,
       "fee_cents": 3750,
       "net_cents": 121250,
       "status": "pending",
       "recipient_data": {
-        "email": "parent@example.com",
-        "product_url": "https://www.takealot.com/..."
+        "karri_card_holder_name": "Maya's Mom",
+        "card_number_last4": "1234",
+        "card_number_masked": "****1234"
       },
       "created_at": "2026-01-25T10:00:00Z"
     }
@@ -458,7 +438,7 @@ POST /v1/payouts/{id}/confirm
 **Request Body:**
 ```json
 {
-  "external_ref": "TKL_GC_12345",  // Partner's reference
+  "external_ref": "KARRI_TOPUP_12345",  // Partner's reference
   "completed_at": "2026-01-25T11:30:00Z"
 }
 ```
@@ -469,7 +449,7 @@ POST /v1/payouts/{id}/confirm
   "data": {
     "id": "po_abc123",
     "status": "completed",
-    "external_ref": "TKL_GC_12345",
+    "external_ref": "KARRI_TOPUP_12345",
     "completed_at": "2026-01-25T11:30:00Z"
   }
 }
@@ -644,25 +624,7 @@ These endpoints are used by the ChipIn frontend, not exposed to partners.
 
 ### Authentication
 
-#### Send Magic Link
-
-```http
-POST /api/internal/auth/magic-link
-```
-
-```json
-{
-  "email": "parent@example.com"
-}
-```
-
-#### Verify Magic Link
-
-```http
-GET /api/internal/auth/verify?token=xxx
-```
-
-Sets session cookie on success.
+Clerk manages host sessions for the frontend.
 
 #### Get Current User
 
@@ -683,53 +645,6 @@ file: [binary]
 ```json
 {
   "url": "https://storage.chipin.co.za/photos/abc123.jpg"
-}
-```
-
-### Product Search
-
-```http
-GET /api/internal/products/search?q=lego+star+wars
-```
-
-**Response:**
-```json
-{
-  "data": [
-    {
-      "id": "PLID12345",
-      "name": "LEGO Star Wars Death Star",
-      "price_cents": 249900,
-      "image_url": "https://media.takealot.com/...",
-      "product_url": "https://www.takealot.com/..."
-    }
-  ]
-}
-```
-
-### Product Fetch (by URL)
-
-```http
-POST /api/internal/products/fetch
-```
-
-```json
-{
-  "url": "https://www.takealot.com/lego-star-wars-death-star/PLID12345"
-}
-```
-
-**Response:**
-```json
-{
-  "data": {
-    "id": "PLID12345",
-    "name": "LEGO Star Wars Death Star",
-    "price_cents": 249900,
-    "image_url": "https://media.takealot.com/...",
-    "product_url": "https://www.takealot.com/...",
-    "in_stock": true
-  }
 }
 ```
 
@@ -780,16 +695,15 @@ const chipin = new ChipInClient({
 const dreamBoard = await chipin.dreamBoards.create({
   childName: 'Maya',
   childPhotoUrl: 'https://...',
-  giftType: 'takealot_product',
-  giftData: {
-    productUrl: 'https://www.takealot.com/...',
-    productName: 'LEGO Death Star',
-    productImage: 'https://...',
-    productPrice: 249900,
-  },
-  goalCents: 249900,
-  deadline: new Date('2026-02-14'),
+  partyDate: '2026-02-15',
+  giftName: 'Mountain Bike with Bells',
+  giftImageUrl: 'https://...',
+  giftImagePrompt: 'A shiny red mountain bike with training wheels and a bell',
+  goalCents: 250000,
   payoutEmail: 'parent@example.com',
+  hostWhatsAppNumber: '+27821234567',
+  karriCardNumber: '1234567890123456',
+  karriCardHolderName: "Maya's Mom",
 });
 
 // Get Dream Board
@@ -800,7 +714,7 @@ const contributions = await chipin.contributions.list('db_abc123');
 
 // Confirm payout
 await chipin.payouts.confirm('po_xyz789', {
-  externalRef: 'TKL_GC_12345',
+  externalRef: 'KARRI_TOPUP_12345',
 });
 ```
 
@@ -813,8 +727,14 @@ curl -X POST https://api.chipin.co.za/v1/dream-boards \
   -H "Content-Type: application/json" \
   -d '{
     "child_name": "Maya",
-    "gift_type": "takealot_product",
-    ...
+    "party_date": "2026-02-15",
+    "gift_name": "Mountain Bike with Bells",
+    "gift_image_url": "https://...",
+    "goal_cents": 250000,
+    "payout_email": "parent@example.com",
+    "host_whatsapp_number": "+27821234567",
+    "karri_card_number": "1234567890123456",
+    "karri_card_holder_name": "Maya\u0027s Mom"
   }'
 
 # Get Dream Board
@@ -825,7 +745,7 @@ curl https://api.chipin.co.za/v1/dream-boards/db_abc123 \
 curl -X POST https://api.chipin.co.za/v1/payouts/po_xyz789/confirm \
   -H "Authorization: Bearer cpk_live_xxx" \
   -H "Content-Type: application/json" \
-  -d '{"external_ref": "TKL_GC_12345"}'
+  -d '{"external_ref": "KARRI_TOPUP_12345"}'
 ```
 
 ---

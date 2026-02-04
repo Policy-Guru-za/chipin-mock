@@ -36,9 +36,9 @@ ChipIn follows a **modern serverless architecture** optimized for:
 │   Neon DB    │  │  Vercel KV   │  │ Vercel Blob  │
 │ (PostgreSQL) │  │   (Redis)    │  │  (Images)    │
 │              │  │              │  │              │
-│ - Dream Boards│  │ - Sessions  │  │ - Child photos│
-│ - Contributions│ │ - Rate limits│ │ - Gift images │
-│ - Payouts    │  │ - Caching   │  │              │
+│ - Dream Boards│  │ - Rate limits│ │ - Child photos│
+│ - Contributions│ │ - Caching   │  │ - Gift images │
+│ - Payouts    │  │             │  │              │
 └──────────────┘  └──────────────┘  └──────────────┘
            │
            ▼
@@ -54,7 +54,7 @@ ChipIn follows a **modern serverless architecture** optimized for:
 ├─────────────────┴─────────────────┴─────────────────────────────┤
 │  AI Services                                                    │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │ OpenAI DALL-E (Gift Artwork Generation)                   │  │
+│  │ Gemini Image Generation (Gift Artwork)                    │  │
 │  └───────────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -73,7 +73,7 @@ ChipIn follows a **modern serverless architecture** optimized for:
 | **Database** | Neon (PostgreSQL) | Serverless Postgres, Vercel integration, branching |
 | **ORM** | Drizzle ORM | Type-safe, lightweight, excellent DX |
 | **Hosting** | Vercel | Edge network, seamless Next.js integration |
-| **Cache/KV** | Vercel KV (Redis) | Session storage, rate limiting, caching |
+| **Cache/KV** | Vercel KV (Redis) | Rate limiting, caching |
 | **Blob Storage** | Vercel Blob | Image uploads (child photos) |
 | **Email** | Resend | Developer-friendly transactional email |
 
@@ -89,7 +89,7 @@ ChipIn follows a **modern serverless architecture** optimized for:
 
 | Service | Purpose | Integration Status |
 |---------|---------|-------------------|
-| **OpenAI DALL-E** | AI-generated gift artwork | API integration |
+| **Gemini** | AI-generated gift artwork | API integration |
 | **WhatsApp Business** | Transactional notifications | API integration |
 | **Karri Card** | Sole payout method (daily batch) | API integration |
 
@@ -142,8 +142,12 @@ chipin/
 │   │   │   ├── ozow.ts
 │   │   │   └── snapscan.ts
 │   │   ├── integrations/         # External service integrations
-│   │   │   ├── takealot.ts
-│   │   │   └── email.ts
+│   │   │   ├── blob.ts
+│   │   │   ├── email.ts
+│   │   │   ├── image-generation.ts
+│   │   │   ├── karri.ts
+│   │   │   ├── karri-batch.ts
+│   │   │   └── whatsapp.ts
 │   │   ├── auth/                 # Authentication utilities
 │   │   ├── utils/                # General utilities
 │   │   └── constants.ts          # App constants
@@ -178,12 +182,11 @@ chipin/
 │ host_id (FK)    │       │ name            │
 │ child_name      │       │ phone           │
 │ child_photo_url │       │ created_at      │
-│ gift_type       │       └─────────────────┘
-│ gift_data (JSON)│
+│ gift_name       │       └─────────────────┘
+│ gift_image_url  │
 │ payout_method   │       ┌─────────────────┐
-│ overflow_gift_data│     │  contributions  │
-│ goal_cents      │       ├─────────────────┤
-│ deadline        │       ├─────────────────┤
+│ goal_cents      │       │  contributions  │
+│ party_date      │       ├─────────────────┤
 │ status          │◄──────│ id (PK)         │
 │ message         │       │ dream_board_id  │
 │ created_at      │       │ contributor_name│
@@ -212,7 +215,7 @@ chipin/
 
 - **Host** → **Dream Board**: One-to-Many (a host can create multiple Dream Boards)
 - **Dream Board** → **Contribution**: One-to-Many (a Dream Board receives many contributions)
-- **Dream Board** → **Payout**: One-to-Many (gift payout + optional charity overflow payout)
+- **Dream Board** → **Payout**: One-to-One (single Karri payout)
 
 ### Status Enums
 
@@ -221,7 +224,7 @@ chipin/
 type DreamBoardStatus = 
   | 'draft'      // Being created
   | 'active'     // Accepting contributions
-  | 'funded'     // Goal reached; charity overflow view active
+  | 'funded'     // Goal reached
   | 'closed'     // Manually closed by host
   | 'paid_out'   // Payout completed
   | 'expired'    // Deadline passed without action
@@ -249,21 +252,19 @@ type PayoutStatus =
 
 ### Host Authentication
 
-Hosts authenticate via **magic link** (passwordless):
+Hosts authenticate via **Clerk** (email + OTP/password):
 
 ```
-1. Host enters email
-2. System sends magic link via Resend
-3. Host clicks link
-4. JWT session cookie set (httpOnly, secure)
-5. Session stored in Vercel KV (7-day expiry)
+1. Host signs in via Clerk UI (/sign-in or /sign-up)
+2. Clerk verifies identity
+3. Session cookies set by Clerk (httpOnly, secure)
+4. User redirected back to /create/child
 ```
 
-**Why magic link?**
-- No password to remember for infrequent use (1-2x/year)
-- Email is already verified
-- Simpler implementation
-- Better security than weak passwords
+**Why Clerk?**
+- Managed auth and session lifecycle
+- Built-in MFA/OTP options
+- Reduced security surface area
 
 ### Guest Authentication
 
@@ -330,7 +331,7 @@ Authorization: Bearer cpk_live_xxxxxxxxxxxx
      │◀──────────────│                                    │
 ```
 
-**Gift funded behavior:** When `raised_cents >= goal_cents`, the Dream Board switches to a charity overflow view for guests (gift hidden) while contributions remain open until close.
+**Gift funded behavior:** When `raised_cents >= goal_cents`, the Dream Board is marked funded but the guest view remains gift-focused while contributions remain open until close.
 
 ### Payment Provider Abstraction
 
@@ -386,8 +387,6 @@ Pot closes → ChipIn triggers payout instruction
          │
          ▼
 Payment Provider transfers to:
-  ├── Takealot (gift card purchase)
-  ├── Charity (donation)
   └── Karri (card top-up)
 ```
 
@@ -403,7 +402,7 @@ This architecture means:
 ### Payout Routing
 
 ```typescript
-type PayoutType = 'takealot_gift_card' | 'philanthropy_donation' | 'karri_card_topup';
+type PayoutType = 'karri_card';
 
 interface PayoutInstruction {
   type: PayoutType;
@@ -411,26 +410,17 @@ interface PayoutInstruction {
   recipientData: PayoutRecipientData;
 }
 
-type PayoutRecipientData = 
-  | { type: 'takealot_gift_card'; email: string; productUrl?: string }
-  | { type: 'philanthropy_donation'; causeId: string; donorName: string }
-  | { type: 'karri_card_topup'; cardNumber: string }
+type PayoutRecipientData = { type: 'karri_card'; cardNumber: string }
 ```
 
-**Overflow handling:**
-- If `raised_cents > goal_cents`, create a **gift payout** for `goal_cents` and a **charity payout** for the overflow.
-```
-
-### Takealot Gift Card Flow
+### Karri Card Flow
 
 ```
-1. Pot closes (deadline or host triggers)
-2. ChipIn calculates gift payout amount (up to goal)
-3. ChipIn requests gift card from Takealot (if payout method is Takealot)
-   - Via affiliate API (preferred) or
-   - Via manual process (fallback)
-4. Gift card code delivered to host email
-5. Host shares with child or redeems directly
+1. Pot closes (party date or host triggers)
+2. ChipIn calculates payout amount (net contributions)
+3. ChipIn queues a Karri top-up
+4. Batch job processes top-up and updates payout status
+5. Host receives confirmation
 ```
 
 ---
@@ -493,7 +483,6 @@ Full API specification in [API.md](./API.md).
 
 | Key Pattern | TTL | Purpose |
 |-------------|-----|---------|
-| `session:{token}` | 7 days | User sessions |
 | `dream-board:{slug}` | 5 min | Dream Board cache (guest view); dates hydrated on read |
 | `webhook:{provider}:{ip}` | 1 min | Webhook rate limiting (fixed window) |
 | `rate:api:partner:{partnerId}:hour` | 1 hour | Public API hourly quota (partner-scoped) |

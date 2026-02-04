@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { WEBHOOK_RETRY_MINUTES } from '@/lib/constants/webhooks';
@@ -22,6 +24,17 @@ describe('webhook signatures', () => {
 
     expect(headers['X-ChipIn-Signature']).toBe(`t=${timestamp},v1=${signature}`);
     expect(headers['X-ChipIn-Event-Id']).toBe('evt-1');
+  });
+
+  it('generates an event id when one is not provided', () => {
+    const payload = JSON.stringify({ id: 'evt-2' });
+    const secret = 'secret';
+    const uuidSpy = vi.spyOn(crypto, 'randomUUID').mockReturnValue('generated-id');
+
+    const headers = buildWebhookHeaders(payload, secret);
+
+    expect(headers['X-ChipIn-Event-Id']).toBe('generated-id');
+    uuidSpy.mockRestore();
   });
 
   it('matches the documented retry schedule', () => {

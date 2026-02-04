@@ -498,26 +498,23 @@ class SnapScanProvider implements PaymentProvider {
 
 | Type | Destination | Process |
 |------|-------------|---------|
-| `takealot_gift_card` | Takealot voucher to email | API or manual |
-| `karri_card_topup` | Karri Card | Manual or API |
-| `philanthropy_donation` | Charity partner (overflow) | API or manual |
+| `karri_card` | Karri Card | Manual or API |
 
 ### Payout Trigger Conditions
 
 Payout can be triggered when:
 1. **Goal reached** — Automatic trigger (configurable)
-2. **Deadline passed** — Automatic trigger
+2. **Party date passed** — Automatic trigger
 3. **Manual close** — Host triggers from dashboard
 
-When the goal is reached, guest view switches to **charity overflow** and contributions remain open until close.
+Guest view remains gift-focused; contributions can continue until close.
 
 ### Payout Calculation
 
 ```typescript
 interface PayoutCalculation {
   raisedCents: number;       // Total net contributions
-  giftCents: number;         // Up to goal
-  overflowCents: number;     // Charity overflow (open-ended)
+  payoutCents: number;       // All net contributions
   platformFeeCents: number;  // Our fee already deducted from contributions
   payoutFeeCents: number;    // Cost to execute payout (if any)
 }
@@ -539,76 +536,15 @@ function calculatePayout(dreamBoard: DreamBoard): PayoutCalculation {
   // Payout fee (e.g., cost of gift card issuance)
   const payoutFeeCents = 0; // Currently none
 
-  const giftCents = Math.min(raisedCents, dreamBoard.goalCents);
-  const overflowCents = Math.max(0, raisedCents - dreamBoard.goalCents);
-
   return {
     raisedCents,
-    giftCents,
-    overflowCents,
+    payoutCents: raisedCents,
     platformFeeCents: contributions.reduce((sum, c) => sum + c.feeCents, 0),
     payoutFeeCents,
   };
 }
 ```
-
-### Takealot Gift Card Payout
-
-**Option A: Affiliate API (Preferred)**
-
-If Takealot provides affiliate/gift card API:
-```typescript
-async function executeTakealotPayout(payout: Payout): Promise<void> {
-  const response = await fetch('https://api.takealot.com/gift-cards', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${TAKEALOT_API_KEY}` },
-    body: JSON.stringify({
-      amount: payout.netCents / 100,
-      recipientEmail: payout.recipientData.email,
-      message: `Dream Gift for ${dreamBoard.childName}`,
-    }),
-  });
-
-  const { giftCardCode, orderId } = await response.json();
-
-  await db.update(payouts)
-    .set({
-      status: 'completed',
-      externalRef: orderId,
-      completedAt: new Date(),
-    })
-    .where(eq(payouts.id, payout.id));
-}
-```
-
-**Option B: Manual Process (Fallback)**
-
-If no API available:
-1. Admin dashboard shows pending payouts
-2. Admin manually purchases gift card on Takealot
-3. Admin enters gift card code into ChipIn
-4. ChipIn emails code to host
-5. Mark payout as completed
-
-```typescript
-// Admin confirms manual payout
-async function confirmManualPayout(payoutId: string, externalRef: string) {
-  await db.update(payouts)
-    .set({
-      status: 'completed',
-      externalRef,
-      completedAt: new Date(),
-    })
-    .where(eq(payouts.id, payoutId));
-
-  // Send email to host with gift card details
-  await sendPayoutEmail(payout);
-}
-```
-
-### Karri Card Top-up Payout
-
-If the host selected **Fund my Karri Card**, execute a Karri top-up instead of a Takealot gift card.
+### Karri Card Payout
 
 **Manual (MVP):**
 1. Admin receives payout alert
@@ -618,10 +554,6 @@ If the host selected **Fund my Karri Card**, execute a Karri top-up instead of a
 
 **API (Future):**
 Use `KarriAPI.topUpCard()` and confirm payout via webhook or status check.
-
-### Charity Overflow Payout
-
-If `overflowCents > 0`, create a **second payout** with type `philanthropy_donation` for the overflow amount.
 
 ---
 

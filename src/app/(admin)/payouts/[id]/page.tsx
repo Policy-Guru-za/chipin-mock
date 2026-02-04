@@ -52,6 +52,33 @@ const payoutStatusLabel = (status: string) =>
     failed: 'Failed',
   })[status] ?? status;
 
+const getRecipientCardData = (recipientData: unknown) => {
+  if (!recipientData || typeof recipientData !== 'object') return null;
+  const record = recipientData as { cardNumberEncrypted?: string } | null;
+  if (!record?.cardNumberEncrypted) return null;
+  try {
+    const last4 = decryptSensitiveValue(record.cardNumberEncrypted).slice(-4);
+    if (!last4) return null;
+    return { last4, masked: `****${last4}` };
+  } catch {
+    return null;
+  }
+};
+
+const sanitizeRecipientData = (recipientData: unknown) => {
+  if (!recipientData || typeof recipientData !== 'object') return recipientData;
+  const record = recipientData as Record<string, unknown>;
+  const { cardNumberEncrypted, ...rest } = record;
+  const cardData = getRecipientCardData(recipientData);
+  return cardData
+    ? {
+        ...rest,
+        card_number_last4: cardData.last4,
+        card_number_masked: cardData.masked,
+      }
+    : rest;
+};
+
 const errorMessage = (code: string | null) => {
   if (!code) return null;
   return (
@@ -92,22 +119,11 @@ const RecipientCard = ({ payout }: { payout: PayoutDetail }) => (
     <h2 className="text-lg font-semibold">Recipient data</h2>
     {payout.type === 'karri_card' ? (
       <div className="rounded-xl border border-border bg-subtle px-4 py-3 text-xs text-text">
-        Karri card:{' '}
-        {(() => {
-          try {
-            const recipient = payout.recipientData as { cardNumberEncrypted?: string } | null;
-            if (!recipient?.cardNumberEncrypted) {
-              return 'Unavailable';
-            }
-            return decryptSensitiveValue(recipient.cardNumberEncrypted);
-          } catch {
-            return 'Unavailable';
-          }
-        })()}
+        Karri card: {getRecipientCardData(payout.recipientData)?.masked ?? 'Unavailable'}
       </div>
     ) : null}
     <pre className="whitespace-pre-wrap rounded-xl bg-subtle px-4 py-3 text-xs text-text">
-      {JSON.stringify(payout.recipientData, null, 2)}
+      {JSON.stringify(sanitizeRecipientData(payout.recipientData), null, 2)}
     </pre>
     <div className="space-y-1 text-sm text-text">
       <div>Gift: {payout.giftName}</div>

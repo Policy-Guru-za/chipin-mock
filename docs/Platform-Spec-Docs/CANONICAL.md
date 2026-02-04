@@ -16,30 +16,21 @@ Resolve conflicts across docs. When anything disagrees, this file wins.
 
 ### Product Scope
 
-- **Dream Board:** one primary gift goal (Takealot product) or a primary philanthropy goal.
+- **Dream Board:** one manual gift goal (parent-written) with AI artwork.
 - **Guest flow:** mobile-web; single CTA; no sign-in.
-- **Host flow:** magic link; 4-step wizard + review/share.
+- **Host flow:** Clerk authentication; 4-step wizard + review/share.
 
-### Gift, Payout, and Charity Overflow
+### Gift and Payout Model
 
-- **Gift type** is independent from **payout method**.
-- If **gift_type = takealot_product**, host must select a **charity overflow cause** during setup.
-- When **raised_cents >= goal_cents**:
-  - Guest view switches to **charity-only** view.
-  - **Original gift is hidden** on guest view.
-  - Contributions remain open until deadline or manual close.
-- **Overflow is open-ended** (no target).
-- **Gift payout** uses chosen payout method:
-  - `takealot_gift_card` **or** `karri_card_topup` (for Takealot gifts).
-  - `philanthropy_donation` (for philanthropy gifts).
-- **Charity overflow payout** uses `philanthropy_donation`.
-- Payouts are **1:N** per Dream Board (gift payout + optional overflow payout).
+- **Single payout method:** Karri Card only.
+- **No charity overflow:** extra funds remain part of the single Karri payout.
+- **Payouts:** one payout per Dream Board (`karri_card`).
 
 ### Public vs Private Display
 
 - **Public guest view:** percentage only (no exact amounts) while funding the gift.
 - **Host view:** exact amounts, contributor details, payout totals.
-- Once funded, guest view shows **charity name + amount raised** (open-ended).
+- **Funded state:** guest view remains gift-focused (no charity switch).
 
 ### Payments
 
@@ -49,7 +40,8 @@ Resolve conflicts across docs. When anything disagrees, this file wins.
 
 ### Auth and Session Storage
 
-- Magic link tokens and sessions stored in **Vercel KV** (not database tables).
+- Clerk handles authentication and session state.
+- No magic link tokens or session storage in Vercel KV.
 
 ### Package Manager
 
@@ -61,25 +53,25 @@ Resolve conflicts across docs. When anything disagrees, this file wins.
 
 ### dream_boards (selected)
 
-- `gift_type` = `takealot_product | philanthropy`
-- `gift_data` (Takealot product or philanthropy data)
+- `gift_name`, `gift_image_url`, `gift_image_prompt`
 - `goal_cents` (gift target)
-- `payout_method` = `takealot_gift_card | karri_card_topup | philanthropy_donation`
-- `overflow_gift_data` (philanthropy data; required when gift_type = takealot_product)
+- `payout_method` = `karri_card`
+- `karri_card_number`, `karri_card_holder_name`, `host_whatsapp_number`
+- `party_date` (pot close date)
 - `status` = `draft | active | funded | closed | paid_out | expired | cancelled`
 
 ### payouts
 
-- Multiple payouts per Dream Board.
-- `type` = `takealot_gift_card | karri_card_topup | philanthropy_donation`
+- One payout per Dream Board.
+- `type` = `karri_card`
 
 ---
 
 ## Canonical Behavior
 
-- **Funding phase:** gift until goal reached, then charity overflow.
-- **Raised calculations:** `raised_cents` is net contributions; `overflow_cents = max(0, raised_cents - goal_cents)`.
-- **Close conditions:** manual close or deadline; closing triggers payout(s).
+- **Funding phase:** gift progress until goal reached; contributions can continue until close.
+- **Raised calculations:** `raised_cents` is net contributions; overfunding is allowed but not redirected.
+- **Close conditions:** manual close or deadline; closing triggers a Karri payout.
 
 ---
 

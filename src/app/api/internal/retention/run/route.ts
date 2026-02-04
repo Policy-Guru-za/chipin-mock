@@ -6,7 +6,10 @@ import { contributions, dreamBoards } from '@/lib/db/schema';
 import {
   ANONYMIZED_CHILD_NAME,
   ANONYMIZED_CHILD_PHOTO_URL,
+  ANONYMIZED_KARRI_CARD_HOLDER,
+  ANONYMIZED_KARRI_CARD_NUMBER,
   ANONYMIZED_PAYOUT_EMAIL,
+  ANONYMIZED_WHATSAPP_NUMBER,
   getRetentionCutoffs,
   NETWORK_METADATA_NULLS,
   RETENTION_ELIGIBLE_STATUSES,
@@ -65,7 +68,11 @@ export async function POST(request: NextRequest) {
         .set({
           childName: ANONYMIZED_CHILD_NAME,
           childPhotoUrl: ANONYMIZED_CHILD_PHOTO_URL,
+          karriCardNumber: ANONYMIZED_KARRI_CARD_NUMBER,
+          karriCardHolderName: ANONYMIZED_KARRI_CARD_HOLDER,
           payoutEmail: ANONYMIZED_PAYOUT_EMAIL,
+          hostWhatsAppNumber: ANONYMIZED_WHATSAPP_NUMBER,
+          message: null,
           updatedAt: now,
         })
         .where(inArray(dreamBoards.id, boardIds))

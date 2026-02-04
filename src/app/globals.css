@@ -6,6 +6,9 @@
   /* Typography */
   --font-primary: 'Outfit', system-ui, sans-serif;
   --font-display: 'Fraunces', Georgia, serif;
+  --font-dm-sans: 'DM Sans', -apple-system, sans-serif;
+  --font-dm-serif: 'DM Serif Display', Georgia, serif;
+  --font-nunito: 'Nunito', sans-serif;
 
   /* Primary scale */
   --color-primary-50: #f0fdfa;
@@ -153,4 +156,81 @@ a:focus-visible {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Landing page animations */
+@keyframes landing-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes landing-testimonial-fade {
+  0%,
+  8% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  12%,
+  88% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  92%,
+  100% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes landing-soft-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 4px 16px rgba(200, 160, 100, 0.25);
+  }
+}
+
+@keyframes landing-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(1deg);
+  }
+}
+
+@keyframes landing-progress-shine {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.animate-landing-fade-up {
+  animation: landing-fade-up 0.7s ease-out;
+}
+
+.animate-landing-testimonial-fade {
+  animation: landing-testimonial-fade 5s ease-in-out;
+}
+
+.animate-landing-float {
+  animation: landing-float 6s ease-in-out infinite;
+}
+
+.animate-landing-progress-shine {
+  animation: landing-progress-shine 2s ease-in-out infinite;
 }

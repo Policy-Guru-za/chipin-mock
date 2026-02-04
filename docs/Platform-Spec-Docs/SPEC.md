@@ -197,11 +197,6 @@ ChipIn occupies a unique position: **purpose-built for parents** + **seamless lo
 - Transparent to guests (shown before payment)
 - Covers payment provider fees (~2%) + margin (~1%)
 
-### Secondary Revenue: Affiliate Commissions
-- **5-10% commission** on Takealot gift card redemptions
-- Not visible to users — built into gift card issuance
-- Potential for similar arrangements with other retailers
-
 ### Future Revenue Streams
 - Premium features (custom branding, extended deadlines)
 - Sponsored gift suggestions

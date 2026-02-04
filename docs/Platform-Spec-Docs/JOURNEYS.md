@@ -32,8 +32,8 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 ┌─────────┐   ┌─────────┐   ┌─────────┐   ┌─────────┐   ┌─────────┐   ┌─────────┐
 │  LAND   │──▶│  AUTH   │──▶│  CHILD  │──▶│  GIFT   │──▶│ DETAILS │──▶│  SHARE  │
 │         │   │         │   │         │   │         │   │         │   │         │
-│ Welcome │   │ Magic   │   │ Photo + │   │ Gift +  │   │ Karri + │   │ Get     │
-│ + CTA   │   │ Link    │   │ Name    │   │ Artwork │   │WhatsApp │   │ Link    │
+│ Welcome │   │ Clerk   │   │ Photo + │   │ Gift +  │   │ Karri + │   │ Get     │
+│ + CTA   │   │ Sign-in │   │ Name    │   │ Artwork │   │WhatsApp │   │ Link    │
 └─────────┘   └─────────┘   └─────────┘   └─────────┘   └─────────┘   └─────────┘
 ```
 
@@ -54,45 +54,20 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 
 ---
 
-### Step 2: Authentication (Magic Link)
+### Step 2: Authentication (Clerk)
 
-**URL:** `chipin.co.za/create`
+**URL:** `chipin.co.za/sign-in`
 
 **Screen Elements:**
-- Heading: "Let's get started"
-- Email input field
-- "Send magic link" button
-- Helper text: "We'll email you a link to continue"
-- Privacy note: "We never share your email"
+- Clerk sign-in form (email + OTP or password, depending on enabled providers)
+- "Continue" button
+- Link to sign up if needed
 
-**User Action:** Enters email, clicks send
+**User Action:** Signs in via Clerk
 
 **System Action:**
-1. Generate magic link token (UUID, 1-hour expiry)
-2. Store token in Vercel KV
-3. Send email via Resend with link
-
-**Email Content:**
-```
-Subject: Your ChipIn magic link ✨
-
-Hi there!
-
-Click below to create your Dream Board:
-
-[Continue to ChipIn →]
-
-This link expires in 1 hour.
-
-— The ChipIn Team
-```
-
-**Screen After Send:**
-- "Check your email!"
-- "We sent a link to {email}"
-- "Didn't receive it? [Resend]"
-
-**User Action:** Opens email, clicks magic link
+1. Clerk creates a session and sets secure cookies
+2. Redirects back to `/create/child` via configured fallback redirect
 
 **Transition:** → Step 3
 

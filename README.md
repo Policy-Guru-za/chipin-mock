@@ -101,7 +101,7 @@
 
 ### In Scope
 - ✅ Dream Board creation with manual gift name + AI-generated artwork
-- ✅ Magic link authentication
+- ✅ Clerk authentication (prebuilt sign-in/sign-up)
 - ✅ Guest contribution via PayFast, Ozow (EFT), SnapScan (QR)
 - ✅ Karri Card as sole payout method
 - ✅ Progress tracking (% for guests, Rands for host only)

@@ -11,11 +11,10 @@
 ChipIn uses PostgreSQL (via Neon) with Drizzle ORM. This document defines all data models, relationships, and constraints.
 
 **Key Changes in v2.0:**
-- Removed `gift_type` enum values: `takealot_product`, `philanthropy`
-- Removed `payout_method` enum values: `takealot_gift_card`, `philanthropy_donation`
-- Karri Card is now the sole payout method
+- Removed legacy `gift_type`/`gift_data` usage (manual gift definition only)
+- Karri Card is now the sole payout method (`karri_card`)
 - Added new columns: `gift_name`, `gift_image_url`, `gift_image_prompt`, `karri_card_holder_name`, `host_whatsapp_number`, `party_date`
-- Removed `overflow_gift_data` column
+- Removed `overflow_gift_data` column (no charity overflow)
 - Added new table: `karri_credit_queue`
 
 ---
@@ -41,7 +40,7 @@ ChipIn uses PostgreSQL (via Neon) with Drizzle ORM. This document defines all da
 │ partner_id (FK) │  │ partner_id (FK) │
 │ key_hash        │  │ host_id (FK)    │
 │ scopes[]        │  │ slug (unique)   │
-│ rate_limit      │  │ gift_type       │
+│ rate_limit      │  │ gift_name       │
 └───────┬─────────┘  │ goal_cents      │
         │ 1:N        └───────┬─────────┘
         ▼                    │ 1:N
@@ -204,8 +203,8 @@ CREATE TABLE dream_boards (
   
   -- Payout details (v2.0: Karri Card only)
   payout_method payout_method NOT NULL DEFAULT 'karri_card',
-  karri_card_number VARCHAR(20) NOT NULL,
-  karri_card_holder_name VARCHAR(100) NOT NULL,
+  karri_card_number TEXT NOT NULL,
+  karri_card_holder_name TEXT NOT NULL,
   payout_email VARCHAR(255) NOT NULL,
   
   -- Host contact (v2.0: WhatsApp notifications)
@@ -221,15 +220,8 @@ CREATE TABLE dream_boards (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   
-  -- Legacy columns (deprecated, kept for migration)
-  gift_type VARCHAR(50),  -- Deprecated in v2.0
-  gift_data JSONB,  -- Deprecated in v2.0
-  overflow_gift_data JSONB,  -- Deprecated in v2.0
-  birthday_date DATE,  -- Deprecated, use party_date
-  deadline TIMESTAMPTZ,  -- Deprecated, use party_date
-  
   -- Constraints
-  CONSTRAINT valid_goal CHECK (goal_cents >= 10000), -- Minimum R100 goal
+  CONSTRAINT valid_goal CHECK (goal_cents >= 2000), -- Minimum R20 goal
   CONSTRAINT valid_party_date CHECK (party_date > CURRENT_DATE)
 );
 
@@ -237,13 +229,13 @@ CREATE INDEX idx_dream_boards_host ON dream_boards(host_id);
 CREATE INDEX idx_dream_boards_partner ON dream_boards(partner_id);
 CREATE INDEX idx_dream_boards_slug ON dream_boards(slug);
 CREATE INDEX idx_dream_boards_status ON dream_boards(status);
-CREATE INDEX idx_dream_boards_deadline ON dream_boards(deadline) WHERE status = 'active';
+CREATE INDEX idx_dream_boards_party_date ON dream_boards(party_date) WHERE status = 'active';
 ```
 
 **Drizzle Schema:**
 
 ```typescript
-import { pgTable, uuid, varchar, text, integer, timestamp, date, jsonb, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, text, integer, timestamp, date, pgEnum } from 'drizzle-orm/pg-core';
 
 export const dreamBoardStatusEnum = pgEnum('dream_board_status', [
   'draft', 'active', 'funded', 'closed', 'paid_out', 'expired', 'cancelled'
@@ -274,8 +266,8 @@ export const dreamBoards = pgTable('dream_boards', {
   
   // Payout details (v2.0: Karri Card only)
   payoutMethod: payoutMethodEnum('payout_method').notNull().default('karri_card'),
-  karriCardNumber: varchar('karri_card_number', { length: 20 }).notNull(),
-  karriCardHolderName: varchar('karri_card_holder_name', { length: 100 }).notNull(),
+  karriCardNumber: text('karri_card_number').notNull(),
+  karriCardHolderName: text('karri_card_holder_name').notNull(),
   payoutEmail: varchar('payout_email', { length: 255 }).notNull(),
   
   // Host contact (v2.0: WhatsApp notifications)
@@ -301,19 +293,9 @@ export const dreamBoards = pgTable('dream_boards', {
 | gift_image_url | TEXT | URL to AI-generated artwork (Vercel Blob) |
 | gift_image_prompt | TEXT | Full prompt used for AI generation |
 | party_date | DATE | Birthday party date, serves as pot close date |
-| karri_card_number | VARCHAR(20) | Host's Karri Card number (encrypted) |
-| karri_card_holder_name | VARCHAR(100) | Cardholder name for verification |
-| host_whatsapp_number | VARCHAR(20) | Host's WhatsApp for notifications |
-
-**Deprecated Fields (kept for migration):**
-
-| Field | Replacement |
-|-------|-------------|
-| gift_type | Removed (manual definition only) |
-| gift_data | Replaced by gift_name + gift_image_url |
-| overflow_gift_data | Removed (no charity overflow) |
-| birthday_date | Renamed to party_date |
-| deadline | Use party_date instead |
+| karri_card_number | TEXT | Host's Karri Card number (encrypted) |
+| karri_card_holder_name | TEXT | Cardholder name for verification |
+| host_whatsapp_number | TEXT | Host's WhatsApp for notifications |
 
 ---
 
@@ -420,7 +402,7 @@ export const contributions = pgTable('contributions', {
 
 ### payouts
 
-Tracks payout execution for closed Dream Boards. A Dream Board can have **multiple payouts** (gift + optional charity overflow).
+Tracks payout execution for closed Dream Boards. Each Dream Board has a **single Karri payout**.
 
 ```sql
 CREATE TYPE payout_status AS ENUM (
@@ -431,9 +413,7 @@ CREATE TYPE payout_status AS ENUM (
 );
 
 CREATE TYPE payout_type AS ENUM (
-  'takealot_gift_card',
-  'philanthropy_donation',
-  'karri_card_topup'
+  'karri_card'
 );
 
 CREATE TABLE payouts (
@@ -475,9 +455,7 @@ export const payoutStatusEnum = pgEnum('payout_status', [
   'pending', 'processing', 'completed', 'failed'
 ]);
 
-export const payoutTypeEnum = pgEnum('payout_type', [
-  'takealot_gift_card', 'philanthropy_donation', 'karri_card_topup'
-]);
+export const payoutTypeEnum = pgEnum('payout_type', ['karri_card']);
 
 export const payouts = pgTable('payouts', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -507,20 +485,7 @@ export const payouts = pgTable('payouts', {
 **recipient_data JSON Structures:**
 
 ```typescript
-// For type = 'takealot_gift_card'
-interface TakealotPayoutData {
-  email: string;          // Where to send gift card
-  productUrl?: string;    // Optional: specific product URL
-}
-
-// For type = 'philanthropy_donation'
-interface PhilanthropyPayoutData {
-  causeId: string;
-  donorName: string;      // Child's name for donation certificate
-  donorEmail: string;     // Where to send confirmation
-}
-
-// For type = 'karri_card_topup'
+// For type = 'karri_card'
 interface KarriCardPayoutData {
   cardNumber: string;     // Encrypted
   cardholderName: string;
@@ -531,10 +496,10 @@ interface KarriCardPayoutData {
 
 ### payout_items
 
-Payout items break a payout into ledger-style components (e.g., gift vs overflow).
+Payout items break a payout into ledger-style components (gift only).
 
 ```sql
-CREATE TYPE payout_item_type AS ENUM ('gift', 'overflow');
+CREATE TYPE payout_item_type AS ENUM ('gift');
 
 CREATE TABLE payout_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -563,7 +528,7 @@ Queue for batch processing Karri Card credits. When a pot closes, an entry is cr
 CREATE TABLE karri_credit_queue (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   dream_board_id UUID NOT NULL REFERENCES dream_boards(id),
-  karri_card_number VARCHAR(20) NOT NULL,
+  karri_card_number TEXT NOT NULL,
   amount_cents INTEGER NOT NULL,
   reference VARCHAR(100) NOT NULL UNIQUE,  -- Idempotency key
   status VARCHAR(20) NOT NULL DEFAULT 'pending',  -- pending, processing, completed, failed
@@ -585,7 +550,7 @@ CREATE INDEX idx_karri_queue_dream_board ON karri_credit_queue(dream_board_id);
 export const karriCreditQueue = pgTable('karri_credit_queue', {
   id: uuid('id').primaryKey().defaultRandom(),
   dreamBoardId: uuid('dream_board_id').notNull().references(() => dreamBoards.id),
-  karriCardNumber: varchar('karri_card_number', { length: 20 }).notNull(),
+  karriCardNumber: text('karri_card_number').notNull(),
   amountCents: integer('amount_cents').notNull(),
   reference: varchar('reference', { length: 100 }).notNull().unique(),
   status: varchar('status', { length: 20 }).notNull().default('pending'),
@@ -736,8 +701,8 @@ GROUP BY db.id;
 CREATE VIEW expiring_dream_boards AS
 SELECT * FROM dream_boards
 WHERE status = 'active'
-  AND deadline BETWEEN NOW() AND NOW() + INTERVAL '7 days'
-ORDER BY deadline ASC;
+  AND party_date BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '7 days'
+ORDER BY party_date ASC;
 ```
 
 ---
@@ -751,7 +716,10 @@ ORDER BY deadline ASC;
 | dream_boards | child_name | PII (Minor) | Board lifetime + 90 days |
 | dream_boards | child_photo_url | PII (Minor) | Board lifetime + 90 days |
 | dream_boards | payout_email | PII | Board lifetime + 90 days |
-| dream_boards | overflow_gift_data | Non-PII | Board lifetime + 90 days |
+| dream_boards | host_whatsapp_number | PII | Board lifetime + 90 days |
+| dream_boards | karri_card_number | PII (encrypted) | Board lifetime + 90 days |
+| dream_boards | karri_card_holder_name | PII | Board lifetime + 90 days |
+| dream_boards | message | PII | Board lifetime + 90 days |
 | contributions | contributor_name | PII | Board lifetime + 90 days |
 | contributions | ip_address | PII | 30 days (fraud detection) |
 | contributions | user_agent | Metadata | 30 days |
@@ -763,7 +731,7 @@ ORDER BY deadline ASC;
 2. **Closed Dream Boards:** Retained for 90 days, then anonymized
 3. **Contribution IP/User Agent:** Deleted after 30 days
 4. **Payout Records:** Retained for 7 years (legal requirement)
-5. **Magic Links:** Stored in KV; auto-expire after use/TTL
+5. **Auth Sessions:** Managed by Clerk; no KV-based magic links
 
 ### Anonymization Process
 
@@ -771,16 +739,19 @@ After 90 days post-closure:
 ```sql
 UPDATE dream_boards 
 SET 
-  child_name = 'Anonymized',
-  child_photo_url = '/images/anonymized.png',
+  child_name = 'Child',
+  child_photo_url = '/images/child-placeholder.svg',
   payout_email = 'anonymized@chipin.co.za',
+  host_whatsapp_number = '+27600000000',
+  karri_card_number = 'legacy_unset',
+  karri_card_holder_name = 'Redacted',
   message = NULL
 WHERE status IN ('paid_out', 'cancelled', 'expired')
   AND updated_at < NOW() - INTERVAL '90 days';
 
 UPDATE contributions
 SET 
-  contributor_name = 'Anonymous',
+  contributor_name = NULL,
   message = NULL,
   ip_address = NULL,
   user_agent = NULL
@@ -801,7 +772,7 @@ WHERE dream_board_id IN (
 |--------------|-------|
 | Find Dream Board by slug | `idx_dream_boards_slug` |
 | List host's Dream Boards | `idx_dream_boards_host` |
-| Find active boards expiring soon | `idx_dream_boards_deadline` (partial) |
+| Find active boards expiring soon | `idx_dream_boards_party_date` (partial) |
 | Look up payment by provider ref | `idx_contributions_payment_ref` |
 | List contributions for board | `idx_contributions_dream_board` |
 | Find pending payouts | `idx_payouts_status` |
@@ -820,13 +791,12 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- Create enums
 CREATE TYPE dream_board_status AS ENUM (...);
-CREATE TYPE gift_type AS ENUM (...);
-CREATE TYPE payout_method AS ENUM (...);
+CREATE TYPE payout_method AS ENUM ('karri_card');
 CREATE TYPE payment_status AS ENUM (...);
 CREATE TYPE payment_provider AS ENUM (...);
 CREATE TYPE payout_status AS ENUM (...);
-CREATE TYPE payout_type AS ENUM (...);
-CREATE TYPE payout_item_type AS ENUM (...);
+CREATE TYPE payout_type AS ENUM ('karri_card');
+CREATE TYPE payout_item_type AS ENUM ('gift');
 CREATE TYPE audit_actor_type AS ENUM (...);
 
 -- Create tables

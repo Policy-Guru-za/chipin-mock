@@ -19,8 +19,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:seed": "tsx scripts/seed.ts",
-    "drizzle:generate": "drizzle-kit generate",
-    "drizzle:push": "drizzle-kit push",
+    "drizzle:generate": "node -e \"if(!process.env.DATABASE_URL){console.error('DATABASE_URL required');process.exit(1)}\" && drizzle-kit generate",
+    "drizzle:push": "node -e \"if(!process.env.DATABASE_URL){console.error('DATABASE_URL required');process.exit(1)}\" && drizzle-kit push",
     "prepare": "husky"
   },
   "dependencies": {
