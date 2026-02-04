@@ -12,4 +12,9 @@ describe('karri batch backoff', () => {
     expect(source).toContain('lastAttemptAt');
     expect(source).toContain('retryCutoff');
   });
+
+  it('preserves payout externalRef when retrying', () => {
+    const source = readSource('src/lib/integrations/karri-batch.ts');
+    expect(source).toContain('payouts.externalRef');
+  });
 });

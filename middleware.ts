@@ -80,19 +80,13 @@ const createClerkHandler = (requestId: string) =>
     const pathname = req.nextUrl.pathname;
 
     if (!isPublicRoute(req)) {
-      const protectResponse = await auth.protect();
-      if (protectResponse) {
-        if (pathname.startsWith('/api')) {
+      if (pathname.startsWith('/api')) {
+        const authObject = await auth();
+        if (!authObject.userId) {
           return new NextResponse(null, { status: 404, headers: { 'x-request-id': requestId } });
         }
-
-        const { signInUrl } = getClerkUrls();
-        const redirectUrl = new URL(signInUrl, req.nextUrl.origin);
-        redirectUrl.searchParams.set('redirect_url', getSafeRedirectPath(req));
-
-        const response = NextResponse.redirect(redirectUrl);
-        response.headers.set('x-request-id', requestId);
-        return response;
+      } else {
+        await auth.protect();
       }
     }
 

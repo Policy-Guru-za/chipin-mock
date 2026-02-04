@@ -1,4 +1,4 @@
-import { and, eq, isNull, lt, or } from 'drizzle-orm';
+import { and, eq, isNull, lt, or, sql } from 'drizzle-orm';
 
 import { recordAuditEvent, type AuditActor } from '@/lib/audit';
 import { LEGACY_PLACEHOLDER } from '@/lib/constants';
@@ -82,9 +82,11 @@ const markQueueFailed = async (params: {
 };
 
 const markPayoutProcessing = async (payoutId: string, externalRef?: string) => {
+  const resolvedExternalRef =
+    externalRef === undefined ? sql`${payouts.externalRef}` : externalRef;
   await db
     .update(payouts)
-    .set({ status: 'processing', externalRef: externalRef ?? null, errorMessage: null })
+    .set({ status: 'processing', externalRef: resolvedExternalRef, errorMessage: null })
     .where(eq(payouts.id, payoutId));
 };
 

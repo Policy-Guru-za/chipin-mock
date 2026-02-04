@@ -11,4 +11,10 @@ describe('middleware Clerk protect usage', () => {
     expect(middleware).toContain('auth.protect');
     expect(middleware).not.toContain('auth().protect');
   });
+
+  it('does not branch on auth.protect return values', () => {
+    const middleware = readSource('middleware.ts');
+    expect(middleware).not.toContain('protectResponse');
+    expect(middleware).not.toContain('if (protectResponse)');
+  });
 });
