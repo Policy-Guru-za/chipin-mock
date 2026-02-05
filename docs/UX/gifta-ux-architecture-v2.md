@@ -219,9 +219,29 @@ The `<UserButton />` component provides:
 | `/admin/*` | Protected + Admin role |
 | `/api/v1/*` | Public (API key auth) |
 | `/api/webhooks/*` | Public (webhook signatures) |
-| `/api/internal/*` | Protected (Clerk auth) |
+| `/api/internal/*` | Internal-only (auth split by endpoint caller type) |
 
-### 2.6 Legacy Route Handling
+### 2.6 Internal API Auth Split (No Path Rename)
+
+All `/api/internal/*` endpoints are private, but auth is split by **who calls the endpoint**:
+
+| Internal Endpoint Type | Intended Caller | Auth |
+|------------------------|-----------------|------|
+| **Internal UI endpoints** | Signed-in host/admin requests | Clerk auth (`requireHostAuth` / `requireAdminAuth`) |
+| **Internal job endpoints** | Schedulers/workers/ops automation | `Authorization: Bearer ${INTERNAL_JOB_SECRET}` |
+
+**Important:** Keep existing internal paths. Do not rename endpoint URLs; enforce auth based on endpoint purpose.
+
+**Current examples:**
+- Clerk auth: `/api/internal/auth/me`, `/api/internal/upload`, `/api/internal/payouts/*`
+- Job secret auth: `/api/internal/karri/batch`, `/api/internal/payments/reconcile`, `/api/internal/retention/run`, `/api/internal/webhooks/process`
+
+**Security requirements for internal job endpoints:**
+- Require `Authorization: Bearer ${INTERNAL_JOB_SECRET}` on every request.
+- Return `401` for missing/invalid bearer token.
+- Never log bearer token values.
+
+### 2.7 Legacy Route Handling
 
 | Legacy Route | Behavior |
 |--------------|----------|
@@ -229,7 +249,7 @@ The `<UserButton />` component provides:
 | `/auth/logout` | Redirect to Clerk sign-out |
 | `/auth/verify` | Show friendly message: "This link is no longer valid. Please sign in to continue." with link to `/sign-in` |
 
-### 2.7 Session Cookie Cleanup
+### 2.8 Session Cookie Cleanup
 
 On first visit to `/sign-in` or `/create`, delete any legacy `chipin_session` cookie to prevent stale session issues.
 

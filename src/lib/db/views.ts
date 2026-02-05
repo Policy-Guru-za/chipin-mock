@@ -11,7 +11,7 @@ export type DreamBoardWithTotals = {
   giftName: string;
   giftImageUrl: string;
   giftImagePrompt: string | null;
-  payoutMethod: 'karri_card';
+  payoutMethod: 'karri_card' | 'bank';
   goalCents: number;
   payoutEmail: string;
   message: string | null;

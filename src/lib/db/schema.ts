@@ -26,8 +26,9 @@ export const dreamBoardStatusEnum = pgEnum('dream_board_status', [
   'cancelled',
 ]);
 
-// v2.0: Karri Card is the sole payout method
-export const payoutMethodEnum = pgEnum('payout_method', ['karri_card']);
+export const payoutMethodEnum = pgEnum('payout_method', ['karri_card', 'bank']);
+
+export const charitySplitTypeEnum = pgEnum('charity_split_type', ['percentage', 'threshold']);
 
 export const paymentStatusEnum = pgEnum('payment_status', [
   'pending',
@@ -46,11 +47,9 @@ export const payoutStatusEnum = pgEnum('payout_status', [
   'failed',
 ]);
 
-// v2.0: Karri Card is the sole payout type
-export const payoutTypeEnum = pgEnum('payout_type', ['karri_card']);
+export const payoutTypeEnum = pgEnum('payout_type', ['karri_card', 'bank', 'charity']);
 
-// v2.0: No charity overflow in simplified model
-export const payoutItemTypeEnum = pgEnum('payout_item_type', ['gift']);
+export const payoutItemTypeEnum = pgEnum('payout_item_type', ['gift', 'charity']);
 
 export const auditActorTypeEnum = pgEnum('audit_actor_type', ['admin', 'host', 'system']);
 
@@ -61,6 +60,10 @@ export const hosts = pgTable(
     email: varchar('email', { length: 255 }).notNull().unique(),
     clerkUserId: varchar('clerk_user_id', { length: 255 }),
     name: varchar('name', { length: 100 }),
+    phone: varchar('phone', { length: 30 }),
+    notificationPreferences: jsonb('notification_preferences')
+      .notNull()
+      .default(sql`'{}'::jsonb`),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
@@ -82,6 +85,31 @@ export const partners = pgTable(
   })
 );
 
+export const charities = pgTable(
+  'charities',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    name: varchar('name', { length: 120 }).notNull(),
+    description: text('description').notNull(),
+    category: varchar('category', { length: 80 }).notNull(),
+    logoUrl: text('logo_url').notNull(),
+    website: text('website'),
+    bankDetailsEncrypted: jsonb('bank_details_encrypted').notNull(),
+    contactName: varchar('contact_name', { length: 120 }).notNull(),
+    contactEmail: varchar('contact_email', { length: 255 }).notNull(),
+    isActive: boolean('is_active').notNull().default(true),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    nameIdx: uniqueIndex('unique_charities_name').on(table.name),
+    categoryIdx: index('idx_charities_category').on(table.category),
+    activeIdx: index('idx_charities_active')
+      .on(table.isActive)
+      .where(sql`${table.isActive} = true`),
+  })
+);
+
 export const dreamBoards = pgTable(
   'dream_boards',
   {
@@ -97,21 +125,37 @@ export const dreamBoards = pgTable(
     // Child details
     childName: varchar('child_name', { length: 50 }).notNull(),
     childPhotoUrl: text('child_photo_url').notNull(),
-    partyDate: date('party_date').notNull(), // v2.0: serves as pot close date
+    childAge: integer('child_age'),
+    birthdayDate: date('birthday_date'),
+    partyDate: date('party_date').notNull(),
+    campaignEndDate: date('campaign_end_date'),
 
     // v2.0: Manual gift definition with AI artwork
     giftName: varchar('gift_name', { length: 200 }).notNull(),
+    giftDescription: text('gift_description'),
     giftImageUrl: text('gift_image_url').notNull(),
     giftImagePrompt: text('gift_image_prompt'),
     goalCents: integer('goal_cents').notNull(),
 
-    // v2.0: Karri Card is sole payout method
+    // v3.0: Karri Card or bank transfer payout
     payoutMethod: payoutMethodEnum('payout_method').notNull().default('karri_card'),
-    karriCardNumber: text('karri_card_number').notNull(),
-    karriCardHolderName: varchar('karri_card_holder_name', { length: 100 }).notNull(),
+    karriCardNumber: text('karri_card_number'),
+    karriCardHolderName: varchar('karri_card_holder_name', { length: 100 }),
+    bankName: varchar('bank_name', { length: 120 }),
+    bankAccountNumberEncrypted: text('bank_account_number_encrypted'),
+    bankAccountLast4: varchar('bank_account_last4', { length: 4 }),
+    bankBranchCode: varchar('bank_branch_code', { length: 20 }),
+    bankAccountHolder: varchar('bank_account_holder', { length: 120 }),
     payoutEmail: varchar('payout_email', { length: 255 }).notNull(),
 
-    // v2.0: WhatsApp notifications
+    // Charity split (Option A representation)
+    charityEnabled: boolean('charity_enabled').notNull().default(false),
+    charityId: uuid('charity_id').references(() => charities.id, { onDelete: 'set null' }),
+    charitySplitType: charitySplitTypeEnum('charity_split_type'),
+    charityPercentageBps: integer('charity_percentage_bps'),
+    charityThresholdCents: integer('charity_threshold_cents'),
+
+    // Notifications
     hostWhatsAppNumber: varchar('host_whatsapp_number', { length: 20 }).notNull(),
 
     // Content
@@ -133,7 +177,59 @@ export const dreamBoards = pgTable(
     partyDateIdx: index('idx_dream_boards_party_date')
       .on(table.partyDate)
       .where(sql`${table.status} = 'active'`),
+    campaignEndDateIdx: index('idx_dream_boards_campaign_end_date')
+      .on(table.campaignEndDate)
+      .where(sql`${table.status} = 'active'`),
+    charityEnabledIdx: index('idx_dream_boards_charity_enabled').on(table.charityEnabled),
+    payoutMethodIdx: index('idx_dream_boards_payout_method').on(table.payoutMethod),
     validGoal: check('valid_goal', sql`${table.goalCents} >= 2000`), // R20 minimum (kept for backward compat)
+    validDates: check(
+      'valid_dream_board_dates',
+      sql`(${table.birthdayDate} IS NULL OR ${table.partyDate} >= ${table.birthdayDate})
+      AND (${table.campaignEndDate} IS NULL OR ${table.campaignEndDate} <= ${table.partyDate})`
+    ),
+    validCharitySplitConfig: check(
+      'valid_charity_split_config',
+      sql`(
+        ${table.charityEnabled} = false
+        AND ${table.charityId} IS NULL
+        AND ${table.charitySplitType} IS NULL
+        AND ${table.charityPercentageBps} IS NULL
+        AND ${table.charityThresholdCents} IS NULL
+      )
+      OR (
+        ${table.charityEnabled} = true
+        AND ${table.charityId} IS NOT NULL
+        AND (
+          (
+            ${table.charitySplitType} = 'percentage'
+            AND ${table.charityPercentageBps} BETWEEN 500 AND 5000
+            AND ${table.charityThresholdCents} IS NULL
+          )
+          OR (
+            ${table.charitySplitType} = 'threshold'
+            AND ${table.charityThresholdCents} >= 5000
+            AND ${table.charityPercentageBps} IS NULL
+          )
+        )
+      )`
+    ),
+    validPayoutMethodData: check(
+      'valid_dream_board_payout_data',
+      sql`(
+        ${table.payoutMethod} = 'karri_card'
+        AND ${table.karriCardNumber} IS NOT NULL
+        AND ${table.karriCardHolderName} IS NOT NULL
+      )
+      OR (
+        ${table.payoutMethod} = 'bank'
+        AND ${table.bankName} IS NOT NULL
+        AND ${table.bankAccountNumberEncrypted} IS NOT NULL
+        AND ${table.bankAccountLast4} IS NOT NULL
+        AND ${table.bankBranchCode} IS NOT NULL
+        AND ${table.bankAccountHolder} IS NOT NULL
+      )`
+    ),
   })
 );
 
@@ -148,10 +244,13 @@ export const contributions = pgTable(
       .notNull()
       .references(() => dreamBoards.id, { onDelete: 'cascade' }),
     contributorName: varchar('contributor_name', { length: 100 }),
+    contributorEmail: varchar('contributor_email', { length: 255 }),
+    isAnonymous: boolean('is_anonymous').notNull().default(false),
     message: text('message'),
     amountCents: integer('amount_cents').notNull(),
     feeCents: integer('fee_cents').notNull(),
     netCents: integer('net_cents').generatedAlwaysAs(sql`(amount_cents - fee_cents)`),
+    charityCents: integer('charity_cents'),
     paymentProvider: paymentProviderEnum('payment_provider').notNull(),
     paymentRef: varchar('payment_ref', { length: 255 }).notNull(),
     paymentStatus: paymentStatusEnum('payment_status').notNull().default('pending'),
@@ -178,6 +277,11 @@ export const contributions = pgTable(
     ),
     uniquePaymentRef: uniqueIndex('unique_payment_ref').on(table.paymentProvider, table.paymentRef),
     validAmount: check('valid_amount', sql`${table.amountCents} >= 2000`),
+    validCharityAmount: check(
+      'valid_charity_amount',
+      sql`${table.charityCents} IS NULL
+      OR (${table.charityCents} >= 0 AND ${table.charityCents} <= ${table.amountCents})`
+    ),
   })
 );
 
@@ -194,6 +298,7 @@ export const payouts = pgTable(
     type: payoutTypeEnum('type').notNull(),
     grossCents: integer('gross_cents').notNull(),
     feeCents: integer('fee_cents').notNull(),
+    charityCents: integer('charity_cents').notNull().default(0),
     netCents: integer('net_cents').notNull(),
     recipientData: jsonb('recipient_data').notNull(),
     status: payoutStatusEnum('status').notNull().default('pending'),
@@ -213,7 +318,9 @@ export const payouts = pgTable(
     ),
     validAmounts: check(
       'valid_amounts',
-      sql`${table.grossCents} >= ${table.netCents} AND ${table.netCents} >= 0`
+      sql`${table.grossCents} >= ${table.netCents}
+      AND ${table.charityCents} >= 0
+      AND ${table.netCents} >= 0`
     ),
   })
 );
@@ -335,6 +442,31 @@ export const webhookEvents = pgTable(
       .on(table.status)
       .where(sql`${table.status} = 'pending'`),
     apiKeyIdx: index('idx_webhook_events_api_key').on(table.apiKeyId),
+  })
+);
+
+export const contributionReminders = pgTable(
+  'contribution_reminders',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    dreamBoardId: uuid('dream_board_id')
+      .notNull()
+      .references(() => dreamBoards.id, { onDelete: 'cascade' }),
+    email: varchar('email', { length: 255 }).notNull(),
+    remindAt: timestamp('remind_at', { withTimezone: true }).notNull(),
+    sentAt: timestamp('sent_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    dreamBoardIdx: index('idx_contribution_reminders_dream_board').on(table.dreamBoardId),
+    dueIdx: index('idx_contribution_reminders_due')
+      .on(table.remindAt)
+      .where(sql`${table.sentAt} IS NULL`),
+    uniqueReminder: uniqueIndex('unique_contribution_reminder').on(
+      table.dreamBoardId,
+      table.email,
+      table.remindAt
+    ),
   })
 );
 

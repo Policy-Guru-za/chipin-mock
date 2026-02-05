@@ -9,7 +9,7 @@ type DreamBoardApiRecord = {
   giftName: string | null;
   giftImageUrl: string | null;
   giftImagePrompt: string | null;
-  payoutMethod: 'karri_card';
+  payoutMethod: 'karri_card' | 'bank';
   goalCents: number;
   raisedCents: number;
   message: string | null;

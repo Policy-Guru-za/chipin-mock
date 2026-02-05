@@ -78,6 +78,20 @@
       "when": 1770188195119,
       "tag": "0010_update_db_views",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1770210000000,
+      "tag": "0011_add_contribution_payment_error_message",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1770220000000,
+      "tag": "0012_expand_ux_data_model",
+      "breakpoints": true
     }
   ]
 }

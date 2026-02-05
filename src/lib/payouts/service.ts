@@ -181,15 +181,21 @@ export async function createPayoutsForDreamBoard(params: {
           metadata: { calculation },
         });
 
-        await queueKarriCredit(
-          {
-            dreamBoardId: board.id,
-            karriCardNumber: board.karriCardNumber,
-            amountCents: plan.amountCents,
-            reference: created.id,
-          },
-          tx
-        );
+        if (plan.type === 'karri_card') {
+          if (!board.karriCardNumber) {
+            throw new Error('Karri card number is missing');
+          }
+
+          await queueKarriCredit(
+            {
+              dreamBoardId: board.id,
+              karriCardNumber: board.karriCardNumber,
+              amountCents: plan.amountCents,
+              reference: created.id,
+            },
+            tx
+          );
+        }
 
         await recordAuditEvent({
           actor: params.actor,
