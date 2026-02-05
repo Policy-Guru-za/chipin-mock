@@ -63,15 +63,27 @@ If you want a clean test-phase reset first, you may purge existing runtime rows 
 ### Optional: test-data purge (no backfill path)
 
 ```sql
-TRUNCATE TABLE
-  contribution_reminders,
-  karri_credit_queue,
-  payout_items,
-  payouts,
-  contributions,
-  dream_boards,
-  charities
-RESTART IDENTITY CASCADE;
+DO $$
+DECLARE
+  existing_tables TEXT;
+BEGIN
+  SELECT string_agg(format('%I', table_name), ', ')
+  INTO existing_tables
+  FROM unnest(ARRAY[
+    'contribution_reminders',
+    'karri_credit_queue',
+    'payout_items',
+    'payouts',
+    'contributions',
+    'dream_boards',
+    'charities'
+  ]) AS t(table_name)
+  WHERE to_regclass(format('public.%I', table_name)) IS NOT NULL;
+
+  IF existing_tables IS NOT NULL THEN
+    EXECUTE format('TRUNCATE TABLE %s RESTART IDENTITY CASCADE;', existing_tables);
+  END IF;
+END $$;
 ```
 
 ### Execute migration
