@@ -20,6 +20,7 @@ const childSchema = z.object({
     .min(2)
     .max(30)
     .regex(/^[a-zA-Z\s'-]+$/, 'Letters only'),
+  childAge: z.coerce.number().int().min(1).max(18),
 });
 
 async function saveChildDetailsAction(formData: FormData) {
@@ -27,9 +28,10 @@ async function saveChildDetailsAction(formData: FormData) {
 
   const session = await requireHostAuth();
   const childName = formData.get('childName');
+  const childAge = formData.get('childAge');
   const photo = formData.get('photo');
 
-  const result = childSchema.safeParse({ childName });
+  const result = childSchema.safeParse({ childName, childAge });
   if (!result.success) {
     redirect('/create/child?error=invalid');
   }
@@ -47,6 +49,7 @@ async function saveChildDetailsAction(formData: FormData) {
     }
     await saveDreamBoardDraft(session.hostId, {
       childName: result.data.childName,
+      childAge: result.data.childAge,
       childPhotoUrl: upload.url,
       photoFilename: upload.filename,
     });
@@ -158,6 +161,22 @@ export default async function CreateChildPage({
                 required
               />
               <p className="text-xs text-text-muted">Max 5MB. JPG, PNG, or WebP.</p>
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="childAge" className="text-sm font-medium text-text">
+                Age turning this birthday
+              </label>
+              <Input
+                id="childAge"
+                name="childAge"
+                type="number"
+                min={1}
+                max={18}
+                step={1}
+                placeholder="e.g. 7"
+                required
+                defaultValue={draft?.childAge ?? ''}
+              />
             </div>
             <Button type="submit">Continue to gift</Button>
           </form>

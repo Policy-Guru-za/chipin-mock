@@ -4,7 +4,10 @@ const DRAFT_EXPIRY_SECONDS = 60 * 60 * 24 * 7;
 
 export type DreamBoardDraftInput = {
   childName?: string;
+  childAge?: number;
+  birthdayDate?: string;
   partyDate?: string;
+  campaignEndDate?: string;
   childPhotoUrl?: string;
   photoFilename?: string;
   giftName?: string;
@@ -12,16 +15,30 @@ export type DreamBoardDraftInput = {
   giftImageUrl?: string;
   giftImagePrompt?: string;
   goalCents?: number;
+  payoutMethod?: 'karri_card' | 'bank';
   payoutEmail?: string;
   karriCardNumberEncrypted?: string;
   karriCardHolderName?: string;
+  bankName?: string;
+  bankAccountNumberEncrypted?: string;
+  bankAccountLast4?: string;
+  bankBranchCode?: string;
+  bankAccountHolder?: string;
+  charityEnabled?: boolean;
+  charityId?: string;
+  charitySplitType?: 'percentage' | 'threshold';
+  charityPercentageBps?: number;
+  charityThresholdCents?: number;
   hostWhatsAppNumber?: string;
   message?: string;
 };
 
 export type DreamBoardDraft = {
   childName?: string;
+  childAge?: number;
+  birthdayDate?: string;
   partyDate?: string;
+  campaignEndDate?: string;
   childPhotoUrl?: string;
   photoFilename?: string;
   giftName?: string;
@@ -29,9 +46,20 @@ export type DreamBoardDraft = {
   giftImageUrl?: string;
   giftImagePrompt?: string;
   goalCents?: number;
+  payoutMethod?: 'karri_card' | 'bank';
   payoutEmail?: string;
   karriCardNumberEncrypted?: string;
   karriCardHolderName?: string;
+  bankName?: string;
+  bankAccountNumberEncrypted?: string;
+  bankAccountLast4?: string;
+  bankBranchCode?: string;
+  bankAccountHolder?: string;
+  charityEnabled?: boolean;
+  charityId?: string;
+  charitySplitType?: 'percentage' | 'threshold';
+  charityPercentageBps?: number;
+  charityThresholdCents?: number;
   hostWhatsAppNumber?: string;
   message?: string;
   updatedAt: string;

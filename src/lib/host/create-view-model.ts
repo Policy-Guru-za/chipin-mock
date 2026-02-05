@@ -63,19 +63,26 @@ const getGoalLabel = (draft?: DreamBoardDraft) => {
 };
 
 const isChildComplete = (draft?: DreamBoardDraft | null) =>
-  [draft?.childName, draft?.childPhotoUrl].every(Boolean);
+  [draft?.childName, draft?.childPhotoUrl, draft?.childAge].every(Boolean);
 
 const isGiftComplete = (draft?: DreamBoardDraft | null) =>
   [draft?.giftName, draft?.giftImageUrl, draft?.goalCents].every(Boolean);
 
 const isDetailsComplete = (draft?: DreamBoardDraft | null) =>
-  [
-    draft?.payoutEmail,
-    draft?.partyDate,
-    draft?.karriCardNumberEncrypted,
-    draft?.karriCardHolderName,
-    draft?.hostWhatsAppNumber,
-  ].every(Boolean);
+  Boolean(
+    draft?.payoutEmail &&
+      draft?.birthdayDate &&
+      draft?.partyDate &&
+      draft?.campaignEndDate &&
+      draft?.hostWhatsAppNumber &&
+      ((draft?.payoutMethod ?? 'karri_card') === 'karri_card'
+        ? draft?.karriCardNumberEncrypted && draft?.karriCardHolderName
+        : draft?.bankName &&
+            draft?.bankAccountNumberEncrypted &&
+            draft?.bankAccountLast4 &&
+            draft?.bankBranchCode &&
+            draft?.bankAccountHolder)
+  );
 
 const getCompletionState = (draft?: DreamBoardDraft | null) => ({
   childComplete: isChildComplete(draft),

@@ -5,6 +5,7 @@ import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
 
 const baseDraft: DreamBoardDraft = {
   childName: 'Maya',
+  childAge: 7,
   partyDate: '2026-02-01',
   childPhotoUrl: 'https://example.com/child.jpg',
   updatedAt: '2026-01-01T00:00:00.000Z',

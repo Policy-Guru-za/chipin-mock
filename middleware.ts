@@ -17,6 +17,7 @@ const isPublicRoute = createRouteMatcher([
   '/api/v1(.*)',
   '/v1(.*)',
   '/api/internal/contributions/create', // Public guest checkout endpoint; do not add job-secret auth.
+  '/api/internal/contributions/reminders', // Public guest reminder scheduling endpoint.
   // Job-secret endpoints (must enforce INTERNAL_JOB_SECRET in handler):
   '/api/internal/webhooks/process',
   '/api/internal/retention/run',

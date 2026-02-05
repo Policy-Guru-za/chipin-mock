@@ -36,15 +36,39 @@ async function createDreamBoardAction() {
       hostId: session.hostId,
       slug,
       childName: parsed.data.childName,
+      childAge: parsed.data.childAge,
       childPhotoUrl: parsed.data.childPhotoUrl,
+      birthdayDate: parsed.data.birthdayDate,
       partyDate: parsed.data.partyDate,
+      campaignEndDate: parsed.data.campaignEndDate,
       giftName: parsed.data.giftName,
+      giftDescription: parsed.data.giftDescription,
       giftImageUrl: parsed.data.giftImageUrl,
       giftImagePrompt: parsed.data.giftImagePrompt,
       goalCents: parsed.data.goalCents,
-      payoutMethod: 'karri_card',
-      karriCardNumber: parsed.data.karriCardNumberEncrypted,
-      karriCardHolderName: parsed.data.karriCardHolderName,
+      payoutMethod: parsed.data.payoutMethod,
+      karriCardNumber:
+        parsed.data.payoutMethod === 'karri_card' ? parsed.data.karriCardNumberEncrypted : null,
+      karriCardHolderName:
+        parsed.data.payoutMethod === 'karri_card' ? parsed.data.karriCardHolderName : null,
+      bankName: parsed.data.payoutMethod === 'bank' ? (parsed.data.bankName ?? null) : null,
+      bankAccountNumberEncrypted:
+        parsed.data.payoutMethod === 'bank' ? (parsed.data.bankAccountNumberEncrypted ?? null) : null,
+      bankAccountLast4:
+        parsed.data.payoutMethod === 'bank' ? (parsed.data.bankAccountLast4 ?? null) : null,
+      bankBranchCode:
+        parsed.data.payoutMethod === 'bank' ? (parsed.data.bankBranchCode ?? null) : null,
+      bankAccountHolder:
+        parsed.data.payoutMethod === 'bank' ? (parsed.data.bankAccountHolder ?? null) : null,
+      charityEnabled: parsed.data.charityEnabled ?? false,
+      charityId: parsed.data.charityEnabled ? (parsed.data.charityId ?? null) : null,
+      charitySplitType: parsed.data.charityEnabled ? (parsed.data.charitySplitType ?? null) : null,
+      charityPercentageBps: parsed.data.charityEnabled
+        ? (parsed.data.charityPercentageBps ?? null)
+        : null,
+      charityThresholdCents: parsed.data.charityEnabled
+        ? (parsed.data.charityThresholdCents ?? null)
+        : null,
       hostWhatsAppNumber: parsed.data.hostWhatsAppNumber,
       message: parsed.data.message,
       payoutEmail: parsed.data.payoutEmail,

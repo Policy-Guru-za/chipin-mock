@@ -20,4 +20,9 @@ describe('middleware public routes', () => {
     const middleware = readSource('middleware.ts');
     expect(middleware).toContain("'/api/internal/contributions/create'");
   });
+
+  it('allowlists guest contribution reminder endpoint', () => {
+    const middleware = readSource('middleware.ts');
+    expect(middleware).toContain("'/api/internal/contributions/reminders'");
+  });
 });

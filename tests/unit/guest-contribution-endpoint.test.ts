@@ -9,12 +9,17 @@ describe('guest contribution endpoint', () => {
   it('remains allowlisted in middleware', () => {
     const middleware = readSource('middleware.ts');
     expect(middleware).toContain("'/api/internal/contributions/create'");
+    expect(middleware).toContain("'/api/internal/contributions/reminders'");
   });
 
   it('is not gated by job-secret auth', () => {
     const handler = readSource('src/app/api/internal/contributions/create/route.ts');
     expect(handler).not.toContain('INTERNAL_JOB_SECRET');
     expect(handler).not.toContain('requireInternalJobAuth');
+
+    const remindersHandler = readSource('src/app/api/internal/contributions/reminders/route.ts');
+    expect(remindersHandler).not.toContain('INTERNAL_JOB_SECRET');
+    expect(remindersHandler).not.toContain('requireInternalJobAuth');
   });
 
   it('persists the contribution before creating the payment intent', () => {
