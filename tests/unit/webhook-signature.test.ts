@@ -22,8 +22,8 @@ describe('webhook signatures', () => {
     const signature = generateWebhookSignature(payload, secret, timestamp);
     const headers = buildWebhookHeaders(payload, secret, 'evt-1');
 
-    expect(headers['X-Gifta-Signature']).toBe(`t=${timestamp},v1=${signature}`);
-    expect(headers['X-Gifta-Event-Id']).toBe('evt-1');
+    expect(headers['X-ChipIn-Signature']).toBe(`t=${timestamp},v1=${signature}`);
+    expect(headers['X-ChipIn-Event-Id']).toBe('evt-1');
   });
 
   it('generates an event id when one is not provided', () => {
@@ -33,7 +33,7 @@ describe('webhook signatures', () => {
 
     const headers = buildWebhookHeaders(payload, secret);
 
-    expect(headers['X-Gifta-Event-Id']).toBe('generated-id');
+    expect(headers['X-ChipIn-Event-Id']).toBe('generated-id');
     uuidSpy.mockRestore();
   });
 

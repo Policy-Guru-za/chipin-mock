@@ -19,7 +19,7 @@ export const buildWebhookHeaders = (
 
   return {
     'Content-Type': 'application/json',
-    'X-Gifta-Signature': `t=${timestamp},v1=${signature}`,
-    'X-Gifta-Event-Id': eventId ?? crypto.randomUUID(),
+    'X-ChipIn-Signature': `t=${timestamp},v1=${signature}`,
+    'X-ChipIn-Event-Id': eventId ?? crypto.randomUUID(),
   };
 };

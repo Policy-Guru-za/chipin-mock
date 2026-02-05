@@ -561,10 +561,12 @@ Gifta pushes events to registered webhook endpoints.
 
 ### Webhook Signature Verification
 
-All webhook requests include a signature header:
+All webhook requests include a signature header.
+
+Note: the current implementation still uses legacy header naming (`X-ChipIn-*`) even though the product name is Gifta.
 
 ```http
-X-Gifta-Signature: t=1706140800,v1=abc123...
+X-ChipIn-Signature: t=1706140800,v1=abc123...
 ```
 
 **Verification Process:**
