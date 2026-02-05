@@ -1,6 +1,8 @@
-# Codebase Forensic Review (Gifta/ChipIn)
+# Codebase Forensic Review (Gifta)
 
 Last updated: 2026-02-05
+
+Note: this report describes “as-built” code reality at the time of writing and calls out docs drift. If you have since synced docs, re-validate the referenced drift items.
 
 Compaction-safe entrypoints:
 - Audit state + findings: `docs/forensic-audit/STATE.md`
@@ -25,7 +27,7 @@ Top confirmed risks (see IDs in `STATE.md`):
 - **F-001 Guest privacy**: docs say “% only”; guest UI renders exact ZAR totals.
 - **F-003 Webhook events**: catalog supports many events; runtime emits only 2.
 - **F-006 Seed/demo**: seed data violates encryption expectations and uses inconsistent webhook event naming.
-- **F-007 Branding**: runtime metadata is “Gifta”; most specs and docs are “ChipIn”.
+- **F-007 Branding**: runtime metadata is “Gifta”; some docs used legacy “ChipIn” naming.
 
 ## 2) Tech stack (as implemented)
 
@@ -309,5 +311,4 @@ P1 (product + partner trust):
 
 P2 (hygiene):
 - Fix seed/demo data to respect encryption + correct webhook event naming/payload shape.
-- Unify branding (Gifta vs ChipIn) across metadata, docs, OpenAPI.
-
+- Unify branding (Gifta vs legacy ChipIn surfaces) across metadata, docs, OpenAPI.

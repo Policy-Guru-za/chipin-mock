@@ -3,7 +3,7 @@
 export const openApiSpec = {
   openapi: '3.0.3',
   info: {
-    title: 'ChipIn Public API',
+    title: 'Gifta Public API',
     version: '1.0.0',
     description: 'Partner API for Dream Boards, contributions, payouts, and webhooks.',
   },
@@ -1021,7 +1021,8 @@ export const openApiSpec = {
         properties: {
           id: {
             type: 'string',
-            example: 'db_abc123',
+            format: 'uuid',
+            example: '0f3b3f3e-1a2b-4c5d-8e9f-0123456789ab',
           },
           slug: {
             type: 'string',

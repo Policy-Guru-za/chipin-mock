@@ -1,4 +1,4 @@
-# ChipIn Product Specification
+# Gifta Product Specification
 
 > **Version:** 2.0.0  
 > **Last Updated:** February 2026  
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-ChipIn is a **social coordination tool** for birthday gifting that transforms chaotic cash requests into meaningful contributions toward a child's dream gift.
+Gifta is a **social coordination tool** for birthday gifting that transforms chaotic cash requests into meaningful contributions toward a child's dream gift.
 
 **The One-Sentence Pitch:**
 > Friends chip in together to turn birthday clutter into one dream gift.
@@ -34,9 +34,9 @@ Parents face three acute pain points around birthday gifts:
 
 ## The Solution
 
-ChipIn provides a **Dream Board** — a single, specific gift goal that guests contribute toward. The psychological reframe is critical:
+Gifta provides a **Dream Board** — a single, specific gift goal that guests contribute toward. The psychological reframe is critical:
 
-| Old Framing | ChipIn Framing |
+| Old Framing | Gifta Framing |
 |-------------|----------------|
 | "Please give us cash" | "Contribute to Maya's Dream Bike Fund" |
 | Feels greedy | Feels personal and intentional |
@@ -66,11 +66,11 @@ All funds are credited to the host's Karri Card. This creates:
 - Parent controls how to use the funds
 
 ### 5. API-First Architecture
-ChipIn exposes APIs that partners integrate with — not the reverse. We control the product; partners adapt to us.
+Gifta exposes APIs that partners integrate with — not the reverse. We control the product; partners adapt to us.
 
 ### 6. Privacy by Default
 - Child's first name only (no surnames)
-- Contribution amounts not displayed publicly
+- Individual contribution amounts not displayed publicly (aggregate progress may show totals)
 - Contributor names optional
 - No class roster uploads (POPIA compliance)
 
@@ -87,11 +87,11 @@ ChipIn exposes APIs that partners integrate with — not the reverse. We control
 | Karri Card Setup | Host provides Karri Card details during creation | P0 |
 | WhatsApp Number | Host provides WhatsApp for notifications | P0 |
 | Shareable Link Generation | Unique URL for distribution via any channel | P0 |
-| Guest Contribution Flow | Mobile web experience showing % funded (not Rands) | P0 |
+| Guest Contribution Flow | Mobile web experience showing % funded + totals raised vs goal | P0 |
 | Payment Processing | Accept contributions via PayFast, Ozow, SnapScan | P0 |
 | Contribution Tracking | Progress bar (%), contributor list (names only) | P0 |
 | WhatsApp Notifications | Alert host on contributions and payout | P0 |
-| Pot Closure & Payout | Automatic on party date, daily batch Karri credit | P0 |
+| Pot Closure & Payout | Close via partner API; Karri credit via internal batch job (external scheduler required) | P0 |
 | Host Dashboard | View Rand amounts, manage Dream Board | P0 |
 
 ### Post-MVP Features (v1.x)
@@ -159,9 +159,9 @@ ChipIn exposes APIs that partners integrate with — not the reverse. We control
 
 ## Competitive Positioning
 
-ChipIn occupies a unique position: **purpose-built for parents** + **seamless local payments**.
+Gifta occupies a unique position: **purpose-built for parents** + **seamless local payments**.
 
-| Competitor | Position | ChipIn Advantage |
+| Competitor | Position | Gifta Advantage |
 |------------|----------|------------------|
 | Evite | Legacy digital invites | No SA payments, heavy ads, dated |
 | Partiful | Gen Z party pages | Nightlife focus, no parent features |
@@ -218,7 +218,7 @@ ChipIn occupies a unique position: **purpose-built for parents** + **seamless lo
 
 ### Phase 3: Partnerships (Months 7-12)
 - School partnerships (if Karri relationship develops)
-- Venue partnerships (party venues offer ChipIn to customers)
+- Venue partnerships (party venues offer Gifta to customers)
 - Influencer seeding (parenting bloggers/instagrammers)
 
 ---
@@ -255,7 +255,7 @@ ChipIn occupies a unique position: **purpose-built for parents** + **seamless lo
 | **Host** | The parent creating the Dream Board |
 | **Guest** | A party invitee who may contribute |
 | **Payout** | The disbursement of pot funds (credited to host's Karri Card) |
-| **Party Date** | The birthday party date, also serves as automatic pot close date |
+| **Party Date** | The birthday party date (used for UX and ops views). Pots are closed explicitly via API; no auto-close scheduler exists in-repo. |
 
 ---
 

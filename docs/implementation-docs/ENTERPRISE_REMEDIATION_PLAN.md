@@ -1,4 +1,6 @@
-# ChipIn Enterprise Remediation Plan (2026-02-04)
+# Gifta Enterprise Remediation Plan (2026-02-04)
+
+> **Status note (2026-02-05):** planning document. Use as reference; it is not guaranteed to match the current shipped behavior.
 
 Audience: GPT-5.2 Codex coding agent (main-only, pnpm-only).  
 Goal: eliminate known correctness/security/ops/doc/tooling issues; align docs ↔ runtime; raise quality gates to “enterprise-grade”.
@@ -171,7 +173,7 @@ KARRI_API_KEY=""
 # Email
 RESEND_API_KEY=""
 RESEND_FROM_EMAIL="noreply@chipin.co.za"
-RESEND_FROM_NAME="ChipIn"
+RESEND_FROM_NAME="Gifta"
 
 # WhatsApp
 WHATSAPP_BUSINESS_API_URL=""

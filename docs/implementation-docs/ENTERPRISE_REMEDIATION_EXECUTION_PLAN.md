@@ -1,5 +1,7 @@
 # Enterprise Remediation Execution Plan (Sequenced)
 
+> **Status note (2026-02-05):** execution plan. Use as reference; sequencing/decisions may not match the current shipped behavior.
+
 Audience: Delivery team / coding agent on `main` (pnpm only).  
 Scope: Implement workstreams **C → D → F → E → G → B2 → H**, then **A** last.  
 Policy decisions confirmed:

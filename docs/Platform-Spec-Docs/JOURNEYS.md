@@ -1,4 +1,4 @@
-# ChipIn User Journeys
+# Gifta User Journeys
 
 > **Version:** 2.0.0  
 > **Last Updated:** February 2026  
@@ -8,7 +8,7 @@
 
 ## Overview
 
-ChipIn has two primary user journeys:
+Gifta has two primary user journeys:
 
 1. **Host Journey** — Creating and managing a Dream Board
 2. **Guest Journey** — Viewing and contributing to a Dream Board
@@ -18,9 +18,11 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 **Key Changes in v2.0:**
 - Gift is defined manually by parent (not from Takealot catalog)
 - AI generates whimsical artwork for the gift
-- Guests see % funded only (not Rand amounts)
+- Guests see % funded + totals raised vs goal (no individual contribution amounts)
 - Karri Card is the sole payout method
 - WhatsApp notifications throughout the journey
+
+**URL note:** this doc uses `<APP_DOMAIN>` as a placeholder for the deployed app domain (derived from `NEXT_PUBLIC_APP_URL`).
 
 ---
 
@@ -39,7 +41,7 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 
 ### Step 1: Landing & Call to Action
 
-**URL:** `chipin.co.za`
+**URL:** `<APP_DOMAIN>`
 
 **Screen Elements:**
 - Hero headline: "Turn 20 toys into one dream gift"
@@ -56,7 +58,7 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 
 ### Step 2: Authentication (Clerk)
 
-**URL:** `chipin.co.za/sign-in`
+**URL:** `<APP_DOMAIN>/sign-in`
 
 **Screen Elements:**
 - Clerk sign-in form (email + OTP or password, depending on enabled providers)
@@ -75,7 +77,7 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 
 ### Step 3: Child Details
 
-**URL:** `chipin.co.za/create/child`
+**URL:** `<APP_DOMAIN>/create/child`
 
 **Screen Elements:**
 - Progress indicator: Step 1 of 4
@@ -113,7 +115,7 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 
 ### Step 4: Dream Gift Definition
 
-**URL:** `chipin.co.za/create/gift`
+**URL:** `<APP_DOMAIN>/create/gift`
 
 **Screen Elements:**
 - Progress indicator: Step 2 of 4
@@ -184,7 +186,7 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 
 ### Step 5: Payout & Contact Details
 
-**URL:** `chipin.co.za/create/details`
+**URL:** `<APP_DOMAIN>/create/details`
 
 **Screen Elements:**
 - Progress indicator: Step 3 of 4
@@ -253,7 +255,7 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 
 ### Step 6: Review & Share
 
-**URL:** `chipin.co.za/create/review`
+**URL:** `<APP_DOMAIN>/create/review`
 
 **Screen Elements:**
 - Progress indicator: Step 4 of 4
@@ -281,7 +283,7 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 └─────────────────────────────────┘
 ```
 
-**Note:** Guests see percentage funded only. Rand amounts are visible to host only.
+**Note:** Guests see percentage funded and totals raised vs goal. Individual contribution amounts are visible to the host only.
 
 **Actions:**
 - "Edit" links next to each section (→ back to respective step)
@@ -297,7 +299,7 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 
 **Post-Creation Screen:**
 
-**URL:** `chipin.co.za/dashboard/{dreamBoardId}` (or `/success`)
+**URL:** `<APP_DOMAIN>/dashboard/{dreamBoardId}` (or `/success`)
 
 **Screen Elements:**
 - 🎉 "Your Dream Board is live!"
@@ -314,7 +316,7 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 
 Help fund Maya's dream gift — a Mountain Bike with Bells!
 
-👉 chipin.co.za/maya-7th-birthday-abc123
+👉 <APP_DOMAIN>/maya-7th-birthday-abc123
 
 Every contribution helps! 💝
 ```
@@ -324,7 +326,7 @@ Every contribution helps! 💝
 🎉 Your Dream Board is live!
 
 Share this link with party guests:
-chipin.co.za/maya-7th-birthday-abc123
+<APP_DOMAIN>/maya-7th-birthday-abc123
 
 You'll receive notifications when friends chip in.
 ```
@@ -335,7 +337,7 @@ You'll receive notifications when friends chip in.
 
 ### Dashboard View
 
-**URL:** `chipin.co.za/dashboard`
+**URL:** `<APP_DOMAIN>/dashboard`
 
 **Screen Elements:**
 - List of host's Dream Boards
@@ -352,7 +354,7 @@ You'll receive notifications when friends chip in.
 
 ### Management Screen
 
-**URL:** `chipin.co.za/dashboard/{dreamBoardId}`
+**URL:** `<APP_DOMAIN>/dashboard/{dreamBoardId}`
 
 **Tabs/Sections:**
 
@@ -402,7 +404,7 @@ You'll receive notifications when friends chip in.
 
 **Context:** Guest receives link via WhatsApp, SMS, email, etc.
 
-**Link Format:** `chipin.co.za/maya-7th-birthday-abc123`
+**Link Format:** `<APP_DOMAIN>/maya-7th-birthday-abc123`
 
 **User Action:** Taps link
 
@@ -412,7 +414,7 @@ You'll receive notifications when friends chip in.
 
 ### Step 2: View Dream Board
 
-**URL:** `chipin.co.za/{slug}`
+**URL:** `<APP_DOMAIN>/{slug}`
 
 **Screen Elements:**
 
@@ -451,7 +453,7 @@ You'll receive notifications when friends chip in.
 └─────────────────────────────────────┘
 ```
 
-**Note:** Guests see percentage funded only (not Rand amounts). This creates social proof without money awkwardness.
+**Note:** Guests see percentage funded and aggregate totals raised vs goal. Individual contribution amounts remain private.
 
 **Key Design Principles:**
 - Mobile-first (designed for phone screens)
@@ -518,7 +520,7 @@ You'll receive notifications when friends chip in.
 - Message: Shown to host only
 
 **Fee Display:**
-- Before payment: "A 3% fee (R6) supports ChipIn"
+- Before payment: "A 3% fee (R6) supports Gifta"
 - Or integrate into amount: "R106 total (includes R6 fee)"
 
 **User Action:** Selects amount, optionally adds name/message, clicks "Continue to Payment"
@@ -540,13 +542,13 @@ You'll receive notifications when friends chip in.
 1. Redirect to PayFast hosted page
 2. User enters card details or selects EFT
 3. Payment processed
-4. Redirect back to ChipIn
+4. Redirect back to Gifta
 
 **Ozow Flow:**
 1. Redirect to Ozow bank selection
 2. User selects bank, logs in
 3. Approves payment
-4. Redirect back to ChipIn
+4. Redirect back to Gifta
 
 **SnapScan Flow:**
 1. Display QR code
@@ -554,13 +556,13 @@ You'll receive notifications when friends chip in.
 3. Approves in app
 4. Webhook confirms, page updates
 
-**Return URL:** `chipin.co.za/{slug}/thanks?ref={paymentRef}`
+**Return URL:** `<APP_DOMAIN>/{slug}/thanks?ref={paymentRef}`
 
 ---
 
 ### Step 5: Thank You & Share
 
-**URL:** `chipin.co.za/{slug}/thanks`
+**URL:** `<APP_DOMAIN>/{slug}/thanks`
 
 **Success Screen:**
 ```
@@ -611,7 +613,7 @@ You'll receive notifications when friends chip in.
 
 ### Dream Board Not Found
 
-**URL:** `chipin.co.za/invalid-slug`
+**URL:** `<APP_DOMAIN>/invalid-slug`
 
 **Screen:**
 ```
@@ -656,7 +658,7 @@ You'll receive notifications when friends chip in.
 
 ### Payment Failed
 
-**Return URL:** `chipin.co.za/{slug}/payment-failed`
+**Return URL:** `<APP_DOMAIN>/{slug}/payment-failed`
 
 **Screen:**
 ```

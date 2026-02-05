@@ -1,5 +1,7 @@
 # Clerk Migration Execution Plan (6 Stages)
 
+> **Status note (2026-02-05):** historical execution plan. The shipped app uses Clerk (`@clerk/nextjs`) without an `AUTH_CLERK_ENABLED` feature flag gate.
+
 ## Purpose
 Translate `CLERK_MIGRATION_PLAN.md` into an execution-ready, staged program with clear gates, rollback safety, and review checkpoints for a main-only repo.
 

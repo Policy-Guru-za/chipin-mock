@@ -1,4 +1,4 @@
-# ChipIn Payment Flows
+# Gifta Payment Flows
 
 > **Version:** 1.0.0  
 > **Last Updated:** January 28, 2026  
@@ -8,14 +8,14 @@
 
 ## Overview
 
-ChipIn processes payments through South African payment providers. This document specifies the complete payment lifecycle from contribution to payout.
+Gifta processes payments through South African payment providers. This document specifies the complete payment lifecycle from contribution to payout.
 
-### Core Principle: ChipIn Never Holds Funds
+### Core Principle: Gifta Never Holds Funds
 
 ```
 Guest contributes → Payment Provider holds funds → Pot closes → Payout executed
                     ↑                                          ↓
-                    └── ChipIn never touches the money ────────┘
+                    └── Gifta never touches the money ────────┘
 ```
 
 This architecture:
@@ -56,7 +56,7 @@ This architecture:
 
 ```
 ┌──────┐     ┌──────┐     ┌──────────┐     ┌────────┐
-│Guest │     │ChipIn│     │  Provider │     │Webhook │
+│Guest │     │Gifta │     │  Provider │     │Webhook │
 └──┬───┘     └──┬───┘     └────┬─────┘     └───┬────┘
    │            │              │               │
    │ Select     │              │               │
@@ -101,19 +101,20 @@ Guest selects amount and optional details on the contribution page.
 const response = await fetch('/api/internal/contributions/create', {
   method: 'POST',
   body: JSON.stringify({
-    dreamBoardId: 'db_abc123',
-    amountCents: 20000,
+    dreamBoardId: '0f3b3f3e-1a2b-4c5d-8e9f-0123456789ab', // UUID
+    contributionCents: 20000,
     contributorName: 'Sarah M.',
     message: 'Happy birthday!',
     paymentProvider: 'payfast',
   }),
 });
 
-const { redirectUrl } = await response.json();
-window.location.href = redirectUrl;
+const intent = await response.json();
+// PayFast returns a hosted-form intent; Ozow returns a redirect; SnapScan returns a QR payload.
+// The client should branch on intent.mode + intent.provider.
 ```
 
-#### 2. ChipIn Creates Payment Request
+#### 2. Gifta Creates Payment Request
 
 **Backend Action:**
 ```typescript
@@ -122,8 +123,8 @@ async function createContribution(input: CreateContributionInput) {
   // 1. Create contribution record (pending)
   const contribution = await db.insert(contributions).values({
     dreamBoardId: input.dreamBoardId,
-    amountCents: input.amountCents,
-    feeCents: calculateFee(input.amountCents),
+    amountCents: input.contributionCents,
+    feeCents: calculateTotalWithFee(input.contributionCents) - input.contributionCents,
     contributorName: input.contributorName,
     message: input.message,
     paymentProvider: input.paymentProvider,
@@ -133,19 +134,19 @@ async function createContribution(input: CreateContributionInput) {
     userAgent: input.userAgent,
   }).returning();
 
-  // 2. Create payment with provider
-  const provider = getPaymentProvider(input.paymentProvider);
-  const payment = await provider.createPayment({
-    amount: input.amountCents,
+  // 2. Create payment intent with provider
+  const intent = await createPaymentIntent(input.paymentProvider, {
+    amountCents: contribution.amountCents + contribution.feeCents,
     reference: contribution.paymentRef,
-    description: `Contribution to ${dreamBoard.childName}'s Dream Gift`,
-    returnUrl: `${BASE_URL}/${dreamBoard.slug}/thanks?ref=${contribution.paymentRef}`,
-    cancelUrl: `${BASE_URL}/${dreamBoard.slug}?cancelled=true`,
+    contributionId: contribution.id,
+    description: `Contribution to ${dreamBoard.childName}'s Dream Board`,
+    returnUrl: `${BASE_URL}/${dreamBoard.slug}/thanks?ref=${contribution.paymentRef}&provider=${input.paymentProvider}`,
+    cancelUrl: `${BASE_URL}/${dreamBoard.slug}?cancelled=1&provider=${input.paymentProvider}`,
     notifyUrl: `${BASE_URL}/api/webhooks/${input.paymentProvider}`,
-    customerEmail: input.email,
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
   });
 
-  return { redirectUrl: payment.redirectUrl };
+  return intent;
 }
 ```
 
@@ -158,7 +159,7 @@ Guest is redirected to provider's hosted payment page:
 
 #### 4. Provider Sends Webhook
 
-Provider sends notification to ChipIn webhook endpoint.
+Provider sends notification to Gifta webhook endpoint.
 
 **PayFast ITN Example:**
 ```
@@ -175,7 +176,7 @@ amount_net=194.20
 signature=abc123...
 ```
 
-#### 5. ChipIn Processes Webhook
+#### 5. Gifta Processes Webhook
 
 ```typescript
 // In /api/webhooks/payfast
@@ -239,7 +240,7 @@ function calculateFee(amountCents: number): number {
 
 ### Fee Breakdown
 
-| Contribution | Our Fee (3%) | Provider Fee (~2.5%) | Net to ChipIn |
+| Contribution | Our Fee (3%) | Provider Fee (~2.5%) | Net to Gifta |
 |--------------|--------------|---------------------|---------------|
 | R100 | R3 (min) | ~R2.50 | ~R0.50 |
 | R200 | R6 | ~R5 | ~R1 |
@@ -251,7 +252,7 @@ function calculateFee(amountCents: number): number {
 Before payment:
 ```
 Contribution: R200
-ChipIn fee (3%): R6
+Gifta fee (3%): R6
 Total: R206
 ```
 
@@ -720,7 +721,7 @@ SNAPSCAN_SNAPCODE=your_snapcode
 SNAPSCAN_API_KEY=your_api_key
 SNAPSCAN_WEBHOOK_AUTH_KEY=your_webhook_auth_key
 
-# ChipIn
+# Gifta
 CHIPIN_FEE_PERCENTAGE=0.03
 CHIPIN_MIN_CONTRIBUTION_CENTS=2000
 CHIPIN_MAX_CONTRIBUTION_CENTS=1000000

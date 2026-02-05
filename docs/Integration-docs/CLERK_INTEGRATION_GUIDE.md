@@ -2,6 +2,8 @@
 
 ## For AI Coding Agents: Enterprise-Grade SaaS Authentication Implementation
 
+> Repo note (2026-02-05): this is a general Clerk reference guide. The current app uses Clerk for auth, but does not implement Clerk webhooks in `src/` (so `CLERK_WEBHOOK_SIGNING_SECRET` is not used by the runtime).
+
 **Version:** 1.0  
 **Focus Area:** Complete Authentication + Multi-Tenancy (Organizations) System  
 **Target:** Production SaaS Application (Next.js Primary)

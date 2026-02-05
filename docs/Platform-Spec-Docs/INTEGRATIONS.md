@@ -1,4 +1,4 @@
-# ChipIn Third-Party Integrations
+# Gifta Third-Party Integrations
 
 > **Version:** 2.0.0  
 > **Last Updated:** February 2026  
@@ -8,19 +8,19 @@
 
 ## Overview
 
-ChipIn integrates with external services for payments, payouts, notifications, and AI image generation. This document specifies the integration patterns and requirements.
+Gifta integrates with external services for payments, payouts, notifications, and AI image generation. This document specifies the integration patterns and requirements.
 
 ### Integration Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                         ChipIn Platform                         │
+│                         Gifta Platform                          │
 │  ┌──────────────────────────────────────────────────────────┐  │
 │  │                     Core Application                      │  │
 │  │   Dream Boards │ Contributions │ Payouts │ Users          │  │
 │  └──────────────────────────────────────────────────────────┘  │
 │                              │                                  │
-│                     ChipIn Public API                          │
+│                     Gifta Public API                           │
 │                              │                                  │
 └──────────────────────────────┼──────────────────────────────────┘
                                │
@@ -182,7 +182,7 @@ Funds will be credited to your Karri Card ending in {{card_last4}} within 24 hou
 ```
 ✅ R{{amount}} has been credited to your Karri Card ending in {{card_last4}}.
 
-Thank you for using ChipIn! 🎁
+Thank you for using Gifta! 🎁
 ```
 
 ### Interface
@@ -256,8 +256,8 @@ Credit pooled funds to the host's Karri Card. This is the **sole payout method**
 ┌─────────────────────────────────────────────────────────────────┐
 │                     Payout Queue                                │
 │                                                                 │
-│   Closed Pot ──► karri_credit_queue ──► Daily Batch Job        │
-│                  (Status: pending)      (6 AM SAST)             │
+│   Closed Pot ──► karri_credit_queue ──► Batch Job Endpoint     │
+│                  (Status: pending)      (external scheduler)    │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -272,11 +272,17 @@ Credit pooled funds to the host's Karri Card. This is the **sole payout method**
 ### Environment Variables
 
 ```bash
-KARRI_API_URL=""
+KARRI_BASE_URL=""
 KARRI_API_KEY=""
 KARRI_BATCH_ENABLED="true"
-KARRI_BATCH_SCHEDULE="0 6 * * *"  # 6 AM SAST daily
+KARRI_AUTOMATION_ENABLED="false"  # optional: enable automated payout execution
+
+# Internal job endpoints auth
+INTERNAL_JOB_SECRET=""
 ```
+
+Scheduling note:
+- This repo does not configure cron. Use an external scheduler (e.g. Vercel Cron) to call `POST /api/internal/karri/batch` with `Authorization: Bearer ${INTERNAL_JOB_SECRET}`.
 
 ### Interface
 
@@ -381,7 +387,7 @@ Email remains for:
 ```bash
 RESEND_API_KEY=""
 RESEND_FROM_EMAIL="noreply@chipin.co.za"
-RESEND_FROM_NAME="ChipIn"
+RESEND_FROM_NAME="Gifta"
 ```
 
 No changes to existing email implementation.

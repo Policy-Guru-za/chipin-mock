@@ -1,5 +1,7 @@
 # Clerk Migration Plan (Magic Link Removal)
 
+> **Status note (2026-02-05):** historical migration plan. The shipped app uses Clerk (`@clerk/nextjs`) and does not ship magic-link authentication.
+
 ## Decisions Captured
 - Auth system will be **fully replaced** by Clerk (no magic link flows remain).
 - **Sign-in UX:** Clerk prebuilt pages at `/sign-in` and `/sign-up`.
@@ -57,7 +59,7 @@
 ### Phase 2 — Clerk Provider & Auth Pages
 4. **Add `ClerkProvider` in `src/app/layout.tsx`**
    - Wrap the app body with `ClerkProvider` and set `signInUrl`, `signUpUrl`, `afterSignInUrl`, `afterSignUpUrl`.
-   - Optional: configure `appearance` to match ChipIn design system.
+   - Optional: configure `appearance` to match Gifta design system.
 5. **Create prebuilt auth pages**
    - Add `/sign-in/[[...sign-in]]/page.tsx` with `<SignIn />`.
    - Add `/sign-up/[[...sign-up]]/page.tsx` with `<SignUp />`.

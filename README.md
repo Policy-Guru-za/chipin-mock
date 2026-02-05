@@ -1,4 +1,4 @@
-# ChipIn Technical Documentation
+# Gifta Technical Documentation
 
 > **Version:** 2.0.0  
 > **Last Updated:** February 2026  
@@ -21,13 +21,15 @@
 
 ## What We're Building
 
-**ChipIn** is a social coordination tool for birthday gifting where:
+**Gifta** is a social coordination tool for birthday gifting where:
 1. Parent creates a "Dream Board" describing ONE dream gift (AI generates artwork)
 2. Shares link with party guests via WhatsApp
-3. Guests contribute money toward the gift (see % funded, not Rands)
+3. Guests contribute money toward the gift (see % funded + totals raised vs goal)
 4. When pot closes, funds are credited to the parent's Karri Card
 
 **Tagline:** *Friends chip in together to turn birthday clutter into one dream gift.*
+
+**Branding note:** the product/app is **Gifta**. Some partner-facing technical surfaces still use legacy naming (e.g. `api.chipin.co.za`, `cpk_*` API keys) until cutover.
 
 **Core Philosophy:**
 - We are in the **pooling business**, not the fulfillment business
@@ -80,7 +82,8 @@
 
 | Layer | Technology |
 |-------|------------|
-| Framework | Next.js 14+ (App Router) |
+| Framework | Next.js 16.1.4 (App Router) |
+| UI | React 19.2.3 |
 | Language | TypeScript (strict) |
 | Database | Neon (PostgreSQL) |
 | ORM | Drizzle |
@@ -91,7 +94,7 @@
 | Payout | Karri Card (sole method) |
 | Email | Resend |
 | Notifications | WhatsApp Business API |
-| AI Image Generation | OpenAI DALL-E |
+| AI Image Generation | Google Gemini (image generation via Generative Language API) |
 | Storage | Vercel Blob |
 | Cache | Vercel KV |
 
@@ -104,7 +107,7 @@
 - ✅ Clerk authentication (prebuilt sign-in/sign-up)
 - ✅ Guest contribution via PayFast, Ozow (EFT), SnapScan (QR)
 - ✅ Karri Card as sole payout method
-- ✅ Progress tracking (% for guests, Rands for host only)
+- ✅ Progress tracking (% + totals for guests; host sees full details)
 - ✅ WhatsApp notifications (contribution alerts, payout confirmation)
 - ✅ Email notifications
 - ✅ Daily batch Karri Card credits

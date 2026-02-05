@@ -1,4 +1,4 @@
-# ChipIn Data Models
+# Gifta Data Models
 
 > **Version:** 2.0.0  
 > **Last Updated:** February 2026  
@@ -8,7 +8,7 @@
 
 ## Overview
 
-ChipIn uses PostgreSQL (via Neon) with Drizzle ORM. This document defines all data models, relationships, and constraints.
+Gifta uses PostgreSQL (via Neon) with Drizzle ORM. This document defines all data models, relationships, and constraints.
 
 **Key Changes in v2.0:**
 - Removed legacy `gift_type`/`gift_data` usage (manual gift definition only)
@@ -608,7 +608,7 @@ CREATE TABLE api_keys (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   partner_id UUID NOT NULL REFERENCES partners(id) ON DELETE RESTRICT,
   partner_name VARCHAR(100) NOT NULL,
-  key_hash VARCHAR(255) NOT NULL,  -- bcrypt hash
+  key_hash VARCHAR(255) NOT NULL,  -- SHA-256 hash (lookup only; raw key not stored)
   key_prefix VARCHAR(12) NOT NULL, -- e.g., "cpk_live_abc"
   scopes TEXT[] NOT NULL DEFAULT '{}',
   rate_limit INTEGER NOT NULL DEFAULT 1000, -- requests per hour
@@ -626,7 +626,10 @@ CREATE INDEX idx_api_keys_active ON api_keys(is_active) WHERE is_active = true;
 
 ### magic_links
 
-Magic links are stored in **Vercel KV** (no database table in MVP).
+Magic-link authentication is not used in the current implementation.
+
+- Host/admin authentication is handled by Clerk.
+- There is no KV-backed magic-link token store.
 
 ---
 

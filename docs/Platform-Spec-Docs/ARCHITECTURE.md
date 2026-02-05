@@ -1,4 +1,4 @@
-# ChipIn Technical Architecture
+# Gifta Technical Architecture
 
 > **Version:** 2.0.0  
 > **Last Updated:** February 2026  
@@ -8,7 +8,7 @@
 
 ## Architecture Overview
 
-ChipIn follows a **modern serverless architecture** optimized for:
+Gifta follows a **modern serverless architecture** optimized for:
 - Rapid development (single codebase)
 - Global edge performance (Vercel)
 - Cost-efficient scaling (pay-per-use)
@@ -67,7 +67,8 @@ ChipIn follows a **modern serverless architecture** optimized for:
 
 | Layer | Technology | Rationale |
 |-------|------------|-----------|
-| **Framework** | Next.js 14+ (App Router) | Full-stack React, SSR, API routes, edge-ready |
+| **Framework** | Next.js 16.1.4 (App Router) | Full-stack React, SSR, API routes, edge-ready |
+| **UI** | React 19.2.3 | Modern React runtime |
 | **Language** | TypeScript | Type safety, better DX, fewer runtime errors |
 | **Styling** | Tailwind CSS | Rapid UI development, consistent design system |
 | **Database** | Neon (PostgreSQL) | Serverless Postgres, Vercel integration, branching |
@@ -135,7 +136,7 @@ chipin/
 │   │   ├── db/                   # Database client and schema
 │   │   │   ├── index.ts          # Drizzle client
 │   │   │   ├── schema.ts         # Database schema
-│   │   │   └── migrations/       # SQL migrations
+│   │   │   └── views.ts          # DB views (SQL-backed)
 │   │   ├── payments/             # Payment provider abstraction
 │   │   │   ├── index.ts          # Unified payment interface
 │   │   │   ├── payfast.ts
@@ -160,6 +161,8 @@ chipin/
 │   ├── unit/
 │   ├── integration/
 │   └── e2e/
+├── drizzle/                     # Drizzle migrations
+│   └── migrations/
 ├── drizzle.config.ts            # Drizzle ORM config
 ├── next.config.js               # Next.js config
 ├── tailwind.config.ts           # Tailwind config
@@ -271,14 +274,14 @@ Hosts authenticate via **Clerk** (email + OTP/password):
 Guests are **unauthenticated**. They access Dream Boards via unique slug:
 
 ```
-https://chipin.co.za/maya-7th-birthday-abc123
+https://<APP_DOMAIN>/maya-7th-birthday-abc123
                       └── unique slug ──────┘
 ```
 
 Guest contributions are tracked by:
 - Optional name (displayed to host)
 - Payment reference (for reconciliation)
-- IP + fingerprint (fraud detection only, not stored long-term)
+- IP address + user agent (fraud detection / abuse prevention; retention-limited)
 
 ### API Authentication
 
@@ -300,7 +303,7 @@ Authorization: Bearer cpk_live_xxxxxxxxxxxx
 
 ```
 ┌──────────┐    ┌──────────┐    ┌──────────────┐    ┌──────────┐
-│  Guest   │───▶│  ChipIn  │───▶│   Payment    │───▶│  ChipIn  │
+│  Guest   │───▶│  Gifta   │───▶│   Payment    │───▶│  Gifta   │
 │  Browser │    │  Server  │    │   Provider   │    │  Webhook │
 └──────────┘    └──────────┘    └──────────────┘    └──────────┘
      │               │                  │                 │
@@ -374,7 +377,7 @@ interface PaymentRequest {
 
 ### Escrow & Fund Holding
 
-**Critical:** ChipIn does not hold funds.
+**Critical:** Gifta does not hold funds.
 
 ```
 Payment Provider receives contribution
@@ -383,7 +386,7 @@ Payment Provider receives contribution
 Funds held by Payment Provider (their escrow)
          │
          ▼
-Pot closes → ChipIn triggers payout instruction
+Pot closes → Gifta triggers payout instruction
          │
          ▼
 Payment Provider transfers to:
@@ -391,7 +394,7 @@ Payment Provider transfers to:
 ```
 
 This architecture means:
-- ChipIn never holds customer funds
+- Gifta never holds customer funds
 - Regulatory burden sits with licensed payment providers
 - We instruct; they execute
 
@@ -417,8 +420,8 @@ type PayoutRecipientData = { type: 'karri_card'; cardNumber: string }
 
 ```
 1. Pot closes (party date or host triggers)
-2. ChipIn calculates payout amount (net contributions)
-3. ChipIn queues a Karri top-up
+2. Gifta calculates payout amount (net contributions)
+3. Gifta queues a Karri top-up
 4. Batch job processes top-up and updates payout status
 5. Host receives confirmation
 ```
@@ -427,7 +430,7 @@ type PayoutRecipientData = { type: 'karri_card'; cardNumber: string }
 
 ## API Architecture
 
-ChipIn exposes a versioned public API for partner integrations.
+Gifta exposes a versioned public API for partner integrations.
 
 ### Base URL
 ```
@@ -570,9 +573,24 @@ Key points:
 
 | Environment | URL | Purpose |
 |-------------|-----|---------|
-| Production | chipin.co.za | Live traffic |
+| Production | `<APP_DOMAIN>` | Live traffic |
 | Preview | *.vercel.app | PR previews |
 | Development | localhost:3000 | Local development |
+
+Notes:
+- App domain is configured via `NEXT_PUBLIC_APP_URL`.
+- Partner API base URL is `https://api.chipin.co.za/v1` (see `public/v1/openapi.json`).
+
+### Internal Jobs / Scheduling
+
+This repo exposes internal job endpoints under `/api/internal/*` (webhook queue, retention, reconciliation, Karri batch).
+
+- All internal job endpoints require `Authorization: Bearer ${INTERNAL_JOB_SECRET}`.
+- There is no in-repo scheduler; use an external scheduler (e.g. Vercel Cron) to invoke:
+  - `POST /api/internal/webhooks/process`
+  - `POST /api/internal/karri/batch`
+  - `POST /api/internal/retention/run`
+  - `POST /api/internal/payments/reconcile`
 
 ### CI/CD Pipeline
 
@@ -616,7 +634,7 @@ Deploy to Production
 
 ### Future Scaling Path
 
-If ChipIn reaches >100k Dream Boards:
+If Gifta reaches >100k Dream Boards:
 1. Move to dedicated PostgreSQL (Neon Pro or Supabase)
 2. Add job queue (Inngest or Trigger.dev) for async processing
 3. Consider edge caching for high-traffic Dream Boards

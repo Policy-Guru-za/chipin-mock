@@ -1,5 +1,7 @@
 # Clerk Stage 4 Cutover (Production Only)
 
+> **Status note (2026-02-05):** historical cutover runbook. Current auth is Clerk-based; use this only as reference if reworking auth rollout.
+
 ## Purpose
 Enable Clerk in **Production** (no Preview environment available) and validate end-to-end authentication, with clear rollback steps.
 

@@ -1,4 +1,4 @@
-# ChipIn Security Requirements
+# Gifta Security Requirements
 
 > **Version:** 1.0.0  
 > **Last Updated:** January 2026  
@@ -22,11 +22,10 @@
 Data visible to anyone with the Dream Board link:
 - Child's first name
 - Child's photo
-- Dream gift name and image (hidden after gift is fully funded)
-- Charity overflow cause (shown after gift is fully funded)
-- Contribution progress (percentage only while gift is funding)
+- Dream gift name and image
+- Contribution progress (percentage + totals raised vs goal)
 - Contributor first names (if provided)
-- Deadline
+- Days-left indicator (derived from party date)
 
 ### Private Data (Host Only)
 Data visible only to the authenticated host:
@@ -83,7 +82,7 @@ Guests access Dream Boards via public URLs. No authentication needed.
 **Security Controls:**
 - Slug contains random suffix (not guessable)
 - Rate limiting on contribution attempts
-- CAPTCHA on suspicious activity
+- No CAPTCHA is implemented in the current codebase (rate limiting only)
 
 ### API Authentication (Partners)
 
@@ -94,7 +93,7 @@ Authorization: Bearer cpk_live_xxxxxxxxxxxxxxxx
 ```
 
 **Security Controls:**
-- Keys hashed with bcrypt before storage
+- Keys hashed with SHA-256 for lookup
 - Keys scoped to specific permissions
 - Rate limiting per key
 - IP allowlist option (enterprise)
@@ -108,11 +107,11 @@ Authorization: Bearer cpk_live_xxxxxxxxxxxxxxxx
 
 **Our Approach:** SAQ-A (outsourced payment)
 
-ChipIn never touches cardholder data. All payment data is collected by the payment provider's hosted page.
+Gifta never touches cardholder data. All payment data is collected by the payment provider's hosted page.
 
 **Flow:**
 ```
-Guest → ChipIn → Redirect → [PayFast Hosted Page] → Process → Redirect → ChipIn
+Guest → Gifta → Redirect → [PayFast Hosted Page] → Process → Redirect → Gifta
                             ↑                                    │
                             └── Card data stays here ────────────┘
 ```
@@ -320,7 +319,7 @@ if (!success) {
 
 | Rule | Trigger | Action |
 |------|---------|--------|
-| Velocity | >5 contributions/IP/hour | Require CAPTCHA |
+| Velocity | >5 contributions/IP/hour | Rate limit (CAPTCHA not implemented) |
 | High value | Single contribution >R10,000 | Manual review |
 | New board spike | >R5,000 in first 24h | Hold payout |
 | Card testing | Multiple small failures | Block IP |
@@ -332,7 +331,7 @@ if (!success) {
 interface FraudSignal {
   type: 'velocity' | 'high_value' | 'new_board' | 'card_testing' | 'geo';
   severity: 'low' | 'medium' | 'high';
-  action: 'allow' | 'captcha' | 'review' | 'block';
+  action: 'allow' | 'review' | 'block';
 }
 
 async function checkFraud(contribution: ContributionInput): Promise<FraudSignal[]> {
@@ -341,7 +340,7 @@ async function checkFraud(contribution: ContributionInput): Promise<FraudSignal[
   // Check velocity
   const recentCount = await countRecentContributions(contribution.ip, '1h');
   if (recentCount > 5) {
-    signals.push({ type: 'velocity', severity: 'medium', action: 'captcha' });
+    signals.push({ type: 'velocity', severity: 'medium', action: 'review' });
   }
   
   // Check amount

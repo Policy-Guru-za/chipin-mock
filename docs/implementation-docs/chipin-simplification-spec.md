@@ -1,19 +1,21 @@
-# ChipIn Platform Simplification
+# Gifta Platform Simplification
 
 **Implementation Specification for AI Coding Agent**
 
 Version: 1.0 DRAFT  
 Date: February 2026
 
+> **Status note (2026-02-05):** historical implementation plan. Current runtime behavior is defined by `src/` and the canonical docs in `docs/Platform-Spec-Docs/` (start at `CANONICAL.md`). For an audited “as-built” view, see `docs/forensic-audit/REPORT.md`.
+
 ---
 
 ## EXECUTIVE DIRECTIVE
 
-You are executing a strategic simplification of the ChipIn platform. This is not a feature addition — it is a focused reduction of scope to sharpen product-market fit.
+You are executing a strategic simplification of the Gifta platform. This is not a feature addition — it is a focused reduction of scope to sharpen product-market fit.
 
 **Core repositioning:**
 
-- ChipIn is a social coordination tool for birthday gifting, not a commerce platform.
+- Gifta is a social coordination tool for birthday gifting, not a commerce platform.
 - We are in the pooling business, not the fulfillment business.
 - Money flows from contributors to a Karri Card. We never hold funds.
 
@@ -192,7 +194,7 @@ Changes required:
 
 - Remove product-specific display logic.
 - Display AI-generated gift artwork instead of product image.
-- Show percentage funded only (not Rand amount).
+- Show percentage funded + totals raised vs goal (no individual contribution amounts).
 - Show suggested contribution amounts: R50 | R100 | R200 | Other.
 
 ### Host Dashboard
@@ -218,8 +220,8 @@ Changes required:
 
 **Implementation requirements:**
 
-- Use environment variable: `IMAGE_GENERATION_API_KEY`
-- Use environment variable: `IMAGE_GENERATION_API_URL` (default to OpenAI DALL-E or configured alternative)
+- Use environment variable: `GEMINI_API_KEY`
+- Optional environment variable: `GEMINI_IMAGE_MODEL` (defaults to `gemini-2.5-flash-image`)
 - Function: `generateGiftArtwork(giftDescription: string): Promise<{ imageUrl: string, prompt: string }>`
 - Prompt engineering: Prepend style directive to ensure non-photorealistic output.
 - Upload generated image to Vercel Blob.
@@ -399,9 +401,8 @@ GIVENGAIN_API_KEY
 
 ```bash
 # AI Image Generation
-IMAGE_GENERATION_API_KEY=""
-IMAGE_GENERATION_API_URL="https://api.openai.com/v1/images/generations"
-IMAGE_GENERATION_MODEL="dall-e-3"
+GEMINI_API_KEY=""
+GEMINI_IMAGE_MODEL="gemini-2.5-flash-image"
 
 # WhatsApp Business API
 WHATSAPP_BUSINESS_API_URL=""
@@ -410,7 +411,17 @@ WHATSAPP_PHONE_NUMBER_ID=""
 
 # Karri Card (enhanced)
 KARRI_BATCH_ENABLED="true"
-KARRI_BATCH_SCHEDULE="0 6 * * *"  # 6 AM daily
+KARRI_BASE_URL=""
+KARRI_API_KEY=""
+
+# Internal jobs (external scheduler required)
+INTERNAL_JOB_SECRET=""
+
+# Sandbox flags
+MOCK_PAYMENTS="false"
+MOCK_PAYMENT_WEBHOOKS="false"
+MOCK_KARRI="false"
+MOCK_SENTRY="false"
 ```
 
 ---
@@ -678,7 +689,7 @@ Before declaring this implementation complete, verify:
 - [ ] Host can create Dream Board with manual gift name and AI-generated artwork.
 - [ ] Host must provide Karri Card details during creation.
 - [ ] Host must provide WhatsApp number during creation.
-- [ ] Guest can view Dream Board and see percentage funded (not Rands).
+- [ ] Guest can view Dream Board and see percentage funded + totals raised vs goal.
 - [ ] Guest can contribute using suggested amounts or custom amount.
 - [ ] Guest contribution is debited immediately via payment provider.
 - [ ] Host receives WhatsApp notification on new contribution.

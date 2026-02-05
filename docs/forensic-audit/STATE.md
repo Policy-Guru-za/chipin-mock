@@ -60,7 +60,7 @@ Purpose: single source of truth for the ongoing “forensic + docs drift” revi
 | F-004 | confirmed | Karri batch | `pending` result resets attempts counter (likely infinite retries) | `markQueuePending(entry.id, entry.attempts)` after increment | KARRI/runbooks |
 | F-005 | confirmed | Payments | Fee semantics inconsistent: checkout charges `amount + fee` but `net_cents = amount - fee` and “raised” sums `net_cents` | `fees.ts`, contribution create route, `schema.ts` + queries | PAYMENTS/DATA/UX/JOURNEYS |
 | F-006 | confirmed | Seed | Seed inserts raw card number (should be encrypted) + wrong webhook event type/payload shape | `seed.ts` uses `karriCardNumber: '5234...'`, eventType `dream_board.created` | demo/reset docs |
-| F-007 | confirmed | Branding | App metadata is “Gifta”; many docs still “ChipIn” | `src/app/layout.tsx` metadata title/OG | README/CANONICAL/UX/API |
+| F-007 | confirmed | Branding | App metadata is “Gifta”; some docs used legacy “ChipIn” naming | `src/app/layout.tsx` metadata title/OG | README/CANONICAL/UX/API |
 
 ## Evidence anchors (line refs)
 

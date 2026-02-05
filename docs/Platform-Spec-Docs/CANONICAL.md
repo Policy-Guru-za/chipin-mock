@@ -1,4 +1,4 @@
-# ChipIn Canonical Spec (Source of Truth)
+# Gifta Canonical Spec (Source of Truth)
 
 > **Version:** 1.1.1  
 > **Last Updated:** January 21, 2026  
@@ -28,9 +28,11 @@ Resolve conflicts across docs. When anything disagrees, this file wins.
 
 ### Public vs Private Display
 
-- **Public guest view:** percentage only (no exact amounts) while funding the gift.
+- **Public guest view:** percentage **and** totals raised vs goal are displayed.
 - **Host view:** exact amounts, contributor details, payout totals.
 - **Funded state:** guest view remains gift-focused (no charity switch).
+
+Note: individual contribution amounts are not displayed publicly (only aggregate progress).
 
 ### Payments
 
@@ -70,8 +72,10 @@ Resolve conflicts across docs. When anything disagrees, this file wins.
 ## Canonical Behavior
 
 - **Funding phase:** gift progress until goal reached; contributions can continue until close.
-- **Raised calculations:** `raised_cents` is net contributions; overfunding is allowed but not redirected.
-- **Close conditions:** manual close or deadline; closing triggers a Karri payout.
+- **Raised calculations:** `raised_cents` is computed from `contributions.net_cents` (current implementation).
+  - Known issue (code reality): checkout charges `amount + fee`, while `net_cents = amount - fee` and `raised_cents` sums `net_cents`.
+- **Close conditions:** explicit/partner-triggered close via `POST /v1/dream-boards/{id}/close`.
+  - There is no in-repo scheduler that auto-closes on `party_date`.
 
 ---
 

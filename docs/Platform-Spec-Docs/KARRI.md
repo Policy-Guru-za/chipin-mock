@@ -8,7 +8,7 @@
 
 ## Strategic Context
 
-Karri Card is the **sole payout method** for ChipIn v2.0. This simplifies the platform by removing fulfillment complexity.
+Karri Card is the **sole payout method** for Gifta v2.0. This simplifies the platform by removing fulfillment complexity.
 
 **Why Karri Card only:**
 1. We are in the **pooling business**, not the fulfillment business
@@ -27,7 +27,7 @@ Karri Card is the **sole payout method** for ChipIn v2.0. This simplifies the pl
 
 ## Integration Model: Immediate Debit, Daily Batch Credit
 
-ChipIn follows an **immediate debit, daily batch credit** model:
+Gifta follows an **immediate debit, daily batch credit** model:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -37,13 +37,13 @@ ChipIn follows an **immediate debit, daily batch credit** model:
 │              (Immediate Debit)         (Status: completed)      │
 └─────────────────────────────────────────────────────────────────┘
                               │
-                              │ (Pot closes on party date)
+                              │ (Pot closes via API call)
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                     Karri Credit Queue                          │
 │                                                                 │
-│   Closed Pot ──► karri_credit_queue ──► Daily Batch Job        │
-│                  (Status: pending)      (6 AM SAST)             │
+│   Closed Pot ──► karri_credit_queue ──► Batch Job Endpoint     │
+│                  (Status: pending)      (external scheduler)    │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -123,7 +123,7 @@ During Dream Board creation (Step 3: Details):
 │                                     │
 │  ℹ️ Funds will be credited to this │
 │     card when the pot closes       │
-│     (on party date)                │
+│     (close is triggered via API)   │
 │                                     │
 └─────────────────────────────────────┘
 ```
@@ -136,7 +136,7 @@ After pot closes and credit is processed:
 WhatsApp:
 ✅ R2,400 has been credited to your Karri Card ending in 1234.
 
-Thank you for using ChipIn! 🎁
+Thank you for using Gifta! 🎁
 ```
 
 ---
@@ -163,7 +163,11 @@ CREATE TABLE karri_credit_queue (
 
 ### Daily Batch Job
 
-Runs daily at 6 AM SAST:
+Invoked via an internal job endpoint and scheduled externally (this repo does not configure cron):
+
+- Endpoint: `POST /api/internal/karri/batch`
+- Auth: `Authorization: Bearer ${INTERNAL_JOB_SECRET}`
+- Gate: `KARRI_BATCH_ENABLED=true`
 
 ```typescript
 async function processDailyKarriBatch(): Promise<BatchResult> {
@@ -187,7 +191,7 @@ async function processDailyKarriBatch(): Promise<BatchResult> {
         cardNumber: entry.karriCardNumber,
         amountCents: entry.amountCents,
         reference: entry.reference,
-        description: `ChipIn Birthday Gift`,
+        description: `Gifta Birthday Gift`,
       });
 
       if (result.status === 'completed') {
@@ -272,12 +276,15 @@ Karri API must:
 
 ```bash
 # Karri Card API
-KARRI_API_URL=""
+KARRI_BASE_URL=""
 KARRI_API_KEY=""
 
 # Batch Processing
 KARRI_BATCH_ENABLED="true"
-KARRI_BATCH_SCHEDULE="0 6 * * *"  # 6 AM SAST daily
+KARRI_AUTOMATION_ENABLED="false"  # optional: enable automated payout execution
+
+# Internal job endpoints auth
+INTERNAL_JOB_SECRET=""
 
 # Card Data Encryption
 CARD_DATA_ENCRYPTION_KEY=""  # 32-byte key for AES-256
@@ -287,13 +294,14 @@ CARD_DATA_ENCRYPTION_KEY=""  # 32-byte key for AES-256
 
 ## Implementation Phases
 
-### Phase 1: Manual (Current)
+### Phase 1: Manual + Job Endpoints (Current)
 
 1. Host enters Karri Card number
-2. On pot close, entry created in `karri_credit_queue`
-3. Admin manually processes credits via Karri portal
-4. Admin marks entries as completed
-5. System sends WhatsApp confirmation
+2. On pot close (via partner API), an entry is created in `karri_credit_queue`
+3. Credits can be processed by:
+   - Admin/manual workflow (admin console), and/or
+   - Internal batch endpoint (`POST /api/internal/karri/batch`) when enabled and scheduled externally
+4. System sends WhatsApp confirmation on completion
 
 ### Phase 2: API Integration (Target)
 

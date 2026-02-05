@@ -1,4 +1,4 @@
-# ChipIn UX Specification
+# Gifta UX Specification
 
 > **Version:** 2.0.0  
 > **Last Updated:** February 2026  
@@ -20,7 +20,7 @@
 - Minimal form fields
 - Smart defaults where possible
 - Progressive disclosure (show complexity only when needed)
-- Guests see % funded only (not Rand amounts) — reduces money awkwardness
+- Guests see % funded + totals raised vs goal (individual contributions stay private)
 
 ### 3. Joyful & Celebratory
 
@@ -42,7 +42,7 @@
 
 ### Philosophy: No Generic AI Aesthetics
 
-ChipIn must look **distinctive**, not like every other AI-generated landing page. We commit to:
+Gifta must look **distinctive**, not like every other AI-generated landing page. We commit to:
 - Real typography choices (not Inter/Roboto defaults)
 - Custom color palette (not default Tailwind)
 - Depth and texture (not flat white backgrounds)
@@ -286,7 +286,7 @@ function celebrate() {
 
 ## Component Library
 
-Using **shadcn/ui** as base, heavily customized for ChipIn's distinctive aesthetic.
+Using **shadcn/ui** as base, heavily customized for Gifta's distinctive aesthetic.
 
 ### Buttons
 
@@ -530,7 +530,7 @@ Using **shadcn/ui** as base, heavily customized for ChipIn's distinctive aesthet
 **Layout:**
 ```
 ┌─────────────────────────────────────┐
-│           [ChipIn Logo]             │
+│           [Gifta Logo]              │
 │                                     │
 │    Turn 20 toys into one            │
 │         dream gift                  │
@@ -740,7 +740,7 @@ Note: Party date from Step 1 serves as the pot close date.
 └─────────────────────────────────────┘
 ```
 
-Note: Guests will see percentage funded only (not Rand amounts).
+Note: Guests will see percentage funded and the aggregate totals raised vs goal.
 
 ### Share Screen (Post-Creation)
 
@@ -754,7 +754,7 @@ Note: Guests will see percentage funded only (not Rand amounts).
 │  Share this link with party guests: │
 │                                     │
 │  ┌─────────────────────────────────┐│
-│  │ chipin.co.za/maya-7th-x7k9m2   ││
+│  │ <APP_DOMAIN>/maya-7th-x7k9m2   ││
 │  │                         [📋]   ││
 │  └─────────────────────────────────┘│
 │                                     │
@@ -810,31 +810,24 @@ Note: Guests will see percentage funded only (not Rand amounts).
 │  Sarah • John • Lisa + 5 more       │
 │                                     │
 │  ─────────────────────────────────  │
-│  Powered by ChipIn                  │
+│  Powered by Gifta                   │
 └─────────────────────────────────────┘
 ```
 
-### Guest View (Charity Overflow)
+### Guest View (Goal Reached)
 
-Shown after gift goal is fully funded. Gift details are hidden.
+Shown after the goal is reached. Guests can still contribute; there is no charity overflow flow in the current implementation.
 
 ```
 ┌─────────────────────────────────────┐
 │                                     │
-│            🎉 Gift funded           │
+│            🎉 Goal reached          │
 │                                     │
-│  Maya chose to support:             │
-│                                     │
-│  ┌─────────────────────────────────┐│
-│  │ [Charity Logo]                  ││
-│  │ Feed Hungry Children            ││
-│  │ Food Forward SA                 ││
-│  └─────────────────────────────────┘│
-│                                     │
-│  R350 raised so far (open-ended)    │
+│  Extra contributions still help     │
+│  cover the dream gift.              │
 │                                     │
 │  ┌───────────────────────────────┐  │
-│  │   Contribute to the charity → │  │
+│  │   Contribute to the gift →    │  │
 │  └───────────────────────────────┘  │
 │                                     │
 └─────────────────────────────────────┘
@@ -871,7 +864,7 @@ Shown after gift goal is fully funded. Gift details are hidden.
 │                                     │
 │  ─────────────────────────────────  │
 │  Contribution: R200                 │
-│  ChipIn fee (3%): R6                │
+│  Gifta fee (3%): R6                 │
 │  Total: R206                        │
 │  ─────────────────────────────────  │
 │                                     │

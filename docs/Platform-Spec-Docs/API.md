@@ -1,4 +1,4 @@
-# ChipIn Public API Specification
+# Gifta Public API Specification
 
 > **Version:** 1.0.0  
 > **Last Updated:** January 28, 2026  
@@ -8,7 +8,7 @@
 
 ## Overview
 
-ChipIn exposes a RESTful API for partner integrations. The API follows the principle that **ChipIn is the source of truth** — partners integrate with us, not the reverse.
+Gifta exposes a RESTful API for partner integrations. The API follows the principle that **Gifta is the source of truth** — partners integrate with us, not the reverse.
 
 ### Base URL
 
@@ -171,10 +171,10 @@ POST /v1/dream-boards
 ```json
 {
   "child_name": "Maya",
-  "child_photo_url": "https://storage.chipin.co.za/photos/abc123.jpg",
+  "child_photo_url": "https://example.public.blob.vercel-storage.com/photos/abc123.jpg",
   "party_date": "2026-02-15",
   "gift_name": "Mountain Bike with Bells",
-  "gift_image_url": "https://storage.chipin.co.za/artwork/bike.png",
+  "gift_image_url": "https://example.public.blob.vercel-storage.com/artwork/bike.png",
   "gift_image_prompt": "A shiny red mountain bike with training wheels and a bell",
   "goal_cents": 250000,
   "payout_email": "parent@example.com",
@@ -194,14 +194,14 @@ POST /v1/dream-boards
 ```json
 {
   "data": {
-    "id": "db_abc123def456",
+    "id": "0f3b3f3e-1a2b-4c5d-8e9f-0123456789ab",
     "slug": "maya-7th-birthday-x7k9m2",
     "child_name": "Maya",
-    "child_photo_url": "https://storage.chipin.co.za/photos/abc123.jpg",
+    "child_photo_url": "https://example.public.blob.vercel-storage.com/photos/abc123.jpg",
     "party_date": "2026-02-15",
     "gift_data": {
       "gift_name": "Mountain Bike with Bells",
-      "gift_image_url": "https://storage.chipin.co.za/artwork/bike.png",
+      "gift_image_url": "https://example.public.blob.vercel-storage.com/artwork/bike.png",
       "gift_image_prompt": "A shiny red mountain bike with training wheels and a bell"
     },
     "payout_method": "karri_card",
@@ -211,7 +211,7 @@ POST /v1/dream-boards
     "status": "active",
     "display_mode": "gift",
     "contribution_count": 0,
-    "public_url": "https://chipin.co.za/maya-7th-birthday-x7k9m2",
+    "public_url": "https://<APP_DOMAIN>/maya-7th-birthday-x7k9m2",
     "created_at": "2026-01-21T10:30:00Z",
     "updated_at": "2026-01-21T10:30:00Z"
   }
@@ -225,16 +225,16 @@ GET /v1/dream-boards/{id}
 ```
 
 **Path Parameters:**
-- `id` — Dream Board ID (`db_xxx`) or slug
+- `id` — Dream Board public identifier (UUID or slug)
 
 **Response:** `200 OK`
 ```json
 {
   "data": {
-    "id": "db_abc123def456",
+    "id": "0f3b3f3e-1a2b-4c5d-8e9f-0123456789ab",
     "slug": "maya-7th-birthday-x7k9m2",
     "child_name": "Maya",
-    "child_photo_url": "https://storage.chipin.co.za/photos/abc123.jpg",
+    "child_photo_url": "https://example.public.blob.vercel-storage.com/photos/abc123.jpg",
     "party_date": "2026-02-15",
     "gift_data": { ... },
     "payout_method": "karri_card",
@@ -244,7 +244,7 @@ GET /v1/dream-boards/{id}
     "status": "active",
     "display_mode": "gift",
     "contribution_count": 8,
-    "public_url": "https://chipin.co.za/maya-7th-birthday-x7k9m2",
+    "public_url": "https://<APP_DOMAIN>/maya-7th-birthday-x7k9m2",
     "created_at": "2026-01-21T10:30:00Z",
     "updated_at": "2026-01-22T15:45:00Z"
   }
@@ -268,8 +268,8 @@ GET /v1/dream-boards
 ```json
 {
   "data": [
-    { "id": "db_xxx", "slug": "...", ... },
-    { "id": "db_yyy", "slug": "...", ... }
+    { "id": "0f3b3f3e-1a2b-4c5d-8e9f-0123456789ab", "slug": "...", ... },
+    { "id": "8f5d2c1b-3a4e-4f6a-9b0c-1234567890de", "slug": "...", ... }
   ],
   "pagination": {
     "has_more": true,
@@ -316,7 +316,7 @@ POST /v1/dream-boards/{id}/close
 ```json
 {
   "data": {
-    "id": "db_abc123",
+    "id": "0f3b3f3e-1a2b-4c5d-8e9f-0123456789ab",
     "status": "closed",
     "raised_cents": 125000,
     "payouts": [
@@ -354,7 +354,7 @@ GET /v1/dream-boards/{id}/contributions
   "data": [
     {
       "id": "con_abc123",
-      "dream_board_id": "db_xyz789",
+      "dream_board_id": "0f3b3f3e-1a2b-4c5d-8e9f-0123456789ab",
       "contributor_name": "Sarah M.",
       "message": "Happy birthday Maya!",
       "amount_cents": 20000,
@@ -402,7 +402,7 @@ GET /v1/payouts/pending
   "data": [
     {
       "id": "po_abc123",
-      "dream_board_id": "db_xyz789",
+      "dream_board_id": "0f3b3f3e-1a2b-4c5d-8e9f-0123456789ab",
       "type": "karri_card",
       "gross_cents": 125000,
       "fee_cents": 3750,
@@ -519,7 +519,7 @@ DELETE /v1/webhooks/{id}
 
 ## Webhook Events
 
-ChipIn pushes events to registered webhook endpoints.
+Gifta pushes events to registered webhook endpoints.
 
 ### Event Format
 
@@ -531,12 +531,12 @@ ChipIn pushes events to registered webhook endpoints.
   "data": {
     "contribution": {
       "id": "con_xyz789",
-      "dream_board_id": "db_abc123",
+      "dream_board_id": "0f3b3f3e-1a2b-4c5d-8e9f-0123456789ab",
       "amount_cents": 20000,
       ...
     },
     "dream_board": {
-      "id": "db_abc123",
+      "id": "0f3b3f3e-1a2b-4c5d-8e9f-0123456789ab",
       "slug": "maya-7th-birthday-x7k9m2",
       "raised_cents": 145000,
       "goal_cents": 249900,
@@ -564,7 +564,7 @@ ChipIn pushes events to registered webhook endpoints.
 All webhook requests include a signature header:
 
 ```http
-X-ChipIn-Signature: t=1706140800,v1=abc123...
+X-Gifta-Signature: t=1706140800,v1=abc123...
 ```
 
 **Verification Process:**
@@ -620,7 +620,7 @@ After 7 failed attempts, the webhook is marked as failed and requires manual ret
 
 ## Internal API Endpoints
 
-These endpoints are used by the ChipIn frontend, not exposed to partners.
+These endpoints are used by the Gifta frontend, not exposed to partners.
 
 ### Authentication
 
@@ -644,7 +644,7 @@ file: [binary]
 **Response:**
 ```json
 {
-  "url": "https://storage.chipin.co.za/photos/abc123.jpg"
+  "url": "https://example.public.blob.vercel-storage.com/photos/abc123.jpg"
 }
 ```
 
@@ -707,10 +707,10 @@ const dreamBoard = await chipin.dreamBoards.create({
 });
 
 // Get Dream Board
-const board = await chipin.dreamBoards.get('db_abc123');
+const board = await chipin.dreamBoards.get('0f3b3f3e-1a2b-4c5d-8e9f-0123456789ab');
 
 // List contributions
-const contributions = await chipin.contributions.list('db_abc123');
+const contributions = await chipin.contributions.list('0f3b3f3e-1a2b-4c5d-8e9f-0123456789ab');
 
 // Confirm payout
 await chipin.payouts.confirm('po_xyz789', {
@@ -738,7 +738,7 @@ curl -X POST https://api.chipin.co.za/v1/dream-boards \
   }'
 
 # Get Dream Board
-curl https://api.chipin.co.za/v1/dream-boards/db_abc123 \
+curl https://api.chipin.co.za/v1/dream-boards/0f3b3f3e-1a2b-4c5d-8e9f-0123456789ab \
   -H "Authorization: Bearer cpk_live_xxx"
 
 # Confirm payout

@@ -7,6 +7,8 @@ Date: February 2026
 Author: System Architect  
 Status: APPROVED FOR IMPLEMENTATION
 
+> **Status note (2026-02-05):** historical execution plan. Current sandbox behavior is implemented in `src/lib/config/feature-flags.ts` (`MOCK_*` flags). Authentication in the shipped app is Clerk-based (no magic-link auth).
+
 ---
 
 ## TABLE OF CONTENTS
@@ -212,7 +214,7 @@ After each phase:
 /**
  * Feature Flags for Sandbox Mode
  * 
- * ChipIn uses granular feature flags to control which integrations are mocked.
+ * Gifta uses granular feature flags to control which integrations are mocked.
  * This allows running a production-grade app with only payments simulated.
  * 
  * Environment Variables:
@@ -1140,7 +1142,7 @@ MOCK_SENTRY=true
 ```markdown
 # Sandbox Mode
 
-ChipIn supports a **sandbox mode** for testing with mocked payments while using real integrations for everything else.
+Gifta supports a **sandbox mode** for testing with mocked payments while using real integrations for everything else.
 
 ## Overview
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-ChipIn generates gift artwork using **Gemini 2.5 Flash Image** via the Google Generative Language API. The integration lives in:
+Gifta generates gift artwork using **Gemini 2.5 Flash Image** via the Google Generative Language API. The integration lives in:
 
 - `src/lib/integrations/image-generation.ts`
 - `src/app/api/internal/artwork/generate/route.ts`

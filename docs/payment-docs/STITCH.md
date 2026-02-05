@@ -1,7 +1,7 @@
 # Stitch Payments Reference
 
 > **Source:** https://docs.stitch.money/api and linked docs (Jan 2026)
-> **Status:** Under evaluation for ChipIn
+> **Status:** Under evaluation for Gifta
 
 ---
 
@@ -129,7 +129,7 @@ Used for bank data access (accounts, balances, transactions). Not required for P
 
 ---
 
-## ChipIn Fit Assessment (Initial)
+## Gifta Fit Assessment (Initial)
 
 **Potential wins**
 - Single provider for pay-ins + payouts

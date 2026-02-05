@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Define non-functional requirements (NFRs) and operations practices for ChipIn.
+Define non-functional requirements (NFRs) and operations practices for Gifta.
 Applies to all phases. Use as acceptance criteria for enterprise-grade delivery.
 
 ## Availability and Reliability
@@ -90,7 +90,7 @@ Applies to all phases. Use as acceptance criteria for enterprise-grade delivery.
 
 ## Compliance Boundaries
 
-- ChipIn never handles card data; hosted payment pages only.
+- Gifta never handles card data; hosted payment pages only.
 - KYC/AML only if required by payment providers.
 - Payment provider audits and evidence retained.
 
@@ -101,4 +101,3 @@ Applies to all phases. Use as acceptance criteria for enterprise-grade delivery.
 - Payout delay response.
 - Data incident response.
 - Scaling response during high-traffic events.
-

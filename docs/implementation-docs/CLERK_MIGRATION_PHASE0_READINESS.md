@@ -1,5 +1,7 @@
 # Clerk Migration — Phase 0 Readiness
 
+> **Status note (2026-02-05):** historical readiness doc. Current auth is Clerk-only; the `AUTH_CLERK_ENABLED` flag referenced here is not part of the shipped runtime.
+
 ## Scope
 Phase 0 captures the current auth surface area, confirms `AUTH_CLERK_ENABLED` defaults, and defines QA checkpoints before any Clerk plumbing ships.
 

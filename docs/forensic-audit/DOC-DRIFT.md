@@ -4,6 +4,8 @@ Last updated: 2026-02-05
 
 Goal: identify every repo doc that is stale vs the current codebase, explain **why**, and state **exactly what to change**.
 
+Note: several doc fixes described here may already be applied. Treat this as a drift inventory that should be re-validated after documentation syncs.
+
 Primary source of truth for confirmed code reality: `docs/forensic-audit/STATE.md` (see Findings F-001..F-007).
 
 ## Blocking product decisions (need your input)
@@ -22,7 +24,7 @@ These 3 choices determine whether several docs are “wrong” vs “desired-but
 - Karri batch retry: docs describe attempt increments; code resets attempts on `pending` (F-004).
 - Fee/net accounting: code charges `amount+fee` but stores/aggregates `amount-fee` as net/raised (F-005).
 - Seed/demo: seed data violates encryption + webhook type conventions (F-006).
-- Branding: “ChipIn” vs “Gifta” inconsistent across docs and runtime metadata (F-007).
+- Branding: legacy “ChipIn” vs “Gifta” inconsistent across docs and runtime metadata (F-007).
 - Env vars: `.env.example` and `.env.demo` do not cover current runtime env usage (confirmed via `process.env.*` scan).
 
 ## Doc-by-doc update list
@@ -48,7 +50,7 @@ Legend:
   - “Guests see % funded, not Rands” (`README.md:27`, `README.md:107`) conflicts with guest UI (F-001).
   - AI images listed as OpenAI DALL-E (`README.md:94`) but code uses Gemini.
   - Tech stack says “Next.js 14+” (`README.md:83`) but `package.json` pins Next.js `16.1.4`.
-  - Branding: header says ChipIn; runtime metadata says Gifta (F-007).
+  - Branding: header used legacy ChipIn naming; runtime metadata says Gifta (F-007).
 - Change:
   - Update guest display statement, AI provider, Next.js version, and product/brand naming.
   - Update “Getting Started” DB steps if `drizzle:generate/push` usage differs from intended workflow.
@@ -112,7 +114,7 @@ Legend:
 
 - Why:
   - Example code shows provider payment amount = `input.amountCents` and `feeCents = calculateFee(input.amountCents)`; current implementation charges `total = contribution + fee` and stores `fee = total - contribution` (F-005).
-  - Doc models “Net to ChipIn” but doesn’t map to DB `net_cents` usage (raised sums net) (F-005).
+  - Doc models “Net to Gifta” but doesn’t map to DB `net_cents` usage (raised sums net) (F-005).
 - Change:
   - Rewrite the payment lifecycle section to match actual endpoints, amount checks, and DB fields.
   - Explicitly define fee semantics and how `raised_cents` is calculated.
