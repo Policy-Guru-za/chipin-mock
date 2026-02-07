@@ -3,6 +3,7 @@
     "src/app/**/page.tsx",
     "src/app/**/layout.tsx",
     "src/app/**/route.ts",
+    "src/instrumentation*.ts",
     "src/lib/**/*.{ts,tsx}",
     "src/components/**/*.{ts,tsx}",
     "scripts/**/*.ts",
