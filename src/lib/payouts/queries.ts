@@ -1,7 +1,7 @@
 import { and, desc, eq, gte, inArray, lte, sql, type SQL } from 'drizzle-orm';
 
 import { db } from '@/lib/db';
-import { contributions, dreamBoards, hosts, payoutItems, payouts } from '@/lib/db/schema';
+import { charities, contributions, dreamBoards, hosts, payoutItems, payouts } from '@/lib/db/schema';
 
 export const getDreamBoardPayoutContext = async (dreamBoardId: string) => {
   const [board] = await db
@@ -18,12 +18,25 @@ export const getDreamBoardPayoutContext = async (dreamBoardId: string) => {
       payoutEmail: dreamBoards.payoutEmail,
       karriCardNumber: dreamBoards.karriCardNumber,
       karriCardHolderName: dreamBoards.karriCardHolderName,
+      bankName: dreamBoards.bankName,
+      bankAccountNumberEncrypted: dreamBoards.bankAccountNumberEncrypted,
+      bankAccountLast4: dreamBoards.bankAccountLast4,
+      bankBranchCode: dreamBoards.bankBranchCode,
+      bankAccountHolder: dreamBoards.bankAccountHolder,
+      charityEnabled: dreamBoards.charityEnabled,
+      charityId: dreamBoards.charityId,
+      charitySplitType: dreamBoards.charitySplitType,
+      charityPercentageBps: dreamBoards.charityPercentageBps,
+      charityThresholdCents: dreamBoards.charityThresholdCents,
+      charityName: charities.name,
+      charityBankDetailsEncrypted: charities.bankDetailsEncrypted,
       hostWhatsAppNumber: dreamBoards.hostWhatsAppNumber,
       status: dreamBoards.status,
       hostEmail: hosts.email,
       hostId: hosts.id,
     })
     .from(dreamBoards)
+    .leftJoin(charities, eq(charities.id, dreamBoards.charityId))
     .leftJoin(hosts, eq(hosts.id, dreamBoards.hostId))
     .where(eq(dreamBoards.id, dreamBoardId))
     .limit(1);
@@ -38,6 +51,9 @@ export const getContributionTotalsForDreamBoard = async (dreamBoardId: string) =
       platformFeeCents: sql<number>`COALESCE(SUM(${contributions.feeCents}), 0)`.as(
         'platform_fee_cents'
       ),
+      charityCents: sql<number>`COALESCE(SUM(${contributions.charityCents}), 0)`.as(
+        'charity_cents'
+      ),
     })
     .from(contributions)
     .where(
@@ -51,6 +67,7 @@ export const getContributionTotalsForDreamBoard = async (dreamBoardId: string) =
     totals ?? {
       raisedCents: 0,
       platformFeeCents: 0,
+      charityCents: 0,
     }
   );
 };
@@ -74,7 +91,25 @@ type PayoutRecord = typeof payouts.$inferSelect;
 type PayoutStatus = PayoutRecord['status'];
 type PayoutType = PayoutRecord['type'];
 
-const getExpectedPayoutTypes = () => ['karri_card'] as PayoutType[];
+const getExpectedPayoutTypes = (board: {
+  payoutMethod: PayoutType;
+  charityEnabled: boolean;
+  raisedCents: number;
+  charityCents: number;
+}) => {
+  const raisedCents = Math.max(0, board.raisedCents);
+  const charityCents = Math.min(Math.max(0, board.charityCents), raisedCents);
+  const giftCents = Math.max(0, raisedCents - charityCents);
+
+  const expected: PayoutType[] = [];
+  if (giftCents > 0) {
+    expected.push(board.payoutMethod);
+  }
+  if (board.charityEnabled && charityCents > 0) {
+    expected.push('charity');
+  }
+  return expected;
+};
 
 export const listDreamBoardsReadyForPayouts = async () => {
   const boards = await db
@@ -84,9 +119,13 @@ export const listDreamBoardsReadyForPayouts = async () => {
       childName: dreamBoards.childName,
       status: dreamBoards.status,
       payoutMethod: dreamBoards.payoutMethod,
+      charityEnabled: dreamBoards.charityEnabled,
       payoutEmail: dreamBoards.payoutEmail,
       goalCents: dreamBoards.goalCents,
       raisedCents: sql<number>`COALESCE(SUM(${contributions.netCents}), 0)`.as('raised_cents'),
+      charityCents: sql<number>`COALESCE(SUM(${contributions.charityCents}), 0)`.as(
+        'charity_cents'
+      ),
       contributionCount: sql<number>`COUNT(${contributions.id})`.as('contribution_count'),
       hostEmail: hosts.email,
       updatedAt: dreamBoards.updatedAt,
@@ -127,7 +166,12 @@ export const listDreamBoardsReadyForPayouts = async () => {
       return false;
     }
 
-    const expected = getExpectedPayoutTypes();
+    const expected = getExpectedPayoutTypes({
+      payoutMethod: board.payoutMethod as PayoutType,
+      charityEnabled: board.charityEnabled,
+      raisedCents: board.raisedCents,
+      charityCents: board.charityCents,
+    });
     const existing = payoutMap.get(board.id) ?? new Set<PayoutType>();
 
     return expected.some((type) => !existing.has(type));

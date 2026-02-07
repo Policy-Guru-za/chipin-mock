@@ -17,6 +17,7 @@ import {
 } from './queries';
 
 type PayoutRecipientData = Record<string, unknown>;
+type BoardPayoutContext = NonNullable<Awaited<ReturnType<typeof getDreamBoardPayoutContext>>>;
 
 type PayoutRecord = typeof payouts.$inferSelect;
 type PayoutItemRecord = typeof payoutItems.$inferSelect;
@@ -33,10 +34,9 @@ const normalizeRecipientData = (payload: unknown): PayoutRecipientData => {
   return payload as PayoutRecipientData;
 };
 
-const getRecipientDataForGift = (params: {
+const getRecipientDataForKarriGift = (params: {
   payoutEmail: string;
   childName: string;
-  payoutMethod: string;
   giftName: string;
   giftImageUrl: string;
   giftImagePrompt?: string | null;
@@ -49,13 +49,102 @@ const getRecipientDataForGift = (params: {
 
   return {
     email: params.payoutEmail,
-    payoutMethod: params.payoutMethod,
+    payoutMethod: 'karri_card',
     childName: params.childName,
     giftName: params.giftName,
     giftImageUrl: params.giftImageUrl,
     giftImagePrompt: params.giftImagePrompt ?? null,
     karriCardHolderName: params.karriCardHolderName ?? null,
     cardNumberEncrypted: params.karriCardNumber,
+  };
+};
+
+const getRecipientDataForBankGift = (params: {
+  payoutEmail: string;
+  childName: string;
+  giftName: string;
+  giftImageUrl: string;
+  giftImagePrompt?: string | null;
+  bankName?: string | null;
+  bankAccountNumberEncrypted?: string | null;
+  bankAccountLast4?: string | null;
+  bankBranchCode?: string | null;
+  bankAccountHolder?: string | null;
+}) => {
+  if (
+    isLegacyPlaceholder(params.bankName) ||
+    isLegacyPlaceholder(params.bankAccountNumberEncrypted) ||
+    isLegacyPlaceholder(params.bankAccountLast4) ||
+    isLegacyPlaceholder(params.bankBranchCode) ||
+    isLegacyPlaceholder(params.bankAccountHolder)
+  ) {
+    throw new Error('Bank payout details are missing');
+  }
+
+  return {
+    email: params.payoutEmail,
+    payoutMethod: 'bank',
+    childName: params.childName,
+    giftName: params.giftName,
+    giftImageUrl: params.giftImageUrl,
+    giftImagePrompt: params.giftImagePrompt ?? null,
+    bankName: params.bankName,
+    bankAccountNumberEncrypted: params.bankAccountNumberEncrypted,
+    bankAccountLast4: params.bankAccountLast4,
+    bankBranchCode: params.bankBranchCode,
+    bankAccountHolder: params.bankAccountHolder,
+  };
+};
+
+const getGiftRecipientData = (board: BoardPayoutContext): PayoutRecipientData => {
+  if (board.payoutMethod === 'karri_card') {
+    return getRecipientDataForKarriGift({
+      payoutEmail: board.payoutEmail,
+      childName: board.childName,
+      giftName: board.giftName,
+      giftImageUrl: board.giftImageUrl,
+      giftImagePrompt: board.giftImagePrompt,
+      karriCardNumber: board.karriCardNumber,
+      karriCardHolderName: board.karriCardHolderName,
+    });
+  }
+
+  if (board.payoutMethod === 'bank') {
+    return getRecipientDataForBankGift({
+      payoutEmail: board.payoutEmail,
+      childName: board.childName,
+      giftName: board.giftName,
+      giftImageUrl: board.giftImageUrl,
+      giftImagePrompt: board.giftImagePrompt,
+      bankName: board.bankName,
+      bankAccountNumberEncrypted: board.bankAccountNumberEncrypted,
+      bankAccountLast4: board.bankAccountLast4,
+      bankBranchCode: board.bankBranchCode,
+      bankAccountHolder: board.bankAccountHolder,
+    });
+  }
+
+  throw new Error(`Unsupported payout method: ${board.payoutMethod}`);
+};
+
+const getRecipientDataForCharityPayout = (board: BoardPayoutContext): PayoutRecipientData => {
+  if (!board.charityEnabled) {
+    throw new Error('Charity payout is not enabled for this board');
+  }
+
+  if (!board.charityId || !board.charityName || !board.charityBankDetailsEncrypted) {
+    throw new Error('Charity payout details are missing');
+  }
+
+  const now = new Date();
+
+  return {
+    payoutMethod: 'charity',
+    charityId: board.charityId,
+    charityName: board.charityName,
+    bankDetailsEncrypted: board.charityBankDetailsEncrypted,
+    settlementMonth: now.getUTCMonth() + 1,
+    settlementYear: now.getUTCFullYear(),
   };
 };
 
@@ -67,22 +156,26 @@ const ensureBoardReady = (status: string) => {
 };
 
 const buildPayoutPlans = (params: {
-  board: Awaited<ReturnType<typeof getDreamBoardPayoutContext>>;
+  board: BoardPayoutContext;
   calculation: ReturnType<typeof calculatePayoutTotals>;
   existingTypes: Set<PayoutType>;
 }): Array<{
   type: PayoutType;
   itemType: PayoutItemType;
-  amountCents: number;
+  grossCents: number;
+  feeCents: number;
+  charityCents: number;
+  netCents: number;
   recipientData: PayoutRecipientData;
 }> => {
   const { board, calculation, existingTypes } = params;
-  if (!board) return [];
-
   const payoutPlans: Array<{
     type: PayoutType;
     itemType: PayoutItemType;
-    amountCents: number;
+    grossCents: number;
+    feeCents: number;
+    charityCents: number;
+    netCents: number;
     recipientData: PayoutRecipientData;
   }> = [];
 
@@ -90,17 +183,27 @@ const buildPayoutPlans = (params: {
     payoutPlans.push({
       type: board.payoutMethod,
       itemType: 'gift',
-      amountCents: calculation.giftCents,
-      recipientData: getRecipientDataForGift({
-        payoutEmail: board.payoutEmail,
-        childName: board.childName,
-        payoutMethod: board.payoutMethod,
-        giftName: board.giftName,
-        giftImageUrl: board.giftImageUrl,
-        giftImagePrompt: board.giftImagePrompt,
-        karriCardNumber: board.karriCardNumber,
-        karriCardHolderName: board.karriCardHolderName,
-      }),
+      grossCents: calculation.raisedCents,
+      feeCents: 0,
+      charityCents: calculation.charityCents,
+      netCents: calculation.giftCents,
+      recipientData: getGiftRecipientData(board),
+    });
+  }
+
+  if (
+    board.charityEnabled &&
+    calculation.charityCents > 0 &&
+    !existingTypes.has('charity')
+  ) {
+    payoutPlans.push({
+      type: 'charity',
+      itemType: 'charity',
+      grossCents: calculation.charityCents,
+      feeCents: 0,
+      charityCents: calculation.charityCents,
+      netCents: calculation.charityCents,
+      recipientData: getRecipientDataForCharityPayout(board),
     });
   }
 
@@ -122,9 +225,10 @@ export async function createPayoutsForDreamBoard(params: {
   const calculation = calculatePayoutTotals({
     raisedCents: totals.raisedCents,
     platformFeeCents: totals.platformFeeCents,
+    charityCents: totals.charityCents,
   });
 
-  if (isLegacyPlaceholder(board.karriCardNumber)) {
+  if (board.payoutMethod === 'karri_card' && isLegacyPlaceholder(board.karriCardNumber)) {
     log('error', 'payout_missing_karri_card', {
       dreamBoardId: board.id,
       payoutEmail: board.payoutEmail,
@@ -148,7 +252,7 @@ export async function createPayoutsForDreamBoard(params: {
     return { created: [], calculation, skipped: true };
   }
 
-  const createdPayouts: Array<{ id: string; type: string }> = [];
+  const createdPayouts: Array<{ id: string; type: PayoutType }> = [];
 
   try {
     await db.transaction(async (tx) => {
@@ -159,9 +263,10 @@ export async function createPayoutsForDreamBoard(params: {
             partnerId: board.partnerId,
             dreamBoardId: board.id,
             type: plan.type,
-            grossCents: plan.amountCents,
-            feeCents: 0,
-            netCents: plan.amountCents,
+            grossCents: plan.grossCents,
+            feeCents: plan.feeCents,
+            charityCents: plan.charityCents,
+            netCents: plan.netCents,
             recipientData: plan.recipientData,
           })
           .onConflictDoNothing({
@@ -177,7 +282,7 @@ export async function createPayoutsForDreamBoard(params: {
           payoutId: created.id,
           dreamBoardId: board.id,
           type: plan.itemType,
-          amountCents: plan.amountCents,
+          amountCents: plan.netCents,
           metadata: { calculation },
         });
 
@@ -190,7 +295,7 @@ export async function createPayoutsForDreamBoard(params: {
             {
               dreamBoardId: board.id,
               karriCardNumber: board.karriCardNumber,
-              amountCents: plan.amountCents,
+              amountCents: plan.netCents,
               reference: created.id,
             },
             tx
@@ -204,7 +309,7 @@ export async function createPayoutsForDreamBoard(params: {
           metadata: {
             dreamBoardId: board.id,
             payoutType: plan.type,
-            amountCents: plan.amountCents,
+            amountCents: plan.netCents,
           },
           database: tx,
         });

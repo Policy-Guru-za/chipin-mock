@@ -121,6 +121,24 @@ describe('payout automation - karri', () => {
 });
 
 describe('payout automation - errors', () => {
+  it('throws for bank payouts to preserve manual processing', async () => {
+    payoutQueryMocks.getPayoutDetail.mockResolvedValue({
+      id: 'payout-bank',
+      type: 'bank',
+      status: 'pending',
+      netCents: 5000,
+      payoutEmail: 'host@chipin.co.za',
+      recipientData: { email: 'host@chipin.co.za' },
+      childName: 'Maya',
+    });
+
+    const { executeAutomatedPayout } = await loadModule();
+
+    await expect(
+      executeAutomatedPayout({ payoutId: 'payout-bank', actor: { type: 'admin' } })
+    ).rejects.toThrow('Unsupported payout type');
+  });
+
   it('throws for unsupported payout types', async () => {
     payoutQueryMocks.getPayoutDetail.mockResolvedValue({
       id: 'payout-disabled',

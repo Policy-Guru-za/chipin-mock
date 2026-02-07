@@ -13,6 +13,7 @@
 | 2026-02-07 | self | Made serializer contract fields required, which risked breaking non-API callers (webhooks/views) | Keep serializer input fields optional + normalize defaults; enforce strictness at API query layer |
 | 2026-02-07 | self | Assumed `pnpm test -- <file>` would run only targeted tests | In this repo it still runs the full Vitest suite; use command expectations accordingly when planning verification time |
 | 2026-02-07 | self | Added `getActiveCharityById` into runtime paths without updating older `db/queries` mocks | When adding query dependencies, centralize mock builders in integration tests and update all call sites immediately |
+| 2026-02-07 | self | Followed phase command `pnpm test tests/unit/payouts` expecting coverage, but repo has no matching directory | Run the milestone command for evidence, then run concrete payout unit files explicitly to validate behavior |
 
 ## User Preferences
 - Start with required doc read order before implementation.
@@ -24,6 +25,7 @@
 - Capture milestone evidence in `docs/implementation-docs/evidence/ux-v2/...` during execution, not after.
 - Bind runtime schemas and OpenAPI enums to `decision-locks.ts`, then assert parity in unit tests.
 - Restore env toggles (`UX_V2_ENABLE_*`) after each test to prevent cross-test gate leakage.
+- Keep payout readiness predicates aligned with `calculatePayoutTotals` (bounded charity + `giftCents > 0`) to avoid permanent false-ready boards.
 
 ## Patterns That Don't Work
 - Skipping preflight docs causes rework and misalignment.
