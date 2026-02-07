@@ -1,181 +1,128 @@
-# Gifta UX v2 DB Expansion — Production Rollout Checklist
+# Gifta UX v2 DB Expansion - Production Rollout Checklist
 
 Use with:
 
 - `docs/implementation-docs/GIFTA_UX_V2_DB_ROLLOUT_RUNBOOK.md`
+- `docs/implementation-docs/GIFTA_UX_V2_GO_NO_GO_TEMPLATE.md`
 - `drizzle/migrations/0012_expand_ux_data_model.sql`
 
----
+## Release Contract (Authoritative for this rollout)
 
-## 1) Pre-Flight (Before Change Window)
+- Scope: schema-first DB migration only (`0012_expand_ux_data_model`).
+- Non-scope: bank/charity UI enablement and any new bank/charity write-path activation.
+- Data policy: no backfill; legacy test data is disposable in this phase.
+- Rollback model: rollback app deploy first; keep schema forward unless a pre-reviewed DB rollback script is approved.
+- Hard stop criteria: partial/failed migration, failed health checks, critical create/contribute/payout breakage, or sustained constraint-error spike.
 
-- [ ] Confirm approved change window + owner on-call.
-- [ ] Confirm production backup/restore point exists (Neon branch/snapshot).
-- [ ] Confirm `main` includes:
-  - [ ] `drizzle/migrations/0012_expand_ux_data_model.sql`
-  - [ ] `drizzle/migrations/meta/_journal.json` entry for `0012_expand_ux_data_model`
-- [ ] Confirm this change follows direct-to-production policy (no staging DB path).
-- [ ] Confirm no-backfill policy is accepted (legacy test data is disposable).
-- [ ] Confirm no concurrent destructive DB changes in same release.
-- [ ] Confirm app feature flags/write paths for bank + charity are still disabled (schema-first only).
+## Glossary (Normalized Terms)
 
----
-
-## 2) Optional Test-Data Reset
-
-- [ ] Decide reset strategy:
-  - [ ] Keep existing test data (still no backfill required), or
-  - [ ] Purge runtime test data before migration.
-
-- [ ] If purging, run:
-
-```sql
-DO $$
-DECLARE
-  existing_tables TEXT;
-BEGIN
-  SELECT string_agg(format('%I', table_name), ', ')
-  INTO existing_tables
-  FROM unnest(ARRAY[
-    'contribution_reminders',
-    'karri_credit_queue',
-    'payout_items',
-    'payouts',
-    'contributions',
-    'dream_boards',
-    'charities'
-  ]) AS t(table_name)
-  WHERE to_regclass(format('public.%I', table_name)) IS NOT NULL;
-
-  IF existing_tables IS NOT NULL THEN
-    EXECUTE format('TRUNCATE TABLE %s RESTART IDENTITY CASCADE;', existing_tables);
-  END IF;
-END $$;
-```
-
-- [ ] Record reset decision/evidence in release notes.
+- Dream Board: canonical two-word entity name (`dream_boards` table).
+- Schema-first: apply DB migration before enabling new product behavior.
+- Write-path disabled: bank/charity create/update writes are rejected in production.
+- Hold point: mandatory observation window between migration and GO decision.
 
 ---
 
-## 3) Execute Migration (Production)
+## 1) Pre-Flight (Runbook R0)
 
-- [ ] Run:
+| ID | Task | Command / Evidence | Expected Result | Done |
+|---|---|---|---|---|
+| R0-01 | Change window approved + on-call staffed | Ticket/approval link | Approved | [ ] |
+| R0-02 | Backup/restore point verified | Snapshot link | Verified | [ ] |
+| R0-03 | Migration files present in `main` | `git ls-files drizzle/migrations/0012_expand_ux_data_model.sql drizzle/migrations/meta/_journal.json` | Both files listed | [ ] |
+| R0-04 | Baseline health check | `curl -fsS "$APP_BASE_URL/health/live" && curl -fsS "$APP_BASE_URL/health/ready"` | Both return HTTP 200 | [ ] |
+| R0-05 | Pre-migration bank write-path probe | Runbook `R0-C1` | HTTP is not 201 | [ ] |
+| R0-06 | Pre-migration charity write-path probe | Runbook `R0-C2` | HTTP is not 201 | [ ] |
 
-```bash
-psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f drizzle/migrations/0012_expand_ux_data_model.sql
-```
-
-- [ ] Confirm command exits `0`.
-
----
-
-## 4) Immediate Post-Run Validation
-
-- [ ] New tables exist:
-
-```sql
-SELECT to_regclass('public.charities') AS charities_table,
-       to_regclass('public.contribution_reminders') AS reminders_table;
-```
-
-- [ ] Dreamboard expansion columns exist:
-
-```sql
-SELECT column_name
-FROM information_schema.columns
-WHERE table_name = 'dream_boards'
-  AND column_name IN (
-    'child_age','birthday_date','campaign_end_date','gift_description',
-    'bank_name','bank_account_number_encrypted','bank_account_last4',
-    'bank_branch_code','bank_account_holder',
-    'charity_enabled','charity_id','charity_split_type',
-    'charity_percentage_bps','charity_threshold_cents'
-  )
-ORDER BY column_name;
-```
-
-- [ ] Confirm no backfill required/attempted (per test-phase policy).
-
-- [ ] Required constraints present:
-
-```sql
-SELECT conname
-FROM pg_constraint
-WHERE conname IN (
-  'valid_dream_board_dates',
-  'valid_charity_split_config',
-  'valid_dream_board_payout_data',
-  'valid_charity_amount',
-  'valid_amounts'
-)
-ORDER BY conname;
-```
-
-- [ ] New indexes present:
-
-```sql
-SELECT indexname
-FROM pg_indexes
-WHERE tablename IN ('dream_boards', 'charities', 'contribution_reminders')
-  AND indexname IN (
-    'idx_dream_boards_campaign_end_date',
-    'idx_dream_boards_charity_enabled',
-    'idx_dream_boards_payout_method',
-    'unique_charities_name',
-    'idx_charities_category',
-    'idx_charities_active',
-    'idx_contribution_reminders_dream_board',
-    'idx_contribution_reminders_due',
-    'unique_contribution_reminder'
-  )
-ORDER BY indexname;
-```
+Hard stop: if R0-05 or R0-06 returns `201`, do not proceed.
 
 ---
 
-## 5) App-Level Smoke Checks
+## 2) Optional Data Reset (Runbook R1)
 
-- [ ] `GET /health/live` returns healthy.
-- [ ] `GET /health/ready` returns healthy.
-- [ ] Create flow still works for existing Karri path (no bank/charity UI enabled yet).
-- [ ] Contribution flow works for existing providers.
-- [ ] Existing payout automation path unaffected.
-- [ ] Error monitoring shows no spike in DB constraint errors.
+| ID | Task | Command / Evidence | Expected Result | Done |
+|---|---|---|---|---|
+| R1-01 | Purge decision recorded | Release note link | Keep or purge decision documented | [ ] |
+| R1-02 | Purge executed (if selected) | Runbook `R1` SQL | SQL executes successfully | [ ] |
 
 ---
 
-## 6) Rollback Trigger Criteria
+## 3) Execute Migration (Runbook R2)
 
-Trigger rollback-to-previous-app-release (schema stays forward) if any apply:
-
-- [ ] Migration fails partially and cannot be corrected in window.
-- [ ] Health endpoints fail after migration.
-- [ ] Critical write paths break (create/contribute/payout).
-- [ ] Sustained error spike tied to new DB constraints.
-
-Action:
-
-- [ ] Roll back app deploy first.
-- [ ] Keep schema as-is unless a separately reviewed DB rollback script is approved.
+| ID | Task | Command / Evidence | Expected Result | Done |
+|---|---|---|---|---|
+| R2-01 | Execute migration | `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f drizzle/migrations/0012_expand_ux_data_model.sql` | Exit code 0 | [ ] |
 
 ---
 
-## 7) Post-Window Closeout
+## 4) Schema + Enum Validation (Runbook R3/R4)
 
-- [ ] Record migration execution timestamp + operator.
-- [ ] Save validation query outputs to release notes.
-- [ ] Confirm incident-free observation window complete.
-- [ ] Open/confirm follow-up task to tighten new NOT NULL constraints after UI rollout.
-- [ ] Confirm follow-up task to fix Drizzle snapshot collision remains tracked.
+| ID | Task | Command / Evidence | Expected Result | Done |
+|---|---|---|---|---|
+| R3-01 | New tables | Runbook `R3-Q1` | `charities` and `contribution_reminders` non-null | [ ] |
+| R3-02 | New dream board columns | Runbook `R3-Q2` | All listed columns returned | [ ] |
+| R3-03 | Constraints present | Runbook `R3-Q3` | All five constraints present | [ ] |
+| R3-04 | Indexes present | Runbook `R3-Q4` | All required indexes present | [ ] |
+| R4-01 | Enum values verified | Runbook `R4-Q1` | Expected enum labels present | [ ] |
 
 ---
 
-## 8) Sign-Off
+## 5) Write-Path Guardrail Recheck (Runbook R5)
 
-- [ ] Engineering owner sign-off
-- [ ] Product owner sign-off
-- [ ] Ops/on-call sign-off
+| ID | Task | Command / Evidence | Expected Result | Done |
+|---|---|---|---|---|
+| R5-01 | Post-migration bank write-path probe | Re-run Runbook `R0-C1` | HTTP is not 201 | [ ] |
+| R5-02 | Post-migration charity write-path probe | Re-run Runbook `R0-C2` | HTTP is not 201 | [ ] |
 
-Status:
+Hard stop: if either probe returns `201`, mark NO-GO.
 
-- [ ] ✅ Production migration accepted
+---
+
+## 6) Hold Point (20 minutes, Runbook R6)
+
+| ID | Task | Command / Evidence | Expected Result | Done |
+|---|---|---|---|---|
+| R6-01 | Start hold timer | Timestamp log | 20-minute window started | [ ] |
+| R6-02 | Health polling | Runbook `R6-M1` | 100% success (all polls 200) | [ ] |
+| R6-03 | Contribution status check | Runbook `R6-M2` | No unexplained failed-state spike | [ ] |
+| R6-04 | Payout status check | Runbook `R6-M3` | No unexplained failed-state spike | [ ] |
+| R6-05 | 5xx + constraint-error monitoring | Dashboard evidence | 5xx increase <= 0.5pp and no sustained constraint-error spike | [ ] |
+
+---
+
+## 7) Existing-Flow Smoke Checks (Runbook R7)
+
+| ID | Task | Command / Evidence | Expected Result | Done |
+|---|---|---|---|---|
+| R7-01 | Existing Karri create flow | Smoke evidence link | PASS | [ ] |
+| R7-02 | Existing contribution flow | Smoke evidence link | PASS | [ ] |
+| R7-03 | Existing payout automation path | Smoke evidence link | PASS | [ ] |
+
+---
+
+## 8) Decision and Rollback Control (Runbook R8/R9)
+
+| ID | Task | Command / Evidence | Expected Result | Done |
+|---|---|---|---|---|
+| R8-01 | GO/NO-GO template completed | `docs/implementation-docs/GIFTA_UX_V2_GO_NO_GO_TEMPLATE.md` | Fully filled and signed | [ ] |
+| R9-01 | If NO-GO: app rollback executed | Deploy log link | Previous app release restored | [ ] |
+| R9-02 | If NO-GO: schema left forward | DB notes | No ad-hoc destructive DB rollback | [ ] |
+
+---
+
+## 9) Post-Window Closeout + Doc Sync (Runbook R10)
+
+| ID | Task | Command / Evidence | Expected Result | Done |
+|---|---|---|---|---|
+| R10-01 | Record execution timeline and outputs | Release notes link | Evidence complete | [ ] |
+| R10-02 | Regenerate OpenAPI | `pnpm openapi:generate` | Command succeeds | [ ] |
+| R10-03 | Validate generated OpenAPI | `pnpm test tests/unit/openapi-spec.test.ts` | Test passes | [ ] |
+| R10-04 | Canonical/API/DATA docs synced | Doc links | Reflect deployed behavior | [ ] |
+| R10-05 | Follow-up tasks logged | Ticket links | NOT NULL tighten + snapshot-collision follow-up tracked | [ ] |
+
+---
+
+## Final Status
+
+- [ ] Production migration accepted
+- [ ] Rolled back
