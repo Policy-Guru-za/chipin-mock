@@ -12,6 +12,7 @@ import {
 } from '@/lib/payments/payfast';
 import { enforceRateLimit } from '@/lib/auth/rate-limit';
 import { extractTimestampValue, validateWebhookTimestamp } from '@/lib/payments/webhook-utils';
+import { completeContributionWithResolvedCharity } from '@/lib/charities/allocation';
 import {
   getContributionByPaymentRef,
   getDreamBoardNotificationContext,
@@ -212,14 +213,19 @@ export async function POST(request: NextRequest) {
   if (contribution.paymentStatus === status) {
     return NextResponse.json({ received: true });
   }
-  await updateContributionStatus(contribution.id, status);
+  let charityCents: number | null = null;
+  if (status === 'completed') {
+    charityCents = await completeContributionWithResolvedCharity(contribution.id);
+  } else {
+    await updateContributionStatus(contribution.id, status);
+  }
   await invalidateDreamBoardCacheById(contribution.dreamBoardId);
 
   if (status === 'completed') {
     const wasFunded = await markDreamBoardFundedIfNeeded(contribution.dreamBoardId);
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
     const contributionPayload = await buildContributionWebhookPayload({
-      contribution: { ...contribution, paymentStatus: status },
+      contribution: { ...contribution, paymentStatus: status, charityCents },
       baseUrl,
     });
 

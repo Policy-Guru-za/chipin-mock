@@ -268,7 +268,7 @@ describe('payout service creation', () => {
     expect(karriBatchMocks.queueKarriCredit).not.toHaveBeenCalled();
   });
 
-  it('creates charity payout rows even when charity write-path toggle is disabled', async () => {
+  it('creates charity payout rows for already-linked charities even when writes are disabled', async () => {
     process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH = 'false';
 
     payoutQueryMocks.getDreamBoardPayoutContext.mockResolvedValue({

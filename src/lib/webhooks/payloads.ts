@@ -12,6 +12,7 @@ type ContributionRecord = {
   amountCents: number;
   feeCents: number;
   netCents: number | null;
+  charityCents?: number | null;
   paymentStatus: string;
   createdAt: Date;
 };

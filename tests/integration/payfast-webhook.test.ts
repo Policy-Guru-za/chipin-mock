@@ -61,6 +61,7 @@ afterEach(() => {
   vi.unmock('@/lib/dream-boards/cache');
   vi.unmock('@/lib/db/queries');
   vi.unmock('@/lib/payments/payfast');
+  vi.unmock('@/lib/charities/allocation');
   vi.clearAllMocks();
   vi.resetModules();
 });
@@ -87,12 +88,16 @@ describe('PayFast webhook integration - success', () => {
     const updateContributionStatus = vi.fn(async () => undefined);
     const markDreamBoardFundedIfNeeded = vi.fn(async () => undefined);
     const getDreamBoardNotificationContext = vi.fn(async () => null);
+    const completeContributionWithResolvedCharity = vi.fn(async () => 525);
 
     vi.doMock('@/lib/db/queries', () => ({
       getContributionByPaymentRef,
       updateContributionStatus,
       markDreamBoardFundedIfNeeded,
       getDreamBoardNotificationContext,
+    }));
+    vi.doMock('@/lib/charities/allocation', () => ({
+      completeContributionWithResolvedCharity,
     }));
 
     vi.doMock('@/lib/payments/payfast', async () => {
@@ -132,7 +137,8 @@ describe('PayFast webhook integration - success', () => {
     expect(payload.received).toBe(true);
 
     expect(getContributionByPaymentRef).toHaveBeenCalledWith('payfast', 'pay-123');
-    expect(updateContributionStatus).toHaveBeenCalledWith('contrib-1', 'completed');
+    expect(completeContributionWithResolvedCharity).toHaveBeenCalledWith('contrib-1');
+    expect(updateContributionStatus).not.toHaveBeenCalled();
     expect(markDreamBoardFundedIfNeeded).toHaveBeenCalledWith('board-1');
   });
 });
@@ -184,6 +190,9 @@ describe('PayFast webhook integration - errors', () => {
       updateContributionStatus,
       markDreamBoardFundedIfNeeded,
       getDreamBoardNotificationContext,
+    }));
+    vi.doMock('@/lib/charities/allocation', () => ({
+      completeContributionWithResolvedCharity: vi.fn(async () => null),
     }));
 
     vi.doMock('@/lib/payments/payfast', async () => {

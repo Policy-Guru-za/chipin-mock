@@ -75,6 +75,37 @@ Required operations:
 - completed charity payouts with references
 - downloadable report dataset for reconciliation
 
+## B4 Service DTOs
+
+### CharitySummaryDTO
+
+- `id`
+- `name`
+- `description`
+- `category`
+- `logo_url`
+- `website`
+- `contact_name`
+- `contact_email`
+- `is_active`
+
+### MonthlyCharitySummaryDTO
+
+- `charity_id`
+- `charity_name`
+- `total_charity_cents`
+- `payout_count`
+- `board_count`
+
+### BoardCharityBreakdownDTO
+
+- `dream_board_id`
+- `charity_id`
+- `charity_name`
+- `split_type` (`percentage` | `threshold`)
+- `total_charity_cents`
+- `allocated_contribution_count`
+
 ## Security Requirements
 
 - charity bank details stored encrypted

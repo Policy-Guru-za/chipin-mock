@@ -373,6 +373,13 @@ export async function updateContributionStatus(
     .where(and(eq(contributions.id, id), ne(contributions.paymentStatus, status)));
 }
 
+export async function setContributionCharityCents(id: string, charityCents: number | null) {
+  await db
+    .update(contributions)
+    .set({ charityCents, updatedAt: new Date() })
+    .where(eq(contributions.id, id));
+}
+
 export async function getApiKeyByHash(params: { keyPrefix: string; keyHash: string }) {
   const [apiKey] = await db
     .select({

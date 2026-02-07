@@ -31,6 +31,7 @@ afterEach(() => {
   vi.unmock('@/lib/auth/rate-limit');
   vi.unmock('@/lib/dream-boards/cache');
   vi.unmock('@/lib/db/queries');
+  vi.unmock('@/lib/charities/allocation');
   vi.clearAllMocks();
   vi.resetModules();
 });
@@ -52,11 +53,15 @@ describe('SnapScan webhook integration - success', () => {
     const getContributionByPaymentRef = vi.fn(async () => contribution);
     const updateContributionStatus = vi.fn(async () => undefined);
     const markDreamBoardFundedIfNeeded = vi.fn(async () => undefined);
+    const completeContributionWithResolvedCharity = vi.fn(async () => null);
 
     vi.doMock('@/lib/db/queries', () => ({
       getContributionByPaymentRef,
       updateContributionStatus,
       markDreamBoardFundedIfNeeded,
+    }));
+    vi.doMock('@/lib/charities/allocation', () => ({
+      completeContributionWithResolvedCharity,
     }));
 
     const payload = {
@@ -90,7 +95,8 @@ describe('SnapScan webhook integration - success', () => {
     expect(result.received).toBe(true);
 
     expect(getContributionByPaymentRef).toHaveBeenCalledWith('snapscan', 'SNAP-123');
-    expect(updateContributionStatus).toHaveBeenCalledWith('contrib-1', 'completed');
+    expect(completeContributionWithResolvedCharity).toHaveBeenCalledWith('contrib-1');
+    expect(updateContributionStatus).not.toHaveBeenCalled();
     expect(markDreamBoardFundedIfNeeded).toHaveBeenCalledWith('board-1');
   });
 });
@@ -117,6 +123,9 @@ describe('SnapScan webhook integration - validation', () => {
       getContributionByPaymentRef,
       updateContributionStatus,
       markDreamBoardFundedIfNeeded,
+    }));
+    vi.doMock('@/lib/charities/allocation', () => ({
+      completeContributionWithResolvedCharity: vi.fn(async () => null),
     }));
 
     const payload = {
@@ -170,6 +179,9 @@ describe('SnapScan webhook integration - validation', () => {
       getContributionByPaymentRef,
       updateContributionStatus,
       markDreamBoardFundedIfNeeded,
+    }));
+    vi.doMock('@/lib/charities/allocation', () => ({
+      completeContributionWithResolvedCharity: vi.fn(async () => null),
     }));
 
     const payload = {

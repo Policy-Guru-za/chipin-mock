@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { isMockPaymentWebhooks } from '@/lib/config/feature-flags';
+import { completeContributionWithResolvedCharity } from '@/lib/charities/allocation';
 import {
   extractSnapScanReference,
   mapSnapScanStatus,
@@ -168,14 +169,19 @@ export async function POST(request: NextRequest) {
   if (contribution.paymentStatus === status) {
     return NextResponse.json({ received: true });
   }
-  await updateContributionStatus(contribution.id, status);
+  let charityCents: number | null = null;
+  if (status === 'completed') {
+    charityCents = await completeContributionWithResolvedCharity(contribution.id);
+  } else {
+    await updateContributionStatus(contribution.id, status);
+  }
   await invalidateDreamBoardCacheById(contribution.dreamBoardId);
 
   if (status === 'completed') {
     const wasFunded = await markDreamBoardFundedIfNeeded(contribution.dreamBoardId);
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
     const contributionPayload = await buildContributionWebhookPayload({
-      contribution: { ...contribution, paymentStatus: status },
+      contribution: { ...contribution, paymentStatus: status, charityCents },
       baseUrl,
     });
 

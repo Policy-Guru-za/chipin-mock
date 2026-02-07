@@ -26,6 +26,7 @@ describe('Ozow webhook integration', () => {
     vi.unmock('@/lib/dream-boards/cache');
     vi.unmock('@/lib/db/queries');
     vi.unmock('@/lib/payments/ozow');
+    vi.unmock('@/lib/charities/allocation');
     vi.clearAllMocks();
     vi.resetModules();
   });
@@ -45,11 +46,15 @@ describe('Ozow webhook integration', () => {
     const getContributionByPaymentRef = vi.fn(async () => contribution);
     const updateContributionStatus = vi.fn(async () => undefined);
     const markDreamBoardFundedIfNeeded = vi.fn(async () => undefined);
+    const completeContributionWithResolvedCharity = vi.fn(async () => null);
 
     vi.doMock('@/lib/db/queries', () => ({
       getContributionByPaymentRef,
       updateContributionStatus,
       markDreamBoardFundedIfNeeded,
+    }));
+    vi.doMock('@/lib/charities/allocation', () => ({
+      completeContributionWithResolvedCharity,
     }));
 
     vi.doMock('@/lib/payments/ozow', async () => {
@@ -81,7 +86,8 @@ describe('Ozow webhook integration', () => {
     expect(payload.received).toBe(true);
 
     expect(getContributionByPaymentRef).toHaveBeenCalledWith('ozow', 'OZOW-123');
-    expect(updateContributionStatus).toHaveBeenCalledWith('contrib-1', 'completed');
+    expect(completeContributionWithResolvedCharity).toHaveBeenCalledWith('contrib-1');
+    expect(updateContributionStatus).not.toHaveBeenCalled();
     expect(markDreamBoardFundedIfNeeded).toHaveBeenCalledWith('board-1');
   });
 
@@ -105,6 +111,9 @@ describe('Ozow webhook integration', () => {
       getContributionByPaymentRef,
       updateContributionStatus,
       markDreamBoardFundedIfNeeded,
+    }));
+    vi.doMock('@/lib/charities/allocation', () => ({
+      completeContributionWithResolvedCharity: vi.fn(async () => null),
     }));
 
     vi.doMock('@/lib/payments/ozow', async () => {

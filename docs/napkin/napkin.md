@@ -14,6 +14,7 @@
 | 2026-02-07 | self | Assumed `pnpm test -- <file>` would run only targeted tests | In this repo it still runs the full Vitest suite; use command expectations accordingly when planning verification time |
 | 2026-02-07 | self | Added `getActiveCharityById` into runtime paths without updating older `db/queries` mocks | When adding query dependencies, centralize mock builders in integration tests and update all call sites immediately |
 | 2026-02-07 | self | Followed phase command `pnpm test tests/unit/payouts` expecting coverage, but repo has no matching directory | Run the milestone command for evidence, then run concrete payout unit files explicitly to validate behavior |
+| 2026-02-07 | self | In charity threshold resolver, queried historical allocations before idempotency short-circuit | Return existing `charity_cents` first for already-completed contributions; only query historical totals when a fresh threshold allocation is needed |
 
 ## User Preferences
 - Start with required doc read order before implementation.
@@ -26,6 +27,7 @@
 - Bind runtime schemas and OpenAPI enums to `decision-locks.ts`, then assert parity in unit tests.
 - Restore env toggles (`UX_V2_ENABLE_*`) after each test to prevent cross-test gate leakage.
 - Keep payout readiness predicates aligned with `calculatePayoutTotals` (bounded charity + `giftCents > 0`) to avoid permanent false-ready boards.
+- For threshold charity completion paths, serialize per `dream_board_id` (transaction + advisory lock) and persist `charity_cents` with `payment_status='completed'` in the same transaction.
 
 ## Patterns That Don't Work
 - Skipping preflight docs causes rework and misalignment.

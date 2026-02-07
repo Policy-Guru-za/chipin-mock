@@ -3,9 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { isMockPayments } from '@/lib/config/feature-flags';
+import { completeContributionWithResolvedCharity } from '@/lib/charities/allocation';
 import { db } from '@/lib/db';
 import { contributions } from '@/lib/db/schema';
-import { markDreamBoardFundedIfNeeded, updateContributionStatus } from '@/lib/db/queries';
+import { markDreamBoardFundedIfNeeded } from '@/lib/db/queries';
 import { invalidateDreamBoardCacheById } from '@/lib/dream-boards/cache';
 
 const requestSchema = z.object({
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (contribution.paymentStatus !== 'completed') {
-    await updateContributionStatus(contribution.id, 'completed');
+    await completeContributionWithResolvedCharity(contribution.id);
     await invalidateDreamBoardCacheById(contribution.dreamBoardId);
     await markDreamBoardFundedIfNeeded(contribution.dreamBoardId);
   }
