@@ -1,0 +1,9 @@
+ignoredBuiltDependencies:
+  - '@sentry/cli'
+  - protobufjs
+  - sharp
+
+onlyBuiltDependencies:
+  - '@clerk/shared'
+  - esbuild
+  - unrs-resolver
