@@ -73,6 +73,7 @@ describe('GET /api/v1/dream-boards/[id]/contributions', () => {
 
     expect(response.status).toBe(200);
     expect(payload.data).toHaveLength(1);
+    expect(payload.data[0].charity_cents).toBeNull();
     expect(payload.pagination.has_more).toBe(true);
     expect(listContributionsForApi).toHaveBeenCalledWith(
       expect.objectContaining({ partnerId: 'partner-1', dreamBoardId: 'board-1' })

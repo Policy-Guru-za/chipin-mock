@@ -6,6 +6,7 @@ type ContributionApiRecord = {
   amountCents: number;
   feeCents: number;
   netCents: number | null;
+  charityCents?: number | null;
   paymentStatus: string;
   createdAt: Date | string;
 };
@@ -23,6 +24,7 @@ export const serializeContribution = (record: ContributionApiRecord) => ({
   amount_cents: record.amountCents,
   fee_cents: record.feeCents,
   net_cents: record.netCents ?? record.amountCents - record.feeCents,
+  charity_cents: record.charityCents ?? null,
   payment_status: record.paymentStatus,
   created_at: toIsoString(record.createdAt),
 });

@@ -6,9 +6,10 @@ import { parseCursor, parseQuery, withApiAuth } from '@/lib/api/route-utils';
 import { jsonError, jsonPaginated } from '@/lib/api/response';
 import { serializePayout } from '@/lib/api/payouts';
 import { listPendingPayoutsForApi } from '@/lib/db/api-queries';
+import { LOCKED_PAYOUT_TYPES } from '@/lib/ux-v2/decision-locks';
 
 const querySchema = z.object({
-  type: z.enum(['karri_card']).optional(),
+  type: z.enum(LOCKED_PAYOUT_TYPES).optional(),
   limit: z.coerce.number().int().min(1).max(100).default(20),
   after: z.string().optional(),
 });

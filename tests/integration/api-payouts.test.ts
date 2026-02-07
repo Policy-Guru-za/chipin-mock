@@ -97,6 +97,26 @@ describe('GET /api/v1/payouts/pending', () => {
     );
     expect(markApiKeyUsed).toHaveBeenCalledWith('api-key-3');
   });
+
+  it('accepts charity payout type filters', async () => {
+    mockAuth();
+
+    const listPendingPayoutsForApi = vi.fn(async () => []);
+    const markApiKeyUsed = vi.fn(async () => undefined);
+
+    vi.doMock('@/lib/db/api-queries', () => ({ listPendingPayoutsForApi }));
+    vi.doMock('@/lib/db/queries', () => ({ markApiKeyUsed }));
+
+    const { GET } = await loadPendingHandler();
+    const response = await GET(
+      new Request('http://localhost/api/v1/payouts/pending?type=charity')
+    );
+
+    expect(response.status).toBe(200);
+    expect(listPendingPayoutsForApi).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'charity' })
+    );
+  });
 });
 
 describe('POST /api/v1/payouts/[id]/confirm', () => {

@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "ChipIn Public API",
+    "title": "Gifta Public API",
     "version": "1.0.0",
     "description": "Partner API for Dream Boards, contributions, payouts, and webhooks."
   },
@@ -159,6 +159,9 @@
           "409": {
             "$ref": "#/components/responses/ConflictError"
           },
+          "422": {
+            "$ref": "#/components/responses/UnsupportedOperationError"
+          },
           "429": {
             "$ref": "#/components/responses/RateLimitError"
           },
@@ -212,6 +215,74 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFoundError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Dream Boards"
+        ],
+        "summary": "Update a dream board",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/DreamBoardId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DreamBoardUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Dream board updated",
+            "headers": {
+              "X-RateLimit-Limit": {
+                "$ref": "#/components/headers/RateLimitLimit"
+              },
+              "X-RateLimit-Remaining": {
+                "$ref": "#/components/headers/RateLimitRemaining"
+              },
+              "X-RateLimit-Reset": {
+                "$ref": "#/components/headers/RateLimitReset"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DreamBoardResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnsupportedOperationError"
           },
           "429": {
             "$ref": "#/components/responses/RateLimitError"
@@ -883,6 +954,16 @@
           }
         }
       },
+      "UnsupportedOperationError": {
+        "description": "Unsupported operation for current rollout phase",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
       "RateLimitError": {
         "description": "Rate limited",
         "headers": {
@@ -953,6 +1034,8 @@
               "not_found",
               "validation_error",
               "conflict",
+              "unsupported_operation",
+              "invalid_reminder_window",
               "rate_limited",
               "internal_error"
             ]
@@ -1021,7 +1104,16 @@
       "PayoutMethod": {
         "type": "string",
         "enum": [
-          "karri_card"
+          "karri_card",
+          "bank"
+        ],
+        "description": "UX v2 enum set. Legacy clients that assumed karri_card-only responses must handle bank values."
+      },
+      "CharitySplitType": {
+        "type": "string",
+        "enum": [
+          "percentage",
+          "threshold"
         ]
       },
       "DisplayMode": {
@@ -1057,11 +1149,27 @@
           "slug",
           "child_name",
           "child_photo_url",
+          "child_age",
+          "birthday_date",
+          "party_date",
+          "campaign_end_date",
           "gift_data",
+          "gift_description",
           "payout_method",
+          "karri_card_holder_name",
+          "bank_name",
+          "bank_account_last4",
+          "bank_branch_code",
+          "bank_account_holder",
+          "payout_email",
+          "charity_enabled",
+          "charity_id",
+          "charity_split_type",
+          "charity_percentage_bps",
+          "charity_threshold_cents",
           "goal_cents",
           "raised_cents",
-          "party_date",
+          "message",
           "status",
           "display_mode",
           "contribution_count",
@@ -1084,15 +1192,81 @@
             "type": "string",
             "format": "uri"
           },
+          "child_age": {
+            "type": "integer",
+            "nullable": true
+          },
+          "birthday_date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
           "party_date": {
             "type": "string",
             "format": "date"
           },
+          "campaign_end_date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
           "gift_data": {
             "$ref": "#/components/schemas/GiftData"
           },
+          "gift_description": {
+            "type": "string",
+            "nullable": true
+          },
           "payout_method": {
             "$ref": "#/components/schemas/PayoutMethod"
+          },
+          "karri_card_holder_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "bank_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "bank_account_last4": {
+            "type": "string",
+            "nullable": true
+          },
+          "bank_branch_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "bank_account_holder": {
+            "type": "string",
+            "nullable": true
+          },
+          "payout_email": {
+            "type": "string",
+            "format": "email"
+          },
+          "charity_enabled": {
+            "type": "boolean"
+          },
+          "charity_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "charity_split_type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CharitySplitType"
+              }
+            ],
+            "nullable": true
+          },
+          "charity_percentage_bps": {
+            "type": "integer",
+            "nullable": true
+          },
+          "charity_threshold_cents": {
+            "type": "integer",
+            "nullable": true
           },
           "goal_cents": {
             "type": "integer"
@@ -1137,9 +1311,7 @@
           "gift_image_url",
           "goal_cents",
           "payout_email",
-          "host_whatsapp_number",
-          "karri_card_number",
-          "karri_card_holder_name"
+          "host_whatsapp_number"
         ],
         "properties": {
           "child_name": {
@@ -1147,11 +1319,24 @@
             "minLength": 2,
             "maxLength": 50
           },
+          "child_age": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 18
+          },
           "child_photo_url": {
             "type": "string",
             "format": "uri"
           },
+          "birthday_date": {
+            "type": "string",
+            "format": "date"
+          },
           "party_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "campaign_end_date": {
             "type": "string",
             "format": "date"
           },
@@ -1159,6 +1344,11 @@
             "type": "string",
             "minLength": 2,
             "maxLength": 200
+          },
+          "gift_description": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 500
           },
           "gift_image_url": {
             "type": "string",
@@ -1170,6 +1360,9 @@
           "goal_cents": {
             "type": "integer",
             "minimum": 2000
+          },
+          "payout_method": {
+            "$ref": "#/components/schemas/PayoutMethod"
           },
           "payout_email": {
             "type": "string",
@@ -1184,12 +1377,101 @@
           "karri_card_holder_name": {
             "type": "string"
           },
+          "bank_name": {
+            "type": "string"
+          },
+          "bank_account_number": {
+            "type": "string"
+          },
+          "bank_branch_code": {
+            "type": "string"
+          },
+          "bank_account_holder": {
+            "type": "string"
+          },
+          "charity_enabled": {
+            "type": "boolean"
+          },
+          "charity_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "charity_split_type": {
+            "$ref": "#/components/schemas/CharitySplitType"
+          },
+          "charity_percentage_bps": {
+            "type": "integer",
+            "minimum": 500,
+            "maximum": 5000
+          },
+          "charity_threshold_cents": {
+            "type": "integer",
+            "minimum": 5000
+          },
           "message": {
             "type": "string",
             "maxLength": 280
           }
         },
-        "description": "Creates a dream board with a single gift and Karri card payout."
+        "description": "Creates a dream board. Bank and charity write paths are accepted in schema but return unsupported_operation (422) until Phase B2 runtime gating is enabled."
+      },
+      "DreamBoardUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "maxLength": 280,
+            "nullable": true
+          },
+          "party_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "$ref": "#/components/schemas/DreamBoardStatus"
+          },
+          "payout_method": {
+            "$ref": "#/components/schemas/PayoutMethod"
+          },
+          "karri_card_number": {
+            "type": "string"
+          },
+          "karri_card_holder_name": {
+            "type": "string"
+          },
+          "bank_name": {
+            "type": "string"
+          },
+          "bank_account_number": {
+            "type": "string"
+          },
+          "bank_branch_code": {
+            "type": "string"
+          },
+          "bank_account_holder": {
+            "type": "string"
+          },
+          "charity_enabled": {
+            "type": "boolean"
+          },
+          "charity_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "charity_split_type": {
+            "$ref": "#/components/schemas/CharitySplitType"
+          },
+          "charity_percentage_bps": {
+            "type": "integer",
+            "minimum": 500,
+            "maximum": 5000
+          },
+          "charity_threshold_cents": {
+            "type": "integer",
+            "minimum": 5000
+          }
+        },
+        "description": "Updates a dream board. Payout and charity mutation paths currently return unsupported_operation (422) until Phase B2."
       },
       "DreamBoardResponse": {
         "type": "object",
@@ -1246,6 +1528,7 @@
           "amount_cents",
           "fee_cents",
           "net_cents",
+          "charity_cents",
           "payment_status",
           "created_at"
         ],
@@ -1273,6 +1556,10 @@
           },
           "net_cents": {
             "type": "integer"
+          },
+          "charity_cents": {
+            "type": "integer",
+            "nullable": true
           },
           "payment_status": {
             "$ref": "#/components/schemas/ContributionStatus"
@@ -1323,8 +1610,11 @@
       "PayoutType": {
         "type": "string",
         "enum": [
-          "karri_card"
-        ]
+          "karri_card",
+          "bank",
+          "charity"
+        ],
+        "description": "UX v2 enum set. Legacy clients that assumed karri_card-only payout types must handle bank and charity."
       },
       "PayoutStatus": {
         "type": "string",
@@ -1349,10 +1639,53 @@
             "$ref": "#/components/schemas/PayoutMethod"
           },
           "karri_card_holder_name": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
+          },
+          "bank_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "bank_account_last4": {
+            "type": "string",
+            "nullable": true
+          },
+          "bank_branch_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "bank_account_holder": {
+            "type": "string",
+            "nullable": true
+          },
+          "charity_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "charity_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "charity_split_type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CharitySplitType"
+              }
+            ],
+            "nullable": true
+          },
+          "charity_percentage_bps": {
+            "type": "integer",
+            "nullable": true
+          },
+          "charity_threshold_cents": {
+            "type": "integer",
+            "nullable": true
           },
           "gift_data": {
-            "$ref": "#/components/schemas/GiftData"
+            "$ref": "#/components/schemas/GiftData",
+            "nullable": true
           },
           "card_number_last4": {
             "type": "string",
@@ -1372,6 +1705,7 @@
           "type",
           "gross_cents",
           "fee_cents",
+          "charity_cents",
           "net_cents",
           "status",
           "created_at"
@@ -1391,6 +1725,9 @@
             "type": "integer"
           },
           "fee_cents": {
+            "type": "integer"
+          },
+          "charity_cents": {
             "type": "integer"
           },
           "net_cents": {

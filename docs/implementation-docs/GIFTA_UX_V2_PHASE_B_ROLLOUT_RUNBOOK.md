@@ -39,11 +39,25 @@ Expected: both HTTP `200`.
 2. confirm environment toggles default-safe
 3. confirm monitoring dashboards open and alert channels armed
 
+Required default-safe values:
+
+- `UX_V2_ENABLE_BANK_WRITE_PATH=false`
+- `UX_V2_ENABLE_CHARITY_WRITE_PATH=false`
+
+These gates are config/env driven and can be flipped at deploy time without a code change.
+
 ## B-R2 Canary Enablement
 
 1. deploy Phase B code with behavior toggles still restricted
 2. run API smoke checks
 3. enable behavior toggles for canary partner/traffic slice
+
+Flip sequence (recommended):
+
+1. enable bank writes first: `UX_V2_ENABLE_BANK_WRITE_PATH=true`
+2. validate bank create/update + payout downstream observability
+3. enable charity writes: `UX_V2_ENABLE_CHARITY_WRITE_PATH=true`
+4. validate charity payload validation and active-charity enforcement
 
 Hard stop if critical path fails.
 
@@ -100,6 +114,8 @@ Trigger rollback if:
 Rollback steps:
 
 1. disable behavior toggles
+   - set `UX_V2_ENABLE_BANK_WRITE_PATH=false`
+   - set `UX_V2_ENABLE_CHARITY_WRITE_PATH=false`
 2. roll back app deployment
 3. preserve evidence and incident log
 4. communicate NO-GO decision

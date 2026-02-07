@@ -1,9 +1,15 @@
 /* eslint-disable max-lines */
 
+import {
+  LOCKED_CHARITY_SPLIT_MODES,
+  LOCKED_PAYOUT_METHODS,
+  LOCKED_PAYOUT_TYPES,
+} from '@/lib/ux-v2/decision-locks';
+
 export const openApiSpec = {
   openapi: '3.0.3',
   info: {
-    title: 'ChipIn Public API',
+    title: 'Gifta Public API',
     version: '1.0.0',
     description: 'Partner API for Dream Boards, contributions, payouts, and webhooks.',
   },
@@ -154,6 +160,9 @@ export const openApiSpec = {
           '403': {
             $ref: '#/components/responses/ForbiddenError',
           },
+          '422': {
+            $ref: '#/components/responses/UnsupportedOperationError',
+          },
           '409': {
             $ref: '#/components/responses/ConflictError',
           },
@@ -208,6 +217,72 @@ export const openApiSpec = {
           },
           '404': {
             $ref: '#/components/responses/NotFoundError',
+          },
+          '429': {
+            $ref: '#/components/responses/RateLimitError',
+          },
+          '500': {
+            $ref: '#/components/responses/InternalError',
+          },
+        },
+      },
+      patch: {
+        tags: ['Dream Boards'],
+        summary: 'Update a dream board',
+        parameters: [
+          {
+            $ref: '#/components/parameters/DreamBoardId',
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/DreamBoardUpdateRequest',
+              },
+            },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'Dream board updated',
+            headers: {
+              'X-RateLimit-Limit': {
+                $ref: '#/components/headers/RateLimitLimit',
+              },
+              'X-RateLimit-Remaining': {
+                $ref: '#/components/headers/RateLimitRemaining',
+              },
+              'X-RateLimit-Reset': {
+                $ref: '#/components/headers/RateLimitReset',
+              },
+            },
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/DreamBoardResponse',
+                },
+              },
+            },
+          },
+          '400': {
+            $ref: '#/components/responses/ValidationError',
+          },
+          '401': {
+            $ref: '#/components/responses/UnauthorizedError',
+          },
+          '403': {
+            $ref: '#/components/responses/ForbiddenError',
+          },
+          '404': {
+            $ref: '#/components/responses/NotFoundError',
+          },
+          '409': {
+            $ref: '#/components/responses/ConflictError',
+          },
+          '422': {
+            $ref: '#/components/responses/UnsupportedOperationError',
           },
           '429': {
             $ref: '#/components/responses/RateLimitError',
@@ -861,6 +936,16 @@ export const openApiSpec = {
           },
         },
       },
+      UnsupportedOperationError: {
+        description: 'Unsupported operation for current rollout phase',
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/ErrorResponse',
+            },
+          },
+        },
+      },
       RateLimitError: {
         description: 'Rate limited',
         headers: {
@@ -925,6 +1010,8 @@ export const openApiSpec = {
               'not_found',
               'validation_error',
               'conflict',
+              'unsupported_operation',
+              'invalid_reminder_window',
               'rate_limited',
               'internal_error',
             ],
@@ -976,7 +1063,13 @@ export const openApiSpec = {
       },
       PayoutMethod: {
         type: 'string',
-        enum: ['karri_card'],
+        enum: LOCKED_PAYOUT_METHODS,
+        description:
+          'UX v2 enum set. Legacy clients that assumed karri_card-only responses must handle bank values.',
+      },
+      CharitySplitType: {
+        type: 'string',
+        enum: LOCKED_CHARITY_SPLIT_MODES,
       },
       DisplayMode: {
         type: 'string',
@@ -1006,11 +1099,27 @@ export const openApiSpec = {
           'slug',
           'child_name',
           'child_photo_url',
+          'child_age',
+          'birthday_date',
+          'party_date',
+          'campaign_end_date',
           'gift_data',
+          'gift_description',
           'payout_method',
+          'karri_card_holder_name',
+          'bank_name',
+          'bank_account_last4',
+          'bank_branch_code',
+          'bank_account_holder',
+          'payout_email',
+          'charity_enabled',
+          'charity_id',
+          'charity_split_type',
+          'charity_percentage_bps',
+          'charity_threshold_cents',
           'goal_cents',
           'raised_cents',
-          'party_date',
+          'message',
           'status',
           'display_mode',
           'contribution_count',
@@ -1033,15 +1142,77 @@ export const openApiSpec = {
             type: 'string',
             format: 'uri',
           },
+          child_age: {
+            type: 'integer',
+            nullable: true,
+          },
+          birthday_date: {
+            type: 'string',
+            format: 'date',
+            nullable: true,
+          },
           party_date: {
             type: 'string',
             format: 'date',
           },
+          campaign_end_date: {
+            type: 'string',
+            format: 'date',
+            nullable: true,
+          },
           gift_data: {
             $ref: '#/components/schemas/GiftData',
           },
+          gift_description: {
+            type: 'string',
+            nullable: true,
+          },
           payout_method: {
             $ref: '#/components/schemas/PayoutMethod',
+          },
+          karri_card_holder_name: {
+            type: 'string',
+            nullable: true,
+          },
+          bank_name: {
+            type: 'string',
+            nullable: true,
+          },
+          bank_account_last4: {
+            type: 'string',
+            nullable: true,
+          },
+          bank_branch_code: {
+            type: 'string',
+            nullable: true,
+          },
+          bank_account_holder: {
+            type: 'string',
+            nullable: true,
+          },
+          payout_email: {
+            type: 'string',
+            format: 'email',
+          },
+          charity_enabled: {
+            type: 'boolean',
+          },
+          charity_id: {
+            type: 'string',
+            format: 'uuid',
+            nullable: true,
+          },
+          charity_split_type: {
+            allOf: [{ $ref: '#/components/schemas/CharitySplitType' }],
+            nullable: true,
+          },
+          charity_percentage_bps: {
+            type: 'integer',
+            nullable: true,
+          },
+          charity_threshold_cents: {
+            type: 'integer',
+            nullable: true,
           },
           goal_cents: {
             type: 'integer',
@@ -1087,8 +1258,6 @@ export const openApiSpec = {
           'goal_cents',
           'payout_email',
           'host_whatsapp_number',
-          'karri_card_number',
-          'karri_card_holder_name',
         ],
         properties: {
           child_name: {
@@ -1096,11 +1265,24 @@ export const openApiSpec = {
             minLength: 2,
             maxLength: 50,
           },
+          child_age: {
+            type: 'integer',
+            minimum: 1,
+            maximum: 18,
+          },
           child_photo_url: {
             type: 'string',
             format: 'uri',
           },
+          birthday_date: {
+            type: 'string',
+            format: 'date',
+          },
           party_date: {
+            type: 'string',
+            format: 'date',
+          },
+          campaign_end_date: {
             type: 'string',
             format: 'date',
           },
@@ -1108,6 +1290,11 @@ export const openApiSpec = {
             type: 'string',
             minLength: 2,
             maxLength: 200,
+          },
+          gift_description: {
+            type: 'string',
+            minLength: 10,
+            maxLength: 500,
           },
           gift_image_url: {
             type: 'string',
@@ -1119,6 +1306,9 @@ export const openApiSpec = {
           goal_cents: {
             type: 'integer',
             minimum: 2000,
+          },
+          payout_method: {
+            $ref: '#/components/schemas/PayoutMethod',
           },
           payout_email: {
             type: 'string',
@@ -1133,12 +1323,103 @@ export const openApiSpec = {
           karri_card_holder_name: {
             type: 'string',
           },
+          bank_name: {
+            type: 'string',
+          },
+          bank_account_number: {
+            type: 'string',
+          },
+          bank_branch_code: {
+            type: 'string',
+          },
+          bank_account_holder: {
+            type: 'string',
+          },
+          charity_enabled: {
+            type: 'boolean',
+          },
+          charity_id: {
+            type: 'string',
+            format: 'uuid',
+          },
+          charity_split_type: {
+            $ref: '#/components/schemas/CharitySplitType',
+          },
+          charity_percentage_bps: {
+            type: 'integer',
+            minimum: 500,
+            maximum: 5000,
+          },
+          charity_threshold_cents: {
+            type: 'integer',
+            minimum: 5000,
+          },
           message: {
             type: 'string',
             maxLength: 280,
           },
         },
-        description: 'Creates a dream board with a single gift and Karri card payout.',
+        description:
+          'Creates a dream board. Bank and charity write paths are accepted in schema but return unsupported_operation (422) until Phase B2 runtime gating is enabled.',
+      },
+      DreamBoardUpdateRequest: {
+        type: 'object',
+        properties: {
+          message: {
+            type: 'string',
+            maxLength: 280,
+            nullable: true,
+          },
+          party_date: {
+            type: 'string',
+            format: 'date',
+          },
+          status: {
+            $ref: '#/components/schemas/DreamBoardStatus',
+          },
+          payout_method: {
+            $ref: '#/components/schemas/PayoutMethod',
+          },
+          karri_card_number: {
+            type: 'string',
+          },
+          karri_card_holder_name: {
+            type: 'string',
+          },
+          bank_name: {
+            type: 'string',
+          },
+          bank_account_number: {
+            type: 'string',
+          },
+          bank_branch_code: {
+            type: 'string',
+          },
+          bank_account_holder: {
+            type: 'string',
+          },
+          charity_enabled: {
+            type: 'boolean',
+          },
+          charity_id: {
+            type: 'string',
+            format: 'uuid',
+          },
+          charity_split_type: {
+            $ref: '#/components/schemas/CharitySplitType',
+          },
+          charity_percentage_bps: {
+            type: 'integer',
+            minimum: 500,
+            maximum: 5000,
+          },
+          charity_threshold_cents: {
+            type: 'integer',
+            minimum: 5000,
+          },
+        },
+        description:
+          'Updates a dream board. Payout and charity mutation paths currently return unsupported_operation (422) until Phase B2.',
       },
       DreamBoardResponse: {
         type: 'object',
@@ -1182,6 +1463,7 @@ export const openApiSpec = {
           'amount_cents',
           'fee_cents',
           'net_cents',
+          'charity_cents',
           'payment_status',
           'created_at',
         ],
@@ -1209,6 +1491,10 @@ export const openApiSpec = {
           },
           net_cents: {
             type: 'integer',
+          },
+          charity_cents: {
+            type: 'integer',
+            nullable: true,
           },
           payment_status: {
             $ref: '#/components/schemas/ContributionStatus',
@@ -1251,7 +1537,9 @@ export const openApiSpec = {
       },
       PayoutType: {
         type: 'string',
-        enum: ['karri_card'],
+        enum: LOCKED_PAYOUT_TYPES,
+        description:
+          'UX v2 enum set. Legacy clients that assumed karri_card-only payout types must handle bank and charity.',
       },
       PayoutStatus: {
         type: 'string',
@@ -1272,9 +1560,48 @@ export const openApiSpec = {
           },
           karri_card_holder_name: {
             type: 'string',
+            nullable: true,
+          },
+          bank_name: {
+            type: 'string',
+            nullable: true,
+          },
+          bank_account_last4: {
+            type: 'string',
+            nullable: true,
+          },
+          bank_branch_code: {
+            type: 'string',
+            nullable: true,
+          },
+          bank_account_holder: {
+            type: 'string',
+            nullable: true,
+          },
+          charity_id: {
+            type: 'string',
+            format: 'uuid',
+            nullable: true,
+          },
+          charity_name: {
+            type: 'string',
+            nullable: true,
+          },
+          charity_split_type: {
+            allOf: [{ $ref: '#/components/schemas/CharitySplitType' }],
+            nullable: true,
+          },
+          charity_percentage_bps: {
+            type: 'integer',
+            nullable: true,
+          },
+          charity_threshold_cents: {
+            type: 'integer',
+            nullable: true,
           },
           gift_data: {
             $ref: '#/components/schemas/GiftData',
+            nullable: true,
           },
           card_number_last4: {
             type: 'string',
@@ -1294,6 +1621,7 @@ export const openApiSpec = {
           'type',
           'gross_cents',
           'fee_cents',
+          'charity_cents',
           'net_cents',
           'status',
           'created_at',
@@ -1313,6 +1641,9 @@ export const openApiSpec = {
             type: 'integer',
           },
           fee_cents: {
+            type: 'integer',
+          },
+          charity_cents: {
             type: 'integer',
           },
           net_cents: {

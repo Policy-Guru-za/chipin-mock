@@ -6,6 +6,8 @@ export type ApiErrorCode =
   | 'not_found'
   | 'validation_error'
   | 'conflict'
+  | 'unsupported_operation'
+  | 'invalid_reminder_window'
   | 'rate_limited'
   | 'internal_error';
 

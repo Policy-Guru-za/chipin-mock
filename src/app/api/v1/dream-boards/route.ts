@@ -6,7 +6,7 @@ import { encodeCursor } from '@/lib/api/pagination';
 import { parseBody, parseCursor, parseQuery, withApiAuth } from '@/lib/api/route-utils';
 import { jsonError, jsonPaginated, jsonSuccess } from '@/lib/api/response';
 import { listDreamBoardsForApi } from '@/lib/db/api-queries';
-import { ensureHostForEmail } from '@/lib/db/queries';
+import { ensureHostForEmail, getActiveCharityById } from '@/lib/db/queries';
 import { db } from '@/lib/db';
 import { dreamBoards } from '@/lib/db/schema';
 import {
@@ -14,6 +14,8 @@ import {
   isPartyDateWithinRange,
   SA_MOBILE_REGEX,
 } from '@/lib/dream-boards/validation';
+import { LOCKED_CHARITY_SPLIT_MODES, LOCKED_PAYOUT_METHODS } from '@/lib/ux-v2/decision-locks';
+import { resolveWritePathBlockReason } from '@/lib/ux-v2/write-path-gates';
 import { encryptSensitiveValue } from '@/lib/utils/encryption';
 import { generateSlug } from '@/lib/utils/slug';
 import { parseDateOnly } from '@/lib/utils/date';
@@ -41,7 +43,7 @@ const createSchema = z
     gift_image_url: z.string().url(),
     gift_image_prompt: z.string().min(1).optional(),
     goal_cents: z.number().int().min(2000),
-    payout_method: z.enum(['karri_card', 'bank']).optional(),
+    payout_method: z.enum(LOCKED_PAYOUT_METHODS).optional(),
     payout_email: z.string().email(),
     host_whatsapp_number: z
       .string()
@@ -54,7 +56,7 @@ const createSchema = z
     bank_account_holder: z.string().min(2).max(120).optional(),
     charity_enabled: z.boolean().optional(),
     charity_id: z.string().uuid().optional(),
-    charity_split_type: z.enum(['percentage', 'threshold']).optional(),
+    charity_split_type: z.enum(LOCKED_CHARITY_SPLIT_MODES).optional(),
     charity_percentage_bps: z.number().int().min(500).max(5000).optional(),
     charity_threshold_cents: z.number().int().min(5000).optional(),
     message: z.string().max(280).optional(),
@@ -62,6 +64,13 @@ const createSchema = z
   .superRefine((value, ctx) => {
     ensureDateRanges(value, ctx);
     const payoutMethod = value.payout_method ?? 'karri_card';
+    const hasAnyBankField =
+      value.bank_name !== undefined ||
+      value.bank_account_number !== undefined ||
+      value.bank_branch_code !== undefined ||
+      value.bank_account_holder !== undefined;
+    const hasAnyKarriField =
+      value.karri_card_number !== undefined || value.karri_card_holder_name !== undefined;
 
     if (payoutMethod === 'karri_card') {
       if (!value.karri_card_number) {
@@ -76,6 +85,13 @@ const createSchema = z
           code: z.ZodIssueCode.custom,
           path: ['karri_card_holder_name'],
           message: 'Karri card holder name is required',
+        });
+      }
+      if (hasAnyBankField) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['payout_method'],
+          message: 'Bank fields require payout_method=bank',
         });
       }
     }
@@ -109,9 +125,31 @@ const createSchema = z
           message: 'Bank account holder is required',
         });
       }
+      if (hasAnyKarriField) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['payout_method'],
+          message: 'Karri card fields require payout_method=karri_card',
+        });
+      }
     }
 
     const charityEnabled = value.charity_enabled === true;
+    const hasAnyCharityField =
+      value.charity_id !== undefined ||
+      value.charity_split_type !== undefined ||
+      value.charity_percentage_bps !== undefined ||
+      value.charity_threshold_cents !== undefined;
+
+    if (!charityEnabled && hasAnyCharityField) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['charity_enabled'],
+        message: 'Charity fields require charity_enabled=true',
+      });
+      return;
+    }
+
     if (!charityEnabled) {
       return;
     }
@@ -217,6 +255,9 @@ const parseCreatePayload = async (request: NextRequest, requestId: string, heade
     message: 'Invalid dream board payload',
   });
 };
+
+const normalizeBankAccountNumber = (value: string) =>
+  value.replace(/\s+/g, '').replace(/-/g, '');
 
 const insertDreamBoard = async (params: {
   payload: CreatePayload;
@@ -352,9 +393,53 @@ export const POST = withApiAuth('dreamboards:write', async (request: NextRequest
   if (!parsed.ok) return parsed.response;
 
   const payoutMethod = parsed.data.payout_method ?? 'karri_card';
-  let karriCardNumberEncrypted: string | null = null;
-  let bankAccountNumberEncrypted: string | null = null;
-  let bankAccountLast4: string | null = null;
+  const isBankWriteRequested =
+    payoutMethod === 'bank' ||
+    parsed.data.bank_name !== undefined ||
+    parsed.data.bank_account_number !== undefined ||
+    parsed.data.bank_branch_code !== undefined ||
+    parsed.data.bank_account_holder !== undefined;
+  const isCharityWriteRequested =
+    parsed.data.charity_enabled === true ||
+    parsed.data.charity_id !== undefined ||
+    parsed.data.charity_split_type !== undefined ||
+    parsed.data.charity_percentage_bps !== undefined ||
+    parsed.data.charity_threshold_cents !== undefined;
+
+  if (parsed.data.charity_enabled === true && parsed.data.charity_id) {
+    const charity = await getActiveCharityById(parsed.data.charity_id);
+    if (!charity) {
+      return jsonError({
+        error: {
+          code: 'validation_error',
+          message: 'charity_id must reference an active charity',
+        },
+        status: 400,
+        requestId,
+        headers: rateLimitHeaders,
+      });
+    }
+  }
+
+  const blockReason = resolveWritePathBlockReason({
+    bankRequested: isBankWriteRequested,
+    charityRequested: isCharityWriteRequested,
+  });
+  if (blockReason) {
+    return jsonError({
+      error: {
+        code: 'unsupported_operation',
+        message: blockReason,
+      },
+      status: 422,
+      requestId,
+      headers: rateLimitHeaders,
+    });
+  }
+
+  let karriCardNumberEncrypted: string | null | undefined = null;
+  let bankAccountNumberEncrypted: string | null | undefined = null;
+  let bankAccountLast4: string | null | undefined = null;
 
   if (payoutMethod === 'karri_card') {
     const karriVerification = await verifyKarriCardForApi({
@@ -362,23 +447,27 @@ export const POST = withApiAuth('dreamboards:write', async (request: NextRequest
       requestId,
       headers: rateLimitHeaders,
     });
-
     if (!karriVerification.ok) {
       return karriVerification.response;
     }
     karriCardNumberEncrypted = encryptSensitiveValue(karriVerification.cardNumber);
   } else {
-    const bankAccountNumber = (parsed.data.bank_account_number ?? '').replace(/\D+/g, '');
-    if (!isBankAccountNumberValid(bankAccountNumber)) {
+    const normalizedBankAccountNumber = normalizeBankAccountNumber(
+      parsed.data.bank_account_number ?? ''
+    );
+    if (!isBankAccountNumberValid(normalizedBankAccountNumber)) {
       return jsonError({
-        error: { code: 'validation_error', message: 'Bank account number is invalid' },
+        error: {
+          code: 'validation_error',
+          message: 'Bank account number must contain 6-20 digits',
+        },
         status: 400,
         requestId,
         headers: rateLimitHeaders,
       });
     }
-    bankAccountNumberEncrypted = encryptSensitiveValue(bankAccountNumber);
-    bankAccountLast4 = bankAccountNumber.slice(-4);
+    bankAccountNumberEncrypted = encryptSensitiveValue(normalizedBankAccountNumber);
+    bankAccountLast4 = normalizedBankAccountNumber.slice(-4);
   }
 
   const host = await ensureHostForEmail(parsed.data.payout_email);
@@ -409,10 +498,32 @@ export const POST = withApiAuth('dreamboards:write', async (request: NextRequest
       childName: parsed.data.child_name,
       childPhotoUrl: parsed.data.child_photo_url,
       partyDate: parsed.data.party_date,
+      childAge: parsed.data.child_age ?? null,
+      birthdayDate: parsed.data.birthday_date ?? null,
+      campaignEndDate: parsed.data.campaign_end_date ?? parsed.data.party_date,
       giftName: parsed.data.gift_name,
+      giftDescription: parsed.data.gift_description ?? null,
       giftImageUrl: parsed.data.gift_image_url,
       giftImagePrompt: parsed.data.gift_image_prompt ?? null,
       payoutMethod,
+      karriCardHolderName: payoutMethod === 'karri_card' ? (parsed.data.karri_card_holder_name ?? null) : null,
+      bankName: payoutMethod === 'bank' ? (parsed.data.bank_name ?? null) : null,
+      bankAccountLast4: payoutMethod === 'bank' ? (bankAccountLast4 ?? null) : null,
+      bankBranchCode: payoutMethod === 'bank' ? (parsed.data.bank_branch_code ?? null) : null,
+      bankAccountHolder: payoutMethod === 'bank' ? (parsed.data.bank_account_holder ?? null) : null,
+      payoutEmail: parsed.data.payout_email,
+      charityEnabled: parsed.data.charity_enabled === true,
+      charityId: parsed.data.charity_enabled === true ? (parsed.data.charity_id ?? null) : null,
+      charitySplitType:
+        parsed.data.charity_enabled === true ? (parsed.data.charity_split_type ?? null) : null,
+      charityPercentageBps:
+        parsed.data.charity_enabled === true
+          ? (parsed.data.charity_percentage_bps ?? null)
+          : null,
+      charityThresholdCents:
+        parsed.data.charity_enabled === true
+          ? (parsed.data.charity_threshold_cents ?? null)
+          : null,
       goalCents: parsed.data.goal_cents,
       raisedCents: 0,
       message: parsed.data.message ?? null,

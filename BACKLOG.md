@@ -13,5 +13,5 @@
 - [ ] [B5][D-007] Implement reminder dispatch worker with bounded retries and `sent_at` idempotent update semantics. Owner: Droid. ETA: Phase B5.
 - [ ] [B6][D-004][D-005] Correct financial model: ensure `raised_cents` tracks gift contribution amount and funded transition uses lock semantics. Owner: Droid. ETA: Phase B6.
 - [ ] [B3/B4][D-008] Implement charity payout plan generation, monthly batch flow, and per-charity reconciliation report output. Owner: Droid. ETA: Phase B3-B4.
-- [ ] [B1/B7][D-009] Remove remaining user-facing legacy `chipin` branding strings from API/meta/export surfaces. Owner: Droid. ETA: Phase B1-B7.
+- [ ] [C6][D-009] Remove remaining user-facing legacy `chipin` branding strings from API/meta/export surfaces. Owner: Droid. ETA: Phase C6.
 - [ ] [C8][D-010] Add enforceable accessibility gate (WCAG 2.1 AA checks) to release verification pipeline. Owner: Droid. ETA: Phase C8.

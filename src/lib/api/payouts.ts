@@ -7,6 +7,7 @@ type PayoutApiRecord = {
   type: string;
   grossCents: number;
   feeCents: number;
+  charityCents?: number;
   netCents: number;
   recipientData: unknown;
   status: string;
@@ -39,6 +40,21 @@ const serializeRecipientBasics = (record: Record<string, unknown>) => {
   if (typeof record.payoutMethod === 'string') payload.payout_method = record.payoutMethod;
   if (typeof record.karriCardHolderName === 'string') {
     payload.karri_card_holder_name = record.karriCardHolderName;
+  }
+  if (typeof record.bankName === 'string') payload.bank_name = record.bankName;
+  if (typeof record.bankAccountLast4 === 'string') payload.bank_account_last4 = record.bankAccountLast4;
+  if (typeof record.bankBranchCode === 'string') payload.bank_branch_code = record.bankBranchCode;
+  if (typeof record.bankAccountHolder === 'string') {
+    payload.bank_account_holder = record.bankAccountHolder;
+  }
+  if (typeof record.charityId === 'string') payload.charity_id = record.charityId;
+  if (typeof record.charityName === 'string') payload.charity_name = record.charityName;
+  if (typeof record.charitySplitType === 'string') payload.charity_split_type = record.charitySplitType;
+  if (typeof record.charityPercentageBps === 'number') {
+    payload.charity_percentage_bps = record.charityPercentageBps;
+  }
+  if (typeof record.charityThresholdCents === 'number') {
+    payload.charity_threshold_cents = record.charityThresholdCents;
   }
   return payload;
 };
@@ -79,6 +95,7 @@ export const serializePayout = (record: PayoutApiRecord) => ({
   type: record.type,
   gross_cents: record.grossCents,
   fee_cents: record.feeCents,
+  charity_cents: record.charityCents ?? 0,
   net_cents: record.netCents,
   recipient_data: serializeRecipientData(record.recipientData),
   status: record.status,

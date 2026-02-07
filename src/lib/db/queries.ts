@@ -4,7 +4,7 @@ import type { PaymentProvider } from '@/lib/payments';
 import { isValidUuid } from '@/lib/utils/validation';
 
 import { db } from './index';
-import { apiKeys, contributions, dreamBoards, hosts } from './schema';
+import { apiKeys, charities, contributions, dreamBoards, hosts } from './schema';
 
 export const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
@@ -51,6 +51,16 @@ export async function ensureHostForEmail(email: string) {
   return created;
 }
 
+export async function getActiveCharityById(charityId: string) {
+  const [charity] = await db
+    .select({ id: charities.id, isActive: charities.isActive })
+    .from(charities)
+    .where(and(eq(charities.id, charityId), eq(charities.isActive, true)))
+    .limit(1);
+
+  return charity ?? null;
+}
+
 export async function getDreamBoardById(id: string, hostId: string) {
   const [board] = await db
     .select({
@@ -88,12 +98,27 @@ export async function getDreamBoardBySlug(slug: string, partnerId?: string) {
       slug: dreamBoards.slug,
       childName: dreamBoards.childName,
       childPhotoUrl: dreamBoards.childPhotoUrl,
+      childAge: dreamBoards.childAge,
+      birthdayDate: dreamBoards.birthdayDate,
       partyDate: dreamBoards.partyDate,
+      campaignEndDate: dreamBoards.campaignEndDate,
       giftName: dreamBoards.giftName,
+      giftDescription: dreamBoards.giftDescription,
       giftImageUrl: dreamBoards.giftImageUrl,
       giftImagePrompt: dreamBoards.giftImagePrompt,
       goalCents: dreamBoards.goalCents,
       payoutMethod: dreamBoards.payoutMethod,
+      karriCardHolderName: dreamBoards.karriCardHolderName,
+      bankName: dreamBoards.bankName,
+      bankAccountLast4: dreamBoards.bankAccountLast4,
+      bankBranchCode: dreamBoards.bankBranchCode,
+      bankAccountHolder: dreamBoards.bankAccountHolder,
+      payoutEmail: dreamBoards.payoutEmail,
+      charityEnabled: dreamBoards.charityEnabled,
+      charityId: dreamBoards.charityId,
+      charitySplitType: dreamBoards.charitySplitType,
+      charityPercentageBps: dreamBoards.charityPercentageBps,
+      charityThresholdCents: dreamBoards.charityThresholdCents,
       message: dreamBoards.message,
       status: dreamBoards.status,
       createdAt: dreamBoards.createdAt,
@@ -131,12 +156,27 @@ export const getDreamBoardByPublicId = async (identifier: string, partnerId?: st
       slug: dreamBoards.slug,
       childName: dreamBoards.childName,
       childPhotoUrl: dreamBoards.childPhotoUrl,
+      childAge: dreamBoards.childAge,
+      birthdayDate: dreamBoards.birthdayDate,
       partyDate: dreamBoards.partyDate,
+      campaignEndDate: dreamBoards.campaignEndDate,
       giftName: dreamBoards.giftName,
+      giftDescription: dreamBoards.giftDescription,
       giftImageUrl: dreamBoards.giftImageUrl,
       giftImagePrompt: dreamBoards.giftImagePrompt,
       goalCents: dreamBoards.goalCents,
       payoutMethod: dreamBoards.payoutMethod,
+      karriCardHolderName: dreamBoards.karriCardHolderName,
+      bankName: dreamBoards.bankName,
+      bankAccountLast4: dreamBoards.bankAccountLast4,
+      bankBranchCode: dreamBoards.bankBranchCode,
+      bankAccountHolder: dreamBoards.bankAccountHolder,
+      payoutEmail: dreamBoards.payoutEmail,
+      charityEnabled: dreamBoards.charityEnabled,
+      charityId: dreamBoards.charityId,
+      charitySplitType: dreamBoards.charitySplitType,
+      charityPercentageBps: dreamBoards.charityPercentageBps,
+      charityThresholdCents: dreamBoards.charityThresholdCents,
       message: dreamBoards.message,
       status: dreamBoards.status,
       createdAt: dreamBoards.createdAt,
