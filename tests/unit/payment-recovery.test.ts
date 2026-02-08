@@ -14,10 +14,11 @@ const slug = 'maya-board';
 
 const attempt: PaymentAttemptData = {
   amountCents: 5000,
+  paymentProvider: 'payfast',
   displayName: 'Ava',
   message: 'Happy birthday',
   isAnonymous: false,
-  attemptedMethod: 'card',
+  attemptedMethod: 'payfast',
   reason: 'declined',
 };
 
@@ -36,6 +37,7 @@ describe('payment recovery storage', () => {
     const stored = getPaymentAttemptData(slug);
     expect(stored?.displayName).toBe('Ava');
     expect(stored?.reason).toBe('declined');
+    expect(stored?.paymentProvider).toBe('payfast');
   });
 
   it('getPaymentAttemptData expires payload older than 30 minutes', () => {

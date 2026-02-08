@@ -1,8 +1,10 @@
 export type PaymentAttemptData = {
   amountCents: number;
+  paymentProvider?: string | null;
   displayName: string | null;
   message: string | null;
   isAnonymous: boolean;
+  // Legacy field retained for backward compatibility with C2 reads.
   attemptedMethod: string | null;
   reason: string | null;
   timestamp?: number;
@@ -14,7 +16,16 @@ const getKey = (slug: string) => `gifta_payment_failed_${slug}`;
 
 export function savePaymentAttemptData(slug: string, data: PaymentAttemptData): void {
   if (typeof window === 'undefined') return;
-  sessionStorage.setItem(getKey(slug), JSON.stringify({ ...data, timestamp: Date.now() }));
+  const paymentProvider = data.paymentProvider ?? data.attemptedMethod ?? null;
+  sessionStorage.setItem(
+    getKey(slug),
+    JSON.stringify({
+      ...data,
+      paymentProvider,
+      attemptedMethod: data.attemptedMethod ?? paymentProvider,
+      timestamp: Date.now(),
+    })
+  );
 }
 
 export function getPaymentAttemptData(slug: string): PaymentAttemptData | null {
@@ -28,7 +39,12 @@ export function getPaymentAttemptData(slug: string): PaymentAttemptData | null {
       sessionStorage.removeItem(getKey(slug));
       return null;
     }
-    return parsed;
+    const paymentProvider = parsed.paymentProvider ?? parsed.attemptedMethod ?? null;
+    return {
+      ...parsed,
+      paymentProvider,
+      attemptedMethod: parsed.attemptedMethod ?? paymentProvider,
+    };
   } catch {
     sessionStorage.removeItem(getKey(slug));
     return null;

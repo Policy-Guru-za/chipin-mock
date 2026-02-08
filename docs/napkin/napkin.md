@@ -72,3 +72,10 @@
 - Thank-you client copy should derive from view-model state; show celebration/receipt/persistence side effects only for confirmed completed contributions.
 - For modal a11y in this repo, prefer `aria-labelledby` wired to visible heading text over standalone `aria-label` when a heading already exists.
 - Defensively validate localStorage payload field types before using string methods in UI components (`trim`, etc.).
+
+## C3 Learnings (2026-02-08)
+- New payment-step tests that render `PaymentOverlay` must stub both legacy and modern media APIs (`matchMedia.addListener/removeListener` and `addEventListener/removeEventListener`) or `framer-motion` throws unhandled jsdom errors.
+- Currency assertions in tests must be locale-safe (`R 257,50` with NBSP/comma appears in this workspace), so avoid strict `R257.50` string matching; use regex that accepts spacing and both separators.
+- Payment-step integration assertions should not assume a single `fetch` call when analytics side effects are active; assert by endpoint/payload (`/api/internal/contributions/create`) instead of total call count.
+- C3 storage handoff stays reliable when Step 2 redirects immediately on missing/expired flow payload; this prevents stale direct-entry payment attempts and keeps route behavior deterministic.
+- `pnpm openapi:generate` can still hit `tsx` IPC `EPERM` under sandbox capture; rerun with escalated permissions for deterministic contract gate completion.

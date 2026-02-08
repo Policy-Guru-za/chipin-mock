@@ -18,12 +18,13 @@ export function PaymentFailedClient({ slug, childName, display, isClosed }: Paym
   const attemptSummary = useMemo(() => {
     const attempt = getPaymentAttemptData(slug);
     if (!attempt) return null;
+    const provider = attempt.paymentProvider ?? attempt.attemptedMethod;
     const amount = new Intl.NumberFormat('en-ZA', {
       style: 'currency',
       currency: 'ZAR',
       maximumFractionDigits: 0,
     }).format(attempt.amountCents / 100);
-    return `Last attempt: ${amount}${attempt.attemptedMethod ? ` via ${attempt.attemptedMethod}` : ''}.`;
+    return `Last attempt: ${amount}${provider ? ` via ${provider}` : ''}.`;
   }, [slug]);
 
   return (
