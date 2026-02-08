@@ -18,6 +18,7 @@
 | 2026-02-08 | self | Let full-suite timeouts block gates while single-file runs were green | Treat as deterministic test infra pressure; remove expensive per-test module reloads and set explicit Vitest `testTimeout` for this repo |
 | 2026-02-08 | self | Passed `$skill-name` inside double quotes to a shell command; shell expanded `$...` and corrupted generated prompt text | Use single quotes or escape `$` when passing literal skill tokens in CLI interface strings |
 | 2026-02-08 | self | Updated payout math but left one queue assertion on old pre-fee amount | When changing monetary semantics, immediately sweep payout service tests for queued amount expectations and ledger formulas |
+| 2026-02-08 | self | Used `apply_patch` through `exec_command` despite tool constraint warning | Use the dedicated `apply_patch` tool directly for file edits |
 
 ## User Preferences
 - Start with required doc read order before implementation.
@@ -35,6 +36,7 @@
 - For reminder scheduler idempotency, lock on `(dream_board_id,email)` and check existing pending reminder before insert; timestamp-based conflict keys drift on retried requests.
 - For WhatsApp webhooks, STOP must update both `whatsapp_contacts.opt_out_at` and pending `contribution_reminders.whatsapp_opt_out_at`; never clear opt-out on non-STOP inbound messages.
 - For startup validation parity, legacy WhatsApp config requires all three keys (`WHATSAPP_BUSINESS_API_URL`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_BUSINESS_API_TOKEN`) or dispatch can fail after boot.
+- For admin dataset services under strict TypeScript, `COALESCE` nullable SQL fields (for example `hostEmail`, `netCents`) at select-time to keep DTOs stable and avoid mapper null-guards everywhere.
 
 ## Patterns That Don't Work
 - Skipping preflight docs causes rework and misalignment.
