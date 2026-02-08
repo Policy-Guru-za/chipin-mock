@@ -108,7 +108,13 @@ export default async function CreateChildPage({
   const view = buildCreateFlowViewModel({ step: 'child', draft });
 
   return (
-    <CreateFlowShell stepLabel={view.stepLabel} title={view.title} subtitle={view.subtitle}>
+    <CreateFlowShell
+      currentStep={1}
+      totalSteps={6}
+      stepLabel={view.stepLabel}
+      title={view.title}
+      subtitle={view.subtitle}
+    >
       <Card>
         <CardHeader>
           <CardTitle>Child details</CardTitle>

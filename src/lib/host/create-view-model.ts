@@ -1,6 +1,6 @@
 import type { DreamBoardDraft } from '@/lib/dream-boards/draft';
 
-export type CreateFlowStep = 'child' | 'gift' | 'details' | 'review';
+export type CreateFlowStep = 'child' | 'gift' | 'dates' | 'giving-back' | 'payout' | 'review';
 
 type GiftPreview = {
   title: string;
@@ -23,23 +23,31 @@ export type CreateFlowViewModel = {
 };
 
 const stepLabels: Record<CreateFlowStep, string> = {
-  child: 'Step 1 of 4',
-  gift: 'Step 2 of 4',
-  details: 'Step 3 of 4',
-  review: 'Step 4 of 4',
+  child: 'Step 1 of 6 — The Child',
+  gift: 'Step 2 of 6 — The Gift',
+  dates: 'Step 3 of 6 — The Dates',
+  'giving-back': 'Step 4 of 6 — Giving Back',
+  payout: 'Step 5 of 6 — Payout Setup',
+  review: 'Step 6 of 6 — Review',
 };
 
 const getStepTitle = (step: CreateFlowStep, childName?: string) => {
-  if (step === 'child') return 'Who’s the birthday star?';
+  if (step === 'child') return "Who's the birthday star?";
   if (step === 'gift') {
-    return childName ? `What’s ${childName}'s dream gift?` : 'What’s the dream gift?';
+    return childName ? `What's ${childName}'s dream gift?` : "What's the dream gift?";
   }
-  if (step === 'details') return 'Almost done!';
+  if (step === 'dates') return "When's the big day?";
+  if (step === 'giving-back') return 'Want to share the love? 💚';
+  if (step === 'payout') return 'How should we send your payout?';
   return 'Review your Dream Board';
 };
 
-const getStepSubtitle = (step: CreateFlowStep) => {
-  if (step === 'gift') return 'Describe the dream gift and generate artwork.';
+const getStepSubtitle = (step: CreateFlowStep, childName?: string) => {
+  if (step === 'giving-back') {
+    return childName
+      ? `Help a cause while celebrating ${childName}.`
+      : 'Help a cause while celebrating.';
+  }
   return undefined;
 };
 
@@ -68,12 +76,30 @@ const isChildComplete = (draft?: DreamBoardDraft | null) =>
 const isGiftComplete = (draft?: DreamBoardDraft | null) =>
   [draft?.giftName, draft?.giftImageUrl, draft?.goalCents].every(Boolean);
 
-const isDetailsComplete = (draft?: DreamBoardDraft | null) =>
+const isDatesComplete = (draft?: DreamBoardDraft | null) =>
+  Boolean(draft?.birthdayDate && draft?.partyDate && draft?.campaignEndDate);
+
+const isGivingBackComplete = (draft?: DreamBoardDraft | null) => {
+  if (draft?.charityEnabled === false) {
+    return true;
+  }
+  if (draft?.charityEnabled !== true) {
+    return false;
+  }
+
+  const hasSplitValue =
+    draft.charitySplitType === 'percentage'
+      ? draft.charityPercentageBps !== undefined && draft.charityPercentageBps !== null
+      : draft.charitySplitType === 'threshold'
+        ? draft.charityThresholdCents !== undefined && draft.charityThresholdCents !== null
+        : false;
+
+  return Boolean(draft.charityId && draft.charitySplitType && hasSplitValue);
+};
+
+const isPayoutComplete = (draft?: DreamBoardDraft | null) =>
   Boolean(
     draft?.payoutEmail &&
-      draft?.birthdayDate &&
-      draft?.partyDate &&
-      draft?.campaignEndDate &&
       draft?.hostWhatsAppNumber &&
       ((draft?.payoutMethod ?? 'karri_card') === 'karri_card'
         ? draft?.karriCardNumberEncrypted && draft?.karriCardHolderName
@@ -87,7 +113,9 @@ const isDetailsComplete = (draft?: DreamBoardDraft | null) =>
 const getCompletionState = (draft?: DreamBoardDraft | null) => ({
   childComplete: isChildComplete(draft),
   giftComplete: isGiftComplete(draft),
-  detailsComplete: isDetailsComplete(draft),
+  datesComplete: isDatesComplete(draft),
+  givingBackComplete: isGivingBackComplete(draft),
+  payoutComplete: isPayoutComplete(draft),
 });
 
 const redirectRules: Record<
@@ -96,10 +124,11 @@ const redirectRules: Record<
 > = {
   child: [],
   gift: [(completion) => (!completion.childComplete ? '/create/child' : undefined)],
-  details: [(completion) => (!completion.giftComplete ? '/create/gift' : undefined)],
+  dates: [(completion) => (!completion.giftComplete ? '/create/gift' : undefined)],
+  'giving-back': [(completion) => (!completion.datesComplete ? '/create/dates' : undefined)],
+  payout: [(completion) => (!completion.givingBackComplete ? '/create/giving-back' : undefined)],
   review: [
-    (completion) => (!completion.giftComplete ? '/create/gift' : undefined),
-    (completion) => (!completion.detailsComplete ? '/create/details' : undefined),
+    (completion) => (!completion.payoutComplete ? '/create/payout' : undefined),
   ],
 };
 
@@ -126,7 +155,7 @@ export const buildCreateFlowViewModel = (params: {
     step,
     stepLabel: stepLabels[step],
     title: getStepTitle(step, draft?.childName),
-    subtitle: getStepSubtitle(step),
+    subtitle: getStepSubtitle(step, draft?.childName),
     redirectTo,
     childName: draft?.childName,
     childPhotoUrl: draft?.childPhotoUrl,

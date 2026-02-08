@@ -80,7 +80,7 @@ async function saveManualGiftAction(formData: FormData) {
     goalCents,
   });
 
-  redirect('/create/details');
+  redirect('/create/dates');
 }
 
 export default async function CreateGiftPage({
@@ -104,7 +104,13 @@ export default async function CreateGiftPage({
   const defaultGoal = resolveDefaultGoal(draft);
 
   return (
-    <CreateFlowShell stepLabel={view.stepLabel} title={view.title} subtitle={view.subtitle}>
+    <CreateFlowShell
+      currentStep={2}
+      totalSteps={6}
+      stepLabel={view.stepLabel}
+      title={view.title}
+      subtitle={view.subtitle}
+    >
       <Card>
         <CardHeader>
           <CardTitle>Dream gift</CardTitle>
@@ -152,7 +158,7 @@ export default async function CreateGiftPage({
               />
             </div>
 
-            <Button type="submit">Continue to payout details</Button>
+            <Button type="submit">Continue to dates</Button>
           </form>
         </CardContent>
       </Card>

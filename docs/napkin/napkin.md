@@ -3,6 +3,10 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-08 | self | In create giving-back step, hid the form when no active charities existed, which left `charityEnabled` unset and blocked progression (`/create/payout` redirected back) | Keep a fallback submit path on no-charity states that persists `charityEnabled=false` and allows moving to payout |
+| 2026-02-08 | self | Put `redirect('/...karri_invalid')` inside `try` and then caught the redirect in the `catch`, which downgraded to `karri_unavailable` | In verification helpers, return status (`valid|invalid|unavailable`) and redirect in caller after helper resolves |
+| 2026-02-08 | self | Typed server form actions to return custom state objects, which broke `<form action={...}>` typing in client components | Keep server form actions as redirecting `Promise<void>` handlers; reserve state return shapes for `useActionState` actions only |
+| 2026-02-08 | self | Ran route-discovery commands with `rg` even though this repo environment lacks `rg` | Default immediately to `find` + `grep` fallback for file and text discovery in this workspace |
 | 2026-02-07 | self | Assumed `rg` was available for repo search commands | Use `find` + `grep` fallback immediately in this environment |
 | 2026-02-07 | self | Probed `src/lib/fees.ts` path that does not exist | Use `src/lib/payments/fees.ts` for fee semantics checks |
 | 2026-02-07 | self | Assumed dependency install would unblock lint in-place | Confirm network reachability first; when DNS is blocked, report gate as environment-blocked with exact error |
@@ -47,3 +51,12 @@
 
 ## Domain Notes
 - Gifta UX v2 rollout is milestone-driven (Phase A complete, executing Phase B).
+- Phase C C0 baseline: current create flow has monolithic `/create/details`; UX v2 target requires split routes (`/create/dates`, `/create/giving-back`, `/create/payout`) and `/create/review` celebration rewrite.
+- Phase C C0 baseline: admin UI currently implements payouts only; UX v2 target includes `/admin`, `/admin/dream-boards`, `/admin/contributions`, `/admin/charities`, `/admin/reports`, `/admin/settings`.
+
+## C1 Learnings (2026-02-08)
+- Split-step extraction pattern worked: keep each new route responsible for a narrow draft subset, rely on `updateDreamBoardDraft` merge semantics, avoid touching `dreamBoardDraftSchema`.
+- `useActionState` fit only for review publish transition where server action returns state. For standard wizard submit routes, server actions should stay redirect-driven and typed as `Promise<void>`.
+- Next.js `redirect()` inside a `try` can be swallowed by broad `catch` and remapped to wrong error. Return verification status from helper and redirect in caller.
+- Preserve payout semantics by copying encryption and Karri verification flow exactly from legacy details action before refactor.
+- C1 introduced additional complexity/line-count lint warnings in new files; lint still passes (warnings-only policy), but C2 should include extraction/refactor passes if warning budget needs reduction.

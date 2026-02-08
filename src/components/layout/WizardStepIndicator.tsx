@@ -1,69 +1,60 @@
-import { cn } from '@/lib/utils';
 import { CheckIcon } from '@/components/icons';
 
-interface WizardStep {
-  label: string;
-  href?: string;
-  status: 'completed' | 'current' | 'upcoming';
-}
+type WizardStepIndicatorProps = {
+  currentStep: number;
+  totalSteps: number;
+};
 
-interface WizardStepIndicatorProps {
-  steps: WizardStep[];
-  currentStepIndex: number;
-}
+export function WizardStepIndicator({ currentStep, totalSteps }: WizardStepIndicatorProps) {
+  const stepNumbers = Array.from({ length: totalSteps }, (_, index) => index + 1);
+  const percentage = Math.max(0, Math.min(100, (currentStep / totalSteps) * 100));
 
-export function WizardStepIndicator({ steps, currentStepIndex }: WizardStepIndicatorProps) {
   return (
-    <nav aria-label="Progress" className="w-full">
-      <ol className="flex items-center justify-between">
-        {steps.map((step, index) => {
-          const isCompleted = step.status === 'completed';
-          const isCurrent = step.status === 'current';
-          const isLast = index === steps.length - 1;
+    <nav aria-label={`Step ${currentStep} of ${totalSteps}`} className="w-full">
+      <div className="sm:hidden">
+        <div className="mb-2 flex items-center justify-between text-xs font-medium text-text-secondary">
+          <span>
+            Step {currentStep} of {totalSteps}
+          </span>
+          <span>{Math.round(percentage)}%</span>
+        </div>
+        <div className="h-2 w-full overflow-hidden rounded-full bg-border" aria-hidden="true">
+          <div
+            className="h-full rounded-full bg-primary transition-all duration-300"
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+      </div>
+
+      <ol className="hidden items-center sm:flex">
+        {stepNumbers.map((stepNumber, index) => {
+          const isCompleted = stepNumber < currentStep;
+          const isCurrent = stepNumber === currentStep;
+          const isLast = index === stepNumbers.length - 1;
 
           return (
-            <li key={step.label} className="relative flex-1">
-              {/* Connector line */}
-              {!isLast && (
-                <div
-                  className={cn(
-                    'absolute left-1/2 top-5 h-0.5 w-full -translate-y-1/2',
-                    isCompleted ? 'bg-primary' : 'bg-border'
-                  )}
+            <li key={stepNumber} className="flex min-w-0 flex-1 items-center">
+              <span
+                className={[
+                  'relative z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-semibold transition-all duration-200',
+                  isCompleted ? 'border-primary bg-primary text-white' : '',
+                  isCurrent ? 'border-primary bg-primary text-white ring-4 ring-primary/20' : '',
+                  !isCompleted && !isCurrent ? 'border-border text-text-muted' : '',
+                ].join(' ')}
+                aria-current={isCurrent ? 'step' : undefined}
+                aria-label={`Step ${stepNumber} of ${totalSteps}`}
+              >
+                {isCompleted ? <CheckIcon size="sm" /> : stepNumber}
+              </span>
+              {!isLast ? (
+                <span
+                  className={[
+                    'mx-2 h-0.5 flex-1 rounded-full',
+                    stepNumber < currentStep ? 'bg-primary' : 'bg-border',
+                  ].join(' ')}
                   aria-hidden="true"
                 />
-              )}
-
-              <div className="relative flex flex-col items-center">
-                {/* Step circle */}
-                <div
-                  className={cn(
-                    'relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-300',
-                    isCompleted
-                      ? 'border-primary bg-primary text-white'
-                      : isCurrent
-                        ? 'border-primary bg-white text-primary ring-4 ring-primary/10'
-                        : 'border-border bg-white text-text-muted'
-                  )}
-                  aria-current={isCurrent ? 'step' : undefined}
-                >
-                  {isCompleted ? (
-                    <CheckIcon size="md" />
-                  ) : (
-                    <span className="text-sm font-semibold">{index + 1}</span>
-                  )}
-                </div>
-
-                {/* Step label */}
-                <span
-                  className={cn(
-                    'mt-2 text-xs font-medium transition-colors',
-                    isCurrent ? 'text-text' : 'text-text-muted'
-                  )}
-                >
-                  {step.label}
-                </span>
-              </div>
+              ) : null}
             </li>
           );
         })}
@@ -72,24 +63,21 @@ export function WizardStepIndicator({ steps, currentStepIndex }: WizardStepIndic
   );
 }
 
-/**
- * Compact variant for mobile screens.
- */
-export function WizardStepIndicatorCompact({ steps, currentStepIndex }: WizardStepIndicatorProps) {
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="flex justify-between text-sm">
-        <span className="font-medium text-text">
-          Step {currentStepIndex + 1} of {steps.length}
-        </span>
-        <span className="text-text-muted">{steps[currentStepIndex]?.label}</span>
-      </div>
+export function WizardStepIndicatorCompact({ currentStep, totalSteps }: WizardStepIndicatorProps) {
+  const percentage = Math.max(0, Math.min(100, (currentStep / totalSteps) * 100));
 
-      {/* Progress bar */}
-      <div className="h-2 overflow-hidden rounded-full bg-border">
+  return (
+    <div className="w-full" aria-label={`Step ${currentStep} of ${totalSteps}`}>
+      <div className="mb-2 flex items-center justify-between text-xs font-medium text-text-secondary">
+        <span>
+          Step {currentStep} of {totalSteps}
+        </span>
+        <span>{Math.round(percentage)}%</span>
+      </div>
+      <div className="h-2 w-full overflow-hidden rounded-full bg-border" aria-hidden="true">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-primary to-accent transition-all duration-500"
-          style={{ width: `${((currentStepIndex + 1) / steps.length) * 100}%` }}
+          className="h-full rounded-full bg-primary transition-all duration-300"
+          style={{ width: `${percentage}%` }}
         />
       </div>
     </div>
