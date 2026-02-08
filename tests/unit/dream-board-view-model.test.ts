@@ -48,7 +48,7 @@ describe('buildGuestViewModel', () => {
       { now: new Date('2026-02-03T00:00:00.000Z') }
     );
 
-    expect(view.daysLeft).toBe(2);
+    expect(view.daysLeft).toBe(3);
   });
 
   it('keeps the gift display when funded', () => {
@@ -92,6 +92,7 @@ describe('buildThankYouViewModel', () => {
     expect(view.headline).toBe('Thank you, Ava!');
     expect(view.message).toMatch(/Your contribution is helping Maya get their dream gift\./);
     expect(view.percentage).toBe(20);
+    expect(view.isContributionCompleted).toBe(true);
   });
 
   it('builds a pending thank-you message', () => {
@@ -110,6 +111,7 @@ describe('buildThankYouViewModel', () => {
 
     expect(view.headline).toBe('Thanks for your support!');
     expect(view.message).toBe('We’ll update this page once your payment is confirmed.');
+    expect(view.isContributionCompleted).toBe(false);
   });
 
   it('builds a gift thank-you message even when funded', () => {

@@ -96,6 +96,7 @@ export async function getDreamBoardBySlug(slug: string, partnerId?: string) {
     .select({
       id: dreamBoards.id,
       slug: dreamBoards.slug,
+      hostId: dreamBoards.hostId,
       childName: dreamBoards.childName,
       childPhotoUrl: dreamBoards.childPhotoUrl,
       childAge: dreamBoards.childAge,
@@ -119,6 +120,10 @@ export async function getDreamBoardBySlug(slug: string, partnerId?: string) {
       charitySplitType: dreamBoards.charitySplitType,
       charityPercentageBps: dreamBoards.charityPercentageBps,
       charityThresholdCents: dreamBoards.charityThresholdCents,
+      charityName: charities.name,
+      charityDescription: charities.description,
+      charityLogoUrl: charities.logoUrl,
+      charityCategory: charities.category,
       message: dreamBoards.message,
       status: dreamBoards.status,
       createdAt: dreamBoards.createdAt,
@@ -134,12 +139,16 @@ export async function getDreamBoardBySlug(slug: string, partnerId?: string) {
         eq(contributions.paymentStatus, 'completed')
       )
     )
+    .leftJoin(
+      charities,
+      and(eq(dreamBoards.charityEnabled, true), eq(dreamBoards.charityId, charities.id))
+    )
     .where(
       partnerId
         ? and(eq(dreamBoards.slug, slug), eq(dreamBoards.partnerId, partnerId))
         : eq(dreamBoards.slug, slug)
     )
-    .groupBy(dreamBoards.id)
+    .groupBy(dreamBoards.id, charities.id)
     .limit(1);
 
   return board ?? null;
@@ -154,6 +163,7 @@ export const getDreamBoardByPublicId = async (identifier: string, partnerId?: st
     .select({
       id: dreamBoards.id,
       slug: dreamBoards.slug,
+      hostId: dreamBoards.hostId,
       childName: dreamBoards.childName,
       childPhotoUrl: dreamBoards.childPhotoUrl,
       childAge: dreamBoards.childAge,
@@ -177,6 +187,10 @@ export const getDreamBoardByPublicId = async (identifier: string, partnerId?: st
       charitySplitType: dreamBoards.charitySplitType,
       charityPercentageBps: dreamBoards.charityPercentageBps,
       charityThresholdCents: dreamBoards.charityThresholdCents,
+      charityName: charities.name,
+      charityDescription: charities.description,
+      charityLogoUrl: charities.logoUrl,
+      charityCategory: charities.category,
       message: dreamBoards.message,
       status: dreamBoards.status,
       createdAt: dreamBoards.createdAt,
@@ -192,12 +206,16 @@ export const getDreamBoardByPublicId = async (identifier: string, partnerId?: st
         eq(contributions.paymentStatus, 'completed')
       )
     )
+    .leftJoin(
+      charities,
+      and(eq(dreamBoards.charityEnabled, true), eq(dreamBoards.charityId, charities.id))
+    )
     .where(
       partnerId
         ? and(eq(dreamBoards.id, identifier), eq(dreamBoards.partnerId, partnerId))
         : eq(dreamBoards.id, identifier)
     )
-    .groupBy(dreamBoards.id)
+    .groupBy(dreamBoards.id, charities.id)
     .limit(1);
 
   return board ?? null;
@@ -282,6 +300,7 @@ export async function listContributionsForDreamBoard(
       amountCents: contributions.amountCents,
       feeCents: contributions.feeCents,
       netCents: contributions.netCents,
+      charityCents: contributions.charityCents,
       paymentStatus: contributions.paymentStatus,
       createdAt: contributions.createdAt,
     })
@@ -293,9 +312,24 @@ export async function listContributionsForDreamBoard(
 }
 
 export async function listRecentContributors(dreamBoardId: string, limit = 6) {
-  return db
+  const AVATAR_COLORS = [
+    '#F5C6AA',
+    '#A8D4E6',
+    '#B8E0B8',
+    '#E6B8B8',
+    '#F0E68C',
+    '#B8D4E0',
+    '#D8B8E8',
+  ] as const;
+
+  const hashCode = (value: string) =>
+    value.split('').reduce((acc, char) => ((acc << 5) - acc + char.charCodeAt(0)) | 0, 0);
+
+  const rows = await db
     .select({
+      id: contributions.id,
       contributorName: contributions.contributorName,
+      isAnonymous: contributions.isAnonymous,
       netCents: contributions.netCents,
     })
     .from(contributions)
@@ -307,6 +341,12 @@ export async function listRecentContributors(dreamBoardId: string, limit = 6) {
     )
     .orderBy(desc(contributions.createdAt))
     .limit(limit);
+
+  return rows.map((contributor) => ({
+    ...contributor,
+    isAnonymous: contributor.isAnonymous || !contributor.contributorName,
+    avatarColorIndex: Math.abs(hashCode(contributor.id)) % AVATAR_COLORS.length,
+  }));
 }
 
 export async function getContributionByPaymentRef(
@@ -319,10 +359,13 @@ export async function getContributionByPaymentRef(
       partnerId: contributions.partnerId,
       dreamBoardId: contributions.dreamBoardId,
       contributorName: contributions.contributorName,
+      contributorEmail: contributions.contributorEmail,
+      isAnonymous: contributions.isAnonymous,
       message: contributions.message,
       amountCents: contributions.amountCents,
       feeCents: contributions.feeCents,
       netCents: contributions.netCents,
+      charityCents: contributions.charityCents,
       paymentStatus: contributions.paymentStatus,
       createdAt: contributions.createdAt,
     })

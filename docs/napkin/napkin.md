@@ -60,3 +60,15 @@
 - Next.js `redirect()` inside a `try` can be swallowed by broad `catch` and remapped to wrong error. Return verification status from helper and redirect in caller.
 - Preserve payout semantics by copying encryption and Karri verification flow exactly from legacy details action before refactor.
 - C1 introduced additional complexity/line-count lint warnings in new files; lint still passes (warnings-only policy), but C2 should include extraction/refactor passes if warning budget needs reduction.
+
+## C2 Learnings (2026-02-08)
+- `react-hooks/set-state-in-effect` is enforced in this repo. For client components reading browser storage, use lazy `useState` initializers or event-driven state updates instead of synchronous `setState` in `useEffect`.
+- Reusing one card component for board + thank-you variants can duplicate copy if both `allocationLabel` and `impactCopy` carry the same string. Add a `showDescription` guard when values match.
+- When adding aggregate + joined fields in Drizzle (`dreamBoards` + `charities` + `SUM/COUNT`), include joined table keys in `groupBy` (`charities.id`) to keep SQL valid and deterministic.
+- Contributor modal pagination requires loaded contributor records, not just total count. Avoid using `totalCount` as page source unless query fetch limit matches intended modal depth.
+- New jsdom tests need explicit `cleanup()` in `afterEach` in this workspace to prevent cross-test DOM bleed and false duplicate-element failures.
+- Keep funded-status eligibility consistent across guest UI and contribution API: `funded` remains open for contribute/retry paths.
+- Thank-you charity impact must use persisted `contributions.charity_cents`; never recompute threshold impact from board-level config on read paths.
+- Thank-you client copy should derive from view-model state; show celebration/receipt/persistence side effects only for confirmed completed contributions.
+- For modal a11y in this repo, prefer `aria-labelledby` wired to visible heading text over standalone `aria-label` when a heading already exists.
+- Defensively validate localStorage payload field types before using string methods in UI components (`trim`, etc.).

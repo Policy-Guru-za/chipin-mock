@@ -1,3 +1,6 @@
+/**
+ * Deprecated: use ContributorDisplay for public board contributor rendering.
+ */
 type ContributorChipsProps = {
   contributors: Array<{ name: string }>;
 };

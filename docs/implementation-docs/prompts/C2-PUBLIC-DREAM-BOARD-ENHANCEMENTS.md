@@ -207,6 +207,11 @@ where `dreamBoards.charityEnabled = true`.
 If the board has `charityEnabled = false` or `charityId` is
 null, the charity fields should be null in the result.
 
+Also add `dreamBoards.hostId` to the select fields of
+`getDreamBoardBySlug` (and `getDreamBoardByPublicId`
+which mirrors it). This field is needed for
+parent-viewing-own-board detection in sub-step 2g.
+
 Also update `listRecentContributors` to return the
 `isAnonymous` flag (or derive it from `contributorName`
 being null/empty) and a stable avatar color index. The avatar
@@ -214,7 +219,7 @@ color can be derived deterministically:
 ```typescript
 const AVATAR_COLORS = [
   '#F5C6AA', '#A8D4E6', '#B8E0B8',
-  '#E8C5E8', '#F5E6AA', '#C5D4E8', '#E8B8B8'
+  '#E6B8B8', '#F0E68C', '#B8D4E0', '#D8B8E8'
 ];
 const colorIndex = hashCode(contributor.id) % AVATAR_COLORS.length;
 ```
@@ -314,9 +319,12 @@ Display rules:
   for anonymous), cycling through 7 avatar colors
 - 6+: Show first 5 + "+ {totalCount - 5} others ➜" link
 - Avatar colors: `['#F5C6AA', '#A8D4E6', '#B8E0B8',
-  '#E8C5E8', '#F5E6AA', '#C5D4E8', '#E8B8B8']`
+  '#E6B8B8', '#F0E68C', '#B8D4E0', '#D8B8E8']`
 - Dynamic heading emoji: 🎁 (<3), 🎉 (3-10), ✨ (>10)
-- Heading text: "{X} loved ones have chipped in"
+- Heading text (dynamic):
+  - 1: "1 loved one has chipped in"
+  - 2-5: "{X} loved ones have chipped in"
+  - 6+: "{X} amazing people have chipped in"
 
 **ContributorsModal** (client component, within
 ContributorDisplay or separate):
@@ -339,12 +347,14 @@ Props:
 }
 ```
 
-Styling by urgency:
-- relaxed: text-gray-600, normal
-- moderate: text-gray-700, semi-bold
-- urgent: bg-orange-50, Fraunces 18px bold
-- critical: text `#C4785A`, Fraunces 20px bold, optional
-  pulse animation (respect prefers-reduced-motion)
+Styling by urgency (match UX spec section 3.4):
+- relaxed: Fraunces 18px 700, text-gray-900
+- moderate: Fraunces 18px 700, text-gray-900, semi-bold
+- urgent: Fraunces 16px, color `#C4785A`; add
+  `bg-orange-50` only when daysLeft ≤ 3
+- critical: Fraunces 20px bold, color `#C4785A`,
+  `bg-orange-50`, optional pulse animation (respect
+  prefers-reduced-motion)
 - expired: text-gray-500, italic
 
 **2e. CharitableGivingCard** (NEW component)
@@ -409,7 +419,7 @@ hostId:
 - Disabled when expired (opacity-50, cursor-not-allowed,
   tooltip "This Dreamboard has closed")
 - Loading state: spinner for 1s post-click
-- Link: `/{slug}/contribute`
+- Link: `/{slug}/contribute?source=dream-board`
 - Hidden when return-visit banner or parent banner is active
 
 **Page composition order (top to bottom):**
@@ -579,6 +589,24 @@ function getFailureDisplay(reason?: string): {
         message: "We lost connection during payment. No funds
           were taken. Please try again.",
         explanations: ["Connection interrupted"]
+      };
+    case 'invalid_card':
+      return {
+        heading: "Card Details Invalid",
+        message: "The card details entered aren't valid.
+          Please check and try again.",
+        explanations: [
+          "Card number is incorrect",
+          "Expiry date is in the past",
+          "CVV/security code is incorrect"
+        ]
+      };
+    case 'timeout':
+      return {
+        heading: "Payment Timeout",
+        message: "Payment took too long to process. Your
+          card was not charged. Please try again.",
+        explanations: ["Connection timed out"]
       };
     case 'user_cancelled':
       return {
@@ -764,7 +792,8 @@ Test the sessionStorage utility:
 
 Test getFailureDisplay:
 - Each reason ('declined', 'insufficient_funds',
-  'network_error', 'user_cancelled') returns correct heading,
+  'network_error', 'invalid_card', 'timeout',
+  'user_cancelled') returns correct heading,
   message, and explanations
 - Unknown/missing reason returns default message
 - Default has all 4 explanation bullets

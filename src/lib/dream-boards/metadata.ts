@@ -44,7 +44,7 @@ export const buildDreamBoardMetadata = (
     giftImageUrl: board.giftImageUrl ?? null,
   });
 
-  const title = `${board.childName}'s Dream Board | ChipIn`;
+  const title = `${board.childName}'s Dream Board | Gifta`;
   const description = getMetadataDescription(board, giftTitle);
   const imageCandidate = getMetadataImage({
     giftImage,
