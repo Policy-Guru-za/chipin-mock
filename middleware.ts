@@ -23,6 +23,7 @@ const isPublicRoute = createRouteMatcher([
   '/api/internal/retention/run',
   '/api/internal/karri/batch',
   '/api/internal/payments/reconcile',
+  '/api/internal/reminders/dispatch',
   '/api/internal/api-keys(.*)',
   // Guest pages (route groups are not in URL):
   /^\/(?!api|_next|sign-in|sign-up|create|dashboard|admin|health)([^/]+)$/,
@@ -39,6 +40,7 @@ const bypassExactPaths = new Set([
   '/api/internal/retention/run',
   '/api/internal/karri/batch',
   '/api/internal/payments/reconcile',
+  '/api/internal/reminders/dispatch',
 ]);
 
 const isBypassRouteWhenAuthUnavailable = (pathname: string): boolean => {

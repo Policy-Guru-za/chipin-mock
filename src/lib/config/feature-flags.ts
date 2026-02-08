@@ -48,6 +48,10 @@ export const isMockKarri = (): boolean => isEnabled(process.env.MOCK_KARRI);
 /** Returns true when Sentry reporting should be mocked. */
 export const isMockSentry = (): boolean => isEnabled(process.env.MOCK_SENTRY);
 
+/** Returns true when WhatsApp reminder dispatch is enabled. */
+export const isWhatsAppReminderDispatchEnabled = (): boolean =>
+  isEnabled(process.env.UX_V2_ENABLE_WHATSAPP_REMINDER_DISPATCH);
+
 /** Returns true when any sandbox mock flag is enabled. */
 export const isAnyMockEnabled = (): boolean =>
   isMockPayments() || isMockPaymentWebhooks() || isMockKarri() || isMockSentry();
@@ -93,6 +97,19 @@ export const assertStartupConfig = (): void => {
 
   if (!hasValue(process.env.RESEND_API_KEY)) {
     issues.push('Missing RESEND_API_KEY (Resend email).');
+  }
+
+  if (isWhatsAppReminderDispatchEnabled()) {
+    const hasModernConfig = hasValue(process.env.WA_PHONE_NUMBER_ID) && hasValue(process.env.WA_ACCESS_TOKEN);
+    const hasLegacyConfig =
+      hasValue(process.env.WHATSAPP_BUSINESS_API_URL) &&
+      hasValue(process.env.WHATSAPP_PHONE_NUMBER_ID) &&
+      hasValue(process.env.WHATSAPP_BUSINESS_API_TOKEN);
+    if (!hasModernConfig && !hasLegacyConfig) {
+      issues.push(
+        'WhatsApp reminder dispatch enabled but no WhatsApp credentials found. Configure WA_PHONE_NUMBER_ID + WA_ACCESS_TOKEN (preferred) or WHATSAPP_BUSINESS_API_URL + WHATSAPP_PHONE_NUMBER_ID + WHATSAPP_BUSINESS_API_TOKEN.'
+      );
+    }
   }
 
   if (!hasValue(process.env.BLOB_READ_WRITE_TOKEN)) {

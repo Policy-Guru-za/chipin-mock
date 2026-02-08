@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, asc, eq, gt, isNull, sql } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -6,6 +6,7 @@ import { jsonInternalError } from '@/lib/api/internal-response';
 import { enforceRateLimit } from '@/lib/auth/rate-limit';
 import { db } from '@/lib/db';
 import { contributionReminders, dreamBoards } from '@/lib/db/schema';
+import { normalizeWhatsAppPhoneNumber } from '@/lib/integrations/whatsapp';
 import { parseDateOnly } from '@/lib/utils/date';
 import { getClientIp } from '@/lib/utils/request';
 
@@ -13,6 +14,25 @@ const requestSchema = z.object({
   dreamBoardId: z.string().uuid(),
   email: z.string().email(),
   remindInDays: z.number().int().min(1).max(14).default(3),
+  whatsappPhoneE164: z.string().trim().min(8).max(20).optional(),
+  whatsappOptIn: z.boolean().optional().default(false),
+  whatsappWaId: z.string().trim().min(5).max(32).optional(),
+}).superRefine((value, ctx) => {
+  if (value.whatsappPhoneE164 && !value.whatsappOptIn) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'whatsappOptIn must be true when whatsappPhoneE164 is provided',
+      path: ['whatsappOptIn'],
+    });
+  }
+
+  if (value.whatsappOptIn && !value.whatsappPhoneE164) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'whatsappPhoneE164 is required when whatsappOptIn is true',
+      path: ['whatsappPhoneE164'],
+    });
+  }
 });
 
 type ReminderRequest = z.infer<typeof requestSchema>;
@@ -93,20 +113,64 @@ const resolveReminderAt = (board: Awaited<ReturnType<typeof fetchDreamBoard>>, r
 };
 
 const scheduleReminder = async (request: ReminderRequest, reminderAt: Date) => {
-  await db
-    .insert(contributionReminders)
-    .values({
-      dreamBoardId: request.dreamBoardId,
-      email: request.email.trim().toLowerCase(),
-      remindAt: reminderAt,
-    })
-    .onConflictDoNothing({
-      target: [
-        contributionReminders.dreamBoardId,
-        contributionReminders.email,
-        contributionReminders.remindAt,
-      ],
-    });
+  const normalizedEmail = request.email.trim().toLowerCase();
+  const normalizedWhatsApp = request.whatsappPhoneE164
+    ? normalizeWhatsAppPhoneNumber(request.whatsappPhoneE164)
+    : null;
+  if (request.whatsappPhoneE164 && !normalizedWhatsApp) {
+    throw new Error('invalid_whatsapp_number');
+  }
+  const now = new Date();
+
+  return db.transaction(async (tx) => {
+    await tx.execute(
+      sql`SELECT pg_advisory_xact_lock(hashtext(${`contribution-reminder:${request.dreamBoardId}:${normalizedEmail}`})::bigint)`
+    );
+
+    const [existing] = await tx
+      .select({ id: contributionReminders.id, remindAt: contributionReminders.remindAt })
+      .from(contributionReminders)
+      .where(
+        and(
+          eq(contributionReminders.dreamBoardId, request.dreamBoardId),
+          eq(contributionReminders.email, normalizedEmail),
+          isNull(contributionReminders.sentAt),
+          gt(contributionReminders.remindAt, now)
+        )
+      )
+      .orderBy(asc(contributionReminders.remindAt))
+      .limit(1);
+
+    if (existing) {
+      if (request.whatsappOptIn && normalizedWhatsApp) {
+        await tx
+          .update(contributionReminders)
+          .set({
+            whatsappPhoneE164: normalizedWhatsApp,
+            whatsappWaId: request.whatsappWaId ?? null,
+            whatsappOptInAt: now,
+            whatsappOptOutAt: null,
+          })
+          .where(eq(contributionReminders.id, existing.id));
+      }
+      return { created: false as const, remindAt: existing.remindAt };
+    }
+
+    const [inserted] = await tx
+      .insert(contributionReminders)
+      .values({
+        dreamBoardId: request.dreamBoardId,
+        email: normalizedEmail,
+        remindAt: reminderAt,
+        nextAttemptAt: reminderAt,
+        whatsappPhoneE164: normalizedWhatsApp,
+        whatsappWaId: request.whatsappWaId ?? null,
+        whatsappOptInAt: request.whatsappOptIn && normalizedWhatsApp ? now : null,
+      })
+      .returning({ id: contributionReminders.id, remindAt: contributionReminders.remindAt });
+
+    return { created: true as const, remindAt: inserted?.remindAt ?? reminderAt };
+  });
 };
 
 export async function POST(request: NextRequest) {
@@ -137,12 +201,35 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  await scheduleReminder(parsed.data, reminderAt);
+  let result: Awaited<ReturnType<typeof scheduleReminder>>;
+  try {
+    result = await scheduleReminder(parsed.data, reminderAt);
+  } catch (error) {
+    if (error instanceof Error && error.message === 'invalid_whatsapp_number') {
+      return jsonInternalError({
+        code: 'invalid_request',
+        status: 400,
+        message: 'Invalid WhatsApp phone number format.',
+      });
+    }
+    throw error;
+  }
+
+  if (!result.created) {
+    return NextResponse.json(
+      {
+        ok: true,
+        idempotent: true,
+        remindAt: result.remindAt.toISOString(),
+      },
+      { status: 200 }
+    );
+  }
 
   return NextResponse.json(
     {
       ok: true,
-      remindAt: reminderAt.toISOString(),
+      remindAt: result.remindAt.toISOString(),
     },
     { status: 201 }
   );

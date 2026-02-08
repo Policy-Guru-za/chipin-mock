@@ -455,18 +455,84 @@ export const contributionReminders = pgTable(
     email: varchar('email', { length: 255 }).notNull(),
     remindAt: timestamp('remind_at', { withTimezone: true }).notNull(),
     sentAt: timestamp('sent_at', { withTimezone: true }),
+    emailSentAt: timestamp('email_sent_at', { withTimezone: true }),
+    whatsappPhoneE164: varchar('whatsapp_phone_e164', { length: 20 }),
+    whatsappWaId: varchar('whatsapp_wa_id', { length: 32 }),
+    whatsappOptInAt: timestamp('whatsapp_opt_in_at', { withTimezone: true }),
+    whatsappOptOutAt: timestamp('whatsapp_opt_out_at', { withTimezone: true }),
+    whatsappSentAt: timestamp('whatsapp_sent_at', { withTimezone: true }),
+    whatsappMessageId: varchar('whatsapp_message_id', { length: 255 }),
+    attemptCount: integer('attempt_count').notNull().default(0),
+    lastAttemptAt: timestamp('last_attempt_at', { withTimezone: true }),
+    nextAttemptAt: timestamp('next_attempt_at', { withTimezone: true }).notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => ({
     dreamBoardIdx: index('idx_contribution_reminders_dream_board').on(table.dreamBoardId),
     dueIdx: index('idx_contribution_reminders_due')
-      .on(table.remindAt)
+      .on(table.nextAttemptAt, table.remindAt)
       .where(sql`${table.sentAt} IS NULL`),
+    pendingByBoardEmailIdx: index('idx_contribution_reminders_pending_board_email')
+      .on(table.dreamBoardId, table.email, table.remindAt)
+      .where(sql`${table.sentAt} IS NULL`),
+    pendingWhatsappIdx: index('idx_contribution_reminders_pending_whatsapp')
+      .on(table.nextAttemptAt, table.remindAt)
+      .where(
+        sql`${table.sentAt} IS NULL
+        AND ${table.whatsappPhoneE164} IS NOT NULL
+        AND ${table.whatsappOptInAt} IS NOT NULL
+        AND ${table.whatsappOptOutAt} IS NULL
+        AND ${table.whatsappSentAt} IS NULL`
+      ),
+    whatsappMessageIdIdx: uniqueIndex('unique_contribution_reminders_whatsapp_message_id').on(
+      table.whatsappMessageId
+    ),
     uniqueReminder: uniqueIndex('unique_contribution_reminder').on(
       table.dreamBoardId,
       table.email,
       table.remindAt
     ),
+  })
+);
+
+export const whatsappContacts = pgTable(
+  'whatsapp_contacts',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    phoneE164: varchar('phone_e164', { length: 20 }).notNull(),
+    waId: varchar('wa_id', { length: 32 }),
+    lastInboundAt: timestamp('last_inbound_at', { withTimezone: true }),
+    cswExpiresAt: timestamp('csw_expires_at', { withTimezone: true }),
+    optInAt: timestamp('opt_in_at', { withTimezone: true }),
+    optOutAt: timestamp('opt_out_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    phoneIdx: uniqueIndex('unique_whatsapp_contacts_phone').on(table.phoneE164),
+    waIdIdx: index('idx_whatsapp_contacts_wa_id').on(table.waId),
+    cswExpiresAtIdx: index('idx_whatsapp_contacts_csw_expires_at').on(table.cswExpiresAt),
+  })
+);
+
+export const whatsappMessageEvents = pgTable(
+  'whatsapp_message_events',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    messageId: varchar('message_id', { length: 255 }),
+    direction: varchar('direction', { length: 16 }).notNull(),
+    eventType: varchar('event_type', { length: 32 }).notNull(),
+    status: varchar('status', { length: 32 }),
+    recipientWaId: varchar('recipient_wa_id', { length: 32 }),
+    recipientPhoneE164: varchar('recipient_phone_e164', { length: 20 }),
+    payload: jsonb('payload').notNull().default(sql`'{}'::jsonb`),
+    receivedAt: timestamp('received_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    messageIdIdx: index('idx_whatsapp_message_events_message_id').on(table.messageId),
+    statusIdx: index('idx_whatsapp_message_events_status').on(table.status),
+    recipientWaIdIdx: index('idx_whatsapp_message_events_recipient_wa_id').on(table.recipientWaId),
   })
 );
 

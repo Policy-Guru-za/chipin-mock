@@ -26,11 +26,9 @@ vi.mock('@/lib/audit', () => auditMocks);
 vi.mock('@/lib/payouts/queries', () => payoutQueryMocks);
 vi.mock('@/lib/payouts/service', () => payoutServiceMocks);
 vi.mock('@/lib/integrations/karri-batch', () => karriBatchMocks);
+vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }));
 
-const loadModule = async () => {
-  vi.resetModules();
-  return import('@/lib/payouts/automation');
-};
+import { executeAutomatedPayout } from '@/lib/payouts/automation';
 
 const originalEnv = {
   KARRI_AUTOMATION_ENABLED: process.env.KARRI_AUTOMATION_ENABLED,
@@ -62,7 +60,6 @@ describe('payout automation - karri', () => {
       transactionId: 'K-123',
     });
 
-    const { executeAutomatedPayout } = await loadModule();
     const result = await executeAutomatedPayout({
       payoutId: 'payout-2',
       actor: { type: 'admin' },
@@ -89,7 +86,6 @@ describe('payout automation - karri', () => {
       transactionId: 'K-456',
     });
 
-    const { executeAutomatedPayout } = await loadModule();
     const result = await executeAutomatedPayout({
       payoutId: 'payout-2b',
       actor: { type: 'admin' },
@@ -113,7 +109,6 @@ describe('payout automation - karri', () => {
       errorMessage: 'Card declined',
     });
 
-    const { executeAutomatedPayout } = await loadModule();
     const result = await executeAutomatedPayout({ payoutId: 'payout-5', actor: { type: 'admin' } });
 
     expect(result.status).toBe('failed');
@@ -132,8 +127,6 @@ describe('payout automation - errors', () => {
       childName: 'Maya',
     });
 
-    const { executeAutomatedPayout } = await loadModule();
-
     await expect(
       executeAutomatedPayout({ payoutId: 'payout-bank', actor: { type: 'admin' } })
     ).rejects.toThrow('Unsupported payout type');
@@ -150,8 +143,6 @@ describe('payout automation - errors', () => {
       childName: 'Maya',
     });
 
-    const { executeAutomatedPayout } = await loadModule();
-
     await expect(
       executeAutomatedPayout({ payoutId: 'payout-disabled', actor: { type: 'admin' } })
     ).rejects.toThrow('Unsupported payout type');
@@ -167,8 +158,6 @@ describe('payout automation - errors', () => {
       payoutEmail: 'host@chipin.co.za',
       childName: 'Maya',
     });
-
-    const { executeAutomatedPayout } = await loadModule();
 
     await expect(
       executeAutomatedPayout({ payoutId: 'payout-disabled-karri', actor: { type: 'admin' } })
