@@ -360,6 +360,10 @@ export async function completePayout(params: {
     return payout;
   }
 
+  if (payout.status === 'failed') {
+    throw new Error('Invalid payout transition');
+  }
+
   const completedAt = params.completedAt ?? new Date();
 
   await db.transaction(async (tx) => {
@@ -422,6 +426,10 @@ export async function failPayout(params: {
   }
 
   if (payout.status === 'failed') {
+    return payout;
+  }
+
+  if (payout.status === 'completed') {
     return payout;
   }
 

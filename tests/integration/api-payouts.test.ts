@@ -186,6 +186,48 @@ describe('POST /api/v1/payouts/[id]/confirm', () => {
     expect(completePayout).not.toHaveBeenCalled();
     expect(getPayoutForApi).toHaveBeenCalledWith({ id, partnerId: 'partner-1' });
   });
+
+  it('returns conflict for invalid payout transitions', async () => {
+    mockAuth();
+
+    const completePayout = vi.fn(async () => {
+      throw new Error('Invalid payout transition');
+    });
+    const getPayoutForApi = vi
+      .fn()
+      .mockResolvedValueOnce({
+        id: '00000000-0000-4000-8000-000000000000',
+        dreamBoardId: 'board-1',
+        type: 'karri_card',
+        grossCents: 20000,
+        feeCents: 0,
+        netCents: 20000,
+        recipientData: { email: 'parent@example.com' },
+        status: 'failed',
+        externalRef: null,
+        errorMessage: 'declined',
+        createdAt: new Date('2026-01-10T10:00:00.000Z'),
+        completedAt: null,
+      });
+    const markApiKeyUsed = vi.fn(async () => undefined);
+
+    vi.doMock('@/lib/payouts/service', () => ({ completePayout }));
+    vi.doMock('@/lib/db/api-queries', () => ({ getPayoutForApi }));
+    vi.doMock('@/lib/db/queries', () => ({ markApiKeyUsed }));
+
+    const { POST } = await loadConfirmHandler();
+    const response = await POST(
+      new Request('http://localhost/api/v1/payouts/00000000-0000-4000-8000-000000000000/confirm', {
+        method: 'POST',
+        body: JSON.stringify({ external_ref: 'KARRI_123' }),
+      }),
+      { params: { id: '00000000-0000-4000-8000-000000000000' } }
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(409);
+    expect(payload.error.code).toBe('conflict');
+  });
 });
 
 describe('GET /api/v1/payouts/[id]', () => {
@@ -337,6 +379,47 @@ describe('POST /api/v1/payouts/[id]/fail', () => {
     expect(response.status).toBe(400);
     expect(payload.error.code).toBe('validation_error');
     expect(getPayoutForApi).not.toHaveBeenCalled();
+    expect(failPayout).not.toHaveBeenCalled();
+  });
+
+  it('returns conflict for invalid payout transitions', async () => {
+    mockAuth();
+
+    const failPayout = vi.fn(async () => undefined);
+    const getPayoutForApi = vi
+      .fn()
+      .mockResolvedValueOnce({
+        id: '00000000-0000-4000-8000-000000000000',
+        dreamBoardId: 'board-1',
+        type: 'karri_card',
+        grossCents: 20000,
+        feeCents: 0,
+        netCents: 20000,
+        recipientData: { email: 'parent@example.com' },
+        status: 'completed',
+        externalRef: 'K-123',
+        errorMessage: null,
+        createdAt: new Date('2026-01-10T10:00:00.000Z'),
+        completedAt: new Date('2026-01-11T10:00:00.000Z'),
+      });
+    const markApiKeyUsed = vi.fn(async () => undefined);
+
+    vi.doMock('@/lib/payouts/service', () => ({ failPayout }));
+    vi.doMock('@/lib/db/api-queries', () => ({ getPayoutForApi }));
+    vi.doMock('@/lib/db/queries', () => ({ markApiKeyUsed }));
+
+    const { POST } = await loadFailHandler();
+    const response = await POST(
+      new Request('http://localhost/api/v1/payouts/00000000-0000-4000-8000-000000000000/fail', {
+        method: 'POST',
+        body: JSON.stringify({ error_message: 'declined' }),
+      }),
+      { params: { id: '00000000-0000-4000-8000-000000000000' } }
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(409);
+    expect(payload.error.code).toBe('conflict');
     expect(failPayout).not.toHaveBeenCalled();
   });
 });

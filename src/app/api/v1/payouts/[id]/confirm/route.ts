@@ -71,6 +71,15 @@ export const POST = withApiAuth(
         });
       }
 
+      if (error instanceof Error && error.message === 'Invalid payout transition') {
+        return jsonError({
+          error: { code: 'conflict', message: 'Invalid payout state transition' },
+          status: 409,
+          requestId,
+          headers: rateLimitHeaders,
+        });
+      }
+
       return jsonError({
         error: { code: 'internal_error', message: 'Unable to confirm payout' },
         status: 500,

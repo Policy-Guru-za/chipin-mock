@@ -170,4 +170,119 @@ describe('POST /api/v1/dream-boards/[id]/close', () => {
     expect(recordAuditEvent).not.toHaveBeenCalled();
     expect(createPayoutsForDreamBoard).toHaveBeenCalled();
   });
+
+  it('returns gift and charity payouts for charity-enabled boards', async () => {
+    mockAuth();
+    const update = mockDb();
+
+    const board = buildBoard({ status: 'active', payoutMethod: 'karri_card' });
+    const closed = buildBoard({ status: 'closed', raisedCents: 20000 });
+    const getDreamBoardByPublicId = vi
+      .fn()
+      .mockResolvedValueOnce(board)
+      .mockResolvedValueOnce(closed);
+
+    const createPayoutsForDreamBoard = vi.fn(async () => ({
+      created: [
+        { id: 'payout-gift', type: 'karri_card' },
+        { id: 'payout-charity', type: 'charity' },
+      ],
+    }));
+    const listPayoutsForDreamBoard = vi.fn(async () => [
+      {
+        id: 'payout-gift',
+        type: 'karri_card',
+        status: 'pending',
+        netCents: 16200,
+      },
+      {
+        id: 'payout-charity',
+        type: 'charity',
+        status: 'pending',
+        netCents: 3000,
+      },
+    ]);
+
+    vi.doMock('@/lib/db/queries', () => ({
+      getDreamBoardByPublicId,
+      markApiKeyUsed: vi.fn(async () => undefined),
+    }));
+    vi.doMock('@/lib/payouts/queries', () => ({ listPayoutsForDreamBoard }));
+    vi.doMock('@/lib/payouts/service', () => ({ createPayoutsForDreamBoard }));
+    vi.doMock('@/lib/audit', () => ({ recordAuditEvent: vi.fn(async () => undefined) }));
+
+    const { POST } = await loadHandler();
+    const response = await POST(
+      new Request('http://localhost/api/v1/dream-boards/board-1/close', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ reason: 'manual' }),
+      }),
+      { params: { id: 'board-1' } }
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(update).toHaveBeenCalled();
+    expect(createPayoutsForDreamBoard).toHaveBeenCalledWith(
+      expect.objectContaining({ dreamBoardId: 'board-1' })
+    );
+    expect(payload.data.payouts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: 'karri_card', net_cents: 16200 }),
+        expect.objectContaining({ type: 'charity', net_cents: 3000 }),
+      ])
+    );
+  });
+
+  it('returns bank payout rows for bank payout boards', async () => {
+    mockAuth();
+    mockDb();
+
+    const board = buildBoard({ status: 'active', payoutMethod: 'bank' });
+    const closed = buildBoard({ status: 'closed', payoutMethod: 'bank', raisedCents: 18000 });
+    const getDreamBoardByPublicId = vi
+      .fn()
+      .mockResolvedValueOnce(board)
+      .mockResolvedValueOnce(closed);
+
+    const createPayoutsForDreamBoard = vi.fn(async () => ({
+      created: [{ id: 'payout-bank', type: 'bank' }],
+    }));
+    const listPayoutsForDreamBoard = vi.fn(async () => [
+      {
+        id: 'payout-bank',
+        type: 'bank',
+        status: 'pending',
+        netCents: 17300,
+      },
+    ]);
+
+    vi.doMock('@/lib/db/queries', () => ({
+      getDreamBoardByPublicId,
+      markApiKeyUsed: vi.fn(async () => undefined),
+    }));
+    vi.doMock('@/lib/payouts/queries', () => ({ listPayoutsForDreamBoard }));
+    vi.doMock('@/lib/payouts/service', () => ({ createPayoutsForDreamBoard }));
+    vi.doMock('@/lib/audit', () => ({ recordAuditEvent: vi.fn(async () => undefined) }));
+
+    const { POST } = await loadHandler();
+    const response = await POST(
+      new Request('http://localhost/api/v1/dream-boards/board-1/close', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ reason: 'manual' }),
+      }),
+      { params: { id: 'board-1' } }
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(createPayoutsForDreamBoard).toHaveBeenCalledWith(
+      expect.objectContaining({ dreamBoardId: 'board-1' })
+    );
+    expect(payload.data.payouts).toEqual([
+      expect.objectContaining({ type: 'bank', status: 'pending', net_cents: 17300 }),
+    ]);
+  });
 });

@@ -19,6 +19,9 @@
 | 2026-02-08 | self | Passed `$skill-name` inside double quotes to a shell command; shell expanded `$...` and corrupted generated prompt text | Use single quotes or escape `$` when passing literal skill tokens in CLI interface strings |
 | 2026-02-08 | self | Updated payout math but left one queue assertion on old pre-fee amount | When changing monetary semantics, immediately sweep payout service tests for queued amount expectations and ledger formulas |
 | 2026-02-08 | self | Used `apply_patch` through `exec_command` despite tool constraint warning | Use the dedicated `apply_patch` tool directly for file edits |
+| 2026-02-08 | self | Repeated `apply_patch` via `exec_command` after prior correction during payout remediation | When editing files, call `functions.apply_patch` directly; never shell-wrap patch operations |
+| 2026-02-08 | self | Unquoted bracketed route paths in zsh (for example `[id]`) and command failed with glob expansion | Quote bracketed paths in shell commands (`'src/.../[id]/route.ts'`) |
+| 2026-02-08 | self | B8 matrix check initially relied on partial historical coverage assumptions | For matrix milestones, build explicit test-ID -> file assertions and patch missing IDs before final gates |
 
 ## User Preferences
 - Start with required doc read order before implementation.

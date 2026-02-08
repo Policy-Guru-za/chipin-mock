@@ -12,7 +12,7 @@ const auditMocks = vi.hoisted(() => ({
 vi.mock('@/lib/db', () => ({ db: dbMock }));
 vi.mock('@/lib/audit', () => auditMocks);
 
-import { completePayout, updatePayoutRecipientData } from '@/lib/payouts/service';
+import { completePayout, failPayout, updatePayoutRecipientData } from '@/lib/payouts/service';
 
 describe('payout service', () => {
   beforeEach(() => {
@@ -136,5 +136,65 @@ describe('payout service', () => {
     expect(auditMocks.recordAuditEvent).toHaveBeenCalledWith(
       expect.objectContaining({ action: 'payout.recipient.updated' })
     );
+  });
+
+  it('blocks completing a failed payout', async () => {
+    const payoutSelectChain = {
+      from: vi.fn(() => ({
+        where: vi.fn(() => ({
+          limit: vi.fn(async () => [
+            {
+              id: 'payout-failed',
+              status: 'failed',
+              dreamBoardId: 'board-1',
+              type: 'karri_card',
+            },
+          ]),
+        })),
+      })),
+    };
+
+    dbMock.select.mockReturnValue(payoutSelectChain);
+
+    await expect(
+      completePayout({
+        payoutId: 'payout-failed',
+        externalRef: 'REF-FAILED',
+        actor: { type: 'admin' },
+      })
+    ).rejects.toThrow('Invalid payout transition');
+    expect(dbMock.transaction).not.toHaveBeenCalled();
+  });
+
+  it('keeps failing a completed payout idempotent', async () => {
+    const payoutSelectChain = {
+      from: vi.fn(() => ({
+        where: vi.fn(() => ({
+          limit: vi.fn(async () => [
+            {
+              id: 'payout-complete',
+              status: 'completed',
+              dreamBoardId: 'board-1',
+            },
+          ]),
+        })),
+      })),
+    };
+
+    dbMock.select.mockReturnValue(payoutSelectChain);
+
+    await expect(
+      failPayout({
+        payoutId: 'payout-complete',
+        errorMessage: 'manual_failure',
+        actor: { type: 'admin' },
+      })
+    ).resolves.toEqual(
+      expect.objectContaining({
+        id: 'payout-complete',
+        status: 'completed',
+      })
+    );
+    expect(dbMock.transaction).not.toHaveBeenCalled();
   });
 });

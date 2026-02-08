@@ -48,6 +48,15 @@ export const POST = withApiAuth(
       });
     }
 
+    if (existing.status === 'completed') {
+      return jsonError({
+        error: { code: 'conflict', message: 'Invalid payout state transition' },
+        status: 409,
+        requestId,
+        headers: rateLimitHeaders,
+      });
+    }
+
     try {
       await failPayout({
         payoutId: params.id,
