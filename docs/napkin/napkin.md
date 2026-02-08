@@ -40,6 +40,7 @@
 - For WhatsApp webhooks, STOP must update both `whatsapp_contacts.opt_out_at` and pending `contribution_reminders.whatsapp_opt_out_at`; never clear opt-out on non-STOP inbound messages.
 - For startup validation parity, legacy WhatsApp config requires all three keys (`WHATSAPP_BUSINESS_API_URL`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_BUSINESS_API_TOKEN`) or dispatch can fail after boot.
 - For admin dataset services under strict TypeScript, `COALESCE` nullable SQL fields (for example `hostEmail`, `netCents`) at select-time to keep DTOs stable and avoid mapper null-guards everywhere.
+- For rollout-decision milestones, keep one canonical milestone evidence file plus supporting artifacts (runbook execution, checklist, GO/NO-GO, exit memo) and mark live-prod steps as manual rather than guessing outcomes.
 
 ## Patterns That Don't Work
 - Skipping preflight docs causes rework and misalignment.
