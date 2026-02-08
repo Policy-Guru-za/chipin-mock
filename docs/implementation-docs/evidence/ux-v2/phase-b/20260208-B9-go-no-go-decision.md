@@ -90,5 +90,17 @@ Not applicable for this decision record.
 ## Sign-Off
 
 Engineering: `Codex (prepared) / 2026-02-08T06:54:36Z`
-Ops: `Pending Ryan manual sign-off during production window`
-Product: `Pending Ryan manual sign-off during production window`
+Ops: `Ryan Laubscher (signed) / 2026-02-08`
+Product: `Ryan Laubscher (signed) / 2026-02-08`
+
+## Production Deploy Strategy
+
+Decision: Phase B and Phase C will be deployed together as a single production release after Phase C completion.
+
+Rationale:
+- Phase B backend changes are backward-safe with write-path toggles OFF.
+- Deploying backend-only changes to production before the UI is ready provides no user-facing value and introduces an unnecessary deploy/validation cycle.
+- A combined deploy reduces operational overhead and allows a single end-to-end production validation pass.
+- Write-path toggles (`UX_V2_ENABLE_BANK_WRITE_PATH`, `UX_V2_ENABLE_CHARITY_WRITE_PATH`) will be enabled as part of the Phase C rollout decision, not before.
+
+Signed: `Ryan Laubscher / 2026-02-08`
