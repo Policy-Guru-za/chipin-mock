@@ -39,7 +39,7 @@ const dreamBoardApiFields = {
   status: dreamBoards.status,
   createdAt: dreamBoards.createdAt,
   updatedAt: dreamBoards.updatedAt,
-  raisedCents: sql<number>`COALESCE(SUM(${contributions.netCents}), 0)`.as('raised_cents'),
+  raisedCents: sql<number>`COALESCE(SUM(${contributions.amountCents}), 0)`.as('raised_cents'),
   contributionCount: sql<number>`COUNT(${contributions.id})`.as('contribution_count'),
 };
 

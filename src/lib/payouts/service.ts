@@ -184,7 +184,7 @@ const buildPayoutPlans = (params: {
       type: board.payoutMethod,
       itemType: 'gift',
       grossCents: calculation.raisedCents,
-      feeCents: 0,
+      feeCents: calculation.platformFeeCents,
       charityCents: calculation.charityCents,
       netCents: calculation.giftCents,
       recipientData: getGiftRecipientData(board),

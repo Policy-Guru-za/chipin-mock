@@ -123,7 +123,7 @@ export async function getDreamBoardBySlug(slug: string, partnerId?: string) {
       status: dreamBoards.status,
       createdAt: dreamBoards.createdAt,
       updatedAt: dreamBoards.updatedAt,
-      raisedCents: sql<number>`COALESCE(SUM(${contributions.netCents}), 0)`.as('raised_cents'),
+      raisedCents: sql<number>`COALESCE(SUM(${contributions.amountCents}), 0)`.as('raised_cents'),
       contributionCount: sql<number>`COUNT(${contributions.id})`.as('contribution_count'),
     })
     .from(dreamBoards)
@@ -181,7 +181,7 @@ export const getDreamBoardByPublicId = async (identifier: string, partnerId?: st
       status: dreamBoards.status,
       createdAt: dreamBoards.createdAt,
       updatedAt: dreamBoards.updatedAt,
-      raisedCents: sql<number>`COALESCE(SUM(${contributions.netCents}), 0)`.as('raised_cents'),
+      raisedCents: sql<number>`COALESCE(SUM(${contributions.amountCents}), 0)`.as('raised_cents'),
       contributionCount: sql<number>`COUNT(${contributions.id})`.as('contribution_count'),
     })
     .from(dreamBoards)
@@ -215,7 +215,7 @@ export async function listDreamBoardsForHost(hostId: string) {
       partyDate: dreamBoards.partyDate,
       goalCents: dreamBoards.goalCents,
       status: dreamBoards.status,
-      raisedCents: sql<number>`COALESCE(SUM(${contributions.netCents}), 0)`.as('raised_cents'),
+      raisedCents: sql<number>`COALESCE(SUM(${contributions.amountCents}), 0)`.as('raised_cents'),
       contributionCount: sql<number>`COUNT(${contributions.id})`.as('contribution_count'),
     })
     .from(dreamBoards)
@@ -249,7 +249,7 @@ export async function getDreamBoardDetailForHost(id: string, hostId: string) {
       payoutEmail: dreamBoards.payoutEmail,
       message: dreamBoards.message,
       status: dreamBoards.status,
-      raisedCents: sql<number>`COALESCE(SUM(${contributions.netCents}), 0)`.as('raised_cents'),
+      raisedCents: sql<number>`COALESCE(SUM(${contributions.amountCents}), 0)`.as('raised_cents'),
       contributionCount: sql<number>`COUNT(${contributions.id})`.as('contribution_count'),
     })
     .from(dreamBoards)
@@ -346,7 +346,7 @@ export async function getDreamBoardNotificationContext(dreamBoardId: string) {
       hostWhatsAppNumber: dreamBoards.hostWhatsAppNumber,
       goalCents: dreamBoards.goalCents,
       karriCardNumber: dreamBoards.karriCardNumber,
-      raisedCents: sql<number>`COALESCE(SUM(${contributions.netCents}), 0)`.as('raised_cents'),
+      raisedCents: sql<number>`COALESCE(SUM(${contributions.amountCents}), 0)`.as('raised_cents'),
     })
     .from(dreamBoards)
     .leftJoin(
@@ -455,7 +455,7 @@ export async function markDreamBoardFundedIfNeeded(dreamBoardId: string): Promis
     .select({
       goalCents: dreamBoards.goalCents,
       status: dreamBoards.status,
-      raisedCents: sql<number>`COALESCE(SUM(${contributions.netCents}), 0)`.as('raised_cents'),
+      raisedCents: sql<number>`COALESCE(SUM(${contributions.amountCents}), 0)`.as('raised_cents'),
     })
     .from(dreamBoards)
     .leftJoin(

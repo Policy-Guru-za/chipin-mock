@@ -180,4 +180,62 @@ describe('payout queries', () => {
 
     expect(result).toEqual([]);
   });
+
+  it('excludes boards where platform fees consume all raised cents', async () => {
+    dbMock.select
+      .mockReturnValueOnce(
+        makeBoardQuery([
+          {
+            id: 'board-5',
+            slug: 'fee-heavy',
+            childName: 'Fee Heavy',
+            status: 'closed',
+            payoutMethod: 'karri_card',
+            charityEnabled: false,
+            payoutEmail: 'host@chipin.co.za',
+            goalCents: 10000,
+            raisedCents: 1000,
+            platformFeeCents: 1000,
+            charityCents: 0,
+            contributionCount: 1,
+            hostEmail: 'host@chipin.co.za',
+            updatedAt: new Date(),
+          },
+        ])
+      )
+      .mockReturnValueOnce(makePayoutQuery([]));
+
+    const result = await listDreamBoardsReadyForPayouts();
+
+    expect(result).toEqual([]);
+  });
+
+  it('excludes charity boards when fees consume all raised cents', async () => {
+    dbMock.select
+      .mockReturnValueOnce(
+        makeBoardQuery([
+          {
+            id: 'board-6',
+            slug: 'fee-heavy-charity',
+            childName: 'Fee Heavy Charity',
+            status: 'closed',
+            payoutMethod: 'karri_card',
+            charityEnabled: true,
+            payoutEmail: 'host@chipin.co.za',
+            goalCents: 10000,
+            raisedCents: 1000,
+            platformFeeCents: 1000,
+            charityCents: 200,
+            contributionCount: 1,
+            hostEmail: 'host@chipin.co.za',
+            updatedAt: new Date(),
+          },
+        ])
+      )
+      .mockReturnValueOnce(makePayoutQuery([]));
+
+    const result = await listDreamBoardsReadyForPayouts();
+
+    expect(result).toEqual([]);
+  });
 });

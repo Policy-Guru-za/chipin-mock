@@ -47,7 +47,7 @@ export const getDreamBoardPayoutContext = async (dreamBoardId: string) => {
 export const getContributionTotalsForDreamBoard = async (dreamBoardId: string) => {
   const [totals] = await db
     .select({
-      raisedCents: sql<number>`COALESCE(SUM(${contributions.netCents}), 0)`.as('raised_cents'),
+      raisedCents: sql<number>`COALESCE(SUM(${contributions.amountCents}), 0)`.as('raised_cents'),
       platformFeeCents: sql<number>`COALESCE(SUM(${contributions.feeCents}), 0)`.as(
         'platform_fee_cents'
       ),
@@ -95,11 +95,14 @@ const getExpectedPayoutTypes = (board: {
   payoutMethod: PayoutType;
   charityEnabled: boolean;
   raisedCents: number;
+  platformFeeCents?: number;
   charityCents: number;
 }) => {
   const raisedCents = Math.max(0, board.raisedCents);
-  const charityCents = Math.min(Math.max(0, board.charityCents), raisedCents);
-  const giftCents = Math.max(0, raisedCents - charityCents);
+  const platformFeeCents = Math.min(Math.max(0, board.platformFeeCents ?? 0), raisedCents);
+  const distributableCents = Math.max(0, raisedCents - platformFeeCents);
+  const charityCents = Math.min(Math.max(0, board.charityCents), distributableCents);
+  const giftCents = Math.max(0, distributableCents - charityCents);
 
   const expected: PayoutType[] = [];
   if (giftCents > 0) {
@@ -122,7 +125,10 @@ export const listDreamBoardsReadyForPayouts = async () => {
       charityEnabled: dreamBoards.charityEnabled,
       payoutEmail: dreamBoards.payoutEmail,
       goalCents: dreamBoards.goalCents,
-      raisedCents: sql<number>`COALESCE(SUM(${contributions.netCents}), 0)`.as('raised_cents'),
+      raisedCents: sql<number>`COALESCE(SUM(${contributions.amountCents}), 0)`.as('raised_cents'),
+      platformFeeCents: sql<number>`COALESCE(SUM(${contributions.feeCents}), 0)`.as(
+        'platform_fee_cents'
+      ),
       charityCents: sql<number>`COALESCE(SUM(${contributions.charityCents}), 0)`.as(
         'charity_cents'
       ),
@@ -170,6 +176,7 @@ export const listDreamBoardsReadyForPayouts = async () => {
       payoutMethod: board.payoutMethod as PayoutType,
       charityEnabled: board.charityEnabled,
       raisedCents: board.raisedCents,
+      platformFeeCents: board.platformFeeCents,
       charityCents: board.charityCents,
     });
     const existing = payoutMap.get(board.id) ?? new Set<PayoutType>();

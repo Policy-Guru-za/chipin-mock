@@ -249,6 +249,7 @@ export const contributions = pgTable(
     message: text('message'),
     amountCents: integer('amount_cents').notNull(),
     feeCents: integer('fee_cents').notNull(),
+    // D-004/D-005: goal progress and funded checks use amount_cents; net_cents is for payout ledger math.
     netCents: integer('net_cents').generatedAlwaysAs(sql`(amount_cents - fee_cents)`),
     charityCents: integer('charity_cents'),
     paymentProvider: paymentProviderEnum('payment_provider').notNull(),

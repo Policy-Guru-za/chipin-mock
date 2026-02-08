@@ -189,7 +189,7 @@ describe('payout service creation', () => {
       expect.objectContaining({
         dreamBoardId: 'board-2',
         reference: 'payout-1',
-        amountCents: 14000,
+        amountCents: 13400,
       }),
       expect.anything()
     );
@@ -261,7 +261,8 @@ describe('payout service creation', () => {
       expect.objectContaining({
         type: 'bank',
         grossCents: 18000,
-        netCents: 18000,
+        feeCents: 700,
+        netCents: 17300,
         charityCents: 0,
       })
     );
@@ -345,7 +346,8 @@ describe('payout service creation', () => {
         expect.objectContaining({
           type: 'karri_card',
           grossCents: 20000,
-          netCents: 17000,
+          feeCents: 800,
+          netCents: 16200,
           charityCents: 3000,
         }),
         expect.objectContaining({
@@ -356,9 +358,18 @@ describe('payout service creation', () => {
         }),
       ])
     );
+    const giftPayout = insertedPayouts.find((row) => row.type === 'karri_card');
+    expect(giftPayout).toEqual(
+      expect.objectContaining({
+        grossCents: 20000,
+        feeCents: 800,
+        charityCents: 3000,
+        netCents: 16200,
+      })
+    );
     expect(insertedItems).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ type: 'gift', amountCents: 17000 }),
+        expect.objectContaining({ type: 'gift', amountCents: 16200 }),
         expect.objectContaining({ type: 'charity', amountCents: 3000 }),
       ])
     );
@@ -366,9 +377,51 @@ describe('payout service creation', () => {
     expect(karriBatchMocks.queueKarriCredit).toHaveBeenCalledWith(
       expect.objectContaining({
         dreamBoardId: 'board-4',
-        amountCents: 17000,
+        amountCents: 16200,
       }),
       expect.anything()
     );
+  });
+
+  it('skips all payouts when platform fees consume all raised cents', async () => {
+    payoutQueryMocks.getDreamBoardPayoutContext.mockResolvedValue({
+      id: 'board-5',
+      partnerId: 'partner-1',
+      status: 'closed',
+      payoutMethod: 'karri_card',
+      giftName: 'Puzzle',
+      giftImageUrl: 'https://images.example/puzzle.jpg',
+      giftImagePrompt: 'A colorful puzzle',
+      payoutEmail: 'host@chipin.co.za',
+      karriCardNumber: 'encrypted-card',
+      karriCardHolderName: 'Host Parent',
+      charityEnabled: true,
+      charityId: 'charity-1',
+      charitySplitType: 'threshold',
+      charityPercentageBps: null,
+      charityThresholdCents: 5000,
+      charityName: 'Save The Ocean',
+      charityBankDetailsEncrypted: { account: 'encrypted' },
+      hostWhatsAppNumber: '+27821234567',
+      childName: 'Mia',
+      hostEmail: 'host@chipin.co.za',
+      hostId: 'host-5',
+    });
+    payoutQueryMocks.getContributionTotalsForDreamBoard.mockResolvedValue({
+      raisedCents: 1000,
+      platformFeeCents: 1000,
+      charityCents: 200,
+    });
+    payoutQueryMocks.listPayoutsForDreamBoard.mockResolvedValue([]);
+
+    const result = await createPayoutsForDreamBoard({
+      dreamBoardId: 'board-5',
+      actor: { type: 'admin' },
+    });
+
+    expect(result.skipped).toBe(true);
+    expect(result.created).toEqual([]);
+    expect(dbMock.transaction).not.toHaveBeenCalled();
+    expect(karriBatchMocks.queueKarriCredit).not.toHaveBeenCalled();
   });
 });

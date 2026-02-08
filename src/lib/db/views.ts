@@ -33,25 +33,27 @@ export type ExpiringDreamBoard = {
 export const getDreamBoardWithTotals = async (id: string): Promise<DreamBoardWithTotals | null> => {
   const result = await db.execute<DreamBoardWithTotals>(sql`
     SELECT
-      id,
-      slug,
-      child_name as "childName",
-      child_photo_url as "childPhotoUrl",
-      party_date as "partyDate",
-      gift_name as "giftName",
-      gift_image_url as "giftImageUrl",
-      gift_image_prompt as "giftImagePrompt",
-      payout_method as "payoutMethod",
-      goal_cents as "goalCents",
-      payout_email as "payoutEmail",
-      message,
-      status,
-      created_at as "createdAt",
-      updated_at as "updatedAt",
-      raised_cents as "raisedCents",
-      contribution_count as "contributionCount"
-    FROM dream_boards_with_totals
-    WHERE id = ${id}
+      db.id,
+      db.slug,
+      db.child_name as "childName",
+      db.child_photo_url as "childPhotoUrl",
+      db.party_date as "partyDate",
+      db.gift_name as "giftName",
+      db.gift_image_url as "giftImageUrl",
+      db.gift_image_prompt as "giftImagePrompt",
+      db.payout_method as "payoutMethod",
+      db.goal_cents as "goalCents",
+      db.payout_email as "payoutEmail",
+      db.message,
+      db.status,
+      db.created_at as "createdAt",
+      db.updated_at as "updatedAt",
+      COALESCE(SUM(c.amount_cents) FILTER (WHERE c.payment_status = 'completed'), 0) as "raisedCents",
+      COUNT(c.id) FILTER (WHERE c.payment_status = 'completed') as "contributionCount"
+    FROM dream_boards db
+    LEFT JOIN contributions c ON c.dream_board_id = db.id
+    WHERE db.id = ${id}
+    GROUP BY db.id
     LIMIT 1
   `);
 
