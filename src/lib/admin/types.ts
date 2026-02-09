@@ -19,6 +19,7 @@ export type AdminDreamBoardFilters = AdminListParams & {
   createdFrom?: Date;
   createdTo?: Date;
   hostId?: string;
+  charityEnabled?: boolean;
   search?: string;
 };
 
@@ -31,6 +32,7 @@ export type AdminDreamBoardDataset = {
   hostId: string;
   hostName: string | null;
   hostEmail: string;
+  charityEnabled: boolean;
   goalCents: number;
   raisedCents: number;
   contributorCount: number;
@@ -111,6 +113,8 @@ export type AdminCharityDataset = {
   category: string;
   logoUrl: string;
   website: string | null;
+  contactName: string;
+  contactEmail: string;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;

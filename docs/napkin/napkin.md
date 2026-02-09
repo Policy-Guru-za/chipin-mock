@@ -3,6 +3,10 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-09 | self | Added an admin integration assertion by extending one `describe` callback past lint `max-lines-per-function`, increasing warning count | When adding tests in this repo, split long suites into multiple `describe` blocks early to avoid warning regressions |
+| 2026-02-09 | self | Read `src/app/(admin)/layout.tsx` without quoting parentheses in zsh, command failed with `no matches found` | Quote path arguments that include route-group parentheses, e.g. `'src/app/(admin)/layout.tsx'` |
+| 2026-02-09 | self | Assumed admin route-group layout auth covered route handlers; legacy `/payouts/export` redirect initially had no auth check | For `route.ts` handlers under admin route groups, call `requireAdminAuth()` explicitly before redirect or response |
+| 2026-02-09 | self | Closed mobile admin drawer on pathname change with `setState` inside `useEffect`; lint failed (`react-hooks/set-state-in-effect`) | Model drawer-open state keyed by pathname instead of effect-driven synchronous state updates |
 | 2026-02-09 | self | Attempted to install `pdf-lib` mid-milestone without confirming registry access; install failed with `ENOTFOUND registry.npmjs.org` | Verify network/package registry reachability first; if blocked, ship fallback behavior and record explicit dependency deviation in evidence |
 | 2026-02-09 | self | Wrote API route tests with `Request`, but handlers read `request.nextUrl.searchParams` and failed outside the unauthenticated branch | Use `NextRequest` in route tests whenever handlers depend on `nextUrl` |
 | 2026-02-09 | self | Added new host dashboard integration test without stubbing `matchMedia`, causing `useReducedMotion` failures | Stub both legacy and modern `matchMedia` methods in jsdom tests that render `ProgressBar` or motion-aware components |
@@ -49,6 +53,7 @@
 - For startup validation parity, legacy WhatsApp config requires all three keys (`WHATSAPP_BUSINESS_API_URL`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_BUSINESS_API_TOKEN`) or dispatch can fail after boot.
 - For admin dataset services under strict TypeScript, `COALESCE` nullable SQL fields (for example `hostEmail`, `netCents`) at select-time to keep DTOs stable and avoid mapper null-guards everywhere.
 - For rollout-decision milestones, keep one canonical milestone evidence file plus supporting artifacts (runbook execution, checklist, GO/NO-GO, exit memo) and mark live-prod steps as manual rather than guessing outcomes.
+- For admin CSV exports, use shared header lists and always emit header-only CSV for empty datasets to keep download behavior deterministic.
 
 ## Patterns That Don't Work
 - Skipping preflight docs causes rework and misalignment.
@@ -89,3 +94,9 @@
 - Internal host download routes need explicit middleware public matching so requests reach handlers, then route-level auth must enforce `401/403/404` semantics.
 - Download route tests must exercise `NextRequest` paths and CSV escaping for commas/quotes/newlines to protect export integrity.
 - Dashboard/client integration tests that render `ProgressBar` require `matchMedia` stubs to avoid motion hook failures.
+
+## C5 Learnings (2026-02-09)
+- Canonical admin route normalization must include explicit auth on redirecting `route.ts` handlers; route-group layout auth does not protect API handlers.
+- Admin modal a11y requires full trap pattern (`Escape` close + `Tab` loop + focus restore) rather than only `aria-modal`.
+- Charity edit flows must not surface encrypted bank payloads; keep masked placeholder and only submit bank JSON on explicit change.
+- Admin export handlers should standardize on `NextRequest` + `request.nextUrl.searchParams` and shared CSV helpers for consistent parser/test behavior.

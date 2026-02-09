@@ -145,6 +145,10 @@ export const listAdminDreamBoards = async (
     conditions.push(eq(dreamBoards.hostId, filters.hostId));
   }
 
+  if (filters.charityEnabled !== undefined) {
+    conditions.push(eq(dreamBoards.charityEnabled, filters.charityEnabled));
+  }
+
   if (filters.search) {
     const pattern = `%${filters.search}%`;
     conditions.push(
@@ -177,6 +181,7 @@ export const listAdminDreamBoards = async (
       hostId: dreamBoards.hostId,
       hostName: hosts.name,
       hostEmail: sql<string>`COALESCE(${hosts.email}, '')`,
+      charityEnabled: dreamBoards.charityEnabled,
       goalCents: dreamBoards.goalCents,
       raisedCents: sql<number>`COALESCE((
         SELECT SUM(c.amount_cents)::int
@@ -240,6 +245,7 @@ export const listAdminDreamBoards = async (
     hostId: row.hostId,
     hostName: row.hostName,
     hostEmail: row.hostEmail,
+    charityEnabled: row.charityEnabled,
     goalCents: row.goalCents,
     raisedCents: row.raisedCents,
     contributorCount: row.contributorCount,
@@ -477,7 +483,7 @@ export const listAdminCharities = async (
   }
 
   if (filters.category) {
-    conditions.push(eq(charities.category, filters.category));
+    conditions.push(sql`LOWER(${charities.category}) = LOWER(${filters.category})`);
   }
 
   if (filters.search) {
@@ -507,6 +513,8 @@ export const listAdminCharities = async (
       category: charities.category,
       logoUrl: charities.logoUrl,
       website: charities.website,
+      contactName: charities.contactName,
+      contactEmail: charities.contactEmail,
       isActive: charities.isActive,
       createdAt: charities.createdAt,
       updatedAt: charities.updatedAt,
@@ -552,6 +560,8 @@ export const listAdminCharities = async (
     category: row.category,
     logoUrl: row.logoUrl,
     website: row.website,
+    contactName: row.contactName,
+    contactEmail: row.contactEmail,
     isActive: row.isActive,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,

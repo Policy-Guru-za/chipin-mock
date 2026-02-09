@@ -1,35 +1,15 @@
-import Link from 'next/link';
-
-import { buttonVariants } from '@/components/ui/button';
+import { AdminSidebar } from '@/components/admin';
 import { requireAdminAuth } from '@/lib/auth/clerk-wrappers';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  await requireAdminAuth();
+  const session = await requireAdminAuth();
 
   return (
-    <div className="min-h-screen bg-subtle text-text">
-      <header className="border-b border-border bg-surface/90 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-3">
-            <span className="text-lg font-display">ChipIn Admin</span>
-            <span className="rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold text-accent">
-              Payouts
-            </span>
-          </div>
-          <nav className="flex items-center gap-3">
-            <Link
-              href="/admin/payouts"
-              className={buttonVariants({ variant: 'outline', size: 'sm' })}
-            >
-              Payout Queue
-            </Link>
-            <Link href="/dashboard" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
-              Host Dashboard
-            </Link>
-          </nav>
-        </div>
-      </header>
-      <main className="mx-auto w-full max-w-6xl px-6 py-10">{children}</main>
+    <div className="min-h-screen bg-subtle text-text lg:flex">
+      <AdminSidebar userEmail={session.email} />
+      <main className="flex-1 p-4 lg:ml-60 lg:p-8">
+        <div className="mx-auto w-full max-w-7xl">{children}</div>
+      </main>
     </div>
   );
 }

@@ -136,6 +136,89 @@ export function MenuIcon({ className, size = 'md' }: IconProps) {
   );
 }
 
+export function DashboardIcon({ className, size = 'md' }: IconProps) {
+  return (
+    <svg
+      className={cn(sizeMap[size], className)}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h8v8H3zM13 3h8v5h-8zM13 10h8v11h-8zM3 13h8v8H3z" />
+    </svg>
+  );
+}
+
+export function WalletIcon({ className, size = 'md' }: IconProps) {
+  return (
+    <svg
+      className={cn(sizeMap[size], className)}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 7a2 2 0 012-2h14a2 2 0 012 2v3H3V7z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18v7a2 2 0 01-2 2H5a2 2 0 01-2-2v-7z" />
+      <circle cx="16.5" cy="13.5" r="1.3" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function BanknotesIcon({ className, size = 'md' }: IconProps) {
+  return (
+    <svg
+      className={cn(sizeMap[size], className)}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8h18v10H3z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M7 5h10M6 12a3 3 0 006 0 3 3 0 006 0" />
+    </svg>
+  );
+}
+
+export function ChartBarIcon({ className, size = 'md' }: IconProps) {
+  return (
+    <svg
+      className={cn(sizeMap[size], className)}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+    </svg>
+  );
+}
+
+export function CogIcon({ className, size = 'md' }: IconProps) {
+  return (
+    <svg
+      className={cn(sizeMap[size], className)}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M10.3 3.6h3.4l.6 2.2a6.8 6.8 0 012 .8l2-1.1 2.4 2.4-1.1 2a6.8 6.8 0 01.8 2l2.2.6v3.4l-2.2.6a6.8 6.8 0 01-.8 2l1.1 2-2.4 2.4-2-1.1a6.8 6.8 0 01-2 .8l-.6 2.2h-3.4l-.6-2.2a6.8 6.8 0 01-2-.8l-2 1.1-2.4-2.4 1.1-2a6.8 6.8 0 01-.8-2l-2.2-.6v-3.4l2.2-.6a6.8 6.8 0 01.8-2l-1.1-2L5 5.5l2 1.1a6.8 6.8 0 012-.8z"
+      />
+      <circle cx="12" cy="12" r="2.8" />
+    </svg>
+  );
+}
+
 export function CopyIcon({ className, size = 'md' }: IconProps) {
   return (
     <svg

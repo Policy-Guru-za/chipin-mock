@@ -78,6 +78,7 @@ export const parseAdminDreamBoardFilters = (
   createdFrom: parseDateParam(params.get('created_from')),
   createdTo: parseDateParam(params.get('created_to')),
   hostId: params.get('host_id') || undefined,
+  charityEnabled: parseBooleanParam(params.get('charity_enabled')),
   search: params.get('search') || undefined,
 });
 

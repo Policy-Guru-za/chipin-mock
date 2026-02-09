@@ -21,6 +21,7 @@ describe('admin query param parsers', () => {
       created_from: '2026-01-01T00:00:00.000Z',
       created_to: '2026-02-01T00:00:00.000Z',
       host_id: 'host-1',
+      charity_enabled: 'true',
       search: 'maya',
     });
 
@@ -30,6 +31,7 @@ describe('admin query param parsers', () => {
     expect(result.statuses).toEqual(['active', 'closed']);
     expect(result.cursor?.id).toBe('db-1');
     expect(result.hostId).toBe('host-1');
+    expect(result.charityEnabled).toBe(true);
     expect(result.search).toBe('maya');
   });
 

@@ -7,7 +7,12 @@ const dbMock = vi.hoisted(() => ({
 
 vi.mock('@/lib/db', () => ({ db: dbMock }));
 
-import { getAdminPlatformSummaryDataset, listAdminPayouts } from '@/lib/admin/service';
+import {
+  listAdminCharities,
+  getAdminPlatformSummaryDataset,
+  listAdminDreamBoards,
+  listAdminPayouts,
+} from '@/lib/admin/service';
 
 const makePayoutRowsQuery = (rows: unknown[]) => {
   const query: any = {};
@@ -24,6 +29,25 @@ const makeCountQuery = (count: number) => {
   const query: any = {};
   query.from = vi.fn(() => query);
   query.where = vi.fn(async () => [{ totalCount: count }]);
+  return query;
+};
+
+const makeDreamBoardRowsQuery = (rows: unknown[]) => {
+  const query: any = {};
+  query.from = vi.fn(() => query);
+  query.leftJoin = vi.fn(() => query);
+  query.where = vi.fn(() => query);
+  query.orderBy = vi.fn(() => query);
+  query.limit = vi.fn(async () => rows);
+  return query;
+};
+
+const makeCharityRowsQuery = (rows: unknown[]) => {
+  const query: any = {};
+  query.from = vi.fn(() => query);
+  query.where = vi.fn(() => query);
+  query.orderBy = vi.fn(() => query);
+  query.limit = vi.fn(async () => rows);
   return query;
 };
 
@@ -105,5 +129,93 @@ describe('admin datasets integration', () => {
     expect(result.totalRaisedCents).toBe(120000);
     expect(result.totalPaidOutCents).toBe(98000);
     expect(result.totalFeesRetainedCents).toBe(22000);
+  });
+});
+
+describe('admin datasets list views', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns dream boards with charity enabled filter field', async () => {
+    dbMock.select
+      .mockReturnValueOnce(
+        makeDreamBoardRowsQuery([
+          {
+            id: 'board-1',
+            slug: 'maya-board',
+            childName: 'Maya',
+            giftName: 'Scooter',
+            status: 'active',
+            hostId: 'host-1',
+            hostName: 'Host Name',
+            hostEmail: 'host@gifta.co.za',
+            charityEnabled: true,
+            goalCents: 100000,
+            raisedCents: 78000,
+            contributorCount: 12,
+            payoutPendingCount: 1,
+            payoutProcessingCount: 0,
+            payoutCompletedCount: 0,
+            payoutFailedCount: 0,
+            createdAt: new Date('2026-02-01T00:00:00.000Z'),
+            updatedAt: new Date('2026-02-02T00:00:00.000Z'),
+          },
+        ]),
+      )
+      .mockReturnValueOnce(makeCountQuery(1));
+
+    const result = await listAdminDreamBoards({
+      charityEnabled: true,
+      limit: 20,
+    });
+
+    expect(result.totalCount).toBe(1);
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0]).toEqual(
+      expect.objectContaining({
+        id: 'board-1',
+        charityEnabled: true,
+        payoutStatusSummary: expect.objectContaining({ pending: 1 }),
+      }),
+    );
+  });
+
+  it('does not expose encrypted bank payload in charity dataset', async () => {
+    dbMock.select
+      .mockReturnValueOnce(
+        makeCharityRowsQuery([
+          {
+            id: 'charity-1',
+            name: 'Hope Fund',
+            description: 'Education support',
+            category: 'Education',
+            logoUrl: 'https://example.com/logo.png',
+            website: 'https://example.com',
+            contactName: 'Dana',
+            contactEmail: 'dana@example.com',
+            isActive: true,
+            createdAt: new Date('2026-02-01T00:00:00.000Z'),
+            updatedAt: new Date('2026-02-02T00:00:00.000Z'),
+            totalBoards: 2,
+            totalRaisedCents: 15000,
+            totalPayoutsCents: 12000,
+          },
+        ]),
+      )
+      .mockReturnValueOnce(makeCountQuery(1));
+
+    const result = await listAdminCharities({ limit: 20 });
+
+    expect(result.totalCount).toBe(1);
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0]).toEqual(
+      expect.objectContaining({
+        id: 'charity-1',
+        contactName: 'Dana',
+        contactEmail: 'dana@example.com',
+      }),
+    );
+    expect(result.items[0]).not.toHaveProperty('bankDetailsEncrypted');
   });
 });
