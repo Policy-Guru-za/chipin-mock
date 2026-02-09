@@ -33,9 +33,9 @@
 The Post-Campaign View displays the completed Dreamboard with a celebration tone, financial breakdown, payout details, and downloadable files (birthday messages PDF, thank you card list CSV).
 
 ### Trigger Conditions
-- Dreamboard status: `completed`
+- Dreamboard status: `closed` or `paid_out`
 - Rendered on the same `/dashboard/[id]` route as active boards
-- Conditional rendering based on `board.status === 'completed'`
+- Conditional rendering based on `board.status === 'closed' || board.status === 'paid_out'`
 
 ### Key Differences from Active View
 - ✅ Celebration heading instead of progress tracking
@@ -589,7 +589,7 @@ interface CompletedDreamBoardDetail {
   child_photo_url: string;
   child_date_of_birth: string; // ISO 8601
   birthday_date: string; // YYYY-MM-DD
-  status: 'completed'; // Only completed status for this view
+  status: 'closed' | 'paid_out'; // Closed and paid-out statuses render this view
   end_date: string; // ISO 8601 (when board closed)
   amount_raised_cents: number;
   contributor_count: number;
@@ -728,7 +728,7 @@ export default async function DashboardDetailPage({
   }
 
   // Render correct view based on status
-  return data.board.status === 'completed' ? (
+  return data.board.status === 'closed' || data.board.status === 'paid_out' ? (
     <CompletedBoardView board={data.board} contributions={data.contributions} messages={data.messages} />
   ) : (
     <ActiveBoardView board={data.board} contributions={data.contributions} messages={data.messages} />
@@ -1125,4 +1125,3 @@ function triggerDownload(blob: Blob, filename: string) {
 **Document Version:** 1.0
 **Status:** Implementation-Ready
 **Last Updated:** February 2025
-

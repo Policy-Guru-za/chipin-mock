@@ -100,6 +100,51 @@ describe('POST /api/internal/analytics', () => {
     const response = await postHandler(request);
     expect(response.status).toBe(400);
   });
+
+  it('rejects origin-prefix spoofing in production mode', async () => {
+    vi.resetModules();
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://gifta.co.za');
+    const routeModule = await import('@/app/api/internal/analytics/route');
+    const productionPost = routeModule.POST;
+
+    const request = new NextRequest('https://gifta.co.za/api/internal/analytics', {
+      method: 'POST',
+      headers: {
+        origin: 'https://gifta.co.za.attacker.tld',
+      },
+      body: JSON.stringify({
+        name: 'LCP',
+        value: 2500,
+        rating: 'good',
+        id: 'v1-123',
+      }),
+    });
+
+    const response = await productionPost(request);
+    expect(response.status).toBe(403);
+  });
+
+  it('rejects requests without origin and referer in production mode', async () => {
+    vi.resetModules();
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://gifta.co.za');
+    const routeModule = await import('@/app/api/internal/analytics/route');
+    const productionPost = routeModule.POST;
+
+    const request = new NextRequest('https://gifta.co.za/api/internal/analytics', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: 'LCP',
+        value: 2500,
+        rating: 'good',
+        id: 'v1-123',
+      }),
+    });
+
+    const response = await productionPost(request);
+    expect(response.status).toBe(403);
+  });
 });
 
 describe('POST /api/internal/metrics', () => {
@@ -199,5 +244,46 @@ describe('POST /api/internal/metrics', () => {
 
     const response = await postHandler(request);
     expect(response.status).toBe(400);
+  });
+
+  it('rejects origin-prefix spoofing in production mode', async () => {
+    vi.resetModules();
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://gifta.co.za');
+    const routeModule = await import('@/app/api/internal/metrics/route');
+    const productionPost = routeModule.POST;
+
+    const request = new NextRequest('https://gifta.co.za/api/internal/metrics', {
+      method: 'POST',
+      headers: {
+        referer: 'https://gifta.co.za.attacker.tld/path',
+      },
+      body: JSON.stringify({
+        name: 'contribution_completed',
+        timestamp: Date.now(),
+      }),
+    });
+
+    const response = await productionPost(request);
+    expect(response.status).toBe(403);
+  });
+
+  it('rejects requests without origin and referer in production mode', async () => {
+    vi.resetModules();
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://gifta.co.za');
+    const routeModule = await import('@/app/api/internal/metrics/route');
+    const productionPost = routeModule.POST;
+
+    const request = new NextRequest('https://gifta.co.za/api/internal/metrics', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: 'contribution_completed',
+        timestamp: Date.now(),
+      }),
+    });
+
+    const response = await productionPost(request);
+    expect(response.status).toBe(403);
   });
 });

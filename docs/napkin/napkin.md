@@ -3,6 +3,7 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-09 | self | Imported `normalizeEmail` into `thanks/page.tsx` and broke unit tests because mocked `@/lib/db/queries` exports in `tests/unit/receipt-action.test.ts` did not include it | When expanding imports from heavily mocked modules, either update the module mock in the same patch or keep normalization inline to preserve existing mock contracts |
 | 2026-02-09 | self | Started final verification before re-reading napkin notes for the session | Read `docs/napkin/SKILL.md` and `docs/napkin/napkin.md` first in every new session before any gate or edit command |
 | 2026-02-09 | self | Declared Gemini cleanup done while `docs/Platform-Spec-Docs/ARCHITECTURE.md` still contained active Gemini references | After deprecating an integration, run targeted `rg` sweeps across `docs/Platform-Spec-Docs` and patch remaining active references before handoff |
 | 2026-02-09 | self | Deleted an API route and immediately ran `pnpm typecheck`; stale `.next/types` still referenced removed file and failed | After route add/delete, run `pnpm exec next typegen` before `pnpm typecheck` to refresh generated route validators |

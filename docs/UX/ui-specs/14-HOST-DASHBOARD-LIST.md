@@ -376,8 +376,8 @@ The Host Dashboard List View displays all Dreamboards created by the authenticat
 | Child Photo | URL | `dream_boards.child_photo_url` | 48px avatar, rounded full |
 | Age | "Age 7" | Calculated from DOB | Integer value |
 | Birthday | "Jan 15" | `dream_boards.birthday_date` | Format: "MMM DD" |
-| Status | "● ACTIVE" or "✓ COMPLETE" | `dream_boards.status` | 'active' or 'completed' |
-| Days Remaining | "23 days left" | Calculated from `end_date` - today | If status === 'completed': "Ended X days ago" |
+| Status | "● ACTIVE", "FUNDED", "✓ COMPLETE", "EXPIRED", "CANCELLED" | `dream_boards.status` | `active`, `funded`, `closed`, `paid_out`, `expired`, `cancelled` |
+| Days Remaining | "23 days left" | Calculated from `end_date` - today | If status is `closed` or `paid_out`: "Ended X days ago" |
 | Amount Raised | "R2,450" | `dream_boards.amount_raised_cents / 100` | Format with currency + thousands separator |
 | Contributor Count | "12 contributors" | `dream_boards.contributor_count` | Singular/plural handling |
 | End Date | "Jan 20" | `dream_boards.end_date` | Format: "MMM DD" (shown in gray meta text) |
@@ -552,7 +552,7 @@ interface DreamBoardListItem {
   child_photo_url: string;
   child_date_of_birth: string; // ISO 8601 date
   birthday_date: string; // e.g., "2025-01-15" (YYYY-MM-DD)
-  status: 'active' | 'completed'; // board status
+  status: 'active' | 'funded' | 'closed' | 'paid_out' | 'expired' | 'cancelled'; // board status
   end_date: string; // ISO 8601 date when collection ends
   amount_raised_cents: number; // Total cents raised (e.g., 245000 = R2,450)
   contributor_count: number; // Total unique contributors
@@ -1119,4 +1119,3 @@ const EditBoardModal = dynamic(() => import('./EditBoardModal'), {
 **Document Version:** 1.0
 **Status:** Implementation-Ready
 **Last Updated:** February 2025
-

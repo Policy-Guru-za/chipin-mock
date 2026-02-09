@@ -7,7 +7,6 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
 
 import { ThankYouClient } from '@/app/(guest)/[slug]/thanks/ThankYouClient';
-import { requestReceiptAction } from '@/app/(guest)/[slug]/thanks/page';
 import { buildThankYouViewModel } from '@/lib/dream-boards/view-model';
 
 vi.mock('@/components/effects/ConfettiTrigger', () => ({
@@ -194,11 +193,6 @@ describe('thank-you display integration', () => {
 
     expect(screen.getByText('Thanks for your support!')).toBeInTheDocument();
     expect(screen.queryByText(/Contribution amount:/i)).not.toBeInTheDocument();
-  });
-
-  it('receipt action stub returns success', async () => {
-    const result = await requestReceiptAction('contribution-1', 'ava@example.com');
-    expect(result).toEqual({ success: true });
   });
 
   it('submits receipt request and shows success feedback', async () => {

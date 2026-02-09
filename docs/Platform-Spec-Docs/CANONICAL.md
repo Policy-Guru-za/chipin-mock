@@ -72,13 +72,11 @@ Decision Register D-004 (LOCKED): transparent fee model.
 - **Fee calculation:** 3% of gift amount, minimum R3 (300 cents), maximum R500 (50,000 cents).
 - **Checkout display:** itemized as "R350 gift + R10.50 processing fee = R360.50 total".
 - **`raised_cents` tracks gift amount only** (excludes platform fee). This prevents fee distortion in goal progress.
-- **Funded condition** (Decision Register D-005, LOCKED): Dream Board is funded when `raised_cents >= goal_cents`, where `raised_cents` = `SUM(contributions.net_cents)` for completed contributions.
+- **Funded condition** (Decision Register D-005, LOCKED): Dream Board is funded when `raised_cents >= goal_cents`, where `raised_cents` = `SUM(contributions.amount_cents)` for completed contributions.
 - **`contributions.net_cents`** is a generated column: `amount_cents - fee_cents`.
-  - `amount_cents` = the gift amount the contributor chose.
-  - `fee_cents` = the platform fee calculated on that amount.
-  - `net_cents` = the amount that counts toward the gift goal.
-
-Note: the current implementation stores `net_cents = amount_cents - fee_cents`, which means `raised_cents` sums the post-fee amount. This is consistent with D-004/D-005 because `amount_cents` represents the gift amount and the fee is added on top at checkout (guest is charged `amount_cents + fee_cents`).
+  - `amount_cents` = the gift amount the contributor chose and the amount that counts toward the gift goal.
+  - `fee_cents` = the platform fee calculated on that amount and added at checkout.
+  - `net_cents` = payout-ledger amount after fee; used for settlement calculations, not goal progress.
 
 ### Public vs Private Display
 
@@ -222,7 +220,7 @@ Timestamps:
 ### Funding and Goal Progress
 
 - **Funding phase:** gift progress advances as contributions complete; contributions can continue after goal is reached until the board is closed.
-- **Raised calculations:** `raised_cents = SUM(contributions.net_cents WHERE payment_status = 'completed')`.
+- **Raised calculations:** `raised_cents = SUM(contributions.amount_cents WHERE payment_status = 'completed')`.
 - **Funded condition:** `raised_cents >= goal_cents`. Fee amounts are excluded from goal progress.
 - **Contributions continue past funded:** reaching the goal does not auto-close the board. The host or an explicit trigger closes it.
 

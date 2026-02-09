@@ -43,15 +43,27 @@ function isValidOrigin(request: NextRequest): boolean {
   const origin = request.headers.get('origin');
   const referer = request.headers.get('referer');
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  const appOrigin = (() => {
+    if (!appUrl) return null;
+    try {
+      return new URL(appUrl).origin;
+    } catch {
+      return null;
+    }
+  })();
 
   if (process.env.NODE_ENV === 'development') return true;
 
-  if (appUrl) {
-    if (origin?.startsWith(appUrl)) return true;
-    if (referer?.startsWith(appUrl)) return true;
-  }
+  const hasAllowedOrigin = (value: string | null) => {
+    if (!value || !appOrigin) return false;
+    try {
+      return new URL(value).origin === appOrigin;
+    } catch {
+      return false;
+    }
+  };
 
-  if (!origin && !referer) return true;
+  if (hasAllowedOrigin(origin) || hasAllowedOrigin(referer)) return true;
 
   return false;
 }

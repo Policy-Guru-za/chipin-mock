@@ -78,7 +78,7 @@ export function ThankYouClient({ view, slug, requestReceiptAction }: ThankYouCli
     }
 
     setReceiptSuccess(false);
-    setReceiptFeedback("Couldn't send receipt. Please try again.");
+    setReceiptFeedback("Couldn't send receipt. Please check your email and try again.");
     window.setTimeout(() => setReceiptFeedback(''), 5000);
   };
 

@@ -620,7 +620,7 @@ interface DreamBoardDetail {
   child_photo_url: string;
   child_date_of_birth: string; // ISO 8601
   birthday_date: string; // YYYY-MM-DD
-  status: 'active' | 'completed';
+  status: 'active' | 'funded' | 'closed' | 'paid_out' | 'expired' | 'cancelled';
   end_date: string; // ISO 8601
   amount_raised_cents: number;
   contributor_count: number;
@@ -1209,4 +1209,3 @@ const displayedContributions = contributions.slice(0, page * itemsPerPage);
 **Document Version:** 1.0
 **Status:** Implementation-Ready
 **Last Updated:** February 2025
-

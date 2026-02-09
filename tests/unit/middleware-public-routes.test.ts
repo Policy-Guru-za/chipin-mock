@@ -32,6 +32,16 @@ describe('middleware public routes', () => {
     expect(middleware).toContain("'/api/internal/contributions/reminders'");
   });
 
+  it('allowlists guest analytics endpoint', () => {
+    const middleware = readSource('middleware.ts');
+    expect(middleware).toContain("'/api/internal/analytics'");
+  });
+
+  it('allowlists guest metrics endpoint', () => {
+    const middleware = readSource('middleware.ts');
+    expect(middleware).toContain("'/api/internal/metrics'");
+  });
+
   it('allowlists og image endpoint for crawler access', () => {
     const middleware = readSource('middleware.ts');
     expect(middleware).toContain("'/api/og(.*)'");

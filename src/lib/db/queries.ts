@@ -381,6 +381,27 @@ export async function getContributionByPaymentRef(
   return contribution ?? null;
 }
 
+export async function getContributionForReceipt(contributionId: string) {
+  const [contribution] = await db
+    .select({
+      id: contributions.id,
+      dreamBoardId: contributions.dreamBoardId,
+      amountCents: contributions.amountCents,
+      feeCents: contributions.feeCents,
+      paymentStatus: contributions.paymentStatus,
+      createdAt: contributions.createdAt,
+      childName: dreamBoards.childName,
+      giftName: dreamBoards.giftName,
+      slug: dreamBoards.slug,
+    })
+    .from(contributions)
+    .innerJoin(dreamBoards, eq(dreamBoards.id, contributions.dreamBoardId))
+    .where(eq(contributions.id, contributionId))
+    .limit(1);
+
+  return contribution ?? null;
+}
+
 export async function getDreamBoardNotificationContext(dreamBoardId: string) {
   const [board] = await db
     .select({
