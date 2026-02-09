@@ -9,10 +9,12 @@ const runMiddleware = async (path: string) =>
 describe('middleware auth unavailable', () => {
   const originalPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
   const originalSecretKey = process.env.CLERK_SECRET_KEY;
+  const originalDevPreview = process.env.DEV_PREVIEW;
 
   beforeEach(() => {
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = '';
     process.env.CLERK_SECRET_KEY = '';
+    delete process.env.DEV_PREVIEW;
   });
 
   afterEach(() => {
@@ -26,6 +28,12 @@ describe('middleware auth unavailable', () => {
       delete process.env.CLERK_SECRET_KEY;
     } else {
       process.env.CLERK_SECRET_KEY = originalSecretKey;
+    }
+
+    if (originalDevPreview === undefined) {
+      delete process.env.DEV_PREVIEW;
+    } else {
+      process.env.DEV_PREVIEW = originalDevPreview;
     }
   });
 
@@ -68,6 +76,17 @@ describe('middleware auth unavailable', () => {
 
   it('bypasses og image endpoint when keys are missing', async () => {
     const response = await runMiddleware('/api/og/maya-birthday');
+    expect(response.status).toBe(200);
+  });
+
+  it('does not bypass dev preview route by default', async () => {
+    const response = await runMiddleware('/dev/icon-picker');
+    expect(response.status).toBe(503);
+  });
+
+  it('bypasses dev preview route when explicitly enabled', async () => {
+    process.env.DEV_PREVIEW = 'true';
+    const response = await runMiddleware('/dev/icon-picker');
     expect(response.status).toBe(200);
   });
 });

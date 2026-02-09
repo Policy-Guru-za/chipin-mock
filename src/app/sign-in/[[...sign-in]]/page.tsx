@@ -13,13 +13,13 @@ export default async function SignInPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-surface px-4 py-12">
+    <main id="main-content" className="flex min-h-screen items-center justify-center bg-surface px-4 py-12">
       <SignIn
         path={signInUrl}
         routing="path"
         signUpUrl={signUpUrl}
         fallbackRedirectUrl={signInFallbackRedirectUrl}
       />
-    </div>
+    </main>
   );
 }

@@ -98,6 +98,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${outfit.variable} ${fraunces.variable} ${dmSans.variable} ${dmSerifDisplay.variable} ${nunito.variable}`}>
       <body className="min-h-screen bg-surface text-text">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-primary-700 focus:px-4 focus:py-2 focus:text-white focus:shadow-lg"
+        >
+          Skip to content
+        </a>
+        <noscript>
+          <div className="border-b border-yellow-200 bg-yellow-50 px-4 py-3 text-center text-sm text-yellow-800">
+            JavaScript is required to use Gifta. Please enable JavaScript in your browser settings.
+          </div>
+        </noscript>
         {clerkConfig.isEnabled ? (
           <ClerkProvider
             publishableKey={clerkConfig.publishableKey ?? ''}

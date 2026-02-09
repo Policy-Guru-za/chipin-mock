@@ -129,7 +129,7 @@ export function DashboardDetailClient({
 
   return (
     <section className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10">
-      <Link href="/dashboard" className="text-sm font-medium text-[#6B9E88] hover:underline">
+      <Link href="/dashboard" className="text-sm font-medium text-primary-700 hover:underline">
         ← Back to Dream Boards
       </Link>
 
@@ -151,7 +151,9 @@ export function DashboardDetailClient({
               )}
             </div>
             <div>
-              <h1 className="font-display text-2xl font-bold text-text">{view.childName}&apos;s Dream Board</h1>
+              <h1 className="font-display text-2xl font-bold text-text [overflow-wrap:anywhere]">
+                {view.childName}&apos;s Dream Board
+              </h1>
               <span className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${statusClass}`}>
                 {view.statusLabel}
               </span>
@@ -194,7 +196,7 @@ export function DashboardDetailClient({
             {visibleContributions.map((contribution) => (
               <li key={contribution.id} className="flex items-center justify-between gap-3 py-3">
                 <div>
-                  <p className="text-sm font-semibold text-text">
+                  <p className="text-sm font-semibold text-text [overflow-wrap:anywhere]">
                     {contribution.isAnonymous ? 'Anonymous' : contribution.contributorName || 'Anonymous'}
                     {contribution.message ? <span className="ml-2">💬</span> : null}
                   </p>
@@ -209,7 +211,7 @@ export function DashboardDetailClient({
           <button
             type="button"
             aria-expanded={showAllContributions}
-            className="mt-4 text-sm font-semibold text-[#6B9E88] hover:underline"
+            className="mt-4 text-sm font-semibold text-primary-700 hover:underline"
             onClick={() => setShowAllContributions((current) => !current)}
           >
             {showAllContributions
@@ -230,7 +232,7 @@ export function DashboardDetailClient({
                 <p className="text-sm font-semibold text-text">
                   {item.isAnonymous ? 'Anonymous' : item.contributorName || 'Anonymous'}
                 </p>
-                <p className="mt-2 text-sm text-gray-600">
+                <p className="mt-2 text-sm text-gray-600 [overflow-wrap:anywhere]">
                   {/* Active view intentionally previews only a short message snippet. */}
                   {item.message.length > 120 ? `${item.message.slice(0, 120)}...` : item.message}
                 </p>
@@ -242,7 +244,7 @@ export function DashboardDetailClient({
           <button
             type="button"
             aria-expanded={showAllMessages}
-            className="mt-4 text-sm font-semibold text-[#6B9E88] hover:underline"
+            className="mt-4 text-sm font-semibold text-primary-700 hover:underline"
             onClick={() => setShowAllMessages((current) => !current)}
           >
             {showAllMessages ? 'Show fewer' : `View all ${messages.length} messages`}
@@ -292,7 +294,9 @@ export function DashboardDetailClient({
         <p className="mt-3 text-sm text-text">
           Payout Method: <span className="font-semibold">{view.payoutMethodLabel}</span>
         </p>
-        <p className="mt-1 text-sm text-gray-600">Recipient: {view.payoutRecipientDisplay}</p>
+        <p className="mt-1 text-sm text-gray-600 [overflow-wrap:anywhere]">
+          Recipient: {view.payoutRecipientDisplay}
+        </p>
         {view.payouts.length === 0 ? (
           <p className="mt-4 text-sm text-gray-500">Payout will be processed when the Dream Board is closed.</p>
         ) : (

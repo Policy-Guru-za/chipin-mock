@@ -297,7 +297,7 @@ export function CharityFormModal({
             ) : null}
           </div>
 
-          {error ? <p className="text-sm text-red-600">{error}</p> : null}
+          {error ? <p role="alert" className="text-sm text-red-600">{error}</p> : null}
 
           <div className="flex gap-3">
             <Button type="button" variant="outline" onClick={handleClose} disabled={saving}>

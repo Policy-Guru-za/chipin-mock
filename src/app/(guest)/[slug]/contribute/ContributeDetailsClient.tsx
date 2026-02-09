@@ -104,9 +104,9 @@ export function ContributeDetailsClient({
   };
 
   return (
-    <main className="mx-auto w-full max-w-3xl space-y-6">
+    <section className="mx-auto w-full max-w-3xl space-y-6">
       <header className="space-y-2">
-        <Link href={`/${slug}`} className="inline-flex min-h-11 items-center text-sm text-[#6B9E88] hover:underline">
+        <Link href={`/${slug}`} className="inline-flex min-h-11 items-center text-sm text-primary-700 hover:underline">
           ← Back
         </Link>
         <h1 className="font-display text-3xl text-text">Chip in for {childName}</h1>
@@ -213,7 +213,7 @@ export function ContributeDetailsClient({
           <button
             type="button"
             onClick={() => setMessageOpen(true)}
-            className="min-h-11 text-left text-xs font-semibold uppercase tracking-[0.12em] text-[#6B9E88] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="min-h-11 text-left text-xs font-semibold uppercase tracking-[0.12em] text-primary-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           >
             Message (optional)
           </button>
@@ -243,7 +243,7 @@ export function ContributeDetailsClient({
             <button
               type="button"
               onClick={() => setMessageOpen(false)}
-              className="text-xs text-[#6B9E88] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              className="text-xs text-primary-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             >
               ↑ Collapse
             </button>
@@ -255,7 +255,7 @@ export function ContributeDetailsClient({
         <button
           type="button"
           onClick={() => setShowReminderModal(true)}
-          className="min-h-11 text-xs text-[#6B9E88] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          className="min-h-11 text-xs text-primary-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
         >
           Remind me later
         </button>
@@ -279,7 +279,7 @@ export function ContributeDetailsClient({
           loading={isSaving}
           disabled={!canContinue}
           onClick={handleContinue}
-          className="min-h-11 w-full rounded-lg bg-[#6B9E88] text-base font-semibold text-white hover:bg-[#5A8E78] sm:max-w-[400px]"
+          className="min-h-11 w-full rounded-lg bg-primary-700 text-base font-semibold text-white hover:bg-primary-800 sm:max-w-[400px]"
         >
           {isSaving ? 'Processing...' : 'Continue to payment'}
         </Button>
@@ -292,6 +292,6 @@ export function ContributeDetailsClient({
         onClose={() => setShowReminderModal(false)}
         onSuccess={(messageText) => setReminderSuccessToast(messageText)}
       />
-    </main>
+    </section>
   );
 }

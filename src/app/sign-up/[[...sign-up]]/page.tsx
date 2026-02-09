@@ -6,13 +6,13 @@ export default function SignUpPage() {
   const { signInUrl, signUpUrl, signUpFallbackRedirectUrl } = getClerkUrls();
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-surface px-4 py-12">
+    <main id="main-content" className="flex min-h-screen items-center justify-center bg-surface px-4 py-12">
       <SignUp
         path={signUpUrl}
         routing="path"
         signInUrl={signInUrl}
         fallbackRedirectUrl={signUpFallbackRedirectUrl}
       />
-    </div>
+    </main>
   );
 }

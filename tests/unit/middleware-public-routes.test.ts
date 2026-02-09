@@ -16,6 +16,12 @@ describe('middleware public routes', () => {
     expect(middleware).toContain("'/create'");
   });
 
+  it('defines dev preview route and env guard', () => {
+    const middleware = readSource('middleware.ts');
+    expect(middleware).toContain("'/dev/icon-picker(.*)'");
+    expect(middleware).toContain('DEV_PREVIEW');
+  });
+
   it('allowlists guest contribution create endpoint', () => {
     const middleware = readSource('middleware.ts');
     expect(middleware).toContain("'/api/internal/contributions/create'");

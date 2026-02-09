@@ -96,7 +96,7 @@ export function DashboardPostCampaignClient({
 
   return (
     <section className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10">
-      <Link href="/dashboard" className="text-sm font-medium text-[#6B9E88] hover:underline">
+      <Link href="/dashboard" className="text-sm font-medium text-primary-700 hover:underline">
         ← Back to Dream Boards
       </Link>
 

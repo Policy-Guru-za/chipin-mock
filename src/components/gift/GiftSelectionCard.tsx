@@ -105,7 +105,7 @@ export function GiftSelectionCard({
               className={cn(
                 'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
                 variant === 'product'
-                  ? 'bg-primary/10 text-primary'
+                  ? 'bg-primary/10 text-primary-700'
                   : 'bg-accent/10 text-accent-600'
               )}
             >

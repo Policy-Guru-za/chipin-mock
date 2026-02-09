@@ -4,12 +4,16 @@ import type { NextFetchEvent, NextRequest } from 'next/server';
 
 import { getClerkConfigStatus, getClerkUrls } from '@/lib/auth/clerk-config';
 
+const isDevPreviewEnabled = () => process.env.DEV_PREVIEW === 'true';
+const isDevPreviewRoute = (pathname: string) => pathname.startsWith('/dev/icon-picker');
+
 const isPublicRoute = createRouteMatcher([
   '/',
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/auth(.*)',
   '/create',
+  '/dev/icon-picker(.*)', // Dev-only visual preview route; guarded by DEV_PREVIEW.
   '/health/live',
   '/health/ready',
   '/api/health',
@@ -50,6 +54,10 @@ const isBypassRouteWhenAuthUnavailable = (pathname: string): boolean => {
     return true;
   }
 
+  if (isDevPreviewRoute(pathname) && isDevPreviewEnabled()) {
+    return true;
+  }
+
   if (pathname.startsWith('/api/webhooks')) {
     return true;
   }
@@ -87,6 +95,10 @@ const getSafeRedirectPath = (req: NextRequest): string => {
 const createClerkHandler = (requestId: string) =>
   clerkMiddleware(async (auth, req) => {
     const pathname = req.nextUrl.pathname;
+
+    if (isDevPreviewRoute(pathname) && !isDevPreviewEnabled()) {
+      return new NextResponse(null, { status: 404, headers: { 'x-request-id': requestId } });
+    }
 
     if (!isPublicRoute(req)) {
       if (pathname.startsWith('/api')) {

@@ -28,7 +28,7 @@ export function PaymentFailedClient({ slug, childName, display, isClosed }: Paym
   }, [slug]);
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
+    <section className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
       <section className="rounded-3xl border border-border bg-white p-6 text-center shadow-soft">
         <header className="space-y-3">
           <h1
@@ -81,6 +81,6 @@ export function PaymentFailedClient({ slug, childName, display, isClosed }: Paym
           </Link>
         </footer>
       </section>
-    </main>
+    </section>
   );
 }

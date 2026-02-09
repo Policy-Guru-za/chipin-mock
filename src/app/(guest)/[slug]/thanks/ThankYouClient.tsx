@@ -89,7 +89,7 @@ export function ThankYouClient({ view, slug, requestReceiptAction }: ThankYouCli
   const showReceiptSection = Boolean(view.contributionId && view.isContributionCompleted);
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
+    <section className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
       <ConfettiTrigger
         trigger={view.isContributionCompleted}
         variant="celebration"
@@ -164,7 +164,7 @@ export function ThankYouClient({ view, slug, requestReceiptAction }: ThankYouCli
           <Button
             type="button"
             onClick={handleShare}
-            className="min-h-11 w-full bg-[#6B9E88] text-white hover:bg-[#5b8e78]"
+            className="min-h-11 w-full bg-primary-700 text-white hover:bg-primary-800"
           >
             📤 Share This Dream Board
           </Button>
@@ -184,6 +184,6 @@ export function ThankYouClient({ view, slug, requestReceiptAction }: ThankYouCli
           Need help? Contact us
         </a>
       </footer>
-    </main>
+    </section>
   );
 }

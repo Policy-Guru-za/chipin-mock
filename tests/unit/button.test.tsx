@@ -27,10 +27,10 @@ describe('Button component', () => {
 
   it('applies variant classes correctly', () => {
     const { rerender } = render(<Button variant="primary">Primary</Button>);
-    expect(screen.getByRole('button')).toHaveClass('from-primary');
+    expect(screen.getByRole('button')).toHaveClass('from-primary-700');
 
     rerender(<Button variant="secondary">Secondary</Button>);
-    expect(screen.getByRole('button')).toHaveClass('from-accent');
+    expect(screen.getByRole('button')).toHaveClass('from-accent-700');
 
     rerender(<Button variant="outline">Outline</Button>);
     expect(screen.getByRole('button')).toHaveClass('border-2');
@@ -56,7 +56,7 @@ describe('Button component', () => {
     expect(screen.getByRole('button')).toHaveClass('h-14');
 
     rerender(<Button size="icon">Icon</Button>);
-    expect(screen.getByRole('button')).toHaveClass('h-10', 'w-10');
+    expect(screen.getByRole('button')).toHaveClass('h-11', 'w-11');
   });
 
   it('applies width classes correctly', () => {

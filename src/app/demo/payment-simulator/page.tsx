@@ -26,7 +26,10 @@ export default function PaymentSimulatorPage({ searchParams }: PaymentSimulatorP
   const returnTo = normalizeReturnTo(searchParams?.returnTo);
 
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-col gap-6 rounded-3xl border border-border bg-white p-8 shadow-soft">
+    <main
+      id="main-content"
+      className="mx-auto flex w-full max-w-xl flex-col gap-6 rounded-3xl border border-border bg-white p-8 shadow-soft"
+    >
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold text-text">Sandbox payment simulator</h1>
         <p className="text-sm text-text-muted">
@@ -42,6 +45,6 @@ export default function PaymentSimulatorPage({ searchParams }: PaymentSimulatorP
       </div>
 
       <PaymentSimulatorClient contributionId={contributionId} returnTo={returnTo} />
-    </div>
+    </main>
   );
 }

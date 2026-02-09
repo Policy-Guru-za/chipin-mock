@@ -67,7 +67,7 @@ export const SnapScanPanel = ({ qr, slug, dreamBoardId, onBack }: SnapScanPanelP
           <button
             type="button"
             onClick={handleCopyReference}
-            className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-primary hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-primary-700 hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             aria-label="Copy reference"
           >
             {copied ? (
@@ -84,7 +84,7 @@ export const SnapScanPanel = ({ qr, slug, dreamBoardId, onBack }: SnapScanPanelP
           </button>
         </div>
 
-        <a href={qr.qrUrl} className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
+        <a href={qr.qrUrl} className="inline-flex items-center gap-2 text-sm font-semibold text-primary-700 hover:underline">
           Open SnapScan app
         </a>
       </div>

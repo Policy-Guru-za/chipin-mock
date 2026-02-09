@@ -45,17 +45,17 @@ const PROVIDER_LABELS: Record<PaymentProvider, { title: string; description: str
   payfast: {
     title: 'Credit or Debit Card',
     description: 'Visa, Mastercard, Amex. Processing with PayFast.',
-    icon: <PayFastIcon className="text-[#0D9488]" />,
+    icon: <PayFastIcon className="text-primary-700" />,
   },
   snapscan: {
     title: 'SnapScan',
     description: 'Scan a QR code with your banking app.',
-    icon: <SnapScanIcon className="text-[#0D9488]" />,
+    icon: <SnapScanIcon className="text-primary-700" />,
   },
   ozow: {
     title: 'Instant EFT',
     description: 'Pay via Ozow bank transfer.',
-    icon: <OzowIcon className="text-[#0D9488]" />,
+    icon: <OzowIcon className="text-primary-700" />,
   },
 };
 
@@ -188,7 +188,7 @@ export function PaymentClient({
   const showPaymentOverlay = isRedirecting && (paymentProvider === 'payfast' || paymentProvider === 'ozow');
 
   return (
-    <main className="mx-auto w-full max-w-3xl space-y-6">
+    <section className="mx-auto w-full max-w-3xl space-y-6">
       <header className="space-y-3">
         <h1 className="font-display text-3xl text-text">Complete your contribution</h1>
         <p className="text-base font-medium text-gray-600">
@@ -213,7 +213,7 @@ export function PaymentClient({
                 onClick={() => setPaymentProvider(provider)}
                 className={`relative min-h-[140px] rounded-lg border p-5 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
                   isSelected
-                    ? 'border-2 border-[#0D9488] bg-[#E8F5F0]'
+                    ? 'border-2 border-primary-700 bg-primary-50'
                     : 'border-gray-200 bg-white'
                 }`}
               >
@@ -221,7 +221,7 @@ export function PaymentClient({
                 <p className="text-base font-semibold text-gray-900">{content.title}</p>
                 <p className="mt-1 text-sm text-gray-600">{content.description}</p>
                 {isSelected ? (
-                  <span className="absolute right-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#0D9488] text-white">
+                  <span className="absolute right-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary-700 text-white">
                     <CheckIcon size="sm" />
                   </span>
                 ) : null}
@@ -258,7 +258,7 @@ export function PaymentClient({
           loading={isSubmitting}
           disabled={!canSubmit}
           onClick={handleSubmit}
-          className="min-h-11 w-full rounded-lg bg-[#6B9E88] text-base font-semibold text-white hover:bg-[#5A8E78] sm:max-w-[400px]"
+          className="min-h-11 w-full rounded-lg bg-primary-700 text-base font-semibold text-white hover:bg-primary-800 sm:max-w-[400px]"
         >
           {isSubmitting ? 'Processing...' : `Pay ${formatZarWithCents(totalCents)} →`}
         </Button>
@@ -268,12 +268,12 @@ export function PaymentClient({
 
       <Link
         href={`/${slug}/contribute`}
-        className="inline-flex min-h-11 items-center text-sm text-[#6B9E88] hover:underline"
+        className="inline-flex min-h-11 items-center text-sm text-primary-700 hover:underline"
       >
         ← Back to details
       </Link>
 
       {showPaymentOverlay ? <PaymentOverlay provider={paymentProvider} /> : null}
-    </main>
+    </section>
   );
 }

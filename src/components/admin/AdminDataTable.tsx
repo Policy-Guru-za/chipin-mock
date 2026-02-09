@@ -51,7 +51,10 @@ export function AdminDataTable<T>({
             data.map((item) => (
               <tr key={keyExtractor(item)} className="border-t border-gray-100 hover:bg-gray-50">
                 {columns.map((column) => (
-                  <td key={column.key} className={`px-4 py-3 align-top ${column.className ?? ''}`}>
+                  <td
+                    key={column.key}
+                    className={`px-4 py-3 align-top [overflow-wrap:anywhere] ${column.className ?? ''}`}
+                  >
                     {column.render(item)}
                   </td>
                 ))}

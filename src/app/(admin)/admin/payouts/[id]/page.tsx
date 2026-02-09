@@ -367,7 +367,7 @@ export default async function PayoutDetailPage({
           <h1 className="mt-2 text-3xl font-display">{payoutTypeLabel(payout.type)}</h1>
           <p className="text-sm text-text-muted">{payout.childName}</p>
         </div>
-        <span className="rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
+        <span className="rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary-700">
           {payoutStatusLabel(payout.status)}
         </span>
       </div>

@@ -101,7 +101,7 @@ export function AmountSelector({
                 'relative rounded-xl border-2 px-4 py-3 text-center font-semibold transition-all',
                 !prefersReducedMotion && 'duration-150',
                 isSelected
-                  ? 'border-primary bg-primary/5 text-primary shadow-[0_0_0_2px_rgba(13,148,136,0.1)]'
+                  ? 'border-primary bg-primary/5 text-primary-700 shadow-[0_0_0_2px_rgba(13,148,136,0.1)]'
                   : 'border-border bg-white text-text hover:border-primary/30 hover:bg-primary/5',
                 !prefersReducedMotion && 'active:scale-[0.97]'
               )}
@@ -119,6 +119,7 @@ export function AmountSelector({
         </div>
         <input
           type="text"
+          aria-label="Custom amount"
           inputMode="numeric"
           placeholder="Custom amount"
           value={customAmount}
@@ -128,7 +129,7 @@ export function AmountSelector({
             'w-full rounded-xl border-2 py-3 pl-10 pr-4 text-lg font-semibold transition-all',
             !prefersReducedMotion && 'duration-150',
             isCustomMode && customAmount
-              ? 'border-primary bg-primary/5 text-primary'
+              ? 'border-primary bg-primary/5 text-primary-700'
               : 'border-border bg-white text-text placeholder:text-text-muted',
             'focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20'
           )}

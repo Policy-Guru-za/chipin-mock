@@ -85,7 +85,7 @@ export function ReturnVisitBanner({ slug, childName, href, isExpired }: ReturnVi
           type="button"
           variant="ghost"
           onClick={handleShare}
-          className="mt-3 min-h-11 border border-[#6B9E88] bg-white text-[#0D9488]"
+          className="mt-3 min-h-11 border border-primary-700 bg-white text-primary-700"
         >
           {copied ? 'Link copied ✓' : 'Share this Dream Board'}
         </Button>
@@ -101,7 +101,7 @@ export function ReturnVisitBanner({ slug, childName, href, isExpired }: ReturnVi
         onClick={handleCtaClick}
         disabled={isExpired || loading}
         title={isExpired ? 'This Dream Board is closed to new contributions.' : undefined}
-        className="min-h-11 w-full border-2 border-[#6B9E88] bg-white text-gray-900 hover:bg-[#F0F7F4]"
+        className="min-h-11 w-full border-2 border-primary-700 bg-white text-text hover:bg-[#F0F7F4]"
       >
         {loading ? 'Loading...' : `Chip in for ${childName} 💝`}
       </Button>

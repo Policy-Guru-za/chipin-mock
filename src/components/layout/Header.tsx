@@ -66,7 +66,7 @@ export function Header({ isClerkEnabled = false }: HeaderProps) {
           <button
             type="button"
             onClick={handleOpenMobileNav}
-            className="rounded-lg p-2 text-text-muted hover:bg-subtle hover:text-text focus:outline-none focus-visible:ring-2 focus-visible:ring-primary md:hidden"
+            className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg p-2 text-text-muted hover:bg-subtle hover:text-text focus:outline-none focus-visible:ring-2 focus-visible:ring-primary md:hidden"
             aria-label="Open navigation menu"
             aria-expanded={isMobileNavOpen}
             aria-controls="mobile-nav"

@@ -143,7 +143,7 @@ export function ReminderModal({ dreamBoardId, isOpen, onClose, onSuccess }: Remi
             className="min-h-11"
             autoFocus
           />
-          {errorMessage ? <p className="text-sm text-red-600">{errorMessage}</p> : null}
+          {errorMessage ? <p role="alert" className="text-sm text-red-600">{errorMessage}</p> : null}
           <Button type="button" onClick={handleSubmit} loading={isSubmitting} className="min-h-11 w-full">
             Send Reminder
           </Button>

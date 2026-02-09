@@ -76,8 +76,8 @@ describe('ProgressBar component', () => {
 
     // 25% and 50% should have primary color (reached)
     const milestones = container.querySelectorAll('.text-xs');
-    expect(milestones[0]).toHaveClass('text-primary'); // 25%
-    expect(milestones[1]).toHaveClass('text-primary'); // 50%
+    expect(milestones[0]).toHaveClass('text-primary-700'); // 25%
+    expect(milestones[1]).toHaveClass('text-primary-700'); // 50%
     expect(milestones[2]).toHaveClass('text-text-muted'); // 75%
   });
 

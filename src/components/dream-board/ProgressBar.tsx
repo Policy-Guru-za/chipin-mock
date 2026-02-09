@@ -81,7 +81,7 @@ export function ProgressBar({
                 key={milestone}
                 className={cn(
                   'absolute top-0 -translate-x-1/2 text-xs font-medium transition-colors',
-                  isReached ? 'text-primary' : 'text-text-muted'
+                  isReached ? 'text-primary-700' : 'text-text-muted'
                 )}
                 style={{ left: `${milestone}%` }}
               >

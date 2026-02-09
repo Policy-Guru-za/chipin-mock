@@ -129,21 +129,21 @@ function PreviewCard({ draft, shareUrl, readonlyMode }: PreviewCardProps) {
         ) : null
       ) : (
         <div className="mt-6 grid gap-2 text-sm">
-          <Link href="/create/child" className="text-primary underline underline-offset-2">
+          <Link href="/create/child" className="text-primary-700 underline underline-offset-2">
             Edit child details
           </Link>
-          <Link href="/create/gift" className="text-primary underline underline-offset-2">
+          <Link href="/create/gift" className="text-primary-700 underline underline-offset-2">
             Edit gift details
           </Link>
-          <Link href="/create/dates" className="text-primary underline underline-offset-2">
+          <Link href="/create/dates" className="text-primary-700 underline underline-offset-2">
             Edit dates
           </Link>
           {draft.charityEnabled ? (
-            <Link href="/create/giving-back" className="text-primary underline underline-offset-2">
+            <Link href="/create/giving-back" className="text-primary-700 underline underline-offset-2">
               Edit charity settings
             </Link>
           ) : null}
-          <Link href="/create/payout" className="text-primary underline underline-offset-2">
+          <Link href="/create/payout" className="text-primary-700 underline underline-offset-2">
             Edit payout details
           </Link>
         </div>

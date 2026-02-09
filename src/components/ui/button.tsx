@@ -15,34 +15,34 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          'bg-gradient-to-br from-primary to-primary-700 text-white ' +
-          'shadow-[0_2px_8px_rgba(13,148,136,0.3)] ' +
-          'hover:shadow-[0_4px_16px_rgba(13,148,136,0.4)] ' +
+          'bg-gradient-to-br from-primary-700 to-primary-800 text-white ' +
+          'shadow-[0_2px_8px_rgba(15,118,110,0.3)] ' +
+          'hover:shadow-[0_4px_16px_rgba(15,118,110,0.4)] ' +
           'hover:-translate-y-0.5 ' +
-          'active:shadow-[0_1px_4px_rgba(13,148,136,0.3)] ' +
+          'active:shadow-[0_1px_4px_rgba(15,118,110,0.3)] ' +
           'active:translate-y-0',
         secondary:
-          'bg-gradient-to-br from-accent to-accent-600 text-white ' +
-          'shadow-[0_2px_8px_rgba(249,115,22,0.3)] ' +
-          'hover:shadow-[0_4px_16px_rgba(249,115,22,0.4)] ' +
+          'bg-gradient-to-br from-accent-700 to-[#9A3412] text-white ' +
+          'shadow-[0_2px_8px_rgba(194,65,12,0.3)] ' +
+          'hover:shadow-[0_4px_16px_rgba(194,65,12,0.4)] ' +
           'hover:-translate-y-0.5 ' +
-          'active:shadow-[0_1px_4px_rgba(249,115,22,0.3)]',
+          'active:shadow-[0_1px_4px_rgba(194,65,12,0.3)]',
         outline:
           'border-2 border-border bg-transparent text-text ' +
-          'hover:border-primary/50 hover:bg-primary/5 hover:text-primary ' +
+          'hover:border-primary/50 hover:bg-primary/5 hover:text-primary-700 ' +
           'active:bg-primary/10',
         ghost: 'text-text-muted hover:text-text hover:bg-subtle ' + 'active:bg-border',
         destructive:
           'bg-red-600 text-white shadow-sm ' +
           'hover:bg-red-700 hover:-translate-y-0.5 ' +
           'active:scale-[0.97]',
-        link: 'text-primary underline-offset-4 hover:underline ' + 'active:text-primary-700',
+        link: 'text-primary-700 underline-offset-4 hover:underline ' + 'active:text-primary-800',
       },
       size: {
         sm: 'h-9 px-4 py-2 text-sm',
         md: 'h-11 px-5 py-2.5 text-sm',
         lg: 'h-14 px-8 py-3 text-base',
-        icon: 'h-10 w-10',
+        icon: 'h-11 w-11',
       },
       width: {
         default: '',

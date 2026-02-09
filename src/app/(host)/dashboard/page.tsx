@@ -35,7 +35,7 @@ export default async function HostDashboardPage() {
       <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <h1 className="font-display text-[28px] font-bold text-text">Your Dream Boards</h1>
         <Link href="/create/child" className="w-full md:w-auto">
-          <Button className="w-full bg-[#6B9E88] hover:bg-[#5A8E78] md:w-auto">Create a Dream Board +</Button>
+          <Button className="w-full bg-primary-700 hover:bg-primary-800 md:w-auto">Create a Dream Board +</Button>
         </Link>
       </header>
 
@@ -92,7 +92,7 @@ export default async function HostDashboardPage() {
 
                   <p className="mt-3 text-sm text-gray-500">{card.timeLabel}</p>
 
-                  <p className="mt-auto pt-6 text-right text-sm font-semibold text-[#6B9E88]">View →</p>
+                  <p className="mt-auto pt-6 text-right text-sm font-semibold text-primary-700">View →</p>
                 </Link>
               </li>
             );

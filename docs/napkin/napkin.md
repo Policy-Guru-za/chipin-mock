@@ -39,6 +39,9 @@
 | 2026-02-08 | self | Repeated `apply_patch` via `exec_command` after prior correction during payout remediation | When editing files, call `functions.apply_patch` directly; never shell-wrap patch operations |
 | 2026-02-08 | self | Unquoted bracketed route paths in zsh (for example `[id]`) and command failed with glob expansion | Quote bracketed paths in shell commands (`'src/.../[id]/route.ts'`) |
 | 2026-02-08 | self | B8 matrix check initially relied on partial historical coverage assumptions | For matrix milestones, build explicit test-ID -> file assertions and patch missing IDs before final gates |
+| 2026-02-09 | self | C7 prompt still had global root-main strategy while latest locked clarification switched to per-group main targets | Treat latest user clarification as override, and explicitly call out stale prompt lines in execution evidence before editing |
+| 2026-02-09 | self | Updated contrast-related utility classes without immediately updating coupled unit assertions (`button.test`, `progress-bar.test`) | After design-token/class changes, run and patch directly coupled component tests before the full-suite run to avoid avoidable red gate loops |
+| 2026-02-09 | self | Added global skip link but left root `error.tsx`/`not-found.tsx` without `id="main-content"` target and used low-contrast focus background | When adding skip-link patterns, validate target presence across fallback routes and use AA-compliant focus tokens (`primary-700`+) |
 
 ## User Preferences
 - Start with required doc read order before implementation.
@@ -48,6 +51,7 @@
 - Follow milestone sequence strictly; no progression when gate fails.
 - Use `nl -ba` + `sed -n` for line-precise evidence extraction in milestone audits.
 - Capture milestone evidence in `docs/implementation-docs/evidence/ux-v2/...` during execution, not after.
+- For auth-free UI QA, gate public preview routes behind `DEV_PREVIEW=true` and pair with Playwright CLI screenshot scripts under `scripts/visual/` writing to `output/playwright/`.
 - Bind runtime schemas and OpenAPI enums to `decision-locks.ts`, then assert parity in unit tests.
 - Restore env toggles (`UX_V2_ENABLE_*`) after each test to prevent cross-test gate leakage.
 - Keep payout readiness predicates aligned with `calculatePayoutTotals` (bounded charity + `giftCents > 0`) to avoid permanent false-ready boards.
@@ -110,3 +114,9 @@
 - Copy-only milestones still need explicit contract guardrails. Keep webhook headers, event names, scopes, and route slugs on a denylist before broad text replacement.
 - Matrix compliance is easiest to keep stable with a dedicated drift test file (`tests/unit/copy-matrix-compliance.test.ts`) that checks exact canonical strings and absence of legacy variants in key sources.
 - If `src/lib/api/openapi.ts` copy-level fields change, regenerate `public/v1/openapi.json` immediately; otherwise `tests/unit/openapi-spec.test.ts` fails even when runtime code is correct.
+
+## C7 Learnings (2026-02-09)
+- Skip-link architecture decisions must be locked once: mixing global-root-main and per-group-main strategies in a single milestone creates semantic conflicts and nested-main risk.
+- Accessibility hardening in this repo is fastest when done as a phased bundle: landmarks first, then ARIA/touch, then contrast tokens, then fallback states and tests.
+- Contrast remediations on shared button variants have broad test-coupling impact; adjust both variant tests and any component tests that assert old `text-primary` classes in the same pass.
+- Source-based drift tests are effective for route-state coverage (`error.tsx`, `loading.tsx`, `not-found.tsx`) and a11y attributes when full render wiring is expensive.

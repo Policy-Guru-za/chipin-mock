@@ -63,7 +63,7 @@ function HeaderSection({ view, ageLine }: { view: GuestViewModel; ageLine: strin
           <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-600">
             {view.childName}&apos;s Dream Board
           </p>
-          <h1 className="font-display text-4xl text-gray-900 sm:text-5xl">{view.childName}</h1>
+          <h1 className="font-display text-4xl text-gray-900 sm:text-5xl [overflow-wrap:anywhere]">{view.childName}</h1>
           <p className="font-primary text-base text-gray-600">{ageLine}</p>
         </div>
       </div>
@@ -95,8 +95,8 @@ function OneWishSection({ view }: { view: GuestViewModel }) {
           />
         </div>
         <div className="space-y-1">
-          <h2 className="font-display text-[20px] font-bold text-gray-900">{view.giftTitle}</h2>
-          <p className="text-sm text-gray-500">{description}</p>
+          <h2 className="font-display text-[20px] font-bold text-gray-900 [overflow-wrap:anywhere]">{view.giftTitle}</h2>
+          <p className="text-sm text-gray-500 [overflow-wrap:anywhere]">{description}</p>
           <p className="text-sm font-semibold text-gray-700">Goal: {formatZar(view.goalCents)}</p>
         </div>
       </div>
@@ -122,7 +122,7 @@ function GoalProgressSection({ view }: { view: GuestViewModel }) {
         <span>{view.daysLeft} days left</span>
       </div>
       {view.message ? (
-        <p className="mt-4 rounded-2xl bg-subtle px-4 py-3 text-sm text-text">“{view.message}”</p>
+        <p className="mt-4 rounded-2xl bg-subtle px-4 py-3 text-sm text-text [overflow-wrap:anywhere]">“{view.message}”</p>
       ) : null}
       {view.isFunded ? (
         <div className="mt-4 rounded-2xl border border-accent/40 bg-accent/10 p-4 text-sm text-text">
@@ -194,7 +194,7 @@ export default async function DreamBoardPage({
       : 'Birthday celebration coming soon';
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
+    <section className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
       <section className="space-y-6">
         <HeaderSection view={view} ageLine={ageLine} />
         <OneWishSection view={view} />
@@ -233,6 +233,6 @@ export default async function DreamBoardPage({
           Need help?
         </a>
       </footer>
-    </main>
+    </section>
   );
 }
