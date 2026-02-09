@@ -54,6 +54,7 @@ export const serializeDreamBoard = (board: DreamBoardApiRecord, baseUrl: string)
     giftName: board.giftName,
     giftImageUrl: board.giftImageUrl,
     giftImagePrompt: board.giftImagePrompt,
+    baseUrl,
   });
   if (!giftData) return null;
 

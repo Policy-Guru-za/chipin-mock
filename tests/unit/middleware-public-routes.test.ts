@@ -26,6 +26,11 @@ describe('middleware public routes', () => {
     expect(middleware).toContain("'/api/internal/contributions/reminders'");
   });
 
+  it('allowlists og image endpoint for crawler access', () => {
+    const middleware = readSource('middleware.ts');
+    expect(middleware).toContain("'/api/og(.*)'");
+  });
+
   it('allowlists internal download endpoints for explicit route auth', () => {
     const middleware = readSource('middleware.ts');
     expect(middleware).toContain("'/api/internal/downloads(.*)'");

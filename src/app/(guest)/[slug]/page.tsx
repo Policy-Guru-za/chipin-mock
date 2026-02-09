@@ -14,6 +14,7 @@ import { listRecentContributors } from '@/lib/db/queries';
 import { getCachedDreamBoardBySlug } from '@/lib/dream-boards/cache';
 import { buildDreamBoardMetadata } from '@/lib/dream-boards/metadata';
 import { buildGuestViewModel, type GuestViewModel } from '@/lib/dream-boards/view-model';
+import { extractIconIdFromPath, getGiftIconById } from '@/lib/icons/gift-icons';
 import { parseDateOnly } from '@/lib/utils/date';
 import { formatZar } from '@/lib/utils/money';
 
@@ -72,6 +73,8 @@ function HeaderSection({ view, ageLine }: { view: GuestViewModel; ageLine: strin
 
 function OneWishSection({ view }: { view: GuestViewModel }) {
   const description = view.giftSubtitle?.slice(0, 100) ?? '';
+  const iconMeta = getGiftIconById(extractIconIdFromPath(view.giftImage ?? '') ?? '');
+  const bgColor = iconMeta?.bgColor ?? '#F5F5F5';
 
   return (
     <section className="rounded-2xl bg-[#FDF8F3] p-5 shadow-soft sm:p-6">
@@ -79,7 +82,10 @@ function OneWishSection({ view }: { view: GuestViewModel }) {
         ✨ {view.childName.toUpperCase()}&apos;S ONE BIG WISH
       </p>
       <div className="mt-4 flex items-center gap-4">
-        <div className="relative h-16 w-16 overflow-hidden rounded-lg bg-white sm:h-20 sm:w-20">
+        <div
+          className="relative h-16 w-16 overflow-hidden rounded-xl sm:h-20 sm:w-20"
+          style={{ backgroundColor: bgColor }}
+        >
           <Image
             src={view.giftImage}
             alt={view.giftTitle}

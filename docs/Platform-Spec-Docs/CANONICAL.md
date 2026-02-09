@@ -28,11 +28,11 @@ This document reflects both the current codebase state and the locked UX v2 deci
 
 ### Product Scope
 
-- **Dream Board:** one manual gift goal (parent-written) with AI-generated artwork (Google Gemini).
+- **Dream Board:** one manual gift goal (parent-written) with curated static icon imagery.
 - **Guest flow:** mobile-web; single CTA ("Chip in"); no sign-in required.
 - **Host flow:** Clerk authentication; 5-step creation wizard + review/confirmation.
   - Step 1: The Child (name, photo, age, birthday)
-  - Step 2: The Gift (name, description, goal amount, AI image)
+  - Step 2: The Gift (name, description, goal amount, icon selection)
   - Step 3: The Dates (birthday, party date, campaign end date)
   - Step 4: Giving Back (optional charity selection and split configuration)
   - Step 5: Payout Setup (Karri Card or bank transfer)
@@ -128,7 +128,7 @@ Note: the current implementation stores `net_cents = amount_cents - fee_cents`, 
 Identity and content:
 - `id` (UUID, PK), `slug` (unique, URL-friendly), `partner_id` (FK), `host_id` (FK)
 - `child_name`, `child_photo_url`, `child_age` (nullable), `birthday_date` (nullable)
-- `gift_name`, `gift_description` (nullable), `gift_image_url`, `gift_image_prompt` (nullable)
+- `gift_name`, `gift_description` (nullable), `gift_image_url` (icon path), `gift_image_prompt` (nullable, deprecated legacy field)
 - `goal_cents` (integer, minimum 2000 = R20)
 - `message` (nullable, host message to contributors)
 

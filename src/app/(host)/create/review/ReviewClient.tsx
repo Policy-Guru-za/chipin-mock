@@ -101,18 +101,20 @@ function PreviewCard({ draft, shareUrl, readonlyMode }: PreviewCardProps) {
       </div>
 
       <div className="mt-6 space-y-4 rounded-2xl border border-border bg-subtle p-4">
-        <div>
-          <p className="text-sm font-semibold text-text">{draft.giftName}</p>
-          <p className="text-xs text-text-muted">Goal: {formatRand(draft.goalCents)}</p>
-        </div>
-        <div className="overflow-hidden rounded-xl border border-border bg-white">
-          <Image
-            src={draft.giftImageUrl}
-            alt={draft.giftName}
-            width={900}
-            height={600}
-            className="h-44 w-full object-cover sm:h-56"
-          />
+        <div className="flex items-center gap-4">
+          <div className="relative h-16 w-16 overflow-hidden rounded-xl sm:h-20 sm:w-20">
+            <Image
+              src={draft.giftImageUrl}
+              alt={draft.giftName}
+              fill
+              sizes="80px"
+              className="object-cover"
+            />
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-text">{draft.giftName}</p>
+            <p className="text-xs text-text-muted">Goal: {formatRand(draft.goalCents)}</p>
+          </div>
         </div>
         <div className="space-y-1 text-xs text-text-secondary sm:text-sm">
           <p>Campaign closes: {formatDate(draft.campaignEndDate)}</p>

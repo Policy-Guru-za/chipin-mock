@@ -1,20 +1,26 @@
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
+import { GiftIconPicker } from '@/components/gift/GiftIconPicker';
 import { CreateFlowShell } from '@/components/layout/CreateFlowShell';
-import { GiftArtworkGenerator } from '@/components/gift/GiftArtworkGenerator';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
 import { getDreamBoardDraft, updateDreamBoardDraft } from '@/lib/dream-boards/draft';
+import {
+  extractIconIdFromPath,
+  getGiftIconById,
+  isValidGiftIconId,
+} from '@/lib/icons/gift-icons';
+import { suggestGiftIcon } from '@/lib/icons/suggest-icon';
 import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
 
 const manualGiftSchema = z.object({
   giftName: z.string().min(2).max(200),
-  giftDescription: z.string().min(10).max(500),
-  giftImageUrl: z.string().url(),
-  giftImagePrompt: z.string().min(1),
+  giftDescription: z.string().max(500).optional(),
+  giftIconId: z.string().min(1),
   goalAmount: z.coerce.number().int().min(20),
 });
 
@@ -26,7 +32,6 @@ const getErrorMessage = (error?: string) =>
   (
     {
       invalid: 'Please complete all required fields.',
-      artwork: 'Generate artwork before continuing.',
     }[error ?? ''] ?? null
   );
 
@@ -38,6 +43,24 @@ const resolveDefaultGiftDescription = (draft?: Awaited<ReturnType<typeof getDrea
 
 const resolveDefaultGoal = (draft?: Awaited<ReturnType<typeof getDreamBoardDraft>>) =>
   draft?.goalCents ? Math.round(draft.goalCents / 100) : '';
+
+const resolveDefaultIconId = (draft?: Awaited<ReturnType<typeof getDreamBoardDraft>>) => {
+  const draftIconId = draft?.giftIconId;
+  if (draftIconId && isValidGiftIconId(draftIconId)) {
+    return draftIconId;
+  }
+
+  const iconIdFromPath = extractIconIdFromPath(draft?.giftImageUrl ?? '');
+  if (iconIdFromPath && isValidGiftIconId(iconIdFromPath)) {
+    return iconIdFromPath;
+  }
+
+  return suggestGiftIcon({
+    giftName: draft?.giftName ?? '',
+    giftDescription: draft?.giftDescription,
+    childAge: draft?.childAge,
+  }).id;
+};
 
 async function saveManualGiftAction(formData: FormData) {
   'use server';
@@ -51,19 +74,16 @@ async function saveManualGiftAction(formData: FormData) {
   if (!draft?.childPhotoUrl) {
     redirect('/create/child');
   }
+
   const giftName = formData.get('giftName');
   const giftDescription = formData.get('giftDescription');
-  const giftImageUrl = formData.get('giftImageUrl');
-  const giftImagePrompt = formData.get('giftImagePrompt');
+  const giftIconId = formData.get('giftIconId');
   const goalAmount = formData.get('goalAmount');
-  if (!giftImageUrl || !giftImagePrompt) {
-    redirect('/create/gift?error=artwork');
-  }
+
   const result = manualGiftSchema.safeParse({
     giftName,
     giftDescription,
-    giftImageUrl,
-    giftImagePrompt,
+    giftIconId,
     goalAmount,
   });
 
@@ -71,12 +91,20 @@ async function saveManualGiftAction(formData: FormData) {
     redirect('/create/gift?error=invalid');
   }
 
+  const icon = getGiftIconById(result.data.giftIconId);
+  if (!icon) {
+    redirect('/create/gift?error=invalid');
+  }
+
+  const normalizedGiftDescription = result.data.giftDescription?.trim();
   const goalCents = Math.round(result.data.goalAmount * 100);
+
   await updateDreamBoardDraft(session.hostId, {
     giftName: result.data.giftName.trim(),
-    giftDescription: result.data.giftDescription.trim(),
-    giftImageUrl: result.data.giftImageUrl,
-    giftImagePrompt: result.data.giftImagePrompt,
+    giftDescription: normalizedGiftDescription && normalizedGiftDescription.length ? normalizedGiftDescription : undefined,
+    giftIconId: icon.id,
+    giftImageUrl: icon.src,
+    giftImagePrompt: undefined,
     goalCents,
   });
 
@@ -102,6 +130,7 @@ export default async function CreateGiftPage({
   const defaultGiftName = resolveDefaultGiftName(draft);
   const defaultGiftDescription = resolveDefaultGiftDescription(draft);
   const defaultGoal = resolveDefaultGoal(draft);
+  const defaultIconId = resolveDefaultIconId(draft);
 
   return (
     <CreateFlowShell
@@ -137,10 +166,28 @@ export default async function CreateGiftPage({
               />
             </div>
 
-            <GiftArtworkGenerator
-              defaultDescription={defaultGiftDescription}
-              defaultImageUrl={draft?.giftImageUrl ?? ''}
-              defaultPrompt={draft?.giftImagePrompt ?? ''}
+            <div className="space-y-2">
+              <label htmlFor="giftDescription" className="text-sm font-medium text-text">
+                Describe the dream gift
+              </label>
+              <Textarea
+                id="giftDescription"
+                name="giftDescription"
+                placeholder="E.g., a red mountain bike with a basket and shiny streamers."
+                defaultValue={defaultGiftDescription}
+              />
+              <p className="text-xs text-text-muted">
+                Describe the gift so contributors know what they&apos;re chipping in for.
+              </p>
+            </div>
+
+            <GiftIconPicker
+              selectedIconId={defaultIconId}
+              giftNameInputId="giftName"
+              giftDescriptionInputId="giftDescription"
+              defaultGiftName={defaultGiftName}
+              defaultGiftDescription={defaultGiftDescription}
+              childAge={draft?.childAge}
             />
 
             <div className="space-y-2">

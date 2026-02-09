@@ -1082,13 +1082,20 @@ export const openApiSpec = {
           gift_name: {
             type: 'string',
           },
+          gift_icon_id: {
+            type: 'string',
+            nullable: true,
+            description: 'Gift icon identifier when gift imagery is sourced from the curated icon library.',
+          },
           gift_image_url: {
             type: 'string',
             format: 'uri',
+            description: 'Absolute URL to the resolved gift icon asset.',
           },
           gift_image_prompt: {
             type: 'string',
             nullable: true,
+            description: 'Deprecated. Legacy AI prompt data, null for icon-based boards.',
           },
         },
       },
@@ -1254,7 +1261,6 @@ export const openApiSpec = {
           'child_photo_url',
           'party_date',
           'gift_name',
-          'gift_image_url',
           'goal_cents',
           'payout_email',
           'host_whatsapp_number',
@@ -1293,15 +1299,22 @@ export const openApiSpec = {
           },
           gift_description: {
             type: 'string',
-            minLength: 10,
             maxLength: 500,
+          },
+          gift_icon_id: {
+            type: 'string',
+            description:
+              'Curated icon id. Required when gift_image_url is omitted. Preferred for new clients.',
           },
           gift_image_url: {
             type: 'string',
-            format: 'uri',
+            description:
+              'Gift icon path or URL. Must map to a supported icon in /icons/gifts/. Required when gift_icon_id is omitted.',
           },
           gift_image_prompt: {
             type: 'string',
+            nullable: true,
+            description: 'Deprecated. Legacy AI prompt value.',
           },
           goal_cents: {
             type: 'integer',

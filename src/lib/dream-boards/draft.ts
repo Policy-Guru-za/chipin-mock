@@ -12,6 +12,7 @@ export type DreamBoardDraftInput = {
   photoFilename?: string;
   giftName?: string;
   giftDescription?: string;
+  giftIconId?: string;
   giftImageUrl?: string;
   giftImagePrompt?: string;
   goalCents?: number;
@@ -43,6 +44,7 @@ export type DreamBoardDraft = {
   photoFilename?: string;
   giftName?: string;
   giftDescription?: string;
+  giftIconId?: string;
   giftImageUrl?: string;
   giftImagePrompt?: string;
   goalCents?: number;

@@ -13,7 +13,7 @@ Gifta uses PostgreSQL (via Neon) with Drizzle ORM. This document defines all dat
 **Key Changes in v2.0:**
 - Removed legacy `gift_type`/`gift_data` usage (manual gift definition only)
 - Karri Card is now the sole payout method (`karri_card`)
-- Added new columns: `gift_name`, `gift_image_url`, `gift_image_prompt`, `karri_card_holder_name`, `host_whatsapp_number`, `party_date`
+- Added new columns: `gift_name`, `gift_image_url`, `gift_image_prompt` (deprecated), `karri_card_holder_name`, `host_whatsapp_number`, `party_date`
 - Removed `overflow_gift_data` column (no charity overflow)
 - Added new table: `karri_credit_queue`
 
@@ -195,10 +195,10 @@ CREATE TABLE dream_boards (
   child_photo_url TEXT NOT NULL,
   party_date DATE NOT NULL,  -- v2.0: renamed from birthday_date, serves as pot close date
   
-  -- Gift details (v2.0: manual definition + AI artwork)
+  -- Gift details (v4.0: manual definition + curated icon path)
   gift_name VARCHAR(200) NOT NULL,
   gift_image_url TEXT NOT NULL,
-  gift_image_prompt TEXT,  -- Prompt used for AI generation (for regeneration)
+  gift_image_prompt TEXT,  -- Deprecated legacy prompt field (null for icon-based boards)
   goal_cents INTEGER NOT NULL,
   
   -- Payout details (v2.0: Karri Card only)
@@ -258,10 +258,10 @@ export const dreamBoards = pgTable('dream_boards', {
   childPhotoUrl: text('child_photo_url').notNull(),
   partyDate: date('party_date').notNull(),  // v2.0: serves as pot close date
   
-  // Gift details (v2.0: manual definition + AI artwork)
+  // Gift details (v4.0: manual definition + curated icon path)
   giftName: varchar('gift_name', { length: 200 }).notNull(),
-  giftImageUrl: text('gift_image_url').notNull(),
-  giftImagePrompt: text('gift_image_prompt'),
+  giftImageUrl: text('gift_image_url').notNull(), // e.g. /icons/gifts/ballet.png
+  giftImagePrompt: text('gift_image_prompt'), // Deprecated legacy field
   goalCents: integer('goal_cents').notNull(),
   
   // Payout details (v2.0: Karri Card only)
@@ -290,8 +290,8 @@ export const dreamBoards = pgTable('dream_boards', {
 | Field | Type | Description |
 |-------|------|-------------|
 | gift_name | VARCHAR(200) | Parent's description of the dream gift |
-| gift_image_url | TEXT | URL to AI-generated artwork (Vercel Blob) |
-| gift_image_prompt | TEXT | Full prompt used for AI generation |
+| gift_image_url | TEXT | Curated gift icon path (`/icons/gifts/{icon-id}.png`) |
+| gift_image_prompt | TEXT | Deprecated legacy prompt value (null for new boards) |
 | party_date | DATE | Birthday party date, serves as pot close date |
 | karri_card_number | TEXT | Host's Karri Card number (encrypted) |
 | karri_card_holder_name | TEXT | Cardholder name for verification |

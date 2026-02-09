@@ -28,9 +28,6 @@ const toAbsoluteUrl = (url: string, baseUrl: string) => {
 const getMetadataDescription = (board: DreamBoardMetadataSource, giftTitle: string) =>
   `Chip in for ${board.childName}'s ${giftTitle}.`;
 
-const getMetadataImage = (params: { giftImage: string; fallbackImage: string }) =>
-  params.giftImage || params.fallbackImage;
-
 const getAltText = (params: { giftSubtitle: string; title: string }) =>
   params.giftSubtitle || params.title;
 
@@ -38,7 +35,7 @@ export const buildDreamBoardMetadata = (
   board: DreamBoardMetadataSource,
   options: MetadataOptions
 ): Metadata => {
-  const { giftTitle, giftSubtitle, giftImage } = getGiftInfo({
+  const { giftTitle, giftSubtitle } = getGiftInfo({
     giftName: board.giftName ?? null,
     giftDescription: null,
     giftImageUrl: board.giftImageUrl ?? null,
@@ -46,11 +43,7 @@ export const buildDreamBoardMetadata = (
 
   const title = `${board.childName}'s Dream Board | Gifta`;
   const description = getMetadataDescription(board, giftTitle);
-  const imageCandidate = getMetadataImage({
-    giftImage,
-    fallbackImage: board.childPhotoUrl,
-  });
-  const imageUrl = imageCandidate ? toAbsoluteUrl(imageCandidate, options.baseUrl) : undefined;
+  const imageUrl = toAbsoluteUrl(`/api/og/${board.slug}`, options.baseUrl);
   const altText = getAltText({ giftSubtitle, title });
   const urlPath = options.path ?? `/${board.slug}`;
   const url = toAbsoluteUrl(urlPath, options.baseUrl);
@@ -63,13 +56,13 @@ export const buildDreamBoardMetadata = (
       description,
       url,
       type: 'website',
-      images: imageUrl ? [{ url: imageUrl, alt: altText }] : undefined,
+      images: [{ url: imageUrl, alt: altText, width: 1200, height: 630 }],
     },
     twitter: {
-      card: imageUrl ? 'summary_large_image' : 'summary',
+      card: 'summary_large_image',
       title,
       description,
-      images: imageUrl ? [imageUrl] : undefined,
+      images: [imageUrl],
     },
   };
 };

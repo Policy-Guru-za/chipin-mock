@@ -174,8 +174,9 @@ POST /v1/dream-boards
   "child_photo_url": "https://example.public.blob.vercel-storage.com/photos/abc123.jpg",
   "party_date": "2026-02-15",
   "gift_name": "Mountain Bike with Bells",
-  "gift_image_url": "https://example.public.blob.vercel-storage.com/artwork/bike.png",
-  "gift_image_prompt": "A shiny red mountain bike with training wheels and a bell",
+  "gift_icon_id": "bicycle",
+  "gift_image_url": "/icons/gifts/bicycle.png",
+  "gift_image_prompt": null,
   "goal_cents": 250000,
   "payout_email": "parent@example.com",
   "host_whatsapp_number": "+27821234567",
@@ -186,7 +187,8 @@ POST /v1/dream-boards
 ```
 
 **Notes:**
-- `gift_image_prompt` is optional; it stores the prompt used for AI artwork.
+- Provide `gift_icon_id` (preferred) or `gift_image_url` that maps to a supported icon.
+- `gift_image_prompt` is deprecated legacy data and is null for icon-based boards.
 - `payout_method` is always `karri_card`.
 - `party_date` must be within the next 6 months.
 
@@ -201,8 +203,9 @@ POST /v1/dream-boards
     "party_date": "2026-02-15",
     "gift_data": {
       "gift_name": "Mountain Bike with Bells",
-      "gift_image_url": "https://example.public.blob.vercel-storage.com/artwork/bike.png",
-      "gift_image_prompt": "A shiny red mountain bike with training wheels and a bell"
+      "gift_icon_id": "bicycle",
+      "gift_image_url": "https://api.chipin.co.za/icons/gifts/bicycle.png",
+      "gift_image_prompt": null
     },
     "payout_method": "karri_card",
     "goal_cents": 250000,
@@ -731,7 +734,7 @@ curl -X POST https://api.chipin.co.za/v1/dream-boards \
     "child_name": "Maya",
     "party_date": "2026-02-15",
     "gift_name": "Mountain Bike with Bells",
-    "gift_image_url": "https://...",
+    "gift_icon_id": "bicycle",
     "goal_cents": 250000,
     "payout_email": "parent@example.com",
     "host_whatsapp_number": "+27821234567",

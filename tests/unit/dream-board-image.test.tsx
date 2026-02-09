@@ -20,9 +20,11 @@ describe('DreamBoardImage', () => {
 
   it('uses provided src when available', () => {
     const html = renderToStaticMarkup(
-      <DreamBoardImage src="https://example.com/image.jpg" alt="Child" />
+      <DreamBoardImage src="/icons/gifts/ballet.png" alt="Child" />
     );
 
-    expect(html).toContain('https://example.com/image.jpg');
+    expect(html).toContain('/icons/gifts/ballet.png');
+    expect(html).toContain('aspect-square');
+    expect(html).toContain('object-contain');
   });
 });

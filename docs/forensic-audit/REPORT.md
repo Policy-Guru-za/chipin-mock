@@ -39,6 +39,7 @@ From `package.json`:
 - Auth: Clerk (`@clerk/nextjs`)
 - Cache / rate limiting: Vercel KV (`@vercel/kv`) with dev fallback in some paths
 - Storage: Vercel Blob (`@vercel/blob`)
+- Gift imagery: static curated icons under `/public/icons/gifts/`
 - Email: Resend (`resend`)
 - Observability: Sentry (`@sentry/nextjs`), optional OpenTelemetry (`@opentelemetry/*`), optional Axiom env keys present
 - Payments (inbound): PayFast, Ozow, SnapScan
@@ -104,7 +105,6 @@ Internal job endpoints (must supply `Authorization: Bearer ${INTERNAL_JOB_SECRET
 
 Internal utilities (Clerk-protected or internal):
 - `POST /api/internal/upload` (blob uploads)
-- `POST /api/internal/artwork/generate` (Gemini artwork)
 - `GET /api/internal/auth/me` (session diagnostics)
 - metrics/analytics/debug routes under `/api/internal/*`
 

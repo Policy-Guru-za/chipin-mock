@@ -50,7 +50,7 @@ const buildBoard = (overrides: Record<string, unknown> = {}) => {
     childPhotoUrl: 'https://images.example/photo.jpg',
     partyDate: new Date(now + 10 * DAY_MS).toISOString().split('T')[0],
     giftName: 'Train set',
-    giftImageUrl: 'https://images.example/product.jpg',
+    giftImageUrl: '/icons/gifts/train.png',
     giftImagePrompt: 'A bright train set',
     goalCents: 35000,
     payoutMethod: 'karri_card',

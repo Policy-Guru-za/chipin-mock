@@ -46,7 +46,7 @@ const baseBoard = {
   childPhotoUrl: 'https://images.example/photo.jpg',
   partyDate: new Date('2026-02-15T00:00:00.000Z'),
   giftName: 'Train set',
-  giftImageUrl: 'https://images.example/product.jpg',
+  giftImageUrl: '/icons/gifts/train.png',
   giftImagePrompt: 'A bright train set',
   goalCents: 35000,
   payoutMethod: 'karri_card',
@@ -153,7 +153,7 @@ describe('POST /api/v1/dream-boards', () => {
           child_photo_url: 'https://images.example/photo.jpg',
           party_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           gift_name: 'Train set',
-          gift_image_url: 'https://images.example/product.jpg',
+          gift_icon_id: 'train',
           gift_image_prompt: 'A bright train set',
           goal_cents: 35000,
           payout_email: 'parent@example.com',
@@ -167,6 +167,8 @@ describe('POST /api/v1/dream-boards', () => {
 
     expect(response.status).toBe(201);
     expect(payload.data.slug).toBe('maya-birthday-abc123');
+    expect(payload.data.gift_data.gift_icon_id).toBe('train');
+    expect(payload.data.gift_data.gift_image_url).toBe('http://localhost:3000/icons/gifts/train.png');
     expect(markApiKeyUsed).toHaveBeenCalledWith('api-key-1');
     expect(insert).toHaveBeenCalled();
   });
@@ -194,7 +196,7 @@ describe('POST /api/v1/dream-boards', () => {
           child_photo_url: 'https://images.example/photo.jpg',
           party_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           gift_name: 'Train set',
-          gift_image_url: 'https://images.example/product.jpg',
+          gift_icon_id: 'train',
           gift_image_prompt: 'A bright train set',
           goal_cents: 35000,
           payout_method: 'bank',
@@ -238,7 +240,7 @@ describe('POST /api/v1/dream-boards', () => {
           child_photo_url: 'https://images.example/photo.jpg',
           party_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           gift_name: 'Train set',
-          gift_image_url: 'https://images.example/product.jpg',
+          gift_icon_id: 'train',
           goal_cents: 35000,
           payout_email: 'parent@example.com',
           host_whatsapp_number: '+27821234567',
@@ -280,7 +282,7 @@ describe('POST /api/v1/dream-boards', () => {
           child_photo_url: 'https://images.example/photo.jpg',
           party_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           gift_name: 'Train set',
-          gift_image_url: 'https://images.example/product.jpg',
+          gift_icon_id: 'train',
           goal_cents: 35000,
           payout_email: 'parent@example.com',
           host_whatsapp_number: '+27821234567',
@@ -322,7 +324,7 @@ describe('POST /api/v1/dream-boards', () => {
           child_photo_url: 'https://images.example/photo.jpg',
           party_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           gift_name: 'Train set',
-          gift_image_url: 'https://images.example/product.jpg',
+          gift_icon_id: 'train',
           goal_cents: 35000,
           payout_email: 'parent@example.com',
           host_whatsapp_number: '+27821234567',
@@ -366,7 +368,7 @@ describe('POST /api/v1/dream-boards', () => {
           child_photo_url: 'https://images.example/photo.jpg',
           party_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           gift_name: 'Train set',
-          gift_image_url: 'https://images.example/product.jpg',
+          gift_icon_id: 'train',
           goal_cents: 35000,
           payout_email: 'parent@example.com',
           host_whatsapp_number: '+27821234567',
@@ -410,7 +412,7 @@ describe('POST /api/v1/dream-boards', () => {
           child_photo_url: 'https://images.example/photo.jpg',
           party_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           gift_name: 'Train set',
-          gift_image_url: 'https://images.example/product.jpg',
+          gift_icon_id: 'train',
           goal_cents: 35000,
           payout_email: 'parent@example.com',
           host_whatsapp_number: '+27821234567',
@@ -462,7 +464,7 @@ describe('POST /api/v1/dream-boards', () => {
           child_photo_url: 'https://images.example/photo.jpg',
           party_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           gift_name: 'Train set',
-          gift_image_url: 'https://images.example/product.jpg',
+          gift_icon_id: 'train',
           goal_cents: 35000,
           payout_method: 'bank',
           payout_email: 'parent@example.com',
@@ -528,7 +530,7 @@ describe('POST /api/v1/dream-boards', () => {
           child_photo_url: 'https://images.example/photo.jpg',
           party_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           gift_name: 'Train set',
-          gift_image_url: 'https://images.example/product.jpg',
+          gift_icon_id: 'train',
           goal_cents: 35000,
           payout_email: 'parent@example.com',
           host_whatsapp_number: '+27821234567',
@@ -579,7 +581,7 @@ describe('POST /api/v1/dream-boards', () => {
           child_photo_url: 'https://images.example/photo.jpg',
           party_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           gift_name: 'Train set',
-          gift_image_url: 'https://images.example/product.jpg',
+          gift_icon_id: 'train',
           goal_cents: 35000,
           payout_email: 'parent@example.com',
           host_whatsapp_number: '+27821234567',
@@ -621,7 +623,7 @@ describe('POST /api/v1/dream-boards', () => {
           child_photo_url: 'https://images.example/photo.jpg',
           party_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           gift_name: 'Train set',
-          gift_image_url: 'https://images.example/product.jpg',
+          gift_icon_id: 'train',
           goal_cents: 35000,
           payout_email: 'parent@example.com',
           host_whatsapp_number: '+27821234567',
@@ -666,7 +668,7 @@ describe('POST /api/v1/dream-boards', () => {
           child_photo_url: 'https://images.example/photo.jpg',
           party_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           gift_name: 'Train set',
-          gift_image_url: 'https://images.example/product.jpg',
+          gift_icon_id: 'train',
           goal_cents: 35000,
           payout_method: 'bank',
           payout_email: 'parent@example.com',
@@ -710,7 +712,7 @@ describe('POST /api/v1/dream-boards', () => {
           child_photo_url: 'https://images.example/photo.jpg',
           party_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           gift_name: 'Train set',
-          gift_image_url: 'https://images.example/product.jpg',
+          gift_icon_id: 'train',
           goal_cents: 35000,
           payout_method: 'karri_card',
           payout_email: 'parent@example.com',
@@ -751,11 +753,50 @@ describe('POST /api/v1/dream-boards', () => {
           child_photo_url: 'https://images.example/photo.jpg',
           party_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           gift_name: 'Train set',
-          gift_image_url: 'https://images.example/product.jpg',
+          gift_icon_id: 'train',
           goal_cents: 35000,
           payout_email: 'parent@example.com',
           host_whatsapp_number: '+27821234567',
           karri_card_number: '  - -  ',
+          karri_card_holder_name: 'Maya Parent',
+        }),
+      })
+    );
+
+    const payload = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(payload.error.code).toBe('validation_error');
+    expect(insert).not.toHaveBeenCalled();
+    expect(markApiKeyUsed).not.toHaveBeenCalled();
+  });
+
+  it('rejects unsupported gift icons', async () => {
+    mockAuth();
+
+    const markApiKeyUsed = vi.fn(async () => undefined);
+    mockDreamBoardWriteQueries({ markApiKeyUsed });
+
+    const insert = vi.fn();
+    vi.doMock('@/lib/db', () => ({ db: { insert } }));
+    vi.doMock('@/lib/utils/encryption', () => ({
+      encryptSensitiveValue: vi.fn(() => 'encrypted-card'),
+    }));
+
+    const { POST } = await loadHandler();
+    const response = await POST(
+      new Request('http://localhost/api/v1/dream-boards', {
+        method: 'POST',
+        body: JSON.stringify({
+          child_name: 'Maya',
+          child_photo_url: 'https://images.example/photo.jpg',
+          party_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          gift_name: 'Train set',
+          gift_icon_id: 'unknown-icon',
+          goal_cents: 35000,
+          payout_email: 'parent@example.com',
+          host_whatsapp_number: '+27821234567',
+          karri_card_number: '1234567890123456',
           karri_card_holder_name: 'Maya Parent',
         }),
       })

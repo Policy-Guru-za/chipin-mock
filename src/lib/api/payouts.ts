@@ -60,12 +60,14 @@ const serializeRecipientBasics = (record: Record<string, unknown>) => {
 };
 
 const serializeRecipientGiftData = (record: Record<string, unknown>) => {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
   return {
     gift_data: serializeGiftData({
       giftName: typeof record.giftName === 'string' ? record.giftName : null,
       giftImageUrl: typeof record.giftImageUrl === 'string' ? record.giftImageUrl : null,
       giftImagePrompt:
         typeof record.giftImagePrompt === 'string' ? record.giftImagePrompt : null,
+      baseUrl,
     }),
   };
 };

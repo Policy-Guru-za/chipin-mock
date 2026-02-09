@@ -15,6 +15,7 @@ const isPublicRoute = createRouteMatcher([
   '/api/health',
   '/api/webhooks(.*)',
   '/api/v1(.*)',
+  '/api/og(.*)',
   '/v1(.*)',
   '/api/internal/contributions/create', // Public guest checkout endpoint; do not add job-secret auth.
   '/api/internal/contributions/reminders', // Public guest reminder scheduling endpoint.
@@ -50,6 +51,10 @@ const isBypassRouteWhenAuthUnavailable = (pathname: string): boolean => {
   }
 
   if (pathname.startsWith('/api/webhooks')) {
+    return true;
+  }
+
+  if (pathname.startsWith('/api/og')) {
     return true;
   }
 

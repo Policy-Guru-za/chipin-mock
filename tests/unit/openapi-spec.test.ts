@@ -37,12 +37,14 @@ describe('openapi spec', () => {
     expect(updateRequest.properties).toHaveProperty('charity_enabled');
   });
 
-  it('keeps create-request payout and gift description constraints aligned with runtime', () => {
+  it('keeps create-request payout and gift icon constraints aligned with runtime', () => {
     const createRequest = openApiSpec.components.schemas.DreamBoardCreateRequest;
     const requiredFields = createRequest.required ?? [];
 
     expect(requiredFields).not.toContain('karri_card_number');
     expect(requiredFields).not.toContain('karri_card_holder_name');
-    expect(createRequest.properties.gift_description.minLength).toBe(10);
+    expect(requiredFields).not.toContain('gift_image_url');
+    expect(createRequest.properties).toHaveProperty('gift_icon_id');
+    expect(createRequest.properties.gift_description.maxLength).toBe(500);
   });
 });

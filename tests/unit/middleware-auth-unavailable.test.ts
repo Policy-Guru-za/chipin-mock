@@ -65,4 +65,9 @@ describe('middleware auth unavailable', () => {
     const response = await runMiddleware('/api/webhooks/payfast');
     expect(response.status).toBe(200);
   });
+
+  it('bypasses og image endpoint when keys are missing', async () => {
+    const response = await runMiddleware('/api/og/maya-birthday');
+    expect(response.status).toBe(200);
+  });
 });

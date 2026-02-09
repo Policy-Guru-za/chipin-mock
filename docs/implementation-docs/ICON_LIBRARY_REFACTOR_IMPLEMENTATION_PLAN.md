@@ -6,6 +6,13 @@ Replace the Gemini Flash AI image generation system with a curated, static icon 
 
 This document is the single authoritative source for you, the implementing agent. Execute sequentially unless explicitly marked as parallelisable. Utilise multiple sub-agents acting in parallel wherever possible and more optimal.
 
+## v2 Lock Amendments (2026-02-09)
+
+- `giftIconId` is the trusted server input for creation. Do not trust client-provided `giftImageUrl`.
+- API responses continue to return absolute `gift_image_url` values.
+- Dynamic OG generation ships in this refactor and must be publicly accessible.
+- Legacy non-icon imagery has no compatibility guarantees.
+
 ---
 
 ## Table of Contents

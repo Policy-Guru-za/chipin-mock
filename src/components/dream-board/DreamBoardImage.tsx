@@ -1,5 +1,6 @@
 import Image from 'next/image';
 
+import { extractIconIdFromPath, getGiftIconById } from '@/lib/icons/gift-icons';
 import { cn } from '@/lib/utils';
 
 type DreamBoardImageProps = {
@@ -24,13 +25,15 @@ export function DreamBoardImage({
   imageClassName,
 }: DreamBoardImageProps) {
   const resolvedSrc = src?.trim().length ? src : fallbackSrc;
+  const iconMeta = getGiftIconById(extractIconIdFromPath(resolvedSrc) ?? '');
 
   return (
     <div
       className={cn(
-        'relative w-full overflow-hidden rounded-2xl bg-stone-100 aspect-[3/2]',
+        'relative w-full overflow-hidden rounded-2xl bg-stone-100 aspect-square',
         className
       )}
+      style={iconMeta ? { backgroundColor: iconMeta.bgColor } : undefined}
     >
       <Image
         src={resolvedSrc}
@@ -38,7 +41,7 @@ export function DreamBoardImage({
         fill
         sizes={sizes}
         priority={priority}
-        className={cn('object-cover', imageClassName)}
+        className={cn('object-contain p-2', imageClassName)}
       />
     </div>
   );

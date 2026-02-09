@@ -130,11 +130,11 @@ export const dreamBoards = pgTable(
     partyDate: date('party_date').notNull(),
     campaignEndDate: date('campaign_end_date'),
 
-    // v2.0: Manual gift definition with AI artwork
+    // v4.0: Manual gift definition with static icon imagery
     giftName: varchar('gift_name', { length: 200 }).notNull(),
     giftDescription: text('gift_description'),
-    giftImageUrl: text('gift_image_url').notNull(),
-    giftImagePrompt: text('gift_image_prompt'),
+    giftImageUrl: text('gift_image_url').notNull(), // Static icon path, e.g. /icons/gifts/ballet.png
+    giftImagePrompt: text('gift_image_prompt'), // Deprecated, null for icon-based boards
     goalCents: integer('goal_cents').notNull(),
 
     // v3.0: Karri Card or bank transfer payout

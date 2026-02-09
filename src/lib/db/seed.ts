@@ -52,10 +52,10 @@ export async function seedDatabase() {
       childName: 'Maya',
       childPhotoUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1',
       partyDate,
-      // v2.0: Manual gift definition with AI artwork
+      // v4.0: Manual gift definition with curated icon
       giftName: 'Wooden Train Set',
-      giftImageUrl: 'https://images.unsplash.com/photo-1509223197845-458d87318791',
-      giftImagePrompt: 'A whimsical watercolor illustration of a wooden train set',
+      giftImageUrl: '/icons/gifts/train.png',
+      giftImagePrompt: null,
       goalCents: 35000,
       // v2.0: Karri Card is sole payout method
       payoutMethod: 'karri_card',

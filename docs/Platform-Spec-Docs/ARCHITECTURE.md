@@ -37,7 +37,7 @@ Gifta follows a **modern serverless architecture** optimized for:
 │ (PostgreSQL) │  │   (Redis)    │  │  (Images)    │
 │              │  │              │  │              │
 │ - Dream Boards│  │ - Rate limits│ │ - Child photos│
-│ - Contributions│ │ - Caching   │  │ - Gift images │
+│ - Contributions│ │ - Caching   │  │ - Gift icons  │
 │ - Payouts    │  │             │  │              │
 └──────────────┘  └──────────────┘  └──────────────┘
            │
@@ -51,12 +51,7 @@ Gifta follows a **modern serverless architecture** optimized for:
 │  │ Ozow      │  │  │ Card      │  │  │ Business  │              │
 │  │ SnapScan  │  │  │ (batch)   │  │  │ Resend    │              │
 │  └───────────┘  │  └───────────┘  │  └───────────┘              │
-├─────────────────┴─────────────────┴─────────────────────────────┤
-│  AI Services                                                    │
-│  ┌───────────────────────────────────────────────────────────┐  │
-│  │ Gemini Image Generation (Gift Artwork)                    │  │
-│  └───────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
+└─────────────────┴─────────────────┴─────────────────────────────┘
 ```
 
 ---
@@ -90,7 +85,7 @@ Gifta follows a **modern serverless architecture** optimized for:
 
 | Service | Purpose | Integration Status |
 |---------|---------|-------------------|
-| **Gemini** | AI-generated gift artwork | API integration |
+| **Gift icon library** | Curated static gift icon set (`/public/icons/gifts`) | In-repo assets |
 | **WhatsApp Business** | Transactional notifications | API integration |
 | **Karri Card** | Sole payout method (daily batch) | API integration |
 
@@ -145,10 +140,12 @@ chipin/
 │   │   ├── integrations/         # External service integrations
 │   │   │   ├── blob.ts
 │   │   │   ├── email.ts
-│   │   │   ├── image-generation.ts
 │   │   │   ├── karri.ts
 │   │   │   ├── karri-batch.ts
 │   │   │   └── whatsapp.ts
+│   │   ├── icons/                # Curated gift icon registry/helpers
+│   │   │   ├── gift-icons.ts
+│   │   │   └── suggest-icon.ts
 │   │   ├── auth/                 # Authentication utilities
 │   │   ├── utils/                # General utilities
 │   │   └── constants.ts          # App constants

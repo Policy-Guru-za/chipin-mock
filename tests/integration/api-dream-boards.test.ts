@@ -18,7 +18,7 @@ const baseBoard = {
   childPhotoUrl: 'https://images.example/photo.jpg',
   partyDate: new Date('2026-02-15T00:00:00.000Z'),
   giftName: 'Train set',
-  giftImageUrl: 'https://images.example/product.jpg',
+  giftImageUrl: '/icons/gifts/train.png',
   giftImagePrompt: 'A bright train set',
   goalCents: 35000,
   payoutMethod: 'karri_card',
@@ -184,6 +184,8 @@ describe('GET /api/v1/dream-boards/[id] responses - payloads', () => {
     expect(response.status).toBe(200);
     expect(payload.data.child_name).toBe('Maya');
     expect(payload.data.gift_data.gift_name).toBe('Train set');
+    expect(payload.data.gift_data.gift_icon_id).toBe('train');
+    expect(payload.data.gift_data.gift_image_url).toBe('http://localhost:3000/icons/gifts/train.png');
     expect(payload.data.display_mode).toBe('gift');
     expect(payload.meta.request_id).toBe('req-123');
   });

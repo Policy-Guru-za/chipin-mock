@@ -14,6 +14,7 @@ import {
   isPartyDateWithinRange,
   SA_MOBILE_REGEX,
 } from '@/lib/dream-boards/validation';
+import { extractIconIdFromPath, getGiftIconById, isValidGiftIconId } from '@/lib/icons/gift-icons';
 import { LOCKED_CHARITY_SPLIT_MODES, LOCKED_PAYOUT_METHODS } from '@/lib/ux-v2/decision-locks';
 import { resolveWritePathBlockReason } from '@/lib/ux-v2/write-path-gates';
 import { encryptSensitiveValue } from '@/lib/utils/encryption';
@@ -39,9 +40,10 @@ const createSchema = z
     party_date: z.string().min(1),
     campaign_end_date: z.string().min(1).optional(),
     gift_name: z.string().min(2).max(200),
-    gift_description: z.string().min(10).max(500).optional(),
-    gift_image_url: z.string().url(),
-    gift_image_prompt: z.string().min(1).optional(),
+    gift_description: z.string().max(500).optional(),
+    gift_icon_id: z.string().min(1).optional(),
+    gift_image_url: z.string().min(1).optional(),
+    gift_image_prompt: z.string().optional(),
     goal_cents: z.number().int().min(2000),
     payout_method: z.enum(LOCKED_PAYOUT_METHODS).optional(),
     payout_email: z.string().email(),
@@ -63,6 +65,15 @@ const createSchema = z
   })
   .superRefine((value, ctx) => {
     ensureDateRanges(value, ctx);
+
+    if (!value.gift_icon_id && !value.gift_image_url) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['gift_icon_id'],
+        message: 'Provide gift_icon_id or gift_image_url',
+      });
+    }
+
     const payoutMethod = value.payout_method ?? 'karri_card';
     const hasAnyBankField =
       value.bank_name !== undefined ||
@@ -256,11 +267,26 @@ const parseCreatePayload = async (request: NextRequest, requestId: string, heade
   });
 };
 
+const resolveGiftIconPath = (payload: CreatePayload) => {
+  const iconIdFromField = payload.gift_icon_id?.trim();
+  if (iconIdFromField && isValidGiftIconId(iconIdFromField)) {
+    return getGiftIconById(iconIdFromField)?.src ?? null;
+  }
+
+  const iconIdFromPath = extractIconIdFromPath(payload.gift_image_url ?? '');
+  if (iconIdFromPath && isValidGiftIconId(iconIdFromPath)) {
+    return getGiftIconById(iconIdFromPath)?.src ?? null;
+  }
+
+  return null;
+};
+
 const normalizeBankAccountNumber = (value: string) =>
   value.replace(/\s+/g, '').replace(/-/g, '');
 
 const insertDreamBoard = async (params: {
   payload: CreatePayload;
+  giftImageUrl: string;
   hostId: string;
   payoutMethod: 'karri_card' | 'bank';
   karriCardNumberEncrypted?: string | null;
@@ -285,7 +311,7 @@ const insertDreamBoard = async (params: {
         campaignEndDate: params.payload.campaign_end_date ?? params.payload.party_date,
         giftName: params.payload.gift_name,
         giftDescription: params.payload.gift_description ?? null,
-        giftImageUrl: params.payload.gift_image_url,
+        giftImageUrl: params.giftImageUrl,
         giftImagePrompt: params.payload.gift_image_prompt ?? null,
         goalCents: params.payload.goal_cents,
         payoutMethod: params.payoutMethod,
@@ -392,6 +418,19 @@ export const POST = withApiAuth('dreamboards:write', async (request: NextRequest
   const parsed = await parseCreatePayload(request, requestId, rateLimitHeaders);
   if (!parsed.ok) return parsed.response;
 
+  const giftImageUrl = resolveGiftIconPath(parsed.data);
+  if (!giftImageUrl) {
+    return jsonError({
+      error: {
+        code: 'validation_error',
+        message: 'gift_icon_id or gift_image_url must reference a supported gift icon',
+      },
+      status: 400,
+      requestId,
+      headers: rateLimitHeaders,
+    });
+  }
+
   const payoutMethod = parsed.data.payout_method ?? 'karri_card';
   const isBankWriteRequested =
     payoutMethod === 'bank' ||
@@ -474,6 +513,7 @@ export const POST = withApiAuth('dreamboards:write', async (request: NextRequest
 
   const created = await insertDreamBoard({
     payload: parsed.data,
+    giftImageUrl,
     hostId: host.id,
     payoutMethod,
     karriCardNumberEncrypted,
@@ -503,7 +543,7 @@ export const POST = withApiAuth('dreamboards:write', async (request: NextRequest
       campaignEndDate: parsed.data.campaign_end_date ?? parsed.data.party_date,
       giftName: parsed.data.gift_name,
       giftDescription: parsed.data.gift_description ?? null,
-      giftImageUrl: parsed.data.gift_image_url,
+      giftImageUrl,
       giftImagePrompt: parsed.data.gift_image_prompt ?? null,
       payoutMethod,
       karriCardHolderName: payoutMethod === 'karri_card' ? (parsed.data.karri_card_holder_name ?? null) : null,

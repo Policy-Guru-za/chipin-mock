@@ -3,6 +3,10 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-09 | self | Started final verification before re-reading napkin notes for the session | Read `docs/napkin/SKILL.md` and `docs/napkin/napkin.md` first in every new session before any gate or edit command |
+| 2026-02-09 | self | Declared Gemini cleanup done while `docs/Platform-Spec-Docs/ARCHITECTURE.md` still contained active Gemini references | After deprecating an integration, run targeted `rg` sweeps across `docs/Platform-Spec-Docs` and patch remaining active references before handoff |
+| 2026-02-09 | self | Deleted an API route and immediately ran `pnpm typecheck`; stale `.next/types` still referenced removed file and failed | After route add/delete, run `pnpm exec next typegen` before `pnpm typecheck` to refresh generated route validators |
+| 2026-02-09 | self | Tried `pnpm dev` in sandbox to refresh route types; Next failed with `listen EPERM 0.0.0.0:3000` | In sandbox, use `pnpm exec next typegen` for route-type refresh instead of binding a dev server port |
 | 2026-02-09 | self | Added an admin integration assertion by extending one `describe` callback past lint `max-lines-per-function`, increasing warning count | When adding tests in this repo, split long suites into multiple `describe` blocks early to avoid warning regressions |
 | 2026-02-09 | self | Read `src/app/(admin)/layout.tsx` without quoting parentheses in zsh, command failed with `no matches found` | Quote path arguments that include route-group parentheses, e.g. `'src/app/(admin)/layout.tsx'` |
 | 2026-02-09 | self | Assumed admin route-group layout auth covered route handlers; legacy `/payouts/export` redirect initially had no auth check | For `route.ts` handlers under admin route groups, call `requireAdminAuth()` explicitly before redirect or response |

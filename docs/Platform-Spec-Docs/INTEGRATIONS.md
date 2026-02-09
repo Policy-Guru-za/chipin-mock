@@ -8,7 +8,7 @@
 
 ## Overview
 
-Gifta integrates with external services for payments, payouts, notifications, and AI image generation. This document specifies the integration patterns and requirements.
+Gifta integrates with external services for payments, payouts, notifications, and storage. This document specifies the integration patterns and requirements.
 
 ### Integration Architecture
 
@@ -28,8 +28,8 @@ Gifta integrates with external services for payments, payouts, notifications, an
     │              │           │           │              │
     ▼              ▼           ▼           ▼              ▼
 ┌────────┐  ┌──────────┐  ┌────────┐  ┌─────────┐  ┌──────────┐
-│  AI    │  │ WhatsApp │  │ Karri  │  │ Payment │  │  Email   │
-│ Images │  │ Business │  │  Card  │  │Providers│  │ (Resend) │
+│ Icons  │  │ WhatsApp │  │ Karri  │  │ Payment │  │  Email   │
+│(Static)│  │ Business │  │  Card  │  │Providers│  │ (Resend) │
 └────────┘  └──────────┘  └────────┘  └─────────┘  └──────────┘
 ```
 
@@ -37,96 +37,29 @@ Gifta integrates with external services for payments, payouts, notifications, an
 
 | Integration | Purpose | Status |
 |-------------|---------|--------|
-| AI Image Generation | Generate gift artwork from descriptions | **NEW** |
+| Gift Icon Library | Curated static icon imagery for dream gifts | **NEW** |
 | WhatsApp Business API | Transactional notifications | **NEW** |
 | Karri Card | Sole payout method (daily batch) | **ENHANCED** |
 | PayFast | Inbound card payments | Unchanged |
 | Ozow | Inbound EFT payments | Unchanged |
 | SnapScan | Inbound QR payments | Unchanged |
 | Resend | Email notifications | Unchanged |
-| Vercel Blob | Image storage | Unchanged |
+| Vercel Blob | Child photo storage | Unchanged |
 | Vercel KV | Cache & rate limiting | Unchanged |
 
 ---
 
-## AI Image Generation
+## Gift Icon Library (Static Assets)
 
-### Purpose
+Dream gift imagery is sourced from static PNG assets at `/public/icons/gifts/*`.
 
-Generate whimsical, non-photorealistic artwork for gift descriptions. Parents describe their child's dream gift, and AI creates an illustration.
+Current behavior:
 
-### Provider
-
-Google Gemini image generation (default), with flexibility for alternative providers.
-
-### Environment Variables
-
-```bash
-GEMINI_API_KEY=""
-GEMINI_IMAGE_MODEL="gemini-2.5-flash-image"
-```
-
-### Interface
-
-```typescript
-interface ImageGenerationService {
-  generateGiftArtwork(giftDescription: string): Promise<GeneratedImage>;
-}
-
-interface GeneratedImage {
-  imageUrl: string;   // Vercel Blob URL (permanent storage)
-  prompt: string;     // Full prompt used (for regeneration)
-}
-```
-
-### Implementation Requirements
-
-1. **Style Directive**: Prepend style instructions to ensure child-friendly, non-photorealistic output:
-
-```typescript
-const STYLE_DIRECTIVE = `Create a whimsical, joyful illustration in a soft
-watercolor and hand-drawn style. The artwork should feel magical and
-dream-like, perfect for a child's birthday celebration. Do NOT create
-photorealistic images. The dream gift is: `;
-```
-
-2. **Upload to Blob**: Generated images must be uploaded to Vercel Blob for permanent storage (AI provider URLs are temporary).
-
-3. **Rate Limiting**: Maximum 5 generations per session per hour.
-
-4. **Cost Tracking**: Log token/credit usage for monitoring.
-
-5. **Retry Logic**: Exponential backoff on transient failures.
-
-### API Route
-
-```
-POST /api/internal/artwork/generate
-```
-
-**Request:**
-```json
-{
-  "description": "A shiny red mountain bike with training wheels"
-}
-```
-
-**Response:**
-```json
-{
-  "imageUrl": "https://xxx.public.blob.vercel-storage.com/artwork/abc123.png",
-  "prompt": "Create a whimsical, playful illustration... A shiny red mountain bike with training wheels"
-}
-```
-
-### Error Handling
-
-| Error | Status | User Message |
-|-------|--------|--------------|
-| Rate limit exceeded | 429 | "You've generated too many images. Please wait a bit." |
-| Invalid description | 400 | "Please provide a description between 10-500 characters." |
-| API failure | 500 | "We couldn't generate artwork right now. Please try again." |
-| Content policy violation | 400 | "We couldn't illustrate that description. Please try different words." |
+1. Hosts select a curated icon during create step 2.
+2. The selected icon path is stored in `dream_boards.gift_image_url` (e.g. `/icons/gifts/ballet.png`).
+3. `gift_image_prompt` is deprecated legacy data and null for icon-based boards.
+4. No third-party AI image provider is called at runtime.
+5. No internal artwork-generation endpoint exists.
 
 ---
 
@@ -398,7 +331,6 @@ No changes to existing email implementation.
 
 Used for:
 - Child photos (uploaded by host)
-- AI-generated gift artwork
 
 ### Environment Variables
 
@@ -440,7 +372,6 @@ Integration health is monitored via `/health/ready`:
 | Storage | Vercel Blob | Warning |
 | Email | Resend | Warning |
 | WhatsApp | WhatsApp Business | Warning |
-| AI Images | Gemini | Warning |
 | Karri | Karri Card API | Warning |
 
 Critical failures return 503. Warning failures log but return 200.
