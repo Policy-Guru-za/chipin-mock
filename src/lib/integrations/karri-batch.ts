@@ -120,7 +120,7 @@ const processQueueEntry = async (entry: QueueRecord, actor: AuditActor) => {
       cardNumber,
       amountCents: entry.amountCents,
       reference: entry.reference,
-      description: 'ChipIn Dream Board credit',
+      description: 'Gifta Dream Board credit',
     });
 
     if (result.status === 'pending') {

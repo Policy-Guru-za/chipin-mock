@@ -10,7 +10,7 @@ export const NETWORK_METADATA_NULLS = { ipAddress: null, userAgent: null } as co
 
 export const ANONYMIZED_CHILD_NAME = 'Child';
 export const ANONYMIZED_CHILD_PHOTO_URL = '/images/child-placeholder.svg';
-export const ANONYMIZED_PAYOUT_EMAIL = 'anonymized@chipin.co.za';
+export const ANONYMIZED_PAYOUT_EMAIL = 'anonymized@gifta.co.za';
 export const ANONYMIZED_WHATSAPP_NUMBER = '+27600000000';
 export const ANONYMIZED_KARRI_CARD_NUMBER = LEGACY_PLACEHOLDER;
 export const ANONYMIZED_KARRI_CARD_HOLDER = 'Redacted';

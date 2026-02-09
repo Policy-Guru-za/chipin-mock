@@ -19,9 +19,9 @@ describe('reminder templates', () => {
     });
 
     expect(payload.to).toBe('friend@example.com');
-    expect(payload.subject).toContain('Maya');
-    expect(payload.subject).toContain('Scooter');
-    expect(payload.html).toContain('Contribute now');
+    expect(payload.subject).toBe("🔔 Reminder: chip in for Maya's gift");
+    expect(payload.html).toContain('Chip in now');
+    expect(payload.text).toContain('Chip in before 2099-01-30.');
     expect(payload.text).toContain('https://gifta.example/maya-board');
   });
 

@@ -102,7 +102,7 @@ describe('PaymentClient', () => {
   it('renders contribution summary from flow data', () => {
     renderPage({ amountCents: 35000 });
     expect(screen.getByText(/Contributing/)).toHaveTextContent(
-      /Contributing R\s*350 to Maya's Dreamboard/
+      /Contributing R\s*350 to Maya's Dream Board/
     );
   });
 

@@ -171,7 +171,7 @@ describe('public board display integration', () => {
     });
 
     render(<PublicBoardHarness board={board} contributors={makeContributors(1)} />);
-    expect(screen.getByText(/Dreamboard has closed/)).toBeInTheDocument();
+    expect(screen.getByText(/Dream Board is closed to new contributions/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Chip in for Maya/i })).toBeDisabled();
   });
 

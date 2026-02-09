@@ -96,7 +96,7 @@ export function ContributeDetailsClient({
       timestamp: Date.now(),
     });
     if (!didSave) {
-      setSaveError('We could not save your details on this device. Please enable browser storage and try again.');
+      setSaveError("We couldn't save your details. Please try again or use a different browser.");
       setIsSaving(false);
       return;
     }
@@ -119,7 +119,7 @@ export function ContributeDetailsClient({
       <section className="space-y-3">
         <fieldset className="space-y-3">
           <legend className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
-            How much would you like to contribute?
+            How much would you like to chip in?
           </legend>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {PRESET_AMOUNTS.map((amount) => {
@@ -180,7 +180,7 @@ export function ContributeDetailsClient({
         {!isAnonymous ? (
           <div className="space-y-2 transition-all duration-200">
             <label htmlFor="contributorName" className="text-xs font-bold uppercase tracking-[0.12em] text-gray-500">
-              Your name (as it will appear)
+              Your name
             </label>
             <Input
               ref={nameInputRef}
@@ -215,7 +215,7 @@ export function ContributeDetailsClient({
             onClick={() => setMessageOpen(true)}
             className="min-h-11 text-left text-xs font-semibold uppercase tracking-[0.12em] text-[#6B9E88] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           >
-            Add a birthday message 🎂
+            Message (optional)
           </button>
         ) : null}
         {messageOpen ? (
@@ -257,7 +257,7 @@ export function ContributeDetailsClient({
           onClick={() => setShowReminderModal(true)}
           className="min-h-11 text-xs text-[#6B9E88] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
         >
-          Remind me in 3 days 🔔
+          Remind me later
         </button>
         {reminderSuccessToast ? (
           <p className="rounded-lg border border-[#0D9488] bg-[#F0F7F4] px-3 py-2 text-sm text-[#0D9488]">
@@ -281,7 +281,7 @@ export function ContributeDetailsClient({
           onClick={handleContinue}
           className="min-h-11 w-full rounded-lg bg-[#6B9E88] text-base font-semibold text-white hover:bg-[#5A8E78] sm:max-w-[400px]"
         >
-          {isSaving ? 'Processing...' : 'Continue to payment →'}
+          {isSaving ? 'Processing...' : 'Continue to payment'}
         </Button>
         <p className="text-center text-xs text-text-muted">🔒 Payments secured by PayFast</p>
       </section>

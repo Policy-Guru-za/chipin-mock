@@ -64,13 +64,13 @@ describe('buildContributionViewModel', () => {
   it('builds a standard contribution headline', () => {
     const view = buildContributionViewModel(makeBoard());
 
-    expect(view.headline).toBe("Contribute to Maya's dream gift");
+    expect(view.headline).toBe("Chip in for Maya's dream gift");
   });
 
   it('keeps the standard contribution copy when funded', () => {
     const view = buildContributionViewModel(makeBoard({ raisedCents: 7000 }));
 
-    expect(view.headline).toBe("Contribute to Maya's dream gift");
+    expect(view.headline).toBe("Chip in for Maya's dream gift");
   });
 });
 
@@ -90,7 +90,7 @@ describe('buildThankYouViewModel', () => {
     });
 
     expect(view.headline).toBe('Thank you, Ava!');
-    expect(view.message).toMatch(/Your contribution is helping Maya get their dream gift\./);
+    expect(view.message).toMatch(/You're helping Maya get their dream gift\./);
     expect(view.percentage).toBe(20);
     expect(view.isContributionCompleted).toBe(true);
   });

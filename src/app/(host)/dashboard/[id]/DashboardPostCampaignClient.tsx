@@ -121,7 +121,7 @@ export function DashboardPostCampaignClient({
           </div>
           {view.charityEnabled ? (
             <div className="flex items-center justify-between text-gray-500">
-              <span>Charity Donation</span>
+              <span>Charity contribution</span>
               <span>-{view.charityLabel}</span>
             </div>
           ) : null}

@@ -15,7 +15,7 @@ export const openApiSpec = {
   },
   servers: [
     {
-      url: 'https://api.chipin.co.za/v1',
+      url: 'https://api.gifta.co.za/v1',
       description: 'Production',
     },
     {

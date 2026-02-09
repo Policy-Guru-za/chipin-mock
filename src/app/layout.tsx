@@ -43,15 +43,15 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: 'Gifta - Everyone Chips In. One Perfect Gift.',
+  title: 'Gifta - One Dream Gift, Together.',
   description:
-    'Create a Dreamboard for your child\'s birthday. Friends and family chip in toward one meaningful gift — no more gift piles, no more guesswork.',
+    "Create a Dream Board for your child's birthday. Friends and family chip in toward one meaningful gift.",
   openGraph: {
     type: 'website',
     url: 'https://gifta.co.za',
     title: 'Gifta',
     description:
-      'Create a Dreamboard for your child\'s birthday. Friends and family chip in toward one meaningful gift — no more gift piles, no more guesswork.',
+      "Create a Dream Board for your child's birthday. Friends and family chip in toward one meaningful gift.",
     images: [
       {
         url: '/og-image.png',
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Gifta',
     description:
-      'Create a Dreamboard for your child\'s birthday. Friends and family chip in toward one meaningful gift — no more gift piles, no more guesswork.',
+      "Create a Dream Board for your child's birthday. Friends and family chip in toward one meaningful gift.",
     images: ['/og-image.png'],
   },
 };

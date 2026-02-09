@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 
-const fromEmail = process.env.RESEND_FROM_EMAIL ?? 'noreply@chipin.co.za';
-const fromName = process.env.RESEND_FROM_NAME ?? 'ChipIn';
+const fromEmail = process.env.RESEND_FROM_EMAIL ?? 'noreply@gifta.co.za';
+const fromName = process.env.RESEND_FROM_NAME ?? 'Gifta';
 
 export type EmailPayload = {
   to: string;

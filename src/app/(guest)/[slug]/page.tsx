@@ -60,7 +60,7 @@ function HeaderSection({ view, ageLine }: { view: GuestViewModel; ageLine: strin
 
         <div className="space-y-2">
           <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-600">
-            {view.childName}&apos;s Dreamboard
+            {view.childName}&apos;s Dream Board
           </p>
           <h1 className="font-display text-4xl text-gray-900 sm:text-5xl">{view.childName}</h1>
           <p className="font-primary text-base text-gray-600">{ageLine}</p>
@@ -120,7 +120,7 @@ function GoalProgressSection({ view }: { view: GuestViewModel }) {
       ) : null}
       {view.isFunded ? (
         <div className="mt-4 rounded-2xl border border-accent/40 bg-accent/10 p-4 text-sm text-text">
-          Goal reached! Extra contributions still help cover the dream gift.
+          Goal reached! Extra contributions still help.
         </div>
       ) : null}
     </section>
@@ -130,7 +130,7 @@ function GoalProgressSection({ view }: { view: GuestViewModel }) {
 function ParentBanner({ boardId }: { boardId: string }) {
   return (
     <section className="rounded-2xl border border-[#E7D7C8] bg-[#FDF8F3] p-5">
-      <p className="text-sm text-gray-800">👋 This is your Dreamboard. You&apos;re all set!</p>
+      <p className="text-sm text-gray-800">👋 This is your Dream Board. You&apos;re all set!</p>
       <Link
         href={`/dashboard/${boardId}`}
         className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-border px-4 text-sm font-semibold text-gray-800 hover:bg-white"

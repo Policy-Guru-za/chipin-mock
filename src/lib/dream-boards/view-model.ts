@@ -102,7 +102,7 @@ const getDisplayInfo = (params: {
 });
 
 const getContributionHeadline = (view: GuestViewModel) =>
-  `Contribute to ${view.childName}'s dream gift`;
+  `Chip in for ${view.childName}'s dream gift`;
 
 const getContributorName = (contribution?: ContributionRecord | null) =>
   contribution?.contributorName || 'Friend';
@@ -112,7 +112,7 @@ const getThankYouMessage = (params: { board: DreamBoardRecord; isComplete: boole
     return 'We’ll update this page once your payment is confirmed.';
   }
 
-  return `Your contribution is helping ${params.board.childName} get their dream gift.`;
+  return `You're helping ${params.board.childName} get their dream gift.`;
 };
 
 const getThankYouCopy = (params: {
@@ -156,7 +156,7 @@ const getTimeRemainingInfo = (params: { board: DreamBoardRecord; now: Date }) =>
   const expired = isBoardExpired(params.board, params.now);
   if (expired) {
     return {
-      message: 'This Dreamboard has closed. Thank you for helping make this birthday special! 💝',
+      message: 'This Dream Board is closed to new contributions.',
       urgency: 'expired' as const,
       daysLeft: 0,
     };

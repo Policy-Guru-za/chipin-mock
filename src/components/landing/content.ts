@@ -54,13 +54,13 @@ export const howItWorksSteps = [
   {
     number: '1',
     icon: '🎁',
-    title: 'Create a Dreamboard',
+    title: 'Create a Dream Board',
     description: "Add your child's one big wish and set a goal.",
   },
   {
     number: '2',
     icon: '📲',
-    title: 'Share your Dreamboard',
+    title: 'Share your Dream Board',
     description:
       'Send via WhatsApp. Friends and family chip in any amount — even from afar.',
   },

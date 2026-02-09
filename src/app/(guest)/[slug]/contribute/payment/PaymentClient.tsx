@@ -192,7 +192,7 @@ export function PaymentClient({
       <header className="space-y-3">
         <h1 className="font-display text-3xl text-text">Complete your contribution</h1>
         <p className="text-base font-medium text-gray-600">
-          Contributing <strong>{formatZar(flowData.amountCents)}</strong> to {childName}&apos;s Dreamboard
+          Contributing <strong>{formatZar(flowData.amountCents)}</strong> to {childName}&apos;s Dream Board
         </p>
       </header>
 

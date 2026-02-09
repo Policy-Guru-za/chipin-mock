@@ -48,8 +48,8 @@ describe('TimeRemaining', () => {
   });
 
   it('renders expired styling as muted italic', () => {
-    render(<TimeRemaining message="This Dreamboard has closed." urgency="expired" />);
-    expect(screen.getByText(/has closed/).parentElement).toHaveClass('italic');
+    render(<TimeRemaining message="This Dream Board is closed to new contributions." urgency="expired" />);
+    expect(screen.getByText(/closed to new contributions/).parentElement).toHaveClass('italic');
   });
 
   it('respects reduced motion for critical state', () => {

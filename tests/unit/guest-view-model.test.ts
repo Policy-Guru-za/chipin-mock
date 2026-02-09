@@ -89,7 +89,7 @@ describe('GuestViewModel time remaining', () => {
   it('maps past campaign end to expired', () => {
     const view = buildGuestViewModel(makeBoard({ campaignEndDate: addDays(now, -1) }), { now });
     expect(view.timeRemainingUrgency).toBe('expired');
-    expect(view.timeRemainingMessage).toContain('has closed');
+    expect(view.timeRemainingMessage).toBe('This Dream Board is closed to new contributions.');
   });
 });
 

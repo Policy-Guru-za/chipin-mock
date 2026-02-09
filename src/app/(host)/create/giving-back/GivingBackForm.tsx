@@ -74,7 +74,7 @@ export function GivingBackForm({
           checked={charityEnabled}
           onChange={(event) => setCharityEnabled(event.currentTarget.checked)}
         />
-        Share a portion with charity
+        Enable giving back (optional)
       </label>
 
       {charityEnabled ? (

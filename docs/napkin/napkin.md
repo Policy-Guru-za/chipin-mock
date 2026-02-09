@@ -11,6 +11,7 @@
 | 2026-02-09 | self | Wrote API route tests with `Request`, but handlers read `request.nextUrl.searchParams` and failed outside the unauthenticated branch | Use `NextRequest` in route tests whenever handlers depend on `nextUrl` |
 | 2026-02-09 | self | Added new host dashboard integration test without stubbing `matchMedia`, causing `useReducedMotion` failures | Stub both legacy and modern `matchMedia` methods in jsdom tests that render `ProgressBar` or motion-aware components |
 | 2026-02-09 | self | Assumed `pnpm add` fully failed after `ENOTFOUND`, but dependency was still linked from local pnpm store | After network-related install errors, verify `package.json`, lockfile, and `require.resolve(...)` before deciding whether dependency is unavailable |
+| 2026-02-09 | self | Updated contribution name label to `(optional)` while non-anonymous path still requires 2-50 characters | Keep form labels aligned with validation gates; if logic is required, copy must not imply optional |
 | 2026-02-08 | self | In create giving-back step, hid the form when no active charities existed, which left `charityEnabled` unset and blocked progression (`/create/payout` redirected back) | Keep a fallback submit path on no-charity states that persists `charityEnabled=false` and allows moving to payout |
 | 2026-02-08 | self | Put `redirect('/...karri_invalid')` inside `try` and then caught the redirect in the `catch`, which downgraded to `karri_unavailable` | In verification helpers, return status (`valid|invalid|unavailable`) and redirect in caller after helper resolves |
 | 2026-02-08 | self | Typed server form actions to return custom state objects, which broke `<form action={...}>` typing in client components | Keep server form actions as redirecting `Promise<void>` handlers; reserve state return shapes for `useActionState` actions only |
@@ -100,3 +101,8 @@
 - Admin modal a11y requires full trap pattern (`Escape` close + `Tab` loop + focus restore) rather than only `aria-modal`.
 - Charity edit flows must not surface encrypted bank payloads; keep masked placeholder and only submit bank JSON on explicit change.
 - Admin export handlers should standardize on `NextRequest` + `request.nextUrl.searchParams` and shared CSV helpers for consistent parser/test behavior.
+
+## C6 Learnings (2026-02-09)
+- Copy-only milestones still need explicit contract guardrails. Keep webhook headers, event names, scopes, and route slugs on a denylist before broad text replacement.
+- Matrix compliance is easiest to keep stable with a dedicated drift test file (`tests/unit/copy-matrix-compliance.test.ts`) that checks exact canonical strings and absence of legacy variants in key sources.
+- If `src/lib/api/openapi.ts` copy-level fields change, regenerate `public/v1/openapi.json` immediately; otherwise `tests/unit/openapi-spec.test.ts` fails even when runtime code is correct.

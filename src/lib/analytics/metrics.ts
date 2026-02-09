@@ -1,5 +1,5 @@
 /**
- * Custom metrics tracking for ChipIn business KPIs.
+ * Custom metrics tracking for Gifta business KPIs.
  */
 
 export type CustomMetricName =

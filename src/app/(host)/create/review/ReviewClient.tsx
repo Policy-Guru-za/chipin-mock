@@ -173,7 +173,7 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
     : '';
   const emailSubject = `Help ${draft.childName}'s Birthday Dream Come True! 🎉`;
   const emailBody = shareUrl
-    ? `Hi there!\n\n${draft.childName} is turning ${draft.childAge} and we're collecting contributions for ${draft.giftName}.\n\nView and contribute here: ${shareUrl}\n\nEvery amount helps!`
+    ? `Hi there!\n\n${draft.childName} is turning ${draft.childAge}, and friends and family are chipping in for ${draft.giftName}.\n\nView and chip in here: ${shareUrl}\n\nEvery amount helps!`
     : '';
 
   if (published && shareUrl) {
@@ -183,7 +183,7 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
 
         <header className="space-y-2 text-center">
           <h1 className="font-display text-4xl text-primary animate-fade-up sm:text-5xl">
-            🎉 {draft.childName}&apos;s Dreamboard is ready!
+            🎉 {draft.childName}&apos;s Dream Board is ready!
           </h1>
         </header>
 
@@ -242,7 +242,7 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
       totalSteps={6}
       stepLabel="Step 6 of 6 — Review"
       title="Review your Dream Board"
-      subtitle="Everything looks good? Publish and start sharing."
+      subtitle="Everything looks good? Create and start sharing."
     >
       <div className="space-y-5">
         {state.error ? (
@@ -259,7 +259,7 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
 
         <form action={formAction}>
           <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? 'Publishing...' : 'Publish Dream Board'}
+            {pending ? 'Creating...' : 'Create Dream Board'}
           </Button>
         </form>
       </div>

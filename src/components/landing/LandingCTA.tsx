@@ -7,7 +7,7 @@ export function LandingCTA() {
         href="/create"
         className="bg-gradient-to-br from-[#6B9E88] to-[#5A8E78] text-white border-none px-7 py-4 md:px-9 md:py-[18px] rounded-xl font-semibold text-[15px] md:text-base lg:text-[17px] text-center shadow-[0_4px_16px_rgba(107,158,136,0.3)] transition-all min-h-[44px] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(107,158,136,0.4)] active:translate-y-0 active:shadow-[0_2px_12px_rgba(107,158,136,0.3)]"
       >
-        Create Your Free Dreamboard
+        Create your free Dream Board
       </Link>
     </div>
   );

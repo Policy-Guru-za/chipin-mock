@@ -31,7 +31,7 @@ export function Header({ isClerkEnabled = false }: HeaderProps) {
       <header className="sticky top-0 z-40 border-b border-border bg-surface/90 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
           <Link href="/" className="text-xl font-display text-text">
-            ChipIn
+            Gifta
           </Link>
 
           {/* Desktop nav */}

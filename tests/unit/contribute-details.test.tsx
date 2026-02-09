@@ -72,7 +72,7 @@ describe('ContributeDetailsClient', () => {
 
   it('enforces a 500-char birthday message cap', async () => {
     renderPage();
-    await userEvent.click(screen.getByRole('button', { name: /add a birthday message/i }));
+    await userEvent.click(screen.getByRole('button', { name: /message \(optional\)/i }));
     const textarea = screen.getByLabelText('Birthday message');
     await userEvent.type(textarea, 'a'.repeat(520));
     expect(textarea).toHaveValue('a'.repeat(500));
@@ -81,7 +81,7 @@ describe('ContributeDetailsClient', () => {
 
   it('shows threshold styling text when approaching message limit', async () => {
     renderPage();
-    await userEvent.click(screen.getByRole('button', { name: /add a birthday message/i }));
+    await userEvent.click(screen.getByRole('button', { name: /message \(optional\)/i }));
     const textarea = screen.getByLabelText('Birthday message');
 
     await userEvent.type(textarea, 'a'.repeat(495));
@@ -129,7 +129,7 @@ describe('ContributeDetailsClient', () => {
 
     expect(pushMock).not.toHaveBeenCalled();
     expect(
-      screen.getByText(/We could not save your details on this device\. Please enable browser storage and try again\./i)
+      screen.getByText(/We couldn't save your details\. Please try again or use a different browser\./i)
     ).toBeInTheDocument();
   });
 });

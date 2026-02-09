@@ -352,7 +352,7 @@ export const sendMismatchAlert = async (
   try {
     await sendEmail({
       to: alertEmail,
-      subject: 'ChipIn reconciliation mismatches',
+      subject: 'Gifta reconciliation mismatches',
       html: buildMismatchEmail(mismatches),
     });
   } catch (error) {
