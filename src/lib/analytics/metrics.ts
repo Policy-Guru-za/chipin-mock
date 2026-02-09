@@ -3,6 +3,21 @@
  */
 
 export type CustomMetricName =
+  | 'host_create_started'
+  | 'host_create_step_completed'
+  | 'host_create_failed'
+  | 'host_create_published'
+  | 'guest_view_loaded'
+  | 'contribution_redirect_started'
+  | 'contribution_failed'
+  | 'reminder_requested'
+  | 'payout_created'
+  | 'payout_processing_started'
+  | 'payout_completed'
+  | 'payout_failed'
+  | 'charity_payout_created'
+  | 'reminder_dispatched'
+  | 'reminder_failed'
   | 'dream_board_created'
   | 'contribution_started'
   | 'contribution_completed'
@@ -75,6 +90,9 @@ export function trackContributionStarted(
   paymentMethod: string
 ): void {
   trackMetric('contribution_started', {
+    dream_board_id: dreamBoardId,
+    amount_cents: amountCents,
+    payment_provider: paymentMethod,
     dreamBoardId,
     amountCents,
     paymentMethod,
@@ -87,6 +105,9 @@ export function trackContributionCompleted(
   paymentMethod: string
 ): void {
   trackMetric('contribution_completed', {
+    dream_board_id: dreamBoardId,
+    amount_cents: amountCents,
+    payment_provider: paymentMethod,
     dreamBoardId,
     amountCents,
     paymentMethod,
@@ -124,6 +145,7 @@ export function trackNavDrawerOpened(): void {
  * Track payment redirect start.
  */
 export function trackPaymentRedirectStarted(provider: string): void {
+  trackContributionRedirectStarted(provider);
   trackMetric('payment_redirect_started', { provider });
 }
 
@@ -139,4 +161,141 @@ export function trackSnapscanQrShown(dreamBoardId?: string): void {
  */
 export function trackSnapscanReferenceCopied(reference: string): void {
   trackMetric('snapscan_reference_copied', { reference_last4: reference.slice(-4) });
+}
+
+export function trackHostCreateStarted(): void {
+  trackMetric('host_create_started');
+}
+
+export function trackHostCreateStepCompleted(step: string): void {
+  trackMetric('host_create_step_completed', { step });
+}
+
+export function trackHostCreateFailed(step: string, failureCode: string): void {
+  trackMetric('host_create_failed', {
+    step,
+    failure_code: failureCode,
+  });
+}
+
+export function trackHostCreatePublished(params: {
+  dreamBoardId: string;
+  payoutMethod: string;
+  charityEnabled: boolean;
+}): void {
+  trackMetric('host_create_published', {
+    dream_board_id: params.dreamBoardId,
+    payout_method: params.payoutMethod,
+    charity_enabled: params.charityEnabled,
+  });
+}
+
+export function trackGuestViewLoaded(dreamBoardId: string): void {
+  trackMetric('guest_view_loaded', { dream_board_id: dreamBoardId });
+}
+
+export function trackContributionRedirectStarted(paymentProvider: string): void {
+  trackMetric('contribution_redirect_started', {
+    payment_provider: paymentProvider,
+  });
+}
+
+export function trackContributionFailed(params: {
+  dreamBoardId: string;
+  paymentProvider: string;
+  amountCents: number;
+  failureCode: string;
+}): void {
+  trackMetric('contribution_failed', {
+    dream_board_id: params.dreamBoardId,
+    payment_provider: params.paymentProvider,
+    amount_cents: params.amountCents,
+    failure_code: params.failureCode,
+  });
+}
+
+export function trackReminderRequested(dreamBoardId: string): void {
+  trackMetric('reminder_requested', { dream_board_id: dreamBoardId });
+}
+
+export function trackPayoutCreated(params: {
+  payoutId: string;
+  payoutType: string;
+  dreamBoardId: string;
+  amountCents: number;
+}): void {
+  trackMetric('payout_created', {
+    payout_id: params.payoutId,
+    payout_type: params.payoutType,
+    dream_board_id: params.dreamBoardId,
+    amount_cents: params.amountCents,
+  });
+}
+
+export function trackPayoutProcessingStarted(params: {
+  payoutId: string;
+  payoutType: string;
+  dreamBoardId: string;
+  amountCents: number;
+}): void {
+  trackMetric('payout_processing_started', {
+    payout_id: params.payoutId,
+    payout_type: params.payoutType,
+    dream_board_id: params.dreamBoardId,
+    amount_cents: params.amountCents,
+  });
+}
+
+export function trackPayoutCompleted(params: {
+  payoutId: string;
+  payoutType: string;
+  dreamBoardId: string;
+  amountCents: number;
+}): void {
+  trackMetric('payout_completed', {
+    payout_id: params.payoutId,
+    payout_type: params.payoutType,
+    dream_board_id: params.dreamBoardId,
+    amount_cents: params.amountCents,
+  });
+}
+
+export function trackPayoutFailed(params: {
+  payoutId: string;
+  payoutType: string;
+  dreamBoardId: string;
+  amountCents: number;
+  failureCode: string;
+}): void {
+  trackMetric('payout_failed', {
+    payout_id: params.payoutId,
+    payout_type: params.payoutType,
+    dream_board_id: params.dreamBoardId,
+    amount_cents: params.amountCents,
+    failure_code: params.failureCode,
+  });
+}
+
+export function trackCharityPayoutCreated(params: {
+  payoutId: string;
+  dreamBoardId: string;
+  amountCents: number;
+}): void {
+  trackMetric('charity_payout_created', {
+    payout_id: params.payoutId,
+    payout_type: 'charity',
+    dream_board_id: params.dreamBoardId,
+    amount_cents: params.amountCents,
+  });
+}
+
+export function trackReminderDispatched(dreamBoardId: string): void {
+  trackMetric('reminder_dispatched', { dream_board_id: dreamBoardId });
+}
+
+export function trackReminderFailed(dreamBoardId: string, failureCode: string): void {
+  trackMetric('reminder_failed', {
+    dream_board_id: dreamBoardId,
+    failure_code: failureCode,
+  });
 }

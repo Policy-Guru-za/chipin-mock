@@ -4,11 +4,13 @@
 
 Execute comprehensive end-to-end UAT scenario coverage, verify
 telemetry instrumentation completeness, run full regression and
-performance checks, and produce a release-readiness evidence package
-that satisfies the Phase C GO/NO-GO pre-gates (CG-02, CG-03, CG-04).
+build/static performance preflight checks, and produce a
+release-readiness evidence package
+that satisfies the Phase C GO/NO-GO pre-gates
+(CG-02, CG-03, CG-04, CG-05) and feeds C9A pre-live readiness.
 This is a validation milestone — no new features, no UI changes, no
-business logic modifications. Every output is a test, a verification,
-or an evidence artifact.
+business logic modifications except minimal blocker defect fixes.
+Every output is a test, a verification, or an evidence artifact.
 
 ---
 
@@ -34,9 +36,15 @@ or an evidence artifact.
   10. `docs/napkin/napkin.md` (all learnings — read fully)
   11. `docs/implementation-docs/evidence/ux-v2/phase-c/20260209-C7-accessibility-and-edge-cases.md`
       (current baseline: 145 test files, 656 tests, P2 deferrals)
-- Gate commands: `pnpm lint && pnpm typecheck && pnpm test`
+- Required full-gate sequence for C8 completion:
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm test`
+  - `pnpm openapi:generate`
+  - `pnpm vitest run tests/unit/openapi-spec.test.ts`
+  - `pnpm build`
 - All gates **must pass** before marking C8 complete.
-- Do NOT proceed to C9.
+- Do NOT proceed to C9A until C8 completion criteria pass.
 - **Scope boundary — C8 is validation only.** Do NOT:
   - Modify any component, page, layout, or business logic file
   - Modify Phase B backend APIs, DB schema, migration files, or
@@ -61,6 +69,25 @@ or an evidence artifact.
   per defect severity rules in the E2E/UAT plan). In that case:
   document the defect, fix it minimally, record the fix in evidence,
   and re-run all gates.
+- **Generated drift policy:** if gate commands create non-test source
+  diffs that are not part of an approved blocker fix, STOP and mark C8
+  as INCOMPLETE. Do not silently absorb drift.
+
+---
+
+## C8 Exit Contract for C9A
+
+C8 is considered complete only when:
+
+- CG-02 through CG-05 map to `PASS` in C8 evidence
+- Full C8 gate sequence is green
+- C8 evidence status is `COMPLETE` (not `INCOMPLETE`)
+- Handoff capsule for C9A is populated with explicit status:
+  - `READY_FOR_C9A`, or
+  - `BLOCKED` (with blocker list)
+
+If any condition is unmet, C8 output must state `INCOMPLETE` and
+provide blocker details for remediation before C9A.
 
 ---
 
@@ -69,8 +96,10 @@ or an evidence artifact.
 See `docs/implementation-docs/evidence/ux-v2/phase-c/20260209-C7-accessibility-and-edge-cases.md`
 for full prior-state reference. C8 starts from that baseline.
 
-- Test files: 145
-- Tests: 656
+- Historical C7 snapshot (from prior evidence): 145 test files,
+  656 tests
+- C8 baseline authority: capture fresh counts in Sub-step 0 and use
+  those captured values for all C8 delta/regression assertions
 - Gate status: `pnpm lint` PASS, `pnpm typecheck` PASS, `pnpm test` PASS
 - `tests/e2e/` directory: exists but is empty (no E2E tests yet)
 - Coverage thresholds: 60% lines/functions/branches/statements
@@ -389,76 +418,56 @@ After this sub-step: run `pnpm lint && pnpm typecheck && pnpm test`.
 
 Create `tests/e2e/uat-telemetry-verification.test.ts`.
 
-This is a **static instrumentation audit** — verify that every
-event in the analytics spec has a corresponding emit call-site in
-the codebase. This does not test runtime delivery; it confirms
-the code paths exist.
+This is an **emitter-level verification audit** — verify that every
+event in the analytics spec is asserted via analytics emit spies in
+journey tests, with required properties validated where applicable.
+Do not rely on raw source-string scanning as the primary assertion
+method.
 
 **Approach:**
-1. For each event in the catalog (17 events total), search the
-   source code for the event name string.
-2. Assert that at least one call-site exists for each event.
-3. For events with required properties, verify the call-site
-   passes those properties.
+1. Spy/mock the analytics emitter used by runtime paths (for example,
+   `trackEvent` or equivalent in `src/lib/analytics/*`).
+2. Drive representative journey flows (host create, guest contribute,
+   reminders, payout transitions) and assert emitted events.
+3. For events with required properties, assert
+   `expect.objectContaining(...)` includes required keys/values.
+4. Maintain an event manifest in the test file listing all 17 catalog
+   events and assert each is covered by at least one emission
+   assertion in the suite.
 
 **Implementation:**
 
 ```typescript
-import { readFileSync, readdirSync } from 'fs';
-import { join } from 'path';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+import * as analytics from '@/lib/analytics';
 
-// Recursively collect all .ts/.tsx source files under src/
-function collectSourceFiles(dir: string): string[] {
-  // ... recursive readdir
-}
-
-function sourceContains(files: string[], pattern: string): boolean {
-  return files.some(f => readFileSync(f, 'utf-8').includes(pattern));
-}
-
-const sourceFiles = collectSourceFiles(join(__dirname, '../../src'));
+const emitSpy = vi.spyOn(analytics, 'trackEvent');
 
 describe('Telemetry event instrumentation', () => {
-  // Host journey
-  it.each([
-    'host_create_started',
-    'host_create_step_completed',
-    'host_create_failed',
-    'host_create_published',
-  ])('emits %s event somewhere in source', (event) => {
-    expect(sourceContains(sourceFiles, event)).toBe(true);
-  });
-
-  // Guest/contributor journey
-  it.each([
-    'guest_view_loaded',
-    'contribution_started',
-    'contribution_redirect_started',
-    'contribution_completed',
-    'contribution_failed',
-    'reminder_requested',
-  ])('emits %s event somewhere in source', (event) => {
-    expect(sourceContains(sourceFiles, event)).toBe(true);
-  });
-
-  // Payout/operations
-  it.each([
-    'payout_created',
-    'payout_processing_started',
-    'payout_completed',
-    'payout_failed',
-    'charity_payout_created',
-    'reminder_dispatched',
-    'reminder_failed',
-  ])('emits %s event somewhere in source', (event) => {
-    expect(sourceContains(sourceFiles, event)).toBe(true);
+  it('asserts required host-create event emissions', async () => {
+    await runHostCreateJourney();
+    expect(emitSpy).toHaveBeenCalledWith(
+      'host_create_started',
+      expect.any(Object)
+    );
+    expect(emitSpy).toHaveBeenCalledWith(
+      'host_create_step_completed',
+      expect.objectContaining({ step: expect.any(String) })
+    );
+    expect(emitSpy).toHaveBeenCalledWith(
+      'host_create_published',
+      expect.objectContaining({
+        dream_board_id: expect.any(String),
+        payout_method: expect.any(String),
+        charity_enabled: expect.any(Boolean),
+      })
+    );
   });
 });
 ```
 
 **Required property verification** — for each event, check that
-the call-site includes the required properties from the spec:
+the emitted payload includes the required properties from the spec:
 
 | Event | Required Properties |
 |---|---|
@@ -469,9 +478,8 @@ the call-site includes the required properties from the spec:
 | `payout_completed` | `payout_id`, `payout_type`, `amount_cents` |
 | `payout_failed` | `payout_id`, `failure_code` |
 
-For each row, search the source file containing the event for the
-required property keys. If a property is missing from the call-site,
-the test fails.
+For each row, assert emitted payload objects include the required
+property keys. If a required property is missing, the test fails.
 
 **Telemetry P0 alert events** — the analytics spec requires P0
 alerts for money-movement and critical-path failures. Verify that
@@ -485,8 +493,8 @@ After this sub-step: run `pnpm lint && pnpm typecheck && pnpm test`.
 ### Sub-step 6: Regression Sweep
 
 This sub-step does not create new test files. It runs the full
-existing suite and verifies zero regressions from the C0–C7
-baseline.
+existing suite and verifies zero regressions from the Sub-step 0
+captured baseline.
 
 1. Run `pnpm lint` — record output (0 errors, note warning count)
 2. Run `pnpm typecheck` — record output (0 errors)
@@ -495,11 +503,11 @@ baseline.
    lines, functions, branches, statements
 5. Run `pnpm openapi:generate` — verify OpenAPI spec regenerates
    without error (napkin: must run before OpenAPI test)
-6. Run `pnpm test tests/unit/openapi-spec.test.ts` — verify
+6. Run `pnpm vitest run tests/unit/openapi-spec.test.ts` — verify
    OpenAPI contract parity holds
 
 **Regression checks:**
-- Total test count must be >= 656 (C7 baseline) + new C8 tests
+- Total test count must be >= Sub-step 0 baseline + new C8 tests
 - No test file count regression
 - Coverage must meet or exceed 60% thresholds
 - OpenAPI enum parity must hold (decision register: runtime
@@ -669,10 +677,10 @@ verified statically.
 
 | Viewport | Class | Routes to Test | Status |
 |---|---|---|---|
-| iPhone Safari (375×812) | Mobile | `/[slug]`, `/[slug]/contribute`, `/create/*`, `/dashboard` | PENDING (C9) |
-| Android Chrome (360×800) | Mobile | `/[slug]`, `/[slug]/contribute`, `/create/*`, `/dashboard` | PENDING (C9) |
-| Desktop Chrome (1440×900) | Desktop | All routes | PENDING (C9) |
-| Desktop Safari (1440×900) | Desktop | All routes | PENDING (C9) |
+| iPhone Safari (375×812) | Mobile | `/[slug]`, `/[slug]/contribute`, `/create/*`, `/dashboard` | PENDING (C9B) |
+| Android Chrome (360×800) | Mobile | `/[slug]`, `/[slug]/contribute`, `/create/*`, `/dashboard` | PENDING (C9B) |
+| Desktop Chrome (1440×900) | Desktop | All routes | PENDING (C9B) |
+| Desktop Safari (1440×900) | Desktop | All routes | PENDING (C9B) |
 
 Include this checklist in the evidence file for C9 to execute.
 
@@ -688,19 +696,26 @@ After this sub-step: no gate run needed (documentation only).
    pnpm typecheck
    pnpm test
    pnpm openapi:generate
-   pnpm test tests/unit/openapi-spec.test.ts
+   pnpm vitest run tests/unit/openapi-spec.test.ts
+   pnpm build
    ```
 2. All must pass (0 errors; warnings OK).
 3. Record:
-   - Total test files (expect ~151+: 145 baseline + 6 new C8 files)
-   - Total tests (expect ~720+: 656 baseline + ~65 new C8 tests)
+   - Total test files (expect baseline + 7 new C8 files)
+   - Total tests (expect baseline + new C8 tests; record exact delta)
    - Lint warning count (compare to C7 baseline)
    - Coverage percentages from `pnpm test:coverage`
 4. Create evidence file at:
-   `docs/implementation-docs/evidence/ux-v2/phase-c/20260209-C8-e2e-uat-and-performance-sweep.md`
+   `docs/implementation-docs/evidence/ux-v2/phase-c/YYYYMMDD-C8-e2e-uat-and-performance-sweep.md`
+   using:
+   `docs/implementation-docs/evidence/ux-v2/phase-c/C8-EVIDENCE-TEMPLATE.md`
 5. Evidence must contain all sections listed below.
 6. Append C8 learnings to `docs/napkin/napkin.md` under
-   `## C8 Learnings (2026-02-09)`
+   `## C8 Learnings (YYYY-MM-DD)`
+7. Set C8 status:
+   - `COMPLETE` only if all P0/P1 criteria pass
+   - `INCOMPLETE` if any gate/pre-gate remains failed
+8. Populate C9A handoff capsule with `READY_FOR_C9A` or `BLOCKED`.
 
 ---
 
@@ -729,10 +744,10 @@ The C8 evidence file must contain these sections:
 
 ### 4) Telemetry Instrumentation Audit
 
-| Event | Call-site File | Required Properties | Properties Present | Status |
+| Event | Assertion File(s) | Required Properties | Properties Present | Status |
 |---|---|---|---|---|
-| `host_create_started` | `src/...` | — | — | PASS/FAIL |
-| `contribution_completed` | `src/...` | `dream_board_id`, `payment_provider`, `amount_cents` | YES/NO | PASS/FAIL |
+| `host_create_started` | `tests/e2e/uat-host-create.test.ts` | — | — | PASS/FAIL |
+| `contribution_completed` | `tests/e2e/uat-guest-contribute.test.ts` | `dream_board_id`, `payment_provider`, `amount_cents` | YES/NO | PASS/FAIL |
 | ... | ... | ... | ... | ... |
 
 ### 5) Data Validation Results
@@ -764,7 +779,7 @@ The C8 evidence file must contain these sections:
 
 ### 9) Device/Viewport Readiness
 - Static responsive check: PASS/FAIL
-- Manual viewport checklist: PENDING (for C9)
+- Manual viewport checklist: PENDING (for C9B)
 
 ### 10) New Test Inventory
 
@@ -799,22 +814,30 @@ Map C8 evidence to Phase C GO/NO-GO pre-gates:
 - `pnpm typecheck`: PASS/FAIL
 - `pnpm test`: PASS/FAIL (N files, N tests)
 - `pnpm openapi:generate`: PASS/FAIL
-- `pnpm test tests/unit/openapi-spec.test.ts`: PASS/FAIL
+- `pnpm vitest run tests/unit/openapi-spec.test.ts`: PASS/FAIL
+- `pnpm build`: PASS/FAIL
 
 ### 14) Risk Assessment and Rollback Readiness
 - Known risks with mitigation
 - Rollback readiness statement for C9
 
+### 15) C9A Handoff Capsule
+- C8 milestone status: `COMPLETE` / `INCOMPLETE`
+- C9A readiness: `READY_FOR_C9A` / `BLOCKED`
+- Blockers (if any): list with owner and remediation milestone
+- Recommended next action: exact command/doc step for operator
+
 ---
 
 ## Acceptance Criteria
 
-### P0 (blocks merge)
+### P0 (blocks C9A entry)
 - All UAT P0 scenarios (UAT-01 through UAT-07, UAT-09, UAT-10,
   UAT-12) have passing tests
 - All edge-case P0 scenarios (EC-01 through EC-06) have passing
   tests
-- All 17 telemetry events have verified call-sites in source
+- GO/NO-GO readiness assessment shows CG-02 through CG-05 all `PASS`
+- All 17 telemetry events have verified emission assertions in tests
 - Money-movement telemetry events (`payout_failed`,
   `contribution_failed`) include `failure_code` property
 - Journey tests assert correct telemetry event emission with
@@ -827,7 +850,10 @@ Map C8 evidence to Phase C GO/NO-GO pre-gates:
 - Full regression suite passes with zero P0/P1 failures
 - `pnpm build` succeeds without errors
 - OpenAPI contract parity holds
-- Gates pass (`pnpm lint && pnpm typecheck && pnpm test`)
+- Full gate sequence passes (`pnpm lint`, `pnpm typecheck`,
+  `pnpm test`, `pnpm openapi:generate`,
+  `pnpm vitest run tests/unit/openapi-spec.test.ts`, `pnpm build`)
+- C8 evidence status is `COMPLETE` and C9A handoff capsule is populated
 
 ### P1 (blocks rollout)
 - All UAT P1 scenarios (UAT-08, UAT-11) have passing tests
@@ -854,8 +880,12 @@ Map C8 evidence to Phase C GO/NO-GO pre-gates:
 ## Stop Conditions
 
 - Any P0 gate failure → stop, fix, re-run
+- Any required full-gate command fails (`lint`, `typecheck`, `test`,
+  `openapi:generate`, openapi parity test, `build`) → STOP
 - Any non-test source file modified (beyond blocker defect fix) →
   STOP (C8 is validation only)
+- Any generated non-test source drift without blocker classification →
+  STOP and mark C8 `INCOMPLETE`
 - Schema or migration file touched → STOP
 - Webhook handler modified → STOP
 - Fee calculation logic modified → STOP
@@ -866,7 +896,14 @@ Map C8 evidence to Phase C GO/NO-GO pre-gates:
   record in evidence, re-run all gates
 - Contract drift between OpenAPI and runtime → STOP (hard-stop
   per execution contract)
-- Test count regression (total < 656 + new C8 tests) → STOP,
+- Test count regression (total < Sub-step 0 baseline + new C8
+  tests) → STOP,
   investigate
 - Any env toggle left in non-default state after test → STOP,
   fix `afterEach` cleanup
+- Any CG-02/03/04/05 status unresolved or `FAIL` at closeout → STOP
+  and mark C8 `INCOMPLETE` (do not proceed to C9A)
+- Blocker-severity defect fix exception: if a money-correctness,
+  critical-journey, or severe a11y blocker is found, minimal
+  non-test code changes are allowed. Record the defect + fix in
+  evidence and re-run full gates before continuing.

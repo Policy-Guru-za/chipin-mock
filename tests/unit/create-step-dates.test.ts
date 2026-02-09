@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const loadModule = async () => {
   vi.resetModules();
-  return import('@/app/(host)/create/dates/page');
+  return import('@/app/(host)/create/dates/actions');
 };
 
 const addDays = (days: number) => {

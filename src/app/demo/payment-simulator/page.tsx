@@ -7,23 +7,25 @@ import { PaymentSimulatorClient } from './PaymentSimulatorClient';
 export const dynamic = 'force-dynamic';
 
 type PaymentSimulatorPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     contributionId?: string;
     contribution_id?: string;
     returnTo?: string;
-  };
+  }>;
 };
 
 const normalizeReturnTo = (value: string | undefined) =>
   value && value.startsWith('/') ? value : '/';
 
-export default function PaymentSimulatorPage({ searchParams }: PaymentSimulatorPageProps) {
+export default async function PaymentSimulatorPage({ searchParams }: PaymentSimulatorPageProps) {
   if (!isPaymentSimulatorEnabled()) {
     notFound();
   }
 
-  const contributionId = searchParams?.contributionId ?? searchParams?.contribution_id;
-  const returnTo = normalizeReturnTo(searchParams?.returnTo);
+  const resolvedSearchParams = await searchParams;
+  const contributionId =
+    resolvedSearchParams?.contributionId ?? resolvedSearchParams?.contribution_id;
+  const returnTo = normalizeReturnTo(resolvedSearchParams?.returnTo);
 
   return (
     <main

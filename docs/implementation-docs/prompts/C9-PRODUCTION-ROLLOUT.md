@@ -2,15 +2,16 @@
 
 ## Objective
 
-Prepare, validate, and execute the Phase C production rollout package.
-Complete the GO/NO-GO pre-gate assessment using C8 evidence, populate
-the production rollout checklist, execute final local gate verification,
-perform the manual viewport verification deferred from C8, execute the
-rollout runbook steps, and produce the closeout evidence package and
-agent handoff payload. This is an operational execution milestone — no
-new features, no UI changes, no business logic modifications. Every
-output is a verification, a checklist completion, or a documentation
-artifact.
+Prepare the Phase C production rollout package and split execution
+cleanly into:
+
+- **C9A (agent-prep):** all pre-live verification, checklist/template
+  population, thresholds, rollback, and handoff documentation.
+- **C9B (human-live):** deployment, smoke checks, hold-point monitoring,
+  validation-gate execution, real-device checks, and GO/NO-GO signing.
+
+This is an operational milestone. No product logic changes. Every output
+is verification, checklist/template completion, or evidence artifact.
 
 ---
 
@@ -22,495 +23,497 @@ artifact.
   3. `docs/implementation-docs/GIFTA_UX_V2_PHASE_C_EXECUTION_PLAN.md`
      (C9 milestone definition)
   4. `docs/implementation-docs/GIFTA_UX_V2_PHASE_C_ROLLOUT_RUNBOOK.md`
-     (**authoritative** operational playbook — steps C-R0 through C-R7)
+     (**authoritative** runbook — C-R0 through C-R7)
   5. `docs/implementation-docs/GIFTA_UX_V2_PHASE_C_GO_NO_GO_TEMPLATE.md`
-     (**authoritative** gate template — pre-gates CG-01 through CG-06,
-     validation gates CV-01 through CV-07)
+     (**authoritative** template — CG-01 through CG-06, CV-01 through CV-07)
   6. `docs/implementation-docs/GIFTA_UX_V2_PHASE_C_PROD_ROLLOUT_CHECKLIST.md`
      (**authoritative** checklist — sections 1 through 5)
   7. `docs/implementation-docs/GIFTA_UX_V2_PHASE_C_E2E_UAT_PLAN.md`
-     (UAT exit criteria and device matrix)
   8. `docs/implementation-docs/GIFTA_UX_V2_ANALYTICS_TELEMETRY_SPEC.md`
-     (telemetry event catalog for CV-07 verification)
-  9. `docs/napkin/napkin.md` (all learnings — read fully)
-  10. `docs/implementation-docs/evidence/ux-v2/phase-c/20260209-C8-e2e-uat-and-performance-sweep.md`
-      (**required input** — C8 evidence package; if this file does not
-      exist, STOP — C8 is not complete)
-- Gate commands: `pnpm lint && pnpm typecheck && pnpm test`
-- All gates **must pass** before proceeding past sub-step 1.
+  9. `docs/napkin/napkin.md` (read fully)
+  10. Latest C8 evidence file matching:
+      `docs/implementation-docs/evidence/ux-v2/phase-c/*-C8-e2e-uat-and-performance-sweep.md`
+      (required input; if missing, STOP)
+- Required gate sequence for pre-live verification:
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm test`
+  - `pnpm openapi:generate`
+  - `pnpm vitest run tests/unit/openapi-spec.test.ts`
+  - `pnpm build`
+- All gates **must pass** before proceeding beyond sub-step 1.
+- `UX_V2_ENABLE_BANK_WRITE_PATH` and `UX_V2_ENABLE_CHARITY_WRITE_PATH`
+  remain **OFF** unless a human explicitly toggles during C9B.
 - **Scope boundary — C9 is operational only.** Do NOT:
-  - Modify any component, page, layout, or business logic file
-  - Modify Phase B backend APIs, DB schema, migration files, or
-    webhook handlers
-  - Change fee calculation logic (`src/lib/payments/fees.ts`)
-  - Change any user-facing copy
-  - Change any accessibility attributes
-  - Add new features, tests, or UI elements
-  - Change `tailwind.config.ts`, `next.config.js`, or
-    `vitest.config.ts`
-  - Change any test files
-- `UX_V2_ENABLE_BANK_WRITE_PATH` and
-  `UX_V2_ENABLE_CHARITY_WRITE_PATH` remain **OFF** until explicit
-  rollout toggle decision.
-- **API contract strings are out of scope.** Do NOT change webhook
-  event names, API scope strings, OpenAPI enum values, database
-  column/enum names, webhook header names, or URL slugs.
-- **Allowed file changes:** Documentation files only — evidence,
-  checklists, GO/NO-GO template, and rollout runbook annotations.
-  No source code changes of any kind.
+  - Modify components/pages/layouts/business logic
+  - Modify Phase B APIs, DB schema, migrations, webhook handlers
+  - Change fee logic in `src/lib/payments/fees.ts`
+  - Change user-facing copy or accessibility attributes
+  - Add tests/features/UI
+  - Change `tailwind.config.ts`, `next.config.js`, or `vitest.config.ts`
+- **Allowed file changes:** documentation only:
+  - C9 evidence file
+  - rollout checklist/template population
+  - runbook annotations if required
+  - `docs/napkin/napkin.md`
+- **Generated-file drift policy:** if gate commands create non-doc diffs
+  (example: regenerated artifacts outside docs), treat as drift and STOP.
+  Record NO-GO diagnostic. Do not patch source in C9.
 
 ---
 
 ## Prerequisite Verification (hard gate)
 
-Before any sub-step, verify these preconditions exist:
+Before any sub-step, verify:
 
 | Precondition | Source | How to verify |
 |---|---|---|
-| C8 evidence file exists | `docs/implementation-docs/evidence/ux-v2/phase-c/20260209-C8-*` | File exists and contains all 14 required sections |
-| C8 P0 gate: PASS | C8 evidence "Gate Outputs" section | All UAT P0 scenarios passing |
-| C8 P1 gate: PASS | C8 evidence "Gate Outputs" section | All UAT P1 scenarios passing |
-| C8 GO/NO-GO readiness: PASS | C8 evidence section 12 | CG-02, CG-03, CG-04, CG-05 all PASS |
-| C0–C7 evidence files exist | `docs/implementation-docs/evidence/ux-v2/phase-c/` | 8 evidence files present (C0 through C7) |
-| Phase B GO approved | Phase B evidence | Phase B GO decision signed |
+| Latest C8 evidence exists | `docs/implementation-docs/evidence/ux-v2/phase-c/*-C8-e2e-uat-and-performance-sweep.md` | Select latest by date and confirm 14 sections present |
+| C8 P0 gate: PASS | C8 evidence "Gate Outputs" + "GO/NO-GO Readiness Assessment" | Required P0 scenarios and CG-02 pass |
+| C8 P1 gate: PASS | C8 evidence "Gate Outputs" + "GO/NO-GO Readiness Assessment" | Required P1 scenarios and CG-03 pass |
+| C8 pre-gate mapping ready | C8 evidence section 12 | CG-02, CG-03, CG-04, CG-05 all PASS |
+| C0 through C7 evidence exists | `docs/implementation-docs/evidence/ux-v2/phase-c/` | Eight files present (C0 through C7) |
+| Phase B GO approved | Phase B evidence | Signed GO decision exists |
 
-**If any precondition fails → STOP. Do not proceed. Document the
-failure and report which precondition is missing.**
+If any precondition fails: STOP. Do not enter C9A execution.
 
 ---
 
 ## Build Sub-steps (execute in order)
 
-### Sub-step 0: Final Local Gate Verification
+### Sub-step 0: Final Local Gate Verification (C9A)
 
-Run the full gate sequence one final time to confirm the codebase
-is release-ready from the C8 baseline.
+Run final pre-live gate verification against C8 baseline.
 
-1. Run `pnpm lint` — record output (0 errors expected)
-2. Run `pnpm typecheck` — record output (0 errors expected)
-3. Run `pnpm test` — record total test count and file count
-4. Run `pnpm openapi:generate` — verify OpenAPI spec regenerates
-5. Run `pnpm test tests/unit/openapi-spec.test.ts` — verify
-   contract parity
-6. Run `pnpm build` — verify production build succeeds
-7. Compare test counts to C8 baseline — must be identical or
-   higher (zero regression)
+1. Capture pre-gate status: `git status --short`
+2. Run `pnpm lint` and record errors/warnings
+3. Run `pnpm typecheck`
+4. Run `pnpm test` and record file/test counts
+5. Run `pnpm openapi:generate`
+6. Run `pnpm vitest run tests/unit/openapi-spec.test.ts`
+7. Run `pnpm build`
+8. Capture post-gate status: `git status --short`
+9. Compare current test counts to C8 baseline (must be equal or higher)
 
-**If any gate fails → STOP.** The codebase has drifted since C8.
-Investigate, do NOT fix in C9 (C9 cannot modify source).
+Gate interpretation rules:
 
-After this sub-step: all gates green, build clean.
+- Any gate failure: STOP (drift since C8)
+- Any non-doc file changed after gates: STOP (drift diagnostic)
+- Do not remediate code in C9; hand back to milestone remediation
+
+After this sub-step: gates green, no non-doc drift, baseline verified.
 
 ---
 
-### Sub-step 1: Pre-Flight Checklist Completion
+### Sub-step 1: Pre-Flight Checklist Completion (C-R0 alignment)
 
-Populate the production rollout checklist
-(`GIFTA_UX_V2_PHASE_C_PROD_ROLLOUT_CHECKLIST.md`) section 1
-(Pre-Flight) with evidence links from C0–C8.
+Populate rollout checklist section 1 (Pre-Flight):
 
 | Checklist ID | Task | Evidence Source |
 |---|---|---|
-| C0-01 | Phase B GO evidence verified | Phase B GO evidence file path |
-| C0-02 | Phase C P0/P1 tests complete | C8 evidence "Gate Outputs" section |
-| C0-03 | UAT critical scenarios complete | C8 evidence "UAT Scenario Results" section |
-| C0-04 | Accessibility P0 checks pass | C8 evidence "Accessibility Regression" section + C7 evidence |
-| C0-05 | Rollback route validated | Rollback play documented in runbook (C-R6) |
+| C0-01 | Phase B GO evidence verified | Phase B GO evidence path |
+| C0-02 | Phase C P0/P1 tests complete | C8 "Gate Outputs" + C9 sub-step 0 results |
+| C0-03 | UAT critical scenarios complete | C8 "UAT Scenario Results" |
+| C0-04 | Accessibility P0 checks pass | C8 "Accessibility Regression" + C7 evidence |
+| C0-05 | Rollback route validated | Runbook C-R6 + C9 rollback prep section |
 
-For C0-05, verify that the rollback path is actionable:
-- Confirm the rollout runbook C-R6 section specifies revert steps
-- Confirm feature toggles can disable UX v2 exposure
-- Record the verification in the checklist
+For C0-05, explicitly confirm:
 
-Mark each item `[x]` with the evidence link.
+- rollback action location in Vercel
+- UX v2 exposure toggles that can be turned OFF
+- evidence/log capture checklist for rollback path
 
-After this sub-step: Pre-flight section fully populated.
+Mark each row `[x]` with evidence link.
 
 ---
 
-### Sub-step 2: GO/NO-GO Pre-Gate Assessment
+### Sub-step 2: GO/NO-GO Pre-Gate Assessment (CG-01 through CG-06)
 
-Populate the GO/NO-GO template
-(`GIFTA_UX_V2_PHASE_C_GO_NO_GO_TEMPLATE.md`) pre-gate section
-(CG-01 through CG-06) using evidence from the complete Phase C
-execution.
+Populate pre-GO gates in:
+`docs/implementation-docs/GIFTA_UX_V2_PHASE_C_GO_NO_GO_TEMPLATE.md`
 
 | Gate | Check | Evidence Source |
 |---|---|---|
-| CG-01 | Phase B GO confirmed | Phase B GO evidence file |
-| CG-02 | Phase C P0 test gates pass | C8 evidence "Gate Outputs" — `pnpm lint`, `pnpm typecheck`, `pnpm test` all PASS |
-| CG-03 | Phase C P1 test gates pass | C8 evidence "Gate Outputs" — coverage thresholds met, P1 UAT/edge-case tests passing |
-| CG-04 | UAT critical scenarios pass | C8 evidence "UAT Scenario Results" — UAT-01 through UAT-12 status |
-| CG-05 | Accessibility P0 checks pass | C8 evidence "Accessibility Regression" + C7 evidence "UX A11y Checklist" |
-| CG-06 | Rollback path validated | Runbook C-R6 documented + sub-step 1 C0-05 verification |
+| CG-01 | Phase B GO confirmed | Phase B GO evidence |
+| CG-02 | Phase C P0 test gates pass | C8 + C9 gate outputs |
+| CG-03 | Phase C P1 test gates pass | C8 + C9 gate outputs |
+| CG-04 | UAT critical scenarios pass | C8 UAT matrix |
+| CG-05 | Accessibility P0 checks pass | C8/C7 accessibility evidence |
+| CG-06 | Rollback path validated | Runbook C-R6 + checklist C0-05 |
 
 For each gate:
-- Set status to `PASS` or `FAIL`
-- Fill in the evidence link column with the specific evidence
-  file path and section reference
-- If any gate is `FAIL`, document the specific failure and STOP
 
-Fill in the template header fields:
+- Set `PASS` or `FAIL`
+- Fill evidence with file path + section reference
+- If any `FAIL`, STOP and record blocking reason
+
+Template header fields:
+
 - Date: current date
 - Release lead: `Ryan Laubscher`
-- Operator: `AI Agent (Phase C)`
+- Operator: `AI Agent (Phase C C9A)`
 
-After this sub-step: all 6 pre-gates assessed.
+After this sub-step: pre-gates complete; if all PASS, C9A continues.
 
 ---
 
 ### Sub-step 3: Deployment Preparation Documentation (C-R1)
 
-Document the deployment preparation steps per runbook C-R1.
-Since this is a Vercel-hosted Next.js app, document:
+Document C-R1 readiness:
 
-1. **Release artifact identification:**
-   - Record the current git commit SHA (`git rev-parse HEAD`)
-   - Record the branch name
-   - Record the `pnpm build` success from sub-step 0
+1. **Release artifact**
+   - `git rev-parse HEAD`
+   - active branch name
+   - `pnpm build` result from sub-step 0
+2. **Config/toggles**
+   - `UX_V2_ENABLE_BANK_WRITE_PATH` default OFF
+   - `UX_V2_ENABLE_CHARITY_WRITE_PATH` default OFF
+   - any additional UX v2 toggles and default state
+3. **Monitoring surfaces**
+   - Vercel deployment logs
+   - Sentry project view for frontend/api issues
+   - telemetry dashboard/event stream
+   - operator comms channel/on-call contact
 
-2. **Config/toggle verification:**
-   - Confirm `UX_V2_ENABLE_BANK_WRITE_PATH` default state (OFF)
-   - Confirm `UX_V2_ENABLE_CHARITY_WRITE_PATH` default state (OFF)
-   - List any other UX v2 feature toggles and their default states
-   - Record in evidence
-
-3. **Dashboard and alert channel readiness:**
-   - Document which monitoring surfaces should be open during
-     rollout (Vercel dashboard, Sentry, any analytics dashboards)
-   - Document the alert channel (if applicable)
-   - This is documentation for the human operator — record what
-     needs to be monitored
-
-After this sub-step: deployment prep documented.
+After this sub-step: C-R1 documentation complete.
 
 ---
 
 ### Sub-step 4: Smoke Route Checklist Preparation (C-R2)
 
-Prepare the smoke route verification checklist for the human
-operator to execute during controlled enablement. Populate
-rollout checklist section 2 (Deploy + Initial Exposure) with
-specific URLs and expected behaviors.
+Populate rollout checklist section 2 (Deploy + Initial Exposure):
 
 | Checklist ID | Route | Expected Behavior | Verification Method |
 |---|---|---|---|
-| C1-01 | UI artifact deployed | Vercel deploy succeeds | Deploy log shows success |
-| C1-02 | `/` (landing) + `/sign-in` | Landing renders, auth redirects work | Visual + no console errors |
-| C1-03 | `/create/child` through `/create/review` | All 6 create steps navigate correctly | Walk through each step |
-| C1-04 | `/[slug]` + `/[slug]/contribute` | Public board renders, contribute form loads | Use test board slug |
-| C1-05 | `/dashboard` | Dashboard loads with board list | Logged-in host session |
-| C1-06 | `/admin/*` critical pages | Admin dreamboards, contributions, payouts load | Admin session |
+| C1-01 | Deploy artifact | Deployment succeeds | Vercel deploy log |
+| C1-02 | `/` and `/sign-in` | Landing/auth healthy | Visual + no console errors |
+| C1-03 | `/create/child` to `/create/review` | 6-step host flow works | End-to-end walkthrough |
+| C1-04 | `/[slug]` and `/[slug]/contribute` | Board + contribution loads | Test slug walkthrough |
+| C1-05 | `/dashboard` | Host dashboard data renders | Authenticated host session |
+| C1-06 | `/admin/*` critical | Admin views render | Authenticated admin session |
 
-For each route, document:
-- The exact URL pattern
-- What "healthy" looks like (renders without error, correct copy,
-  correct layout)
-- What "unhealthy" looks like (blank page, error boundary, wrong
-  data, console errors)
+For each route, define:
 
-After this sub-step: smoke checklist ready for human execution.
+- exact URL path/pattern
+- healthy state
+- unhealthy state
+- required evidence (screenshot/log reference)
+
+After this sub-step: C-R2 smoke checklist ready for human execution.
 
 ---
 
-### Sub-step 5: Hold Point Monitoring Guide (C-R3)
+### Sub-step 5: Hold Point Monitoring Guide (C-R3, quantitative)
 
-Document the 30-minute hold point monitoring plan for the human
-operator. Prepare rollout checklist section 3 (Hold Point).
+Populate rollout checklist section 3 with explicit thresholds.
 
-**Monitoring targets:**
-
-| Signal | Where to Monitor | Threshold | Escalation |
+| Signal | Baseline Window | Threshold (breach) | Escalation |
 |---|---|---|---|
-| Frontend error rate | Sentry dashboard | No severe spike vs. pre-deploy baseline | Trigger C-R6 rollback |
-| API failure rate | Vercel/Sentry | No sustained 5xx spike | Trigger C-R6 rollback |
-| Contribution completion | Payment provider dashboard / DB query | Conversion rate within ±10% of baseline | Investigate, potential C-R6 |
-| Payout operations | Admin panel / Karri dashboard | No new failures post-deploy | Investigate, potential C-R6 |
-| Telemetry event flow | Analytics dashboard | Events flowing for all 17 catalog events | Document gaps as P2 |
+| Frontend severe errors | Previous 24h same-hour median per 5min | `> baseline + 2` severe events for 2 consecutive checks, or any P0 crash | Trigger C-R6 rollback |
+| API 5xx rate | Pre-deploy 30min window | `>1%` for any 5-min bucket or `>2%` for 3 consecutive minutes | Trigger C-R6 rollback |
+| Contribution completion rate | Trailing 7-day same-hour baseline (minimum sample 20 attempts) | Drop greater than 15% vs baseline | Investigate immediately; rollback if sustained for 2 checks |
+| Payout operation health | Previous 24h payout failure trend | Any new release-correlated payout failure | Investigate; probable rollback |
+| Telemetry smoke subset | N/A (action-triggered) | Missing any required smoke event after smoke flows | Block ramp; fix instrumentation path before proceed |
 
-**Hold point protocol:**
-1. Start timer at deploy completion
-2. Check each signal at T+5min, T+15min, T+30min
-3. Record observations at each checkpoint
-4. At T+30min: if all thresholds respected, proceed to C-R4
-5. If any threshold breached: execute C-R6 rollback play
+Required telemetry smoke subset for hold-point verification:
 
-After this sub-step: monitoring guide documented.
+- `guest_view_loaded`
+- `contribution_started`
+- `contribution_redirect_started`
+- one terminal contribution event:
+  - `contribution_completed`, or
+  - `contribution_failed`
+- `host_create_started`
+- `host_create_published`
+
+Hold-point protocol:
+
+1. Start timer at initial exposure complete
+2. Check at T+5m, T+15m, T+30m
+3. Record each checkpoint in checklist + GO/NO-GO log
+4. If all thresholds pass at T+30m, proceed to C-R4
+5. If any threshold breaches, execute C-R6 rollback
+
+After this sub-step: quantitative C-R3 guide complete.
 
 ---
 
-### Sub-step 6: Validation Gate Preparation (CV-01 through CV-07)
+### Sub-step 6: Full Exposure and Decision Workflow Prep (C-R4/C-R5)
 
-Pre-populate the GO/NO-GO template validation gates section with
-verification instructions for the human operator.
+Populate rollout checklist section 4 (Full Exposure) and prepare
+decision workflow.
+
+1. Define exposure ramp plan:
+   - preferred: `10% -> 50% -> 100%`
+   - if constrained exposure unsupported: document "direct 100%" path
+2. For each ramp step, define:
+   - smoke subset to rerun (`C1-02` through `C1-06`)
+   - minimum hold duration (`>=10 minutes`)
+   - stop/rollback triggers (reuse C-R3 thresholds)
+3. Map checklist IDs:
+   - `C3-01` full exposure enabled
+   - `C3-02` full smoke suite pass
+   - `C3-03` GO/NO-GO template completed
+4. Pre-stage GO packet requirements:
+   - completed checklist links
+   - completed GO/NO-GO template
+   - hold-point metrics snapshots
+   - rollback readiness confirmation
+
+After this sub-step: C-R4/C-R5 preparation complete.
+
+---
+
+### Sub-step 7: Validation Gate Preparation (CV-01 through CV-07)
+
+Pre-fill validation gate instructions in GO/NO-GO template:
 
 | Gate | Check | How to Verify |
 |---|---|---|
-| CV-01 | Host create flow healthy | Complete a test board creation end-to-end in production |
-| CV-02 | Guest contribution flow healthy | Submit a test contribution (minimum amount) via each active provider |
-| CV-03 | Reminder UX path healthy | Request a reminder on a test board, verify no error |
-| CV-04 | Host dashboard correctness | View dashboard with test board, verify amounts and status display |
-| CV-05 | Admin critical UX paths healthy | Navigate admin dreamboards, contributions, payouts pages |
-| CV-06 | Frontend/API error thresholds respected | Sentry error count within threshold after hold point |
-| CV-07 | Telemetry event continuity confirmed | Verify analytics events flowing in dashboard for test actions |
+| CV-01 | Host create flow healthy | Create/publish one test board in production |
+| CV-02 | Guest contribution flow healthy | Submit minimum contribution on active providers |
+| CV-03 | Reminder UX path healthy | Request reminder and verify persisted state |
+| CV-04 | Host dashboard correctness | Validate totals/status for test board |
+| CV-05 | Admin critical UX healthy | Navigate admin dreamboards/contributions/payouts |
+| CV-06 | Frontend/API thresholds respected | Validate against C-R3 metrics checks |
+| CV-07 | Telemetry continuity confirmed | Verify smoke subset during rollout, then verify broader catalog continuity during post-release watch |
 
-Each gate gets a `PASS`/`FAIL` status after human execution.
-Pre-fill the "Evidence" column with instructions on what
-screenshot/log to capture.
+Evidence expectations for each CV gate:
 
-After this sub-step: validation gates ready for human execution.
+- screenshot or log link
+- timestamp
+- operator initials
+- PASS/FAIL status
+
+After this sub-step: validation section execution-ready.
 
 ---
 
-### Sub-step 7: Manual Viewport Verification Checklist
+### Sub-step 8: Manual Viewport Verification Checklist
 
-Complete the device/viewport manual checklist deferred from C8
-sub-step 10. This is documentation for the human operator to
-execute on real devices during or immediately after rollout.
+Carry forward C8 deferred real-device checklist for C9B:
 
 | # | Device / Browser | Viewport | Routes to Verify | Status |
 |---|---|---|---|---|
-| 1 | iPhone Safari | 375×812 | `/[slug]`, `/[slug]/contribute`, `/create/*`, `/dashboard` | PENDING |
-| 2 | Android Chrome | 360×800 | `/[slug]`, `/[slug]/contribute`, `/create/*`, `/dashboard` | PENDING |
-| 3 | Desktop Chrome | 1440×900 | All routes | PENDING |
-| 4 | Desktop Safari | 1440×900 | All routes | PENDING |
+| 1 | iPhone Safari | 375x812 | `/[slug]`, `/[slug]/contribute`, `/create/*`, `/dashboard` | PENDING (C9B) |
+| 2 | Android Chrome | 360x800 | `/[slug]`, `/[slug]/contribute`, `/create/*`, `/dashboard` | PENDING (C9B) |
+| 3 | Desktop Chrome | 1440x900 | All routes | PENDING (C9B) |
+| 4 | Desktop Safari | 1440x900 | All routes | PENDING (C9B) |
 
-For each device, document what to verify:
-- Layout renders without horizontal scroll
-- Touch targets ≥ 44×44px on mobile
-- Text readable without zoom
-- Forms usable (input focus, keyboard doesn't obscure)
-- Animations respect `prefers-reduced-motion`
+For each entry, verify:
 
-After this sub-step: viewport checklist documented.
+- no horizontal overflow
+- touch targets >= 44x44 on mobile
+- readable text without zoom
+- keyboard/input usability
+- reduced-motion behavior
 
----
-
-### Sub-step 8: Rollback Play Documentation (C-R6)
-
-Verify and document the rollback procedure in detail:
-
-1. **Application rollback:**
-   - Vercel instant rollback to previous deployment
-   - Verify rollback URL pattern / dashboard location
-
-2. **Feature toggle rollback:**
-   - Disable any UX v2 exposure toggles
-   - Document which env vars need to change
-
-3. **Backend stability:**
-   - Confirm Phase B backend remains stable (no C9 backend changes)
-   - Document that DB schema is unchanged
-
-4. **Evidence preservation:**
-   - If rollback triggered, capture: deploy logs, Sentry errors,
-     timeline of events, screenshots of failures
-   - Store in evidence folder
-
-After this sub-step: rollback play fully documented.
+After this sub-step: viewport checklist ready for human execution.
 
 ---
 
-### Sub-step 9: Closeout and Evidence Archival (C-R7)
+### Sub-step 9: Rollback Play Documentation (C-R6)
 
-1. **Archive release evidence:**
-   - Verify all C0–C8 evidence files are present in
-     `docs/implementation-docs/evidence/ux-v2/phase-c/`
-   - Create the C9 evidence file (see Evidence File Structure below)
+Document rollback play with exact operator actions:
 
-2. **Documentation sync:**
-   - Verify docs reflect deployed behavior
-   - Check that `CHANGELOG.md` has a Phase C entry
-   - Verify `AGENTS.md` reflects current state
+1. **App rollback**
+   - rollback to previous Vercel deployment
+   - record deployment ID and timestamp
+2. **Toggle rollback**
+   - disable UX v2 exposure toggles
+   - record env var changes + propagation checks
+3. **Backend stability statement**
+   - no C9 backend/schema changes
+   - Phase B remains baseline
+4. **Evidence preservation**
+   - deploy logs
+   - Sentry error links
+   - timeline with timestamps
+   - screenshots of failing paths
 
-3. **P2 deferral log:**
-   - Compile all P2 deferrals from C0–C8 evidence files into a
-     consolidated list with owner and target date
-   - Include: Lighthouse audit, real-device testing, load testing,
-     axe-core automation, runtime telemetry verification, Web Vitals
-     measurement, `text-text-muted` token consolidation,
-     marketing/auth error boundaries, leaf-route loading states,
-     high-contrast mode support
+After this sub-step: rollback play executable and auditable.
 
-4. **Agent handoff payload** (per execution contract):
-   - Execution summary by phase (B + C)
-   - Gate pass/fail matrix (all milestones)
-   - Production rollout status (GO/NO-GO/PENDING)
-   - Unresolved risk register
-   - Exact next-step list for any open items
+---
 
-5. Append C9 learnings to `docs/napkin/napkin.md` under
-   `## C9 Learnings (YYYY-MM-DD)`
+### Sub-step 10: C9A Closeout Package (pre-live)
 
-After this sub-step: closeout complete.
+Create/update C9 evidence and handoff package with C9A status only.
+
+1. Verify C0 through C8 evidence presence
+2. Create C9 evidence file (structure below)
+3. Populate all C9A sections as complete
+4. Mark C9B live-execution sections as `PENDING (human-run)`
+5. Consolidate P2 deferrals from C0 through C8 with owner + target date
+6. Build required handoff payload per execution contract
+7. Append `## C9 Learnings (YYYY-MM-DD)` to `docs/napkin/napkin.md`
+
+C9A completion state:
+
+- `READY_FOR_LIVE_EXECUTION` if all C9A criteria pass
+- This is not GO sign-off
+
+---
+
+### Sub-step 11: Post-Live Finalization (C9B follow-through)
+
+Run after human completes live execution.
+
+1. Ingest completed checklist/template outcomes
+2. Update C9 evidence with actual C9B statuses
+3. Record GO/NO-GO decision, timestamp, and sign-off fields
+4. Record unresolved risks and follow-up actions
+5. Finalize milestone status (`GO` or `NO-GO`)
+
+If live execution has not occurred, keep C9B sections pending.
 
 ---
 
 ## Evidence File Structure
 
-Create evidence file at:
+Create:
 `docs/implementation-docs/evidence/ux-v2/phase-c/YYYYMMDD-C9-production-rollout.md`
 
-The C9 evidence file must contain these sections:
+Required sections:
 
 ### 1) Prerequisite Verification
-- C8 evidence file: EXISTS/MISSING
-- C8 P0 gate: PASS/FAIL
-- C8 P1 gate: PASS/FAIL
-- C0–C7 evidence files: all present / list missing
-- Phase B GO: confirmed / not confirmed
+- Selected C8 evidence file path
+- C8 P0/P1 readiness status
+- C0 through C7 file presence
+- Phase B GO confirmation
 
-### 2) Final Gate Verification
-- `pnpm lint`: PASS/FAIL (errors: N, warnings: N)
+### 2) Final Gate Verification (C9A)
+- `pnpm lint`: PASS/FAIL (errors N, warnings N)
 - `pnpm typecheck`: PASS/FAIL
 - `pnpm test`: PASS/FAIL (N files, N tests)
 - `pnpm openapi:generate`: PASS/FAIL
-- `pnpm test tests/unit/openapi-spec.test.ts`: PASS/FAIL
-- `pnpm build`: PASS/FAIL (time: Ns)
-- Test count comparison to C8 baseline: MATCH/REGRESSION
+- `pnpm vitest run tests/unit/openapi-spec.test.ts`: PASS/FAIL
+- `pnpm build`: PASS/FAIL
+- test-count delta vs C8
+- pre/post `git status --short` snapshots
 
-### 3) Pre-Flight Checklist Status
-| ID | Task | Status | Evidence |
-|---|---|---|---|
-| C0-01 | Phase B GO verified | ✓/✗ | link |
-| C0-02 | P0/P1 tests complete | ✓/✗ | link |
-| C0-03 | UAT scenarios complete | ✓/✗ | link |
-| C0-04 | Accessibility checks pass | ✓/✗ | link |
-| C0-05 | Rollback validated | ✓/✗ | link |
+### 3) Drift Check Result
+- non-doc diffs detected: YES/NO
+- drift files list (if any)
+- disposition (STOP/continue)
 
-### 4) GO/NO-GO Pre-Gate Assessment
-| Gate | Status | Evidence |
-|---|---|---|
-| CG-01 | PASS/FAIL | link |
-| CG-02 | PASS/FAIL | link |
-| CG-03 | PASS/FAIL | link |
-| CG-04 | PASS/FAIL | link |
-| CG-05 | PASS/FAIL | link |
-| CG-06 | PASS/FAIL | link |
+### 4) Pre-Flight Checklist Status (C0-01 through C0-05)
+Status + evidence links
 
-### 5) Deployment Preparation
-- Git SHA: `{sha}`
-- Branch: `{branch}`
-- Build status: PASS
-- Toggle states documented: YES/NO
+### 5) GO/NO-GO Pre-Gate Assessment (CG-01 through CG-06)
+Status + evidence links
 
-### 6) Smoke Route Checklist (for human execution)
-Table from sub-step 4 with status column
+### 6) Deployment Preparation (C-R1)
+Artifact IDs, toggle states, monitoring surfaces, on-call channel
 
-### 7) Hold Point Monitoring Guide
-Table from sub-step 5
+### 7) Smoke Route Checklist (C-R2)
+Prepared checklist with route-level evidence requirements
 
-### 8) Validation Gates (for human execution)
-CV-01 through CV-07 with status column
+### 8) Hold Point Monitoring Guide (C-R3)
+Quantitative threshold table + checkpoint protocol
 
-### 9) Manual Viewport Checklist (for human execution)
-Table from sub-step 7 with status column
+### 9) Full Exposure Plan (C-R4/C-R5)
+Ramp plan + stop criteria + GO packet requirements
 
-### 10) Rollback Play
-- Rollback method documented: YES/NO
-- Toggle rollback documented: YES/NO
-- Evidence preservation plan: YES/NO
+### 10) Validation Gate Instructions (CV-01 through CV-07)
+Verification method + evidence requirements per gate
 
-### 11) P2 Consolidated Deferral Log
+### 11) Manual Viewport Checklist (deferred C9B execution)
+Device matrix + required checks
 
+### 12) Rollback Play (C-R6)
+App rollback + toggle rollback + evidence-preservation checklist
+
+### 13) C9A Handoff Payload
+- phase execution summary
+- gate matrix summary
+- rollout status (`READY_FOR_LIVE_EXECUTION` / `BLOCKED`)
+- unresolved risks
+- exact next-step list for C9B operator
+
+### 14) C9B Live Execution Log (human-run)
+- deploy start/end
+- hold-point checkpoints
+- smoke execution notes
+- full-exposure steps
+
+### 15) C9B Validation Outcomes
+- CV-01 through CV-07 PASS/FAIL with evidence
+- viewport matrix statuses
+
+### 16) Final Decision + Sign-off
+- GO / NO-GO
+- timestamp
+- rationale
+- Engineering/Ops/Product sign-off
+
+### 17) Consolidated P2 Deferrals
 | ID | Item | Source Milestone | Owner | Target Date |
 |---|---|---|---|---|
-| P2-01 | Lighthouse performance audit | C8 | TBD | TBD |
-| P2-02 | Real-device viewport testing | C8 | TBD | TBD |
-| ... | ... | ... | ... | ... |
 
-### 12) Agent Handoff Payload
-- Phase B summary: {status}
-- Phase C summary: {status}
-- Gate matrix: all milestones
-- Rollout status: GO / NO-GO / PENDING
-- Unresolved risks: {list}
-- Next steps: {list}
-
-### 13) Phase C Milestone Summary
-
-| Milestone | Date | Status | Test Delta |
-|---|---|---|---|
-| C0 | 2026-02-08 | Complete | baseline |
-| C1 | 2026-02-08 | Complete | +N tests |
-| C2 | 2026-02-08 | Complete | +N tests |
-| C3 | 2026-02-08 | Complete | +N tests |
-| C4 | 2026-02-08 | Complete | +N tests |
-| C5 | 2026-02-09 | Complete | +N tests |
-| C6 | 2026-02-09 | Complete | +N tests |
-| C7 | 2026-02-09 | Complete | +N tests |
-| C8 | 2026-02-09 | Complete | +N tests |
-| C9 | YYYY-MM-DD | {status} | +0 (operational) |
-
-### 14) Risk Assessment
-- Known risks with mitigation
-- Open items requiring human action
-- Timeline dependencies
+### 18) Final Risk Assessment
+- known risks
+- mitigations
+- open follow-ups
 
 ---
 
 ## Acceptance Criteria
 
-### P0 (blocks rollout decision)
-- C8 evidence file exists and all 14 sections populated
-- All 6 GO/NO-GO pre-gates (CG-01 through CG-06) assessed as PASS
-- Pre-flight checklist (C0-01 through C0-05) fully populated with
-  evidence links
-- Final local gates pass (`pnpm lint && pnpm typecheck && pnpm test
-  && pnpm build`)
-- Test count matches or exceeds C8 baseline (zero regression)
-- Rollback play documented with actionable steps
-- Agent handoff payload complete
+### P0 (blocks C9A handoff to live execution)
+- C8 evidence present and eligible (pre-gate mapping PASS)
+- CG-01 through CG-06 all `PASS`
+- C0-01 through C0-05 checklist complete with evidence
+- local gate suite PASS:
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm test`
+  - `pnpm openapi:generate`
+  - `pnpm vitest run tests/unit/openapi-spec.test.ts`
+  - `pnpm build`
+- test count matches/exceeds C8 baseline
+- no non-doc drift from gate execution
+- C-R1 through C-R6 prep sections complete
+- C9A handoff payload complete
 
-### P1 (blocks full release sign-off)
-- Smoke route checklist prepared with specific URLs and expected
-  behaviors for all 6 route groups
-- Hold point monitoring guide prepared with thresholds and
-  escalation paths
-- Validation gates (CV-01 through CV-07) documented with
-  verification instructions
-- Manual viewport checklist prepared for 4 device/browser
-  combinations
-- P2 deferral log consolidated from all milestones with owners
-- Phase C milestone summary table complete
-- CHANGELOG.md updated with Phase C entry
-- Napkin learnings appended
+### P1 (blocks final GO sign-off in C9B)
+- smoke routes executed and recorded
+- hold-point checks passed with C-R3 thresholds
+- full exposure step completed per C-R4
+- CV-01 through CV-07 executed with evidence
+- real-device viewport matrix executed
+- GO/NO-GO decision signed by required roles
+- C9 evidence finalized with C9B outcomes
 
-### P2 (defer with waiver — log in evidence)
-- Live smoke route execution (requires production deployment)
-- Hold point monitoring execution (requires production deployment)
-- Validation gate execution (requires production deployment)
-- Real-device viewport testing (requires physical devices)
-- GO/NO-GO decision signing (requires human sign-off)
-- Runtime telemetry delivery confirmation (requires live environment)
+### P2 (allowed defer with waiver; document in evidence)
+- extended telemetry catalog continuity beyond smoke subset
+- long-window conversion stability confirmation
+- additional real-device/browser permutations beyond defined matrix
 
 ---
 
-## Human Operator Actions (cannot be automated)
+## Human Operator Actions (C9B, cannot be automated)
 
-The following actions require human execution after the agent
-completes sub-steps 0–9. The agent prepares all documentation
-and checklists; the human executes:
+After C9A package is ready, human operator executes:
 
-1. **Deploy to Vercel** — push/merge to production branch
-2. **Execute smoke routes** — walk through checklist from sub-step 4
-3. **Monitor hold point** — follow guide from sub-step 5
-4. **Execute validation gates** — complete CV-01 through CV-07
-5. **Test on real devices** — follow viewport checklist from sub-step 7
-6. **Sign GO/NO-GO decision** — fill in Decision section of template
-7. **Execute rollback if needed** — follow play from sub-step 8
+1. Deploy to Vercel (production)
+2. Execute smoke routes (checklist section 2)
+3. Monitor 30-minute hold point (checklist section 3)
+4. Execute full-exposure steps (checklist section 4)
+5. Execute CV-01 through CV-07 gates
+6. Execute real-device viewport checks
+7. Sign GO/NO-GO decision
+8. Execute rollback if required
+
+Then return outcomes for sub-step 11 finalization.
 
 ---
 
 ## Stop Conditions
 
-- C8 evidence file missing or incomplete → STOP (C8 not done)
-- Any GO/NO-GO pre-gate (CG-01 through CG-06) fails → STOP,
-  document which gate failed and why
-- Local gate failure (`lint`, `typecheck`, `test`, `build`) → STOP,
-  codebase has drifted since C8
-- Test count regression vs. C8 baseline → STOP, investigate
-- Any source file modified → STOP (C9 is documentation only)
-- Any test file modified → STOP (C9 is documentation only)
-- Schema or migration file touched → STOP
-- Phase B GO evidence not found → STOP
+- C8 evidence missing/incomplete/failed pre-gates
+- any CG pre-gate fails
+- any local gate fails (`lint`, `typecheck`, `test`, `openapi`, openapi parity test, `build`)
+- test count regresses vs C8 baseline
+- non-doc drift appears after gate execution
+- any source/test/schema/migration file manually modified
+- Phase B GO evidence missing

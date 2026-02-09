@@ -130,16 +130,16 @@ export const validateUuid = (value: string, params: ValidationParams): Validatio
 };
 
 export const withApiAuth =
-  <Params extends Record<string, string> | undefined>(
+  <Params extends Record<string, string> = Record<string, string>>(
     requiredScope: ApiKeyScope,
     handler: (request: NextRequest, context: ApiAuthContext, params: Params) => Promise<Response>
   ) =>
-  async (request: NextRequest, ctx?: { params?: Params | Promise<Params> }) => {
+  async (request: NextRequest, ctx: { params: Promise<Params> }) => {
     const auth = await enforceApiAuth(request, requiredScope);
     if (!auth.ok) return auth.response;
 
-    const params = ctx?.params ? await ctx.params : undefined;
-    const response = await handler(request, auth.context, params as Params);
+    const params = await (ctx?.params ?? Promise.resolve({} as Params));
+    const response = await handler(request, auth.context, params);
 
     if (response.ok) {
       await markApiKeyUsed(auth.context.apiKey.id);

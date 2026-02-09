@@ -3,6 +3,9 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-09 | self | Split create/thanks server actions into `actions.ts` for tests but left duplicate page-local handlers wired in runtime | After extracting action modules, delete page-local copies and import the shared action so tests and production execute identical code |
+| 2026-02-09 | self | Replaced Unicode PDF font loading with Helvetica-only fallback, causing non-ASCII birthday messages to degrade to `?` | Keep Unicode-capable font embedding (`fontkit` + Noto bytes) with Helvetica only as fallback when embed fails |
+| 2026-02-09 | self | Updated C8 to require full gate chain but initially left `pnpm build` out of the Sub-step 11 command block | After doc-wide command-list changes, sweep all repeated command blocks to keep gate definitions consistent |
 | 2026-02-09 | self | Imported `normalizeEmail` into `thanks/page.tsx` and broke unit tests because mocked `@/lib/db/queries` exports in `tests/unit/receipt-action.test.ts` did not include it | When expanding imports from heavily mocked modules, either update the module mock in the same patch or keep normalization inline to preserve existing mock contracts |
 | 2026-02-09 | self | Started final verification before re-reading napkin notes for the session | Read `docs/napkin/SKILL.md` and `docs/napkin/napkin.md` first in every new session before any gate or edit command |
 | 2026-02-09 | self | Declared Gemini cleanup done while `docs/Platform-Spec-Docs/ARCHITECTURE.md` still contained active Gemini references | After deprecating an integration, run targeted `rg` sweeps across `docs/Platform-Spec-Docs` and patch remaining active references before handoff |
@@ -52,6 +55,8 @@
 - Follow milestone sequence strictly; no progression when gate fails.
 - Use `nl -ba` + `sed -n` for line-precise evidence extraction in milestone audits.
 - Capture milestone evidence in `docs/implementation-docs/evidence/ux-v2/...` during execution, not after.
+- For rollout milestones, split agent-prep (documentation and pre-gates) from human-live execution (deploy, smoke, GO sign-off) so acceptance criteria stay satisfiable.
+- For milestone evidence docs, provide a fixed section-locked template file to reduce status drift and missing-gate omissions during handoff.
 - For auth-free UI QA, gate public preview routes behind `DEV_PREVIEW=true` and pair with Playwright CLI screenshot scripts under `scripts/visual/` writing to `output/playwright/`.
 - Bind runtime schemas and OpenAPI enums to `decision-locks.ts`, then assert parity in unit tests.
 - Restore env toggles (`UX_V2_ENABLE_*`) after each test to prevent cross-test gate leakage.
@@ -121,3 +126,9 @@
 - Accessibility hardening in this repo is fastest when done as a phased bundle: landmarks first, then ARIA/touch, then contrast tokens, then fallback states and tests.
 - Contrast remediations on shared button variants have broad test-coupling impact; adjust both variant tests and any component tests that assert old `text-primary` classes in the same pass.
 - Source-based drift tests are effective for route-state coverage (`error.tsx`, `loading.tsx`, `not-found.tsx`) and a11y attributes when full render wiring is expensive.
+
+## C8 Learnings (2026-02-09)
+- `next build` can appear stalled while holding `.next/lock`; verify lock holder via `lsof .next/lock` before retrying to avoid false parallel-build failures.
+- Escalated build runs can expose different failure classes than sandbox runs (fonts DNS/network vs Turbopack/Webpack asset-loader errors); capture both in evidence to avoid misdiagnosis.
+- `pnpm typecheck` reliability in this repo depends on Next-generated route types; `pnpm exec next typegen` helps refresh generated files but does not resolve real page/route signature drift.
+- C8 telemetry contract expansion is safest when constrained to internal analytics surfaces (`src/lib/analytics/metrics.ts`, `src/app/api/internal/metrics/route.ts`) with no public API changes.

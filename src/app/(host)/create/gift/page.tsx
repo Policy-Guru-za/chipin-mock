@@ -114,7 +114,7 @@ async function saveManualGiftAction(formData: FormData) {
 export default async function CreateGiftPage({
   searchParams,
 }: {
-  searchParams?: GiftSearchParams;
+  searchParams?: Promise<GiftSearchParams>;
 }) {
   const session = await requireHostAuth();
   const draft = await getDreamBoardDraft(session.hostId);
@@ -126,7 +126,8 @@ export default async function CreateGiftPage({
     redirect('/create/child');
   }
 
-  const errorMessage = getErrorMessage(searchParams?.error);
+  const resolvedSearchParams = await searchParams;
+  const errorMessage = getErrorMessage(resolvedSearchParams?.error);
   const defaultGiftName = resolveDefaultGiftName(draft);
   const defaultGiftDescription = resolveDefaultGiftDescription(draft);
   const defaultGoal = resolveDefaultGoal(draft);

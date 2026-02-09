@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const loadModule = async () => {
   vi.resetModules();
-  return import('@/app/(host)/create/payout/page');
+  return import('@/app/(host)/create/payout/actions');
 };
 
 const ORIGINAL_ENCRYPTION_KEY = process.env.CARD_DATA_ENCRYPTION_KEY;

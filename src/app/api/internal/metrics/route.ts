@@ -7,6 +7,14 @@ import { getClientIp } from '@/lib/utils/request';
 
 // Allowlist of property keys to prevent PII leakage
 const ALLOWED_PROPERTY_KEYS = new Set([
+  'dream_board_id',
+  'amount_cents',
+  'payment_provider',
+  'failure_code',
+  'payout_id',
+  'payout_type',
+  'payout_method',
+  'charity_enabled',
   'dreamBoardId',
   'amountCents',
   'paymentMethod',
@@ -20,6 +28,21 @@ const ALLOWED_PROPERTY_KEYS = new Set([
 
 const customMetricSchema = z.object({
   name: z.enum([
+    'host_create_started',
+    'host_create_step_completed',
+    'host_create_failed',
+    'host_create_published',
+    'guest_view_loaded',
+    'contribution_redirect_started',
+    'contribution_failed',
+    'reminder_requested',
+    'payout_created',
+    'payout_processing_started',
+    'payout_completed',
+    'payout_failed',
+    'charity_payout_created',
+    'reminder_dispatched',
+    'reminder_failed',
     'dream_board_created',
     'contribution_started',
     'contribution_completed',

@@ -23,7 +23,7 @@ vi.mock('@/lib/auth/rate-limit', () => ({
   enforceRateLimit: enforceRateLimitMock,
 }));
 
-import { requestReceiptAction } from '@/app/(guest)/[slug]/thanks/page';
+import { requestReceiptAction } from '@/app/(guest)/[slug]/thanks/actions';
 
 const receiptContribution = {
   id: 'contribution-1',

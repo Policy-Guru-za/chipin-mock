@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 
 const loadModule = async () => {
   vi.resetModules();
-  return import('@/app/(host)/create/giving-back/page');
+  return import('@/app/(host)/create/giving-back/actions');
 };
 
 const makeDraft = (overrides: Record<string, unknown> = {}) => ({
@@ -226,8 +226,8 @@ describe('saveGivingBackAction', () => {
       listActiveCharities: vi.fn(async () => []),
     }));
 
-    const givingBackPageModule = await loadModule();
-    const element = await givingBackPageModule.default({ searchParams: {} });
+    const givingBackPageModule = await import('@/app/(host)/create/giving-back/page');
+    const element = await givingBackPageModule.default({ searchParams: Promise.resolve({}) });
     const html = renderToStaticMarkup(element);
 
     expect(html).toContain('No active charities are configured.');

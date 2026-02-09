@@ -12,7 +12,7 @@ import { sendDreamBoardLink } from '@/lib/integrations/whatsapp';
 import { log } from '@/lib/observability/logger';
 import { generateSlug } from '@/lib/utils/slug';
 
-export async function publishDreamBoardAction(
+async function publishDreamBoardAction(
   _state: PublishState,
   _formData: FormData
 ): Promise<PublishState> {

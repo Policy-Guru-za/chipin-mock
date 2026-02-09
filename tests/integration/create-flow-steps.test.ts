@@ -72,9 +72,9 @@ const loadActions = async (store: DraftRecord, options?: { verifyKarriThrows?: b
 
   vi.doMock('@sentry/nextjs', () => ({ captureException: vi.fn() }));
 
-  const datesModule = await import('@/app/(host)/create/dates/page');
-  const givingBackModule = await import('@/app/(host)/create/giving-back/page');
-  const payoutModule = await import('@/app/(host)/create/payout/page');
+  const datesModule = await import('@/app/(host)/create/dates/actions');
+  const givingBackModule = await import('@/app/(host)/create/giving-back/actions');
+  const payoutModule = await import('@/app/(host)/create/payout/actions');
 
   return {
     saveDatesAction: datesModule.saveDatesAction,

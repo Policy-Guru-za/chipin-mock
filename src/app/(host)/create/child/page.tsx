@@ -99,11 +99,12 @@ const getChildErrorMessage = (error?: string) => {
 export default async function CreateChildPage({
   searchParams,
 }: {
-  searchParams?: ChildSearchParams;
+  searchParams?: Promise<ChildSearchParams>;
 }) {
   const session = await requireHostAuth();
   const draft = await getDreamBoardDraft(session.hostId);
-  const error = searchParams?.error;
+  const resolvedSearchParams = await searchParams;
+  const error = resolvedSearchParams?.error;
   const errorMessage = getChildErrorMessage(error);
   const view = buildCreateFlowViewModel({ step: 'child', draft });
 
