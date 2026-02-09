@@ -3,6 +3,10 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-09 | self | Attempted to install `pdf-lib` mid-milestone without confirming registry access; install failed with `ENOTFOUND registry.npmjs.org` | Verify network/package registry reachability first; if blocked, ship fallback behavior and record explicit dependency deviation in evidence |
+| 2026-02-09 | self | Wrote API route tests with `Request`, but handlers read `request.nextUrl.searchParams` and failed outside the unauthenticated branch | Use `NextRequest` in route tests whenever handlers depend on `nextUrl` |
+| 2026-02-09 | self | Added new host dashboard integration test without stubbing `matchMedia`, causing `useReducedMotion` failures | Stub both legacy and modern `matchMedia` methods in jsdom tests that render `ProgressBar` or motion-aware components |
+| 2026-02-09 | self | Assumed `pnpm add` fully failed after `ENOTFOUND`, but dependency was still linked from local pnpm store | After network-related install errors, verify `package.json`, lockfile, and `require.resolve(...)` before deciding whether dependency is unavailable |
 | 2026-02-08 | self | In create giving-back step, hid the form when no active charities existed, which left `charityEnabled` unset and blocked progression (`/create/payout` redirected back) | Keep a fallback submit path on no-charity states that persists `charityEnabled=false` and allows moving to payout |
 | 2026-02-08 | self | Put `redirect('/...karri_invalid')` inside `try` and then caught the redirect in the `catch`, which downgraded to `karri_unavailable` | In verification helpers, return status (`valid|invalid|unavailable`) and redirect in caller after helper resolves |
 | 2026-02-08 | self | Typed server form actions to return custom state objects, which broke `<form action={...}>` typing in client components | Keep server form actions as redirecting `Promise<void>` handlers; reserve state return shapes for `useActionState` actions only |
@@ -79,3 +83,9 @@
 - Payment-step integration assertions should not assume a single `fetch` call when analytics side effects are active; assert by endpoint/payload (`/api/internal/contributions/create`) instead of total call count.
 - C3 storage handoff stays reliable when Step 2 redirects immediately on missing/expired flow payload; this prevents stale direct-entry payment attempts and keeps route behavior deterministic.
 - `pnpm openapi:generate` can still hit `tsx` IPC `EPERM` under sandbox capture; rerun with escalated permissions for deterministic contract gate completion.
+
+## C4 Learnings (2026-02-08)
+- Host dashboard post-campaign routing should be keyed off `closed|paid_out` only; keep `funded` in the active/editable surface.
+- Internal host download routes need explicit middleware public matching so requests reach handlers, then route-level auth must enforce `401/403/404` semantics.
+- Download route tests must exercise `NextRequest` paths and CSV escaping for commas/quotes/newlines to protect export integrity.
+- Dashboard/client integration tests that render `ProgressBar` require `matchMedia` stubs to avoid motion hook failures.

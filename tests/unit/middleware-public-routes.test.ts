@@ -25,4 +25,9 @@ describe('middleware public routes', () => {
     const middleware = readSource('middleware.ts');
     expect(middleware).toContain("'/api/internal/contributions/reminders'");
   });
+
+  it('allowlists internal download endpoints for explicit route auth', () => {
+    const middleware = readSource('middleware.ts');
+    expect(middleware).toContain("'/api/internal/downloads(.*)'");
+  });
 });
