@@ -26,6 +26,7 @@ export function LandingPage() {
       <div className="absolute w-[250px] h-[250px] lg:w-[400px] lg:h-[400px] bg-[radial-gradient(circle,rgba(220,190,160,0.1)_0%,transparent_70%)] -bottom-[50px] lg:-bottom-[100px] -right-[30px] lg:-right-[50px] pointer-events-none" />
 
       <LandingNav mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
+      <div aria-hidden="true" className="h-[73px] md:h-[97px] lg:h-[121px]" />
 
       {/* Main Content - Hero Grid */}
       <div className="flex flex-col gap-8 md:gap-12 lg:gap-[100px] px-5 py-6 pb-[60px] md:px-10 md:py-[50px] md:pb-[70px] lg:px-20 lg:py-[70px] max-w-[1400px] mx-auto relative z-[5] lg:grid lg:grid-cols-[1.1fr_0.9fr] lg:items-center">

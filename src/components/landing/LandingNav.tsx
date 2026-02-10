@@ -109,7 +109,7 @@ export function LandingNav({ mobileMenuOpen, setMobileMenuOpen }: LandingNavProp
       )}
 
       {/* Navigation */}
-      <nav className="sticky top-0 flex justify-between items-center px-4 py-4 md:px-10 md:py-6 lg:px-16 lg:py-7 z-30 border-b border-black/[0.04] bg-[#FFFCF9]/95 supports-[backdrop-filter]:backdrop-blur-sm">
+      <nav className="fixed top-0 inset-x-0 flex justify-between items-center px-4 py-4 md:px-10 md:py-6 lg:px-16 lg:py-7 z-30 border-b border-black/[0.04] bg-[#FFFCF9]/95 supports-[backdrop-filter]:backdrop-blur-sm">
         <Link
           href="/"
           className="flex items-center gap-2.5 no-underline"
