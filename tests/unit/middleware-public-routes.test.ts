@@ -32,6 +32,11 @@ describe('middleware public routes', () => {
     expect(middleware).toContain("'/api/internal/contributions/reminders'");
   });
 
+  it('allowlists guest contribute payment page', () => {
+    const middleware = readSource('src/middleware.ts');
+    expect(middleware).toContain('contribute\\/payment');
+  });
+
   it('allowlists guest analytics endpoint', () => {
     const middleware = readSource('src/middleware.ts');
     expect(middleware).toContain("'/api/internal/analytics'");

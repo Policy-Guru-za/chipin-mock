@@ -10,6 +10,7 @@ describe('guest contribution endpoint', () => {
     const middleware = readSource('src/middleware.ts');
     expect(middleware).toContain("'/api/internal/contributions/create'");
     expect(middleware).toContain("'/api/internal/contributions/reminders'");
+    expect(middleware).toContain('contribute\\/payment');
   });
 
   it('is not gated by job-secret auth', () => {

@@ -36,6 +36,7 @@ const isPublicRoute = createRouteMatcher([
   // Guest pages (route groups are not in URL):
   /^\/(?!api|_next|sign-in|sign-up|create|dashboard|admin|health)([^/]+)$/,
   /^\/(?!api|_next|sign-in|sign-up|create|dashboard|admin|health)([^/]+)\/(contribute|thanks|payment-failed)$/,
+  /^\/(?!api|_next|sign-in|sign-up|create|dashboard|admin|health)([^/]+)\/contribute\/payment$/,
 ]);
 
 
