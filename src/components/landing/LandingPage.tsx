@@ -18,12 +18,14 @@ export function LandingPage() {
 
   return (
     <div
-      className="min-h-screen bg-[#FFFCF9] relative overflow-hidden"
+      className="min-h-screen bg-[#FFFCF9] relative"
       style={{ fontFamily: 'var(--font-dm-sans)' }}
     >
       {/* Warm ambient gradients */}
-      <div className="absolute w-[300px] h-[300px] md:w-[450px] md:h-[450px] lg:w-[600px] lg:h-[600px] bg-[radial-gradient(circle,rgba(248,220,180,0.15)_0%,transparent_70%)] -top-[100px] md:-top-[150px] lg:-top-[200px] left-[10%] md:left-[20%] lg:left-[30%] pointer-events-none" />
-      <div className="absolute w-[250px] h-[250px] lg:w-[400px] lg:h-[400px] bg-[radial-gradient(circle,rgba(220,190,160,0.1)_0%,transparent_70%)] -bottom-[50px] lg:-bottom-[100px] -right-[30px] lg:-right-[50px] pointer-events-none" />
+      <div aria-hidden="true" className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute w-[300px] h-[300px] md:w-[450px] md:h-[450px] lg:w-[600px] lg:h-[600px] bg-[radial-gradient(circle,rgba(248,220,180,0.15)_0%,transparent_70%)] -top-[100px] md:-top-[150px] lg:-top-[200px] left-[10%] md:left-[20%] lg:left-[30%]" />
+        <div className="absolute w-[250px] h-[250px] lg:w-[400px] lg:h-[400px] bg-[radial-gradient(circle,rgba(220,190,160,0.1)_0%,transparent_70%)] -bottom-[50px] lg:-bottom-[100px] -right-[30px] lg:-right-[50px]" />
+      </div>
 
       <LandingNav mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
       <div aria-hidden="true" className="h-[73px] md:h-[97px] lg:h-[121px]" />
