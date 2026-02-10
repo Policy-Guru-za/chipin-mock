@@ -1,7 +1,7 @@
-# 09 — PUBLIC DREAM BOARD (Shared Experience)
+# 09 — PUBLIC DREAMBOARD (Shared Experience)
 
 **Route:** `/[slug]`
-**Purpose:** The public-facing dream board that contributors see via WhatsApp link. This is the MOST CRITICAL UI—it must inspire generosity, feel warm and personal, and never transactional.
+**Purpose:** The public-facing Dreamboard that contributors see via WhatsApp link. This is the MOST CRITICAL UI—it must inspire generosity, feel warm and personal, and never transactional.
 **Audience:** Contributors (gift-givers) accessing via shared link
 **Device Priority:** Mobile-first (85% WhatsApp preview/mobile traffic)
 
@@ -571,7 +571,7 @@ interface OGObject {
 src/
 ├── app/
 │   └── [slug]/
-│       ├── page.tsx                    # Main public dream board page
+│       ├── page.tsx                    # Main public Dreamboard page
 │       ├── layout.tsx                  # Layout with metadata
 │       ├── error.tsx                   # Error boundary
 │       └── loading.tsx                 # Loading skeleton
@@ -792,7 +792,7 @@ xl: '1280px',  // Large desktop
 - **Easing:** `ease-in-out`
 
 ### Confetti (on successful contribution return)
-- **Not on dream board view** — reserved for thank-you page
+- **Not on Dreamboard view** — reserved for thank-you page
 - Handled in 12-CONTRIBUTE-THANK-YOU.md
 
 ---

@@ -274,7 +274,7 @@ Keep as server component. Expand data fetching and rendering.
 #### 2a — Page Header
 - Title: `"Your Dream Boards"` (Fraunces 28px, 700) — per copy
   matrix
-- CTA: `"Create a Dream Board +"` (Sage filled button `#6B9E88`,
+- CTA: `"Create a Dreamboard +"` (Sage filled button `#6B9E88`,
   right-aligned on desktop, full-width below title on mobile)
 - Layout: flex row, space-between, items-center on desktop;
   stacked on mobile
@@ -314,16 +314,16 @@ transition, padding 20px):
 - Dashed border (2px, gray-300), rounded-xl, same height as
   board cards
 - Center-aligned: `"+"` icon (32px, text-gray-400) +
-  `"Create a Dream Board"` (Outfit 16px, 500, text-gray-500)
+  `"Create a Dreamboard"` (Outfit 16px, 500, text-gray-500)
 - Hover: border-teal-300, text-teal-600
 - Links to `/create/child`
 - Renders as last item in grid
 
 #### 2d — Empty State
 - When no boards exist, replace entire grid with centered state:
-- Heading: `"You haven't created a Dream Board yet."` (Outfit
+- Heading: `"You haven't created a Dreamboard yet."` (Outfit
   18px, text-gray-600)
-- CTA: `"Create your first Dream Board"` (Sage filled button,
+- CTA: `"Create your first Dreamboard"` (Sage filled button,
   large)
 - Links to `/create/child`
 
@@ -409,11 +409,11 @@ Create `src/app/(host)/dashboard/[id]/DashboardDetailClient.tsx`
 
 #### 3f — Quick Actions
 - Layout: horizontal button group on desktop, stacked on mobile
-- **"Share Dream Board"** (outline button, link icon):
+- **"Share Dreamboard"** (outline button, link icon):
   copies `shareUrl` to clipboard via `navigator.clipboard
   .writeText()`. Show toast `"Link copied!"` (auto-dismiss 3s).
   Fallback: select-and-copy if clipboard API unavailable.
-- **"Edit Dream Board"** (outline button, pencil icon):
+- **"Edit Dreamboard"** (outline button, pencil icon):
   opens `EditDreamBoardModal` (sub-step 5). Only visible when
   `isEditable` is true.
 - **"View Public Page"** (outline button, external-link icon):
@@ -438,7 +438,7 @@ Create `src/app/(host)/dashboard/[id]/DashboardDetailClient.tsx`
     - `completed`: green dot + `"Sent"`
     - `failed`: red dot + `"Failed"`
 - **No payout rows yet:** `"Payout will be processed when the
-  Dream Board is closed."` (Outfit 14px, text-gray-500)
+  Dreamboard is closed."` (Outfit 14px, text-gray-500)
 
 ---
 
@@ -460,7 +460,7 @@ Create `src/app/(host)/dashboard/[id]/DashboardPostCampaignClient
 
 #### 4b — Celebration Header
 - `"🎉"` (40px, block, centered)
-- `"{childName}'s Dream Board is complete!"` (Fraunces 28px, 700,
+- `"{childName}'s Dreamboard is complete!"` (Fraunces 28px, 700,
   centered)
 - `"Campaign complete"` (Outfit 16px, text-gray-500, centered)
   — per copy matrix
@@ -561,7 +561,7 @@ interface EditDreamBoardModalProps {
   items-center justify-center
 - Card: white, rounded-2xl, shadow-xl, max-w-lg w-full,
   max-h-[90vh] overflow-y-auto, p-6
-- Title: `"Edit Dream Board"` (Fraunces 20px, 700)
+- Title: `"Edit Dreamboard"` (Fraunces 20px, 700)
 - Close: X button top-right, Esc key handler,
   backdrop click closes
 - Focus trap: tab cycles within modal
@@ -663,7 +663,7 @@ export async function GET(request: NextRequest) {
   // 4. listBirthdayMessages(dreamBoardId)
   // 5. Generate PDF:
   //    - Title page: "{childName}'s Birthday Messages"
-  //    - Subtitle: "From their Dream Board on Gifta"
+  //    - Subtitle: "From their Dreamboard on Gifta"
   //    - Each message as a section:
   //      - "From: {contributorName}" (or "From: Anonymous")
   //      - Message text
@@ -721,7 +721,7 @@ Manually construct the CSV string — no external library needed.
 #### 6c — Route Auth + Middleware
 
 - Both routes require host authentication via `requireHostAuth()`
-- Both verify the dream board belongs to the authenticated host
+- Both verify the Dreamboard belongs to the authenticated host
 - Return 401 on missing auth, 403 on wrong host, 404 on missing
   board
 - Add these routes to the middleware allowlist if the codebase
@@ -822,7 +822,7 @@ Verify all new and modified components meet WCAG 2.1 AA:
 
 - **Dashboard cards:** Wrap grid in `<ul>`, each card in `<li>`.
   Card link wraps entire card with `aria-label="{childName}'s
-  Dream Board — {statusLabel}"`. Status badge includes text (not
+  Dreamboard — {statusLabel}"`. Status badge includes text (not
   color-only).
 - **Summary stats:** Each stat card has `aria-label` describing
   both value and label (e.g., `"Total Raised: R3,250"`)

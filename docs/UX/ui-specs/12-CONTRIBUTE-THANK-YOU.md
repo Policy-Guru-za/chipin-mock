@@ -16,7 +16,7 @@ This is the **celebration screen** — the emotional payoff for making a gift co
 2. **Confirms** contribution details
 3. **Shows impact** (charity split, if applicable)
 4. **Offers receipts** (email capture)
-5. **Encourages sharing** (return others to dream board)
+5. **Encourages sharing** (return others to Dreamboard)
 6. **Builds loyalty** (contact support, next steps)
 
 Philosophy: **Joyful, grateful, not transactional.** This is the brand moment where contributors feel good about their choice. Design should feel celebratory and personal.
@@ -428,7 +428,7 @@ const handleShare = async () => {
 #### "Back to Dreamboard" Link
 - **Text:** `"← Back to Dreamboard"` (Outfit 14px, sage text)
 - **Color:** Sage `#6B9E88` on hover darken
-- **Action:** Navigate to `/[slug]` (return to public dream board)
+- **Action:** Navigate to `/[slug]` (return to public Dreamboard)
 - **Underline:** On hover
 
 #### "Contact Support" Link

@@ -13,7 +13,7 @@ Read order completed as requested:
 
 Implemented B1 normalization only (no B2/B4/B6 runtime enablement):
 - OpenAPI enum/schema parity updates in `src/lib/api/openapi.ts`
-- Dream board request/response contract expansion:
+- Dreamboard request/response contract expansion:
   - `src/app/api/v1/dream-boards/route.ts`
   - `src/app/api/v1/dream-boards/[id]/route.ts`
   - `src/lib/api/dream-boards.ts`
@@ -38,9 +38,9 @@ Implemented B1 normalization only (no B2/B4/B6 runtime enablement):
 
 | Decision | Locked Value | Runtime | OpenAPI | Result |
 |---|---|---|---|---|
-| D-001 | payout_method = `karri_card`,`bank` | `z.enum(LOCKED_PAYOUT_METHODS)` in dream board create/update routes | `PayoutMethod.enum = LOCKED_PAYOUT_METHODS` | PASS |
+| D-001 | payout_method = `karri_card`,`bank` | `z.enum(LOCKED_PAYOUT_METHODS)` in Dreamboard create/update routes | `PayoutMethod.enum = LOCKED_PAYOUT_METHODS` | PASS |
 | D-002 | payout_type = `karri_card`,`bank`,`charity` | `z.enum(LOCKED_PAYOUT_TYPES)` in payouts pending route | `PayoutType.enum = LOCKED_PAYOUT_TYPES` | PASS |
-| D-003 | charity_split_type = `percentage`,`threshold` | `z.enum(LOCKED_CHARITY_SPLIT_MODES)` in dream board create/update routes | `CharitySplitType.enum = LOCKED_CHARITY_SPLIT_MODES` | PASS |
+| D-003 | charity_split_type = `percentage`,`threshold` | `z.enum(LOCKED_CHARITY_SPLIT_MODES)` in Dreamboard create/update routes | `CharitySplitType.enum = LOCKED_CHARITY_SPLIT_MODES` | PASS |
 | D-006 | bank/charity writes gated by phase policy | Create/update return `unsupported_operation` (422) for gated payout/charity mutation payloads | 422 documented via `UnsupportedOperationError` response | PASS (phase-appropriate gating) |
 
 ## Error Taxonomy Alignment
@@ -51,8 +51,8 @@ Implemented B1 normalization only (no B2/B4/B6 runtime enablement):
 
 ## Contract/Shape Parity Highlights
 
-- Dream board OpenAPI and runtime now include bank + charity fields in create/update request schemas and in response serialization.
-- Dream board PATCH is now documented in OpenAPI (`/dream-boards/{id}`) with request shape and 422 unsupported-operation response.
+- Dreamboard OpenAPI and runtime now include bank + charity fields in create/update request schemas and in response serialization.
+- Dreamboard PATCH is now documented in OpenAPI (`/dream-boards/{id}`) with request shape and 422 unsupported-operation response.
 - Contribution responses expose `charity_cents` (nullable) in runtime and OpenAPI.
 - Payout responses/filters support full payout type enum set in runtime and OpenAPI.
 

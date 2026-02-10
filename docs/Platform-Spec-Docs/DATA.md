@@ -402,7 +402,7 @@ export const contributions = pgTable('contributions', {
 
 ### payouts
 
-Tracks payout execution for closed Dream Boards. Each Dream Board has a **single Karri payout**.
+Tracks payout execution for closed Dream Boards. Each Dreamboard has a **single Karri payout**.
 
 ```sql
 CREATE TYPE payout_status AS ENUM (
@@ -681,7 +681,7 @@ CREATE INDEX idx_webhook_events_api_key ON webhook_events(api_key_id);
 
 ## Computed Fields & Views
 
-### Dream Board with Totals
+### Dreamboard with Totals
 
 ```sql
 CREATE VIEW dream_boards_with_totals AS
@@ -773,7 +773,7 @@ WHERE dream_board_id IN (
 
 | Query Pattern | Index |
 |--------------|-------|
-| Find Dream Board by slug | `idx_dream_boards_slug` |
+| Find Dreamboard by slug | `idx_dream_boards_slug` |
 | List host's Dream Boards | `idx_dream_boards_host` |
 | Find active boards expiring soon | `idx_dream_boards_party_date` (partial) |
 | Look up payment by provider ref | `idx_contributions_payment_ref` |

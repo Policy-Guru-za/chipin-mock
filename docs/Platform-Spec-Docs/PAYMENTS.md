@@ -139,7 +139,7 @@ async function createContribution(input: CreateContributionInput) {
     amountCents: contribution.amountCents + contribution.feeCents,
     reference: contribution.paymentRef,
     contributionId: contribution.id,
-    description: `Contribution to ${dreamBoard.childName}'s Dream Board`,
+    description: `Contribution to ${dreamBoard.childName}'s Dreamboard`,
     returnUrl: `${BASE_URL}/${dreamBoard.slug}/thanks?ref=${contribution.paymentRef}&provider=${input.paymentProvider}`,
     cancelUrl: `${BASE_URL}/${dreamBoard.slug}?cancelled=1&provider=${input.paymentProvider}`,
     notifyUrl: `${BASE_URL}/api/webhooks/${input.paymentProvider}`,
@@ -204,7 +204,7 @@ async function handlePayFastWebhook(payload: PayFastITN) {
     })
     .where(eq(contributions.id, contribution.id));
 
-  // 4. If successful, update dream board totals
+  // 4. If successful, update Dreamboard totals
   if (status === 'completed') {
     await updateDreamBoardTotals(contribution.dreamBoardId);
     await sendContributionNotification(contribution);
@@ -562,7 +562,7 @@ Use `KarriAPI.topUpCard()` and confirm payout via webhook or status check.
 
 ### When Refunds Occur
 
-1. **Dream Board cancelled** — Host cancels before closure
+1. **Dreamboard cancelled** — Host cancels before closure
 2. **Payout failure** — Cannot execute payout
 3. **Fraud detection** — Suspicious activity
 
@@ -583,7 +583,7 @@ async function processRefunds(dreamBoardId: string): Promise<void> {
       await provider.refund({
         reference: contribution.paymentRef,
         amount: contribution.amountCents,
-        reason: 'Dream Board cancelled',
+        reason: 'Dreamboard cancelled',
       });
 
       await db.update(contributions)

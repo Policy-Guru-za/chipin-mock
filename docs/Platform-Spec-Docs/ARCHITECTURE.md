@@ -101,11 +101,11 @@ chipin/
 │   │   │   ├── page.tsx          # Landing page
 │   │   │   └── layout.tsx
 │   │   ├── (host)/               # Host-side pages (authenticated)
-│   │   │   ├── create/           # Dream Board creation wizard
+│   │   │   ├── create/           # Dreamboard creation wizard
 │   │   │   ├── dashboard/        # Host dashboard
 │   │   │   └── layout.tsx
 │   │   ├── (guest)/              # Guest-side pages (public)
-│   │   │   └── [slug]/           # Dream Board view + contribute
+│   │   │   └── [slug]/           # Dreamboard view + contribute
 │   │   │       └── page.tsx
 │   │   ├── api/                  # API Routes
 │   │   │   ├── v1/               # Versioned public API
@@ -124,7 +124,7 @@ chipin/
 │   │   └── layout.tsx            # Root layout
 │   ├── components/               # React components
 │   │   ├── ui/                   # Base UI components (shadcn/ui)
-│   │   ├── dream-board/          # Dream Board specific components
+│   │   ├── dream-board/          # Dreamboard specific components
 │   │   ├── payment/              # Payment flow components
 │   │   └── shared/               # Shared components
 │   ├── lib/                      # Utilities and helpers
@@ -213,14 +213,14 @@ chipin/
 
 ### Entity Relationships
 
-- **Host** → **Dream Board**: One-to-Many (a host can create multiple Dream Boards)
-- **Dream Board** → **Contribution**: One-to-Many (a Dream Board receives many contributions)
-- **Dream Board** → **Payout**: One-to-One (single Karri payout)
+- **Host** → **Dreamboard**: One-to-Many (a host can create multiple Dream Boards)
+- **Dreamboard** → **Contribution**: One-to-Many (a Dreamboard receives many contributions)
+- **Dreamboard** → **Payout**: One-to-One (single Karri payout)
 
 ### Status Enums
 
 ```typescript
-// Dream Board Status
+// Dreamboard Status
 type DreamBoardStatus = 
   | 'draft'      // Being created
   | 'active'     // Accepting contributions
@@ -331,7 +331,7 @@ Authorization: Bearer cpk_live_xxxxxxxxxxxx
      │◀──────────────│                                    │
 ```
 
-**Gift funded behavior:** When `raised_cents >= goal_cents`, the Dream Board is marked funded but the guest view remains gift-focused while contributions remain open until close.
+**Gift funded behavior:** When `raised_cents >= goal_cents`, the Dreamboard is marked funded but the guest view remains gift-focused while contributions remain open until close.
 
 ### Payment Provider Abstraction
 
@@ -449,8 +449,8 @@ Authorization: Bearer cpk_live_xxxxxxxxxxxx
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/dream-boards` | Create Dream Board |
-| GET | `/dream-boards/{id}` | Get Dream Board details |
+| POST | `/dream-boards` | Create Dreamboard |
+| GET | `/dream-boards/{id}` | Get Dreamboard details |
 | GET | `/dream-boards/{id}/contributions` | List contributions |
 | GET | `/payouts/pending` | List pending payouts (for partners) |
 | POST | `/payouts/{id}/confirm` | Confirm payout executed |
@@ -483,7 +483,7 @@ Full API specification in [API.md](./API.md).
 
 | Key Pattern | TTL | Purpose |
 |-------------|-----|---------|
-| `dream-board:{slug}` | 5 min | Dream Board cache (guest view); dates hydrated on read |
+| `dream-board:{slug}` | 5 min | Dreamboard cache (guest view); dates hydrated on read |
 | `webhook:{provider}:{ip}` | 1 min | Webhook rate limiting (fixed window) |
 | `rate:api:partner:{partnerId}:hour` | 1 hour | Public API hourly quota (partner-scoped) |
 | `rate:api:partner:{partnerId}:minute` | 60s | Public API burst quota (partner-scoped sliding window) |
@@ -491,7 +491,7 @@ Full API specification in [API.md](./API.md).
 
 ### Cache Invalidation
 
-- Dream Board cache invalidated when a contribution status transitions (webhooks + reconciliation)
+- Dreamboard cache invalidated when a contribution status transitions (webhooks + reconciliation)
 - Product cache refreshed daily or on-demand
 - Session cache invalidated on logout
 
@@ -538,7 +538,7 @@ interface ErrorResponse {
 - Vercel Analytics for web vitals
 - Vercel Speed Insights for performance
 - Custom events for business metrics:
-  - Dream Board created
+  - Dreamboard created
   - Contribution received
   - Payout completed
 

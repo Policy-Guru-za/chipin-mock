@@ -81,7 +81,7 @@ async function publishDreamBoardAction(
     if (!created) {
       return {
         status: 'preview',
-        error: 'Could not publish your Dream Board. Please try again.',
+        error: 'Could not publish your Dreamboard. Please try again.',
       };
     }
 

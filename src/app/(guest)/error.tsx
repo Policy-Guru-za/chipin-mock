@@ -16,7 +16,7 @@ export default function GuestError({ error, reset }: ErrorPageProps) {
 
   return (
     <ErrorFallback
-      heading="We couldn't load this Dream Board"
+      heading="We couldn't load this Dreamboard"
       message="Something went wrong while loading this page. Please try again."
       reset={reset}
       homeHref="/"

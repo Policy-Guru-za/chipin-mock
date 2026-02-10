@@ -14,7 +14,7 @@ Roll out the UX-v2 data model safely, with no product-behavior expansion during 
 
 ## Glossary (Normalized Terms)
 
-- Dream Board: canonical two-word entity name (`dream_boards` table).
+- Dreamboard: canonical two-word entity name (`dream_boards` table).
 - Schema-first: apply DB migration before enabling new product behavior.
 - Write-path disabled: bank/charity create/update writes are rejected in production.
 - Hold point: mandatory observation window between migration and GO decision.
@@ -172,7 +172,7 @@ SELECT to_regclass('public.charities') AS charities_table,
 
 Expected: both values are non-null.
 
-### R3-Q2 - Dream Board Expansion Columns
+### R3-Q2 - Dreamboard Expansion Columns
 
 ```sql
 SELECT column_name

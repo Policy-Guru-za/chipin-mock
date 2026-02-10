@@ -19,7 +19,7 @@
 ## Data Classification
 
 ### Public Data
-Data visible to anyone with the Dream Board link:
+Data visible to anyone with the Dreamboard link:
 - Child's first name
 - Child's photo
 - Dream gift name and image
@@ -251,7 +251,7 @@ SESSION_SECRET
 All user input validated and sanitized:
 
 ```typescript
-// Example: Dream Board creation
+// Example: Dreamboard creation
 const createDreamBoardSchema = z.object({
   childName: z.string().min(2).max(50).regex(/^[a-zA-Z\s'-]+$/),
   childPhotoUrl: z.string().url().startsWith('https://'),
@@ -290,7 +290,7 @@ const createDreamBoardSchema = z.object({
 |----------|-------|--------|
 | Clerk auth attempts | 10 | 15 min |
 | Contribution attempt | 10 | 1 min |
-| Dream Board creation | 5 | 1 hour |
+| Dreamboard creation | 5 | 1 hour |
 | API (per key) | 1000 | 1 hour |
 | Webhook (per IP) | 100 | 1 min |
 
@@ -357,7 +357,7 @@ async function checkFraud(contribution: ContributionInput): Promise<FraudSignal[
 ### Payout Holds
 
 Payouts automatically held for review if:
-- Dream Board created <24 hours ago AND pot >R5,000
+- Dreamboard created <24 hours ago AND pot >R5,000
 - Any contribution flagged for fraud
 - Host account <7 days old AND pot >R10,000
 

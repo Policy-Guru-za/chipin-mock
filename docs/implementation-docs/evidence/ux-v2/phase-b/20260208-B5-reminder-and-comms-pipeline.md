@@ -45,7 +45,7 @@ Implemented B5 scope:
 | Bounded retry (48h) | reminders due for more than 48h are marked terminal (set `sent_at`) and logged as expired to prevent infinite retries | PASS |
 | Attempt observability | each attempt/success/failure/expiry path logs structured reminder events | PASS |
 | Template variable validation before send | strict validator enforces required vars (`child_name`, `dreamboard_title`, `dreamboard_url`, `campaign_close_date`) prior to dispatch | PASS |
-| Required reminder content fields | email and WhatsApp template payload include child name, dream board title, public URL (`/<slug>`), campaign close date, and CTA text | PASS |
+| Required reminder content fields | email and WhatsApp template payload include child name, Dreamboard title, public URL (`/<slug>`), campaign close date, and CTA text | PASS |
 | Scheduling endpoint duplicate behavior | duplicate `(dream_board_id,email,remind_at)` now returns explicit idempotent `200` response (`{ idempotent: true }`) | PASS |
 | Scheduling guardrails | active/funded board requirement retained; invalid/past reminder windows return `invalid_reminder_window` | PASS |
 | WhatsApp sender env parity | sender supports modern Cloud API env keys (`WA_*`) with backward-compatible legacy aliases (`WHATSAPP_*`) | PASS |

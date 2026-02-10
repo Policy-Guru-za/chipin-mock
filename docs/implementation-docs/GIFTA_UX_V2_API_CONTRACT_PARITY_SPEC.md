@@ -13,7 +13,7 @@ Define required parity between API runtime behavior, OpenAPI schema, DB enums, a
 
 ## Canonical Enum Set
 
-### Dream Board
+### Dreamboard
 
 - `payout_method`: `karri_card` | `bank`
 - `charity_split_type`: `percentage` | `threshold`
@@ -77,7 +77,7 @@ Validation contract:
 
 1. `PayoutMethod` enum must include `bank`.
 2. `PayoutType` enum must include `karri_card`, `bank`, `charity`.
-3. Dream Board create schema must include bank and charity fields + conditional requirements description.
+3. Dreamboard create schema must include bank and charity fields + conditional requirements description.
 4. Recipient data schemas must include bank/charity-safe shapes where relevant.
 5. Error response examples must include validation/path-specific errors for payout/charity fields.
 

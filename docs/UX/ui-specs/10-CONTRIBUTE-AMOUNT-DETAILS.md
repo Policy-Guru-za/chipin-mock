@@ -4,7 +4,7 @@
 **Purpose:** Capture contribution amount, display name, anonymity preference, and optional birthday message
 **Audience:** Contributors (gift-givers)
 **Device Priority:** Mobile-first
-**Context:** User has clicked "Chip in" on dream board; now fills out details before payment
+**Context:** User has clicked "Chip in" on Dreamboard; now fills out details before payment
 
 ---
 

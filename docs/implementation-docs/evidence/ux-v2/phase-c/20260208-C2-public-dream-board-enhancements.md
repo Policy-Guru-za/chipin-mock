@@ -1,4 +1,4 @@
-# 20260208-C2 Public Dream Board Enhancements
+# 20260208-C2 Public Dreamboard Enhancements
 
 ## 1) Summary
 Milestone C2 completed.

@@ -15,13 +15,13 @@ Define mandatory backend test coverage and release gates for Phase B.
 
 | Test ID | Area | Type | Priority | Required Assertion |
 |---|---|---|---|---|
-| B-T01 | Dream board create validation | Unit | P0 | payout/charity conditional rules enforced |
+| B-T01 | Dreamboard create validation | Unit | P0 | payout/charity conditional rules enforced |
 | B-T02 | Bank account validation + encryption | Unit | P0 | invalid account rejected; encrypted persistence only |
 | B-T03 | Charity split config validation | Unit | P0 | percentage/threshold exclusivity enforced |
 | B-T04 | Fee + raised semantics | Unit | P0 | calculations match decision register |
 | B-T05 | Payout plan generation | Unit | P0 | correct payout types and amounts produced |
 | B-T06 | Payout state transitions | Unit | P0 | invalid transitions blocked |
-| B-T07 | Dream board API create/list | Integration | P0 | response contract and persistence correct |
+| B-T07 | Dreamboard API create/list | Integration | P0 | response contract and persistence correct |
 | B-T08 | Payout pending API | Integration | P0 | supports required payout types + filters |
 | B-T09 | Reminder schedule API | Integration | P0 | dedupe + window rules correct |
 | B-T10 | Charity activation rules | Integration | P0 | inactive charity blocked for new associations |

@@ -1,8 +1,8 @@
 export const uiCopy = {
   guest: {
     closed: {
-      body: 'This Dream Board is no longer accepting contributions.',
-      ctaLabel: 'Back to Dream Board',
+      body: 'This Dreamboard is no longer accepting contributions.',
+      ctaLabel: 'Back to Dreamboard',
     },
     paymentsUnavailable: {
       body: 'Payments are temporarily unavailable. Please check back shortly.',

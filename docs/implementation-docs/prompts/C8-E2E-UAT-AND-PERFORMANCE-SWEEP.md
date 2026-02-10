@@ -204,7 +204,7 @@ step through review/publish, not individual steps.
   giving-back → payout → review)
 - Payout method = `karri_card`, card number provided
 - Charity disabled (`charityEnabled: false`)
-- Assert: dream board record created with correct status, slug
+- Assert: Dreamboard record created with correct status, slug
   generated, payout method persisted, charity fields null/false
 - Assert: share URL construction uses correct slug format
 
@@ -256,14 +256,14 @@ After this sub-step: run `pnpm lint && pnpm typecheck && pnpm test`.
 Create `tests/e2e/uat-guest-contribute.test.ts`.
 
 **UAT-05: Contribute via PayFast**
-- Create a test dream board (active, Karri payout)
+- Create a test Dreamboard (active, Karri payout)
 - Submit contribution with `provider: 'payfast'`, valid amount
 - Assert: contribution record created with `pending` status
 - Assert: PayFast payment intent returns form data with valid
   signature
 - Simulate webhook completion (PayFast ITN)
 - Assert: contribution status updated to `completed`
-- Assert: dream board `raised_cents` updated correctly
+- Assert: Dreamboard `raised_cents` updated correctly
 - Assert: fee calculation matches `amount * 0.03` bounded to
   [R3, R500] (decision register D-004)
 
@@ -282,7 +282,7 @@ Create `tests/e2e/uat-guest-contribute.test.ts`.
 - Assert: status + raised amount correct
 
 **UAT-08: Request reminder (P1)**
-- Create active dream board with campaign_end_date in future
+- Create active Dreamboard with campaign_end_date in future
 - Submit reminder request with valid email
 - Assert: `contributionReminders` record created with
   `sent_at: null`
@@ -316,7 +316,7 @@ After this sub-step: run `pnpm lint && pnpm typecheck && pnpm test`.
 Create `tests/e2e/uat-dashboard-admin.test.ts`.
 
 **UAT-09: Host dashboard progress and payout details**
-- Create dream board with 3 completed contributions
+- Create Dreamboard with 3 completed contributions
 - Assert: dashboard list view returns board with correct
   `raisedCents`, `contributorCount`, percentage calculation
 - Assert: detail view includes payout method label and status
@@ -324,7 +324,7 @@ Create `tests/e2e/uat-dashboard-admin.test.ts`.
   actions and payout summary
 
 **UAT-10: Admin payout review flow**
-- Create dream board → fund to goal → close campaign
+- Create Dreamboard → fund to goal → close campaign
 - Assert: payout record created with `pending` status
 - Exercise admin confirm endpoint → assert status transitions
   to `completed`
@@ -335,7 +335,7 @@ Create `tests/e2e/uat-dashboard-admin.test.ts`.
 
 **UAT-11: Admin charity management/report workflows (P1)**
 - Create charity record via admin
-- Associate charity with dream board
+- Associate charity with Dreamboard
 - Run charity reconciliation query
 - Assert: report data includes correct allocation amounts
 - Assert: charity list filtering by active/inactive works
@@ -379,7 +379,7 @@ Create `tests/e2e/uat-edge-cases.test.ts`.
 - Assert: contribution remains in `pending` or transitions to
   `failed`
 - Assert: no partial state corruption
-- Assert: dream board `raised_cents` not incremented
+- Assert: Dreamboard `raised_cents` not incremented
 
 **EC-04: Reminder requested after close window**
 - Create board with `campaign_end_date` in the past

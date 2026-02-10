@@ -43,7 +43,7 @@ export function Header({ isClerkEnabled = false }: HeaderProps) {
               Trust & safety
             </Link>
             <Link href="/create" className={buttonVariants({ size: 'sm' })}>
-              Create a Dream Board
+              Create a Dreamboard
             </Link>
             {isClerkEnabled ? (
               <>

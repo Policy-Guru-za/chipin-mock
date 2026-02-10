@@ -17,7 +17,7 @@ export default function HostError({ error, reset }: ErrorPageProps) {
   return (
     <ErrorFallback
       heading="We couldn't load your dashboard"
-      message="Something failed while loading your Dream Board data. Please try again."
+      message="Something failed while loading your Dreamboard data. Please try again."
       reset={reset}
       homeHref="/dashboard"
       homeLabel="Go to dashboard"

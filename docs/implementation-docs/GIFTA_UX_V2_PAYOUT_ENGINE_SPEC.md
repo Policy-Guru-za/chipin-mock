@@ -12,7 +12,7 @@ Define deterministic payout creation, processing, and settlement behavior across
 
 ## Preconditions for Payout Creation
 
-- Dream Board status is payout-eligible (`closed` unless explicitly extended by decision update)
+- Dreamboard status is payout-eligible (`closed` unless explicitly extended by decision update)
 - Contribution ledger totals are finalized for payout window
 - Payout method data passes validation constraints
 
@@ -92,7 +92,7 @@ Terminal state:
 
 - `completed`
 
-A Dream Board transitions to `paid_out` only when all required payout rows for that board are `completed`.
+A Dreamboard transitions to `paid_out` only when all required payout rows for that board are `completed`.
 
 ## Automation Rules
 

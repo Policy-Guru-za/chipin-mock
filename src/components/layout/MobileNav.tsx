@@ -180,7 +180,7 @@ export function MobileNav({ isOpen, onClose, isClerkEnabled = false }: MobileNav
                     onClick={handleLinkClick}
                     className={buttonVariants({ size: 'lg', className: 'w-full justify-center' })}
                   >
-                    Create a Dream Board
+                    Create a Dreamboard
                   </Link>
                 </div>
               </div>

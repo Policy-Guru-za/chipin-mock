@@ -156,7 +156,7 @@ const getTimeRemainingInfo = (params: { board: DreamBoardRecord; now: Date }) =>
   const expired = isBoardExpired(params.board, params.now);
   if (expired) {
     return {
-      message: 'This Dream Board is closed to new contributions.',
+      message: 'This Dreamboard is closed to new contributions.',
       urgency: 'expired' as const,
       daysLeft: 0,
     };

@@ -52,15 +52,15 @@ Scope: Copy/content alignment only (no behavior, schema, or API contract changes
 ## 2) Old -> New String Summary (Representative)
 
 - `ChipIn` -> `Gifta` in active branding surfaces and fallback comms strings.
-- `Dreamboard` -> `Dream Board` in user-visible UI copy.
-- `Publish Dream Board` -> `Create Dream Board`.
+- `Dreamboard` -> `Dreamboard` in user-visible UI copy.
+- `Publish Dreamboard` -> `Create Dreamboard`.
 - `Share a portion with charity` -> `Enable giving back (optional)`.
 - `Your name (as it will appear)` -> `Your name (optional)`.
 - `Add a birthday message 🎂` -> `Message (optional)`.
 - `Remind me in 3 days 🔔` -> `Remind me later`.
-- Reminder modal confirmation -> `We'll send one reminder before this Dream Board closes.`
+- Reminder modal confirmation -> `We'll send one reminder before this Dreamboard closes.`
 - Funded banner -> `Goal reached! Extra contributions still help.`
-- Closed-state copy -> `This Dream Board is closed to new contributions.`
+- Closed-state copy -> `This Dreamboard is closed to new contributions.`
 - Reminder email subject/body/CTA moved from `contribute` phrasing to `chip in` phrasing per matrix.
 
 ## 3) Protected Contract Checks
@@ -87,7 +87,7 @@ Final full test run: `138` test files passed, `627` tests passed.
 
 - New file: `tests/unit/copy-matrix-compliance.test.ts`
 - New assertions: `11`
-- Purpose: prevent drift on brand strings, Dream Board terminology, matrix CTA/reminder text, and critical banner copy.
+- Purpose: prevent drift on brand strings, Dreamboard terminology, matrix CTA/reminder text, and critical banner copy.
 
 ## 6) Copy Matrix Compliance Checklist
 
@@ -96,13 +96,13 @@ Final full test run: `138` test files passed, `627` tests passed.
 | Header brand | `Gifta` | `Gifta` | PASS |
 | Footer brand | `Gifta` | `Gifta` | PASS |
 | Host create giving-back toggle | `Enable giving back (optional)` | exact | PASS |
-| Host create review CTA | `Create Dream Board` | exact | PASS |
+| Host create review CTA | `Create Dreamboard` | exact | PASS |
 | Public funded banner | `Goal reached! Extra contributions still help.` | exact | PASS |
-| Public closed state | `This Dream Board is closed to new contributions.` | exact | PASS |
+| Public closed state | `This Dreamboard is closed to new contributions.` | exact | PASS |
 | Contribution optional name | `Your name (optional)` | exact | PASS |
 | Contribution optional message | `Message (optional)` | exact | PASS |
 | Contribution reminder prompt | `Remind me later` | exact | PASS |
-| Reminder confirmation | `We'll send one reminder before this Dream Board closes.` | exact | PASS |
+| Reminder confirmation | `We'll send one reminder before this Dreamboard closes.` | exact | PASS |
 | Reminder email subject | `🔔 Reminder: chip in for [Child]'s gift` | exact shape | PASS |
 | Reminder email CTA | `Chip in now` | exact | PASS |
 

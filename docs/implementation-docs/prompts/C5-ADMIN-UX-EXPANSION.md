@@ -418,7 +418,7 @@ Create `src/app/(admin)/contributions/page.tsx` (server component):
 | Column | Source Field | Render |
 |--------|-------------|--------|
 | Contributor | contributorName | text (or "Anonymous") |
-| Dream Board | childName + dreamBoardSlug | name as link |
+| Dreamboard | childName + dreamBoardSlug | name as link |
 | Amount | amountCents | `formatZar()` |
 | Fee | feeCents | `formatZar()`, gray-400 |
 | Net | netCents | `formatZar()` |
@@ -455,7 +455,7 @@ admin components while preserving ALL existing functionality.
 
 | Column | Source Field | Render |
 |--------|-------------|--------|
-| Dream Board | childName + dreamBoardSlug | name as link |
+| Dreamboard | childName + dreamBoardSlug | name as link |
 | Host | hostEmail | text |
 | Type | type | label (Karri Card / Bank / Charity) |
 | Amount | netCents | `formatZar()` |
@@ -711,7 +711,7 @@ Create these test files:
 - Quick links render and point to correct routes
 
 **`tests/unit/admin-dream-boards.test.tsx`** (~5 tests):
-- Table renders dream board rows with correct columns
+- Table renders Dreamboard rows with correct columns
 - Status badges render for each status variant
 - CSV export button links to export route
 - Filter panel renders status/date/search fields
@@ -841,7 +841,7 @@ Verify all new and modified components meet WCAG 2.1 AA:
 ### P2 (defer with waiver)
 - GMV chart on dashboard (requires Recharts — skip if
   `pnpm add recharts` fails due to registry)
-- Dream board flag/close admin actions (requires new service
+- Dreamboard flag/close admin actions (requires new service
   methods — defer to C6 or post-C9)
 - Contribution refund admin action (requires new service method
   — defer)

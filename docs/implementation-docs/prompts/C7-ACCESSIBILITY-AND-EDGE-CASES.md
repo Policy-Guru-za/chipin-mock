@@ -263,7 +263,7 @@ feedback during navigation.
 
 | File | Content |
 |------|---------|
-| `src/app/(guest)/[slug]/loading.tsx` | Skeleton for public Dream Board page |
+| `src/app/(guest)/[slug]/loading.tsx` | Skeleton for public Dreamboard page |
 | `src/app/(host)/dashboard/loading.tsx` | Skeleton for host dashboard listing |
 | `src/app/(admin)/admin/loading.tsx` | Skeleton for admin dashboard |
 
@@ -548,12 +548,12 @@ After this sub-step: run `pnpm lint && pnpm typecheck`.
 Create skeleton loading components for critical routes only.
 
 1. **`src/app/(guest)/[slug]/loading.tsx`**
-   - Skeleton matching public Dream Board layout: hero image
+   - Skeleton matching public Dreamboard layout: hero image
      placeholder, title bar, progress bar, amount area
    - Use `animate-pulse` on `bg-gray-200 rounded-xl` blocks
 
 2. **`src/app/(host)/dashboard/loading.tsx`**
-   - Skeleton for dashboard listing: stats card row + Dream Board
+   - Skeleton for dashboard listing: stats card row + Dreamboard
      cards grid
    - Use `animate-pulse` on placeholder blocks
 

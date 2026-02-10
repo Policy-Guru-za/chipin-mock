@@ -110,7 +110,7 @@ Build-order implication:
 
 - Landing page parity and auth-state behavior tuning on `/`.
 - Auth route polish and branded Clerk theming (`/sign-in`, `/sign-up`).
-- Public dream board (`/[slug]`) visual hierarchy + charity/return-state parity.
+- Public Dreamboard (`/[slug]`) visual hierarchy + charity/return-state parity.
 - Thank-you and dashboard list/detail visual/compositional parity.
 - Existing admin payouts pages alignment to shared admin navigation/system.
 
@@ -134,7 +134,7 @@ Rationale by dependency:
 1. **C1 Host Create Flow Restructure first**
    - Largest structural delta; unlocks correct route topology (`/create/dates`, `/create/giving-back`, `/create/payout`).
    - Reduces downstream rework for host/dashboard and copy/a11y passes.
-2. **C2 Public Dream Board before C3 Contributor Journey**
+2. **C2 Public Dreamboard before C3 Contributor Journey**
    - Stabilizes public board states/charity visibility and CTA context before payment-flow split.
 3. **C3 Contributor Journey next**
    - Implements new `/[slug]/contribute/payment` architecture and reminder entrypoint after public board baseline is stable.

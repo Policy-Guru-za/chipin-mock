@@ -16,7 +16,7 @@ Use with:
 
 ## Glossary (Normalized Terms)
 
-- Dream Board: canonical two-word entity name (`dream_boards` table).
+- Dreamboard: canonical two-word entity name (`dream_boards` table).
 - Schema-first: apply DB migration before enabling new product behavior.
 - Write-path disabled: bank/charity create/update writes are rejected in production.
 - Hold point: mandatory observation window between migration and GO decision.
@@ -60,7 +60,7 @@ Hard stop: if R0-05 or R0-06 returns `201`, do not proceed.
 | ID | Task | Command / Evidence | Expected Result | Done |
 |---|---|---|---|---|
 | R3-01 | New tables | Runbook `R3-Q1` | `charities` and `contribution_reminders` non-null | [ ] |
-| R3-02 | New dream board columns | Runbook `R3-Q2` | All listed columns returned | [ ] |
+| R3-02 | New Dreamboard columns | Runbook `R3-Q2` | All listed columns returned | [ ] |
 | R3-03 | Constraints present | Runbook `R3-Q3` | All five constraints present | [ ] |
 | R3-04 | Indexes present | Runbook `R3-Q4` | All required indexes present | [ ] |
 | R4-01 | Enum values verified | Runbook `R4-Q1` | Expected enum labels present | [ ] |

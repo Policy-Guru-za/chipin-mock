@@ -152,7 +152,7 @@ export function DashboardDetailClient({
             </div>
             <div>
               <h1 className="font-display text-2xl font-bold text-text [overflow-wrap:anywhere]">
-                {view.childName}&apos;s Dream Board
+                {view.childName}&apos;s Dreamboard
               </h1>
               <span className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${statusClass}`}>
                 {view.statusLabel}
@@ -262,18 +262,18 @@ export function DashboardDetailClient({
       <article className="rounded-xl bg-white p-6 shadow-sm">
         <h2 className="font-display text-xl font-bold text-text">Quick Actions</h2>
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          <Button type="button" variant="outline" onClick={handleShare} aria-label="Share Dream Board">
+          <Button type="button" variant="outline" onClick={handleShare} aria-label="Share Dreamboard">
             <CopyIcon size="sm" />
-            Share Dream Board
+            Share Dreamboard
           </Button>
           {view.isEditable ? (
             <Button
               type="button"
               variant="outline"
               onClick={() => setShowEditModal(true)}
-              aria-label="Edit Dream Board"
+              aria-label="Edit Dreamboard"
             >
-              Edit Dream Board
+              Edit Dreamboard
             </Button>
           ) : null}
           <a href={view.publicUrl} target="_blank" rel="noopener noreferrer">
@@ -298,7 +298,7 @@ export function DashboardDetailClient({
           Recipient: {view.payoutRecipientDisplay}
         </p>
         {view.payouts.length === 0 ? (
-          <p className="mt-4 text-sm text-gray-500">Payout will be processed when the Dream Board is closed.</p>
+          <p className="mt-4 text-sm text-gray-500">Payout will be processed when the Dreamboard is closed.</p>
         ) : (
           <ul className="mt-4 space-y-3">
             {view.payouts.map((payout) => (

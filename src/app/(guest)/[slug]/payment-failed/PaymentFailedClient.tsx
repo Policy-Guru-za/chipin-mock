@@ -54,7 +54,7 @@ export function PaymentFailedClient({ slug, childName, display, isClosed }: Paym
 
         {isClosed ? (
           <p className="mt-6 rounded-xl border border-border bg-subtle px-4 py-3 text-sm text-gray-700">
-            This Dream Board is closed to new contributions.
+            This Dreamboard is closed to new contributions.
           </p>
         ) : (
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
@@ -77,7 +77,7 @@ export function PaymentFailedClient({ slug, childName, display, isClosed }: Paym
             Need help? Contact us 💬
           </a>
           <Link href={`/${slug}`} className="hover:text-text">
-            Back to {childName}&apos;s Dream Board ←
+            Back to {childName}&apos;s Dreamboard ←
           </Link>
         </footer>
       </section>

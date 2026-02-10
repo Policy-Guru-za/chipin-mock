@@ -258,7 +258,7 @@ Philosophy: **Empathetic, helpful, unblocking.** Payment failures are frustratin
 #### "Back to Dreamboard" Link
 - **Text:** `"Back to [Child]'s Dreamboard ←"` (Outfit 14px, sage)
 - **Color:** Sage, underline on hover
-- **Action:** Navigate to `/[slug]` (public dream board)
+- **Action:** Navigate to `/[slug]` (public Dreamboard)
 - **Target:** `_self`
 - **Accessibility:** `aria-label="Return to ${child.name}'s Dreamboard"`
 

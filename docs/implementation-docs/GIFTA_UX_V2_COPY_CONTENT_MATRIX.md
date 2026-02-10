@@ -14,7 +14,7 @@ Canonical copy source for UX v2 UI and communication surfaces.
 
 | Term | Canonical Copy |
 |---|---|
-| Dream Board | Dream Board |
+| Dreamboard | Dreamboard |
 | Host/Parent | Parent |
 | Contribution | Chip in |
 | Payout | Payout |
@@ -28,15 +28,15 @@ Canonical copy source for UX v2 UI and communication surfaces.
 | Gift step intro | "What’s the dream gift?" |
 | Giving back toggle | "Enable giving back (optional)" |
 | Payout method label | "How should we send your payout?" |
-| Review CTA | "Create Dream Board" |
+| Review CTA | "Create Dreamboard" |
 
-## Public Dream Board Copy
+## Public Dreamboard Copy
 
 | Location | Copy |
 |---|---|
 | Hero title | "Help make this gift happen" |
 | Progress support text | "[percentage]% funded" |
-| Closed state | "This Dream Board is closed to new contributions." |
+| Closed state | "This Dreamboard is closed to new contributions." |
 | Funded state banner | "Goal reached! Extra contributions still help." |
 
 ### Marketing Homepage CTA
@@ -53,14 +53,14 @@ Canonical copy source for UX v2 UI and communication surfaces.
 | Optional name | "Your name (optional)" |
 | Optional message | "Message (optional)" |
 | Reminder prompt | "Remind me later" |
-| Reminder confirmation | "We’ll send one reminder before this Dream Board closes." |
+| Reminder confirmation | "We’ll send one reminder before this Dreamboard closes." |
 
 ## Host Dashboard Copy
 
 | Location | Copy |
 |---|---|
 | Dashboard title | "Your Dream Boards" |
-| Empty state | "You haven’t created a Dream Board yet." |
+| Empty state | "You haven’t created a Dreamboard yet." |
 | Payout section | "Payout details" |
 | Post-campaign | "Campaign complete" |
 
@@ -89,7 +89,7 @@ Examples:
 | Template | Subject |
 |---|---|
 | Parent new contribution | "🎉 New contribution for [Child]!" |
-| Parent campaign complete | "🎉 [Child]’s Dream Board is complete" |
+| Parent campaign complete | "🎉 [Child]’s Dreamboard is complete" |
 | Contributor confirmation | "💝 Thanks for chipping in for [Child]!" |
 | Contributor reminder | "🔔 Reminder: chip in for [Child]’s gift" |
 

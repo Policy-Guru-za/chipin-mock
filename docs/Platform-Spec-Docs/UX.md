@@ -293,7 +293,7 @@ Using **shadcn/ui** as base, heavily customized for Gifta's distinctive aestheti
 ```tsx
 // Primary Button — Bold, tactile
 <Button variant="primary" size="lg">
-  Create Dream Board
+  Create Dreamboard
 </Button>
 
 // Secondary Button — Subtle but present
@@ -403,7 +403,7 @@ Using **shadcn/ui** as base, heavily customized for Gifta's distinctive aestheti
 ### Cards
 
 ```tsx
-// Dream Board Preview Card — with playful tilt
+// Dreamboard Preview Card — with playful tilt
 <Card variant="tilted" className="p-6">
   <Avatar src={childPhoto} size="xl" />
   <h2 className="font-display">{childName}'s Birthday</h2>
@@ -539,7 +539,7 @@ Using **shadcn/ui** as base, heavily customized for Gifta's distinctive aestheti
 │  your child's birthday              │
 │                                     │
 │  ┌───────────────────────────────┐  │
-│  │    Create a Dream Board →     │  │
+│  │    Create a Dreamboard →     │  │
 │  └───────────────────────────────┘  │
 │                                     │
 │         How it works ↓              │
@@ -562,13 +562,13 @@ Using **shadcn/ui** as base, heavily customized for Gifta's distinctive aestheti
 ├─────────────────────────────────────┤
 │                                     │
 │  ┌───────────────────────────────┐  │
-│  │    Create a Dream Board →     │  │
+│  │    Create a Dreamboard →     │  │
 │  └───────────────────────────────┘  │
 │                                     │
 └─────────────────────────────────────┘
 ```
 
-### Dream Board Creation Wizard
+### Dreamboard Creation Wizard
 
 **Step Indicators:**
 ```
@@ -710,7 +710,7 @@ Note: Party date from Step 1 serves as the pot close date.
 ┌─────────────────────────────────────┐
 │ ← Back          Step 4 of 4         │
 │                                     │
-│  Review your Dream Board            │
+│  Review your Dreamboard            │
 │                                     │
 │  ┌─────────────────────────────────┐│
 │  │        [Maya's Photo]           ││
@@ -735,7 +735,7 @@ Note: Party date from Step 1 serves as the pot close date.
 │  [Edit Child] [Edit Gift] [Edit Msg]│
 │                                     │
 │  ┌───────────────────────────────┐  │
-│  │    Create Dream Board →       │  │
+│  │    Create Dreamboard →       │  │
 │  └───────────────────────────────┘  │
 └─────────────────────────────────────┘
 ```
@@ -749,7 +749,7 @@ Note: Guests will see percentage funded and the aggregate totals raised vs goal.
 │                                     │
 │              🎉                     │
 │                                     │
-│  Your Dream Board is live!          │
+│  Your Dreamboard is live!          │
 │                                     │
 │  Share this link with party guests: │
 │                                     │
@@ -773,7 +773,7 @@ Note: Guests will see percentage funded and the aggregate totals raised vs goal.
 └─────────────────────────────────────┘
 ```
 
-### Guest View (Dream Board)
+### Guest View (Dreamboard)
 
 ```
 ┌─────────────────────────────────────┐
@@ -897,14 +897,14 @@ Shown after the goal is reached. Guests can still contribute; there is no charit
 │  └───────────────────────────────┘  │
 │                                     │
 │  ┌───────────────────────────────┐  │
-│  │     View Dream Board          │  │
+│  │     View Dreamboard          │  │
 │  └───────────────────────────────┘  │
 │                                     │
 │  ─────────────────────────────────  │
 │                                     │
 │  Want to create your own?           │
 │  ┌───────────────────────────────┐  │
-│  │  Create a Dream Board →       │  │
+│  │  Create a Dreamboard →       │  │
 │  └───────────────────────────────┘  │
 │                                     │
 └─────────────────────────────────────┘

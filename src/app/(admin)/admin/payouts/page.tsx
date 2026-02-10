@@ -30,7 +30,7 @@ const payoutTypeLabel = (type: AdminPayoutDataset['type']) =>
 const columns: AdminDataColumn<AdminPayoutDataset>[] = [
   {
     key: 'dream-board',
-    header: 'Dream board',
+    header: 'Dreamboard',
     render: (item) => (
       <Link
         href={`/${item.dreamBoardSlug}`}

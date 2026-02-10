@@ -45,7 +45,7 @@ Authorization: Bearer cpk_live_xxxxxxxxxxxxxxxxxxxx
 **Key Scopes:**
 | Scope | Description |
 |-------|-------------|
-| `dreamboards:read` | Read Dream Board data |
+| `dreamboards:read` | Read Dreamboard data |
 | `dreamboards:write` | Create/update Dream Boards |
 | `contributions:read` | Read contribution data |
 | `payouts:read` | Read payout status |
@@ -161,7 +161,7 @@ Response includes pagination metadata:
 
 ### Dream Boards
 
-#### Create Dream Board
+#### Create Dreamboard
 
 ```http
 POST /v1/dream-boards
@@ -221,14 +221,14 @@ POST /v1/dream-boards
 }
 ```
 
-#### Get Dream Board
+#### Get Dreamboard
 
 ```http
 GET /v1/dream-boards/{id}
 ```
 
 **Path Parameters:**
-- `id` — Dream Board public identifier (UUID or slug)
+- `id` — Dreamboard public identifier (UUID or slug)
 
 **Response:** `200 OK`
 ```json
@@ -281,7 +281,7 @@ GET /v1/dream-boards
 }
 ```
 
-#### Update Dream Board
+#### Update Dreamboard
 
 ```http
 PATCH /v1/dream-boards/{id}
@@ -300,9 +300,9 @@ PATCH /v1/dream-boards/{id}
 - `party_date` (can only extend, not shorten)
 - `status` (only certain transitions allowed)
 
-**Response:** `200 OK` with updated Dream Board
+**Response:** `200 OK` with updated Dreamboard
 
-#### Close Dream Board
+#### Close Dreamboard
 
 ```http
 POST /v1/dream-boards/{id}/close
@@ -383,7 +383,7 @@ GET /v1/contributions/{id}
 
 ### Payouts
 
-**Note:** Each Dream Board has a single Karri payout.
+**Note:** Each Dreamboard has a single Karri payout.
 
 #### List Pending Payouts
 
@@ -553,11 +553,11 @@ Gifta pushes events to registered webhook endpoints.
 
 | Event | Description | Payload |
 |-------|-------------|---------|
-| `dreamboard.created` | New Dream Board created | Dream Board object |
-| `dreamboard.updated` | Dream Board updated | Dream Board object |
-| `contribution.received` | Successful contribution | Contribution + Dream Board |
-| `pot.funded` | Goal amount reached | Dream Board object |
-| `pot.closed` | Dream Board closed | Dream Board object |
+| `dreamboard.created` | New Dreamboard created | Dreamboard object |
+| `dreamboard.updated` | Dreamboard updated | Dreamboard object |
+| `contribution.received` | Successful contribution | Contribution + Dreamboard |
+| `pot.funded` | Goal amount reached | Dreamboard object |
+| `pot.closed` | Dreamboard closed | Dreamboard object |
 | `payout.ready` | Payout ready for execution | Payout object |
 | `payout.completed` | Payout confirmed complete | Payout object |
 | `payout.failed` | Payout failed | Payout object + error |
@@ -696,7 +696,7 @@ const chipin = new ChipInClient({
   apiKey: 'cpk_live_xxx',
 });
 
-// Create Dream Board
+// Create Dreamboard
 const dreamBoard = await chipin.dreamBoards.create({
   childName: 'Maya',
   childPhotoUrl: 'https://...',
@@ -711,7 +711,7 @@ const dreamBoard = await chipin.dreamBoards.create({
   karriCardHolderName: "Maya's Mom",
 });
 
-// Get Dream Board
+// Get Dreamboard
 const board = await chipin.dreamBoards.get('0f3b3f3e-1a2b-4c5d-8e9f-0123456789ab');
 
 // List contributions
@@ -726,7 +726,7 @@ await chipin.payouts.confirm('po_xyz789', {
 ### cURL Examples
 
 ```bash
-# Create Dream Board
+# Create Dreamboard
 curl -X POST https://api.chipin.co.za/v1/dream-boards \
   -H "Authorization: Bearer cpk_live_xxx" \
   -H "Content-Type: application/json" \
@@ -742,7 +742,7 @@ curl -X POST https://api.chipin.co.za/v1/dream-boards \
     "karri_card_holder_name": "Maya\u0027s Mom"
   }'
 
-# Get Dream Board
+# Get Dreamboard
 curl https://api.chipin.co.za/v1/dream-boards/0f3b3f3e-1a2b-4c5d-8e9f-0123456789ab \
   -H "Authorization: Bearer cpk_live_xxx"
 

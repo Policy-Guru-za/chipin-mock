@@ -87,7 +87,7 @@ All messages must use pre-approved templates in WhatsApp Business Manager.
 
 #### Template: `dream_board_created`
 ```
-🎉 {{child_name}}'s Dream Board is live!
+🎉 {{child_name}}'s Dreamboard is live!
 
 Share this link with party guests:
 {{dream_board_url}}
@@ -97,14 +97,14 @@ You'll receive notifications when friends chip in.
 
 #### Template: `contribution_received`
 ```
-💝 {{contributor_name}} just contributed to {{child_name}}'s Dream Board!
+💝 {{contributor_name}} just contributed to {{child_name}}'s Dreamboard!
 
 Progress: {{percentage}}% funded
 ```
 
 #### Template: `funding_complete`
 ```
-🎊 Amazing news! {{child_name}}'s Dream Board is fully funded!
+🎊 Amazing news! {{child_name}}'s Dreamboard is fully funded!
 
 Total raised: R{{amount}}
 
@@ -348,7 +348,7 @@ Used for:
 - Session storage
 - Magic link tokens
 - Rate limiting counters
-- Dream board draft state
+- Dreamboard draft state
 
 ### Environment Variables
 

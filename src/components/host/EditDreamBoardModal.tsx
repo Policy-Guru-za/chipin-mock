@@ -250,7 +250,7 @@ export function EditDreamBoardModal({
       >
         <div className="mb-4 flex items-start justify-between gap-3">
           <h2 id="edit-modal-title" className="font-display text-xl font-bold text-text">
-            Edit Dream Board
+            Edit Dreamboard
           </h2>
           <button
             type="button"

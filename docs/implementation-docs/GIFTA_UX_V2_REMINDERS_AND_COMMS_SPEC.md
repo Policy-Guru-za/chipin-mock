@@ -13,7 +13,7 @@ Define required reminder scheduling/dispatch and communications behavior for UX 
 
 | Event | Recipient | Channel | Trigger |
 |---|---|---|---|
-| Dream Board created | Parent/Host | WhatsApp + Email | Successful board creation |
+| Dreamboard created | Parent/Host | WhatsApp + Email | Successful board creation |
 | New contribution | Parent/Host | WhatsApp + Email | Contribution moves to `completed` |
 | Contribution confirmation | Contributor | Email | Contribution `completed` |
 | Reminder requested | Contributor | Email | Reminder due time reached |

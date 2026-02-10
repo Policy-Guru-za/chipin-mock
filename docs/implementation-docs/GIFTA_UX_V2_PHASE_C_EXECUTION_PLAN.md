@@ -47,7 +47,7 @@ Acceptance:
 - `P0`: step sequencing and data integrity correct
 - `P1`: copy and interaction parity complete
 
-### C2 - Public Dream Board Enhancements
+### C2 - Public Dreamboard Enhancements
 
 Tasks:
 

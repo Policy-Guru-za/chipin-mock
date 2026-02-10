@@ -1862,7 +1862,7 @@ button, a, input, select, textarea {
 |------|---------|-----------|-------|
 | Product | Gifta | ChipIn, gifta | Always capitalized |
 | Verb | chip in | ChipIn, Chip In | Lowercase, two words |
-| Entity | Dreamboard | Dream Board, dream board | One word, capitalized |
+| Entity | Dreamboard | Dreamboard, Dreamboard | One word, capitalized |
 | Action | contribute | chip in, donate, fund | Primary action word |
 
 ### Tone Guidelines

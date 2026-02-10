@@ -103,7 +103,7 @@ interface CreditResult {
 
 ### Host: Entering Karri Card Details
 
-During Dream Board creation (Step 3: Details):
+During Dreamboard creation (Step 3: Details):
 
 ```
 ┌─────────────────────────────────────┐
@@ -256,7 +256,7 @@ Karri API must:
 
 ### Verification Flow
 
-1. Host enters card number during Dream Board creation
+1. Host enters card number during Dreamboard creation
 2. Call `karri.verifyCard()` before allowing proceed
 3. Store encrypted card number and cardholder name
 4. Re-verify before processing payout (card may have been cancelled)
@@ -265,7 +265,7 @@ Karri API must:
 
 | Scenario | Handling |
 |----------|----------|
-| Card verification fails | Block Dream Board creation, show error |
+| Card verification fails | Block Dreamboard creation, show error |
 | Credit fails (transient) | Retry in next batch (up to 3 attempts) |
 | Credit fails (permanent) | Mark as failed, alert admin, email host |
 | Card cancelled after creation | Alert host, request new card details |

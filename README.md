@@ -22,7 +22,7 @@
 ## What We're Building
 
 **Gifta** is a social coordination tool for birthday gifting where:
-1. Parent creates a "Dream Board" describing ONE dream gift (AI generates artwork)
+1. Parent creates a "Dreamboard" describing ONE dream gift (AI generates artwork)
 2. Shares link with party guests via WhatsApp
 3. Guests contribute money toward the gift (see % funded + totals raised vs goal)
 4. When pot closes, funds are credited to the parent's Karri Card
@@ -103,7 +103,7 @@
 ## MVP Scope
 
 ### In Scope
-- ✅ Dream Board creation with manual gift name + AI-generated artwork
+- ✅ Dreamboard creation with manual gift name + AI-generated artwork
 - ✅ Clerk authentication (prebuilt sign-in/sign-up)
 - ✅ Guest contribution via PayFast, Ozow (EFT), SnapScan (QR)
 - ✅ Karri Card as sole payout method
@@ -114,7 +114,7 @@
 - ✅ Public Partner API (API keys, scopes, rate limiting)
 
 ### Out of Scope (Post-MVP)
-- ❌ Multiple gifts per Dream Board
+- ❌ Multiple gifts per Dreamboard
 - ❌ Native mobile apps
 - ❌ Desktop-optimized layouts (mobile-first serves all)
 

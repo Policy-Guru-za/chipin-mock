@@ -103,7 +103,7 @@ export function DashboardPostCampaignClient({
       <article className="rounded-xl bg-white p-8 text-center shadow-sm">
         <p className="text-[40px] leading-none">🎉</p>
         <h1 className="mt-3 font-display text-3xl font-bold text-text">
-          {view.childName}&apos;s Dream Board is complete!
+          {view.childName}&apos;s Dreamboard is complete!
         </h1>
         <p className="mt-2 text-base text-gray-500">Campaign complete</p>
       </article>

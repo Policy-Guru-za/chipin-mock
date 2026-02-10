@@ -41,7 +41,7 @@ export const buildDreamBoardMetadata = (
     giftImageUrl: board.giftImageUrl ?? null,
   });
 
-  const title = `${board.childName}'s Dream Board | Gifta`;
+  const title = `${board.childName}'s Dreamboard | Gifta`;
   const description = getMetadataDescription(board, giftTitle);
   const imageUrl = toAbsoluteUrl(`/api/og/${board.slug}`, options.baseUrl);
   const altText = getAltText({ giftSubtitle, title });

@@ -10,8 +10,8 @@
 
 Gifta has two primary user journeys:
 
-1. **Host Journey** — Creating and managing a Dream Board
-2. **Guest Journey** — Viewing and contributing to a Dream Board
+1. **Host Journey** — Creating and managing a Dreamboard
+2. **Guest Journey** — Viewing and contributing to a Dreamboard
 
 Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 
@@ -26,7 +26,7 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 
 ---
 
-## Host Journey: Creating a Dream Board
+## Host Journey: Creating a Dreamboard
 
 ### Journey Overview
 
@@ -46,11 +46,11 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 **Screen Elements:**
 - Hero headline: "Turn 20 toys into one dream gift"
 - Subheadline: "Friends chip in together for your child's birthday"
-- Primary CTA: "Create a Dream Board" (large, prominent)
+- Primary CTA: "Create a Dreamboard" (large, prominent)
 - Secondary: "How it works" (scroll anchor)
 - Social proof: "2,500+ dream gifts funded" (once we have data)
 
-**User Action:** Clicks "Create a Dream Board"
+**User Action:** Clicks "Create a Dreamboard"
 
 **Transition:** → Step 2
 
@@ -259,7 +259,7 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 
 **Screen Elements:**
 - Progress indicator: Step 4 of 4
-- Heading: "Review your Dream Board"
+- Heading: "Review your Dreamboard"
 
 **Preview Card (exactly as guests will see):**
 ```
@@ -287,12 +287,12 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 
 **Actions:**
 - "Edit" links next to each section (→ back to respective step)
-- "Create Dream Board" button (primary)
+- "Create Dreamboard" button (primary)
 
-**User Action:** Reviews, clicks "Create Dream Board"
+**User Action:** Reviews, clicks "Create Dreamboard"
 
 **System Action:**
-1. Create Dream Board record in database
+1. Create Dreamboard record in database
 2. Generate unique slug: `maya-7th-birthday-{random6chars}`
 3. Upload finalized image if needed
 4. Set status to 'active'
@@ -302,13 +302,13 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 **URL:** `<APP_DOMAIN>/dashboard/{dreamBoardId}` (or `/success`)
 
 **Screen Elements:**
-- 🎉 "Your Dream Board is live!"
+- 🎉 "Your Dreamboard is live!"
 - Shareable link in copy-able text box
 - Share buttons:
   - "Share via WhatsApp" (deep link)
   - "Copy link"
   - "Share via Email" (mailto)
-- Preview of the live Dream Board
+- Preview of the live Dreamboard
 
 **WhatsApp Share Template:**
 ```
@@ -323,7 +323,7 @@ Every contribution helps! 💝
 
 **WhatsApp Notification to Host:**
 ```
-🎉 Your Dream Board is live!
+🎉 Your Dreamboard is live!
 
 Share this link with party guests:
 <APP_DOMAIN>/maya-7th-birthday-abc123
@@ -333,7 +333,7 @@ You'll receive notifications when friends chip in.
 
 ---
 
-## Host Journey: Managing a Dream Board
+## Host Journey: Managing a Dreamboard
 
 ### Dashboard View
 
@@ -348,8 +348,8 @@ You'll receive notifications when friends chip in.
   - Deadline: "5 days left"
   - Contributor count: "8 contributions"
 
-**Actions per Dream Board:**
-- "View" → Opens public Dream Board
+**Actions per Dreamboard:**
+- "View" → Opens public Dreamboard
 - "Manage" → Opens management screen
 
 ### Management Screen
@@ -359,7 +359,7 @@ You'll receive notifications when friends chip in.
 **Tabs/Sections:**
 
 #### Overview Tab
-- Full preview of Dream Board
+- Full preview of Dreamboard
 - Progress visualization (% AND Rand amount - host view)
 - Quick stats: Total raised, # contributors, days until party
 
@@ -375,7 +375,7 @@ You'll receive notifications when friends chip in.
 #### Settings Tab
 - Edit message
 - Close pot early
-- Cancel Dream Board
+- Cancel Dreamboard
 
 #### Payout Tab (appears when pot closes)
 - "Your pot has closed!"
@@ -386,7 +386,7 @@ You'll receive notifications when friends chip in.
 
 ---
 
-## Guest Journey: Contributing to a Dream Board
+## Guest Journey: Contributing to a Dreamboard
 
 ### Journey Overview
 
@@ -412,7 +412,7 @@ You'll receive notifications when friends chip in.
 
 ---
 
-### Step 2: View Dream Board
+### Step 2: View Dreamboard
 
 **URL:** `<APP_DOMAIN>/{slug}`
 
@@ -583,7 +583,7 @@ You'll receive notifications when friends chip in.
 │  └───────────────────────────────┘  │
 │                                     │
 │  ┌───────────────────────────────┐  │
-│  │   View Dream Board            │  │
+│  │   View Dreamboard            │  │
 │  └───────────────────────────────┘  │
 │                                     │
 │  ─────────────────────────────────  │
@@ -611,7 +611,7 @@ You'll receive notifications when friends chip in.
 
 ## Edge Cases & Error States
 
-### Dream Board Not Found
+### Dreamboard Not Found
 
 **URL:** `<APP_DOMAIN>/invalid-slug`
 
@@ -621,7 +621,7 @@ You'll receive notifications when friends chip in.
 │                                     │
 │              😕                     │
 │                                     │
-│     Dream Board not found          │
+│     Dreamboard not found          │
 │                                     │
 │  This link may have expired or     │
 │  been removed.                      │
@@ -633,7 +633,7 @@ You'll receive notifications when friends chip in.
 └─────────────────────────────────────┘
 ```
 
-### Dream Board Closed
+### Dreamboard Closed
 
 **Screen:**
 ```
@@ -643,14 +643,14 @@ You'll receive notifications when friends chip in.
 │                                     │
 │              ✅                     │
 │                                     │
-│     This Dream Board has closed    │
+│     This Dreamboard has closed    │
 │                                     │
 │  R2,100 was raised toward Maya's   │
 │  LEGO Death Star!                   │
 │                                     │
 │  Want to create your own?          │
 │  ┌───────────────────────────────┐  │
-│  │   Create a Dream Board →      │  │
+│  │   Create a Dreamboard →      │  │
 │  └───────────────────────────────┘  │
 │                                     │
 └─────────────────────────────────────┘
@@ -709,9 +709,9 @@ You'll receive notifications when friends chip in.
 
 | Event | Recipient | Message |
 |-------|-----------|---------|
-| Dream Board created | Host | "🎉 Your Dream Board is live! Share this link: {url}" |
-| Contribution received | Host | "💝 {name} just contributed to {childName}'s Dream Board! {percentage}% funded" |
-| Goal reached | Host | "🎊 Amazing! {childName}'s Dream Board is fully funded! R{amount} raised" |
+| Dreamboard created | Host | "🎉 Your Dreamboard is live! Share this link: {url}" |
+| Contribution received | Host | "💝 {name} just contributed to {childName}'s Dreamboard! {percentage}% funded" |
+| Goal reached | Host | "🎊 Amazing! {childName}'s Dreamboard is fully funded! R{amount} raised" |
 | Pot closed | Host | "Your pot has closed! R{amount} will be credited to Karri Card ending in {last4}" |
 | Payout credited | Host | "✅ R{amount} has been credited to your Karri Card ending in {last4}" |
 
@@ -719,7 +719,7 @@ You'll receive notifications when friends chip in.
 
 | Event | Recipient | Email Content |
 |-------|-----------|---------------|
-| Dream Board created | Host | "Your Dream Board is live! Here's your link..." |
+| Dreamboard created | Host | "Your Dreamboard is live! Here's your link..." |
 | Payout credited | Host | "Funds have been credited to your Karri Card" |
 | Payout failed | Host | "We couldn't credit your Karri Card. Please contact support." |
 
@@ -765,7 +765,7 @@ If host enables browser notifications:
 
 ### Optimization Strategies
 
-- Static generation for Dream Board pages (ISR)
+- Static generation for Dreamboard pages (ISR)
 - Image optimization via Vercel
 - Minimal JavaScript for guest view
 - Edge caching for repeated views

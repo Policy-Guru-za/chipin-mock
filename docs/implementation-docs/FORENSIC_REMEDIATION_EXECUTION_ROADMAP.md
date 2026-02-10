@@ -19,7 +19,7 @@ Execute a full forensic remediation program that fixes correctness risks, remove
 ### In scope
 - Money/accounting correctness (fee, raised, funded, payout totals).
 - Karri batch retry correctness.
-- Dream Board lifecycle transition consistency.
+- Dreamboard lifecycle transition consistency.
 - Webhook contract/runtime alignment.
 - Payout-method coherence in runtime/API/docs (`karri_card` + `bank`), including removal of half-supported branches.
 - Route-policy hardening in middleware.
@@ -148,10 +148,10 @@ pnpm test tests/unit/karri-batch.test.ts tests/unit/karri-batch-backoff.test.ts 
 ---
 
 ## P0.4 Lifecycle State Machine Consolidation
-**Goal:** Centralize Dream Board and payout state transitions to eliminate scattered rules.
+**Goal:** Centralize Dreamboard and payout state transitions to eliminate scattered rules.
 
 **Tasks**
-- Introduce lifecycle transition module(s) for Dream Board and payout status rules.
+- Introduce lifecycle transition module(s) for Dreamboard and payout status rules.
 - Replace route-local transition checks with centralized validators.
 - Ensure close/funded/paid_out flows use shared transition API.
 - Add negative tests for invalid transitions.
@@ -487,7 +487,7 @@ Gate criteria:
 **Goal:** Improve signal, speed, and maintenance of test suite.
 
 **Tasks**
-- Add reusable factories/fixtures for Dream Board, contribution, payout, webhook event.
+- Add reusable factories/fixtures for Dreamboard, contribution, payout, webhook event.
 - Standardize integration test harness setup.
 - Expand branch coverage on critical domain modules (accounting/lifecycle/webhooks).
 

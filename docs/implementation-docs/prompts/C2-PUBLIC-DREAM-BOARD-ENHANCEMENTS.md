@@ -1,4 +1,4 @@
-# Phase C — Milestone C2: Public Dream Board Enhancements
+# Phase C — Milestone C2: Public Dreamboard Enhancements
 
 ## Context
 
@@ -10,9 +10,9 @@ Create Flow Restructure) complete and approved: 6-step flow,
 Production deploy strategy: Phase B and C deploy together
 after Phase C completion. Write-path toggles remain OFF.
 
-You are now executing Milestone C2: Public Dream Board
+You are now executing Milestone C2: Public Dreamboard
 Enhancements. This milestone upgrades the three guest-facing
-pages — the public dream board, thank-you, and payment-failed
+pages — the public Dreamboard, thank-you, and payment-failed
 — with charity visibility, richer contributor display,
 dynamic time messaging, return-visit detection, celebration
 UX, receipt capture, and empathetic error recovery.
@@ -78,7 +78,7 @@ Then read the current source code you will be modifying:
 **Routes being enhanced (all exist, no new routes):**
 
 ```
-/(guest)/[slug]              → Public dream board (MAJOR enhancement)
+/(guest)/[slug]              → Public Dreamboard (MAJOR enhancement)
 /(guest)/[slug]/thanks       → Thank-you page (MAJOR enhancement)
 /(guest)/[slug]/payment-failed → Payment failed (SIGNIFICANT enhancement)
 ```
@@ -248,11 +248,11 @@ contribution and board data.
 In `src/lib/dream-boards/metadata.ts`, change the brand
 name in OG titles from "ChipIn" to "Gifta":
 ```
-"${childName}'s Dream Board | ChipIn"
-  → "${childName}'s Dream Board | Gifta"
+"${childName}'s Dreamboard | ChipIn"
+  → "${childName}'s Dreamboard | Gifta"
 ```
 
-### Sub-step 2: Rewrite Public Dream Board Page
+### Sub-step 2: Rewrite Public Dreamboard Page
 
 **File:** `src/app/(guest)/[slug]/page.tsx`
 

@@ -22,7 +22,7 @@ Related docs:
 
 ## Glossary (Normalized Terms)
 
-- Dream Board: canonical two-word entity name (`dream_boards` table).
+- Dreamboard: canonical two-word entity name (`dream_boards` table).
 - Schema-first: apply DB migration before enabling new product behavior.
 - Write-path disabled: bank/charity create/update writes are rejected in production.
 - Hold point: mandatory observation window between migration and GO decision.
@@ -36,7 +36,7 @@ Related docs:
 - In scope:
   - bank/charity schema support
   - charities + contribution_reminders tables
-  - host/dream board/contribution/payout schema extensions
+  - host/Dreamboard/contribution/payout schema extensions
 - Out of scope:
   - bank/charity product launch
   - activation of new bank/charity write paths

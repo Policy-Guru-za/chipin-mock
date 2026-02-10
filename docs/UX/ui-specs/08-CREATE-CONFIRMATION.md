@@ -80,7 +80,7 @@ The Child Gift Dates Giving Back Payout Review
 │    is ready!                                │
 │                                             │
 │ ┌───────────────────────────────────────┐  │
-│ │   DREAM BOARD PREVIEW                 │  │
+│ │   DREAMBOARD PREVIEW                 │  │
 │ │                                       │  │
 │ │ ┌─────────────────────────────────┐   │  │
 │ │ │                                 │   │  │
@@ -128,7 +128,7 @@ The Child Gift Dates Giving Back Payout Review
 │                  🎉 Sophie's Dreamboard is ready!                 │
 │                                                                     │
 │ ┌─────────────────────────────────────────────────────────────────┐│
-│ │                    DREAM BOARD PREVIEW                          ││
+│ │                    DREAMBOARD PREVIEW                          ││
 │ │                                                                 ││
 │ │                  ┌─────────────────────────┐                   ││
 │ │                  │                         │                   ││
@@ -512,7 +512,7 @@ Always available for navigation
 **Timeline (0 - 2 seconds):**
 
 1. **0ms:** Page loads, content hidden
-   - Dream board preview: opacity 0, transform translateY(24px)
+   - Dreamboard preview: opacity 0, transform translateY(24px)
    - Confetti initializing (off-screen)
 
 2. **100ms:** Content fade-in starts

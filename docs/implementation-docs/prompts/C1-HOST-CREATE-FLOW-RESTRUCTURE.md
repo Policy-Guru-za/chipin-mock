@@ -146,7 +146,7 @@ Update titles per UX specs:
 - giving-back: "Want to share the love? 💚"
   (subtitle: "Help a cause while celebrating {childName}.")
 - payout: "How should we send your payout?"
-- review: "Review your Dream Board"
+- review: "Review your Dreamboard"
 
 Add completion validators:
 
@@ -539,7 +539,7 @@ becomes a two-state celebration experience.
 Mark as `'use client'`. This component manages two states:
 
 **State 1 — Pre-publish (initial load):**
-- Dream board preview card showing all captured data:
+- Dreamboard preview card showing all captured data:
   child photo (circular, 120px mobile / 150px desktop),
   "{childName} turns {age}!", birthday date, gift name + image
   + goal amount, campaign close date, payout method summary,
@@ -551,7 +551,7 @@ Mark as `'use client'`. This component manages two states:
   - Dates section (birthday, party, campaign) → `/create/dates`
   - Charity section (if enabled) → `/create/giving-back`
   - Payout section (method, contact) → `/create/payout`
-- Prominent "Publish Dream Board" button (primary, full-width
+- Prominent "Publish Dreamboard" button (primary, full-width
   on mobile)
 - CreateFlowShell with currentStep=6, totalSteps=6
 
@@ -572,7 +572,7 @@ transition. The state machine is:
   implementation — keep dependencies minimal.
 - Celebration heading: "🎉 {childName}'s Dreamboard is ready!"
   (Fraunces font, text-4xl, fade-up animation)
-- Dream board preview card (same as pre-publish but read-only,
+- Dreamboard preview card (same as pre-publish but read-only,
   no edit links)
 - Share link display: `https://gifta.co/{slug}` with copy
   button ("Copy" → "Copied! ✓" for 2 seconds)
@@ -745,7 +745,7 @@ a regression — fix it.
 - [ ] Encryption: card and bank account numbers encrypted
       with same AES-256-GCM pattern
 - [ ] Karri verification: called when enabled, errors handled
-- [ ] Final publish action: creates dream board in database
+- [ ] Final publish action: creates Dreamboard in database
       with correct field mapping (identical to current)
 - [ ] No regressions: all pre-existing 429 tests pass
 - [ ] New unit tests pass for dates, giving-back, payout

@@ -423,7 +423,7 @@ Create these test files:
 - "Continue to payment" disabled when no amount selected
 - "Continue to payment" disabled when name empty and not anonymous
 - Social proof text renders
-- Back button navigates to dream board
+- Back button navigates to Dreamboard
 
 **`tests/unit/contribute-payment.test.ts`** (~10 tests):
 - Redirects to details page when no flow data in sessionStorage

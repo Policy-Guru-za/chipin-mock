@@ -235,7 +235,7 @@ export const buildDashboardCardViewModel = (
   return {
     boardId: board.id,
     slug: board.slug,
-    boardTitle: `${board.childName}'s Dream Board`,
+    boardTitle: `${board.childName}'s Dreamboard`,
     percentage,
     raisedLabel: formatZar(board.raisedCents),
     contributionCount: board.contributionCount,

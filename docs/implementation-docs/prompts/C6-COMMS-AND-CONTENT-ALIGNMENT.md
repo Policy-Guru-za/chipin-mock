@@ -5,7 +5,7 @@
 Align all user-visible UI copy, email templates, branding strings,
 error messages, and product terminology to the canonical copy matrix.
 Remove every legacy "ChipIn" reference from active UX surfaces, fix
-all "Dreamboard" → "Dream Board" casing violations, and close the
+all "Dreamboard" → "Dreamboard" casing violations, and close the
 gap between the copy matrix definitions and the implemented strings.
 
 ---
@@ -55,7 +55,7 @@ gap between the copy matrix definitions and the implemented strings.
 ### Global Terminology
 | Term | Canonical | Wrong variants to find/fix |
 |------|-----------|---------------------------|
-| Dream Board | `Dream Board` (two words, both capitalised) | `Dreamboard`, `dreamboard`, `dream board` (lowercase) |
+| Dreamboard | `Dreamboard` (two words, both capitalised) | `Dreamboard`, `dreamboard`, `Dreamboard` (lowercase) |
 | Contribution verb | `chip in` (lowercase) | `contribute`, `donation`, `donate` when user-facing |
 | Giving Back | `Gift That Gives Twice` | `giving back` in user-facing labels |
 | Host/Parent | `Parent` in user-facing copy | `Host` in user-facing labels |
@@ -67,14 +67,14 @@ gap between the copy matrix definitions and the implemented strings.
 | Gift step intro | `"What's the dream gift?"` (or `"What's {childName}'s dream gift?"`) |
 | Giving back toggle | `"Enable giving back (optional)"` |
 | Payout method label | `"How should we send your payout?"` |
-| Review CTA | `"Create Dream Board"` |
+| Review CTA | `"Create Dreamboard"` |
 
-### Public Dream Board
+### Public Dreamboard
 | Location | Canonical copy |
 |----------|---------------|
 | Hero title | `"Help make this gift happen"` |
 | Progress text | `"{percentage}% funded"` |
-| Closed state | `"This Dream Board is closed to new contributions."` |
+| Closed state | `"This Dreamboard is closed to new contributions."` |
 | Funded banner | `"Goal reached! Extra contributions still help."` |
 
 ### Contribution Flow
@@ -84,13 +84,13 @@ gap between the copy matrix definitions and the implemented strings.
 | Name field | `"Your name (optional)"` |
 | Message field | `"Message (optional)"` |
 | Reminder prompt | `"Remind me later"` |
-| Reminder confirmation | `"We'll send one reminder before this Dream Board closes."` |
+| Reminder confirmation | `"We'll send one reminder before this Dreamboard closes."` |
 
 ### Host Dashboard
 | Location | Canonical copy |
 |----------|---------------|
 | Title | `"Your Dream Boards"` |
-| Empty state | `"You haven't created a Dream Board yet."` |
+| Empty state | `"You haven't created a Dreamboard yet."` |
 | Payout section | `"Payout details"` |
 | Post-campaign | `"Campaign complete"` |
 
@@ -111,7 +111,7 @@ gap between the copy matrix definitions and the implemented strings.
 | Template | Subject |
 |----------|---------|
 | Parent new contribution | `"🎉 New contribution for [Child]!"` |
-| Parent campaign complete | `"🎉 [Child]'s Dream Board is complete"` |
+| Parent campaign complete | `"🎉 [Child]'s Dreamboard is complete"` |
 | Contributor confirmation | `"💝 Thanks for chipping in for [Child]!"` |
 | Contributor reminder | `"🔔 Reminder: chip in for [Child]'s gift"` |
 
@@ -130,7 +130,7 @@ gap between the copy matrix definitions and the implemented strings.
 | `src/lib/integrations/email.ts` | 3 | `'noreply@chipin.co.za'` fallback | → `'noreply@gifta.co.za'` |
 | `src/lib/integrations/email.ts` | 4 | `'ChipIn'` from-name fallback | → `'Gifta'` |
 | `src/lib/payments/reconciliation-job.ts` | 355 | `'ChipIn reconciliation mismatches'` | → `'Gifta reconciliation mismatches'` |
-| `src/lib/integrations/karri-batch.ts` | 123 | `'ChipIn Dream Board credit'` | → `'Gifta Dream Board credit'` |
+| `src/lib/integrations/karri-batch.ts` | 123 | `'ChipIn Dreamboard credit'` | → `'Gifta Dreamboard credit'` |
 | `src/lib/retention/retention.ts` | 13 | `'anonymized@chipin.co.za'` | → `'anonymized@gifta.co.za'` |
 | `src/lib/api/openapi.ts` | 18 | `'https://api.chipin.co.za/v1'` | → `'https://api.gifta.co.za/v1'` |
 | `src/lib/analytics/metrics.ts` | 2 | `ChipIn business KPIs` (comment) | → `Gifta business KPIs` |
@@ -139,7 +139,7 @@ gap between the copy matrix definitions and the implemented strings.
 ### Critical — "Dreamboard" casing violations
 
 Every `Dreamboard` or `dreamboard` in a **user-visible string**
-must become `Dream Board`. Leave API scope strings, webhook event
+must become `Dreamboard`. Leave API scope strings, webhook event
 names, and code variable names unchanged.
 
 | File | Line(s) | Context |
@@ -172,13 +172,13 @@ names, and code variable names unchanged.
 | File | Current | Matrix target |
 |------|---------|---------------|
 | `src/app/(host)/create/giving-back/GivingBackForm.tsx:77` | `"Share a portion with charity"` | `"Enable giving back (optional)"` |
-| `src/app/(host)/create/review/ReviewClient.tsx:262` | `"Publish Dream Board"` | `"Create Dream Board"` |
+| `src/app/(host)/create/review/ReviewClient.tsx:262` | `"Publish Dreamboard"` | `"Create Dreamboard"` |
 | `src/app/(guest)/[slug]/contribute/ContributeDetailsClient.tsx:183` | `"Your name (as it will appear)"` | `"Your name (optional)"` |
 | `src/app/(guest)/[slug]/contribute/ContributeDetailsClient.tsx:218` | `"Add a birthday message 🎂"` | `"Message (optional)"` |
 | `src/app/(guest)/[slug]/contribute/ContributeDetailsClient.tsx:260` | `"Remind me in 3 days 🔔"` | `"Remind me later"` |
-| `src/components/contribute/ReminderModal.tsx:120` | `"We'll send you a reminder in 3 days so you can check on the progress."` | `"We'll send one reminder before this Dream Board closes."` |
+| `src/components/contribute/ReminderModal.tsx:120` | `"We'll send you a reminder in 3 days so you can check on the progress."` | `"We'll send one reminder before this Dreamboard closes."` |
 | `src/app/(host)/dashboard/[id]/DashboardPostCampaignClient.tsx:124` | `"Charity Donation"` | `"Charity contribution"` |
-| `src/lib/dream-boards/view-model.ts:159` | `"This Dreamboard has closed. Thank you for..."` | `"This Dream Board is closed to new contributions."` |
+| `src/lib/dream-boards/view-model.ts:159` | `"This Dreamboard has closed. Thank you for..."` | `"This Dreamboard is closed to new contributions."` |
 | `src/app/(guest)/[slug]/page.tsx:123` | `"Goal reached! Extra contributions still help cover the dream gift."` | `"Goal reached! Extra contributions still help."` |
 
 ### Medium — Reminder email template terminology
@@ -234,7 +234,7 @@ listed in the "Critical — Legacy ChipIn" table above.
 - `src/app/layout.tsx` lines 46, 48, 54, 67 — update SEO title
   to `"Gifta — One Dream Gift, Together."` (or similar approved
   tagline). Replace `"Create a Dreamboard for your child's
-  birthday..."` with `"Create a Dream Board for your child's
+  birthday..."` with `"Create a Dreamboard for your child's
   birthday. Friends and family chip in toward one meaningful
   gift."`.
 
@@ -243,26 +243,26 @@ no imports broke.
 
 ---
 
-### Sub-step 2: Dream Board Casing
+### Sub-step 2: Dreamboard Casing
 
-Replace every user-visible `Dreamboard` with `Dream Board` in the
+Replace every user-visible `Dreamboard` with `Dreamboard` in the
 files listed in the "Critical — Dreamboard casing" table above.
 
 **Pattern:** Search for `Dreamboard` (case-sensitive) across all
 `.tsx` and `.ts` files under `src/`. For each hit:
 - If it's in a JSX string, React text node, `title` prop,
   `description`, metadata, or user-visible copy → replace with
-  `Dream Board`
+  `Dreamboard`
 - If it's in an API scope string, webhook event name, URL slug,
   or code variable → leave unchanged
 
 **Landing page strings** (`LandingCTA`, `LandingPage`,
 `LandingNav`, `LandingDreamBoard`, `content.ts`):
-- `"Create Your Free Dreamboard"` → `"Create your free Dream Board"`
+- `"Create Your Free Dreamboard"` → `"Create your free Dreamboard"`
   (sentence case per copy matrix rules)
-- `"Create a Dreamboard"` → `"Create a Dream Board"`
-- `"Share your Dreamboard"` → `"Share your Dream Board"`
-- `"Mia's Dreamboard"` → `"Mia's Dream Board"`
+- `"Create a Dreamboard"` → `"Create a Dreamboard"`
+- `"Share your Dreamboard"` → `"Share your Dreamboard"`
+- `"Mia's Dreamboard"` → `"Mia's Dreamboard"`
 
 After this sub-step: run `pnpm lint && pnpm typecheck`.
 
@@ -277,13 +277,13 @@ Fix the mismatches in the host creation flow:
    - Change to: `"Enable giving back (optional)"`
 
 2. **`src/app/(host)/create/review/ReviewClient.tsx:262`**
-   - Current: `"Publish Dream Board"`
-   - Change to: `"Create Dream Board"`
+   - Current: `"Publish Dreamboard"`
+   - Change to: `"Create Dreamboard"`
    - Also fix the pending state: `"Publishing..."` → `"Creating..."`
 
 3. **`src/app/(host)/create/review/ReviewClient.tsx:186`**
    - Current: `"{childName}'s Dreamboard is ready!"`
-   - Change to: `"🎉 {childName}'s Dream Board is ready!"`
+   - Change to: `"🎉 {childName}'s Dreamboard is ready!"`
 
 4. **`src/app/(host)/create/review/ReviewClient.tsx:175-177`**
    - Email body: `"we're collecting contributions"` →
@@ -310,7 +310,7 @@ Fix the mismatches in the host creation flow:
 4. **`src/components/contribute/ReminderModal.tsx:120`**
    - Current: `"We'll send you a reminder in 3 days so you can
      check on the progress."`
-   - Change to: `"We'll send one reminder before this Dream Board
+   - Change to: `"We'll send one reminder before this Dreamboard
      closes."`
 
 5. **`src/app/(guest)/[slug]/contribute/ContributeDetailsClient.tsx:99`**
@@ -330,7 +330,7 @@ Fix the mismatches in the host creation flow:
 2. **`src/lib/dream-boards/view-model.ts:159`**
    - Current: `"This Dreamboard has closed. Thank you for helping
      make this birthday special! 💝"`
-   - Change to: `"This Dream Board is closed to new contributions."`
+   - Change to: `"This Dreamboard is closed to new contributions."`
 
 3. **`src/lib/dream-boards/view-model.ts:105`**
    - Current: `"Contribute to {childName}'s dream gift"`
@@ -371,8 +371,8 @@ Update `src/lib/reminders/templates.ts`:
 Update any test assertions that reference old copy strings. Search
 test files for:
 - `"ChipIn"` — update to `"Gifta"`
-- `"Dreamboard"` — update to `"Dream Board"`
-- `"Publish Dream Board"` — update to `"Create Dream Board"`
+- `"Dreamboard"` — update to `"Dreamboard"`
+- `"Publish Dreamboard"` — update to `"Create Dreamboard"`
 - `"Share a portion"` — update to `"Enable giving back"`
 - `"Remind me in 3 days"` — update to `"Remind me later"`
 - Any other string that was changed in sub-steps 1–6
@@ -384,16 +384,16 @@ test files for:
 - Footer renders `"Gifta"` not `"ChipIn"`
 - `APP_NAME` constant equals `"Gifta"`
 - Email from-name fallback equals `"Gifta"`
-- View model closed message contains `"Dream Board"` not
+- View model closed message contains `"Dreamboard"` not
   `"Dreamboard"`
 - View model contribution headline uses `"Chip in"` not
   `"Contribute"`
 - Reminder email subject contains `"chip in"` not `"contribute"`
 - Reminder email body contains `"Chip in now"` not
   `"Contribute now"`
-- Landing page CTA contains `"Dream Board"` not `"Dreamboard"`
-- Review CTA button text is `"Create Dream Board"` not
-  `"Publish Dream Board"`
+- Landing page CTA contains `"Dreamboard"` not `"Dreamboard"`
+- Review CTA button text is `"Create Dreamboard"` not
+  `"Publish Dreamboard"`
 - Funded banner text matches matrix exactly
 - Closed state text matches matrix exactly
 
@@ -444,7 +444,7 @@ Verify that copy changes did not break accessibility:
 ### P1 (blocks rollout)
 - All copy matrix entries implemented as specified
 - Reminder email uses `"chip in"` terminology
-- Review CTA is `"Create Dream Board"` (not `"Publish"`)
+- Review CTA is `"Create Dreamboard"` (not `"Publish"`)
 - Giving back toggle matches matrix
 - Contribution flow field labels match matrix
 - Closed/funded state messages match matrix

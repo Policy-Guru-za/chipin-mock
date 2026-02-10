@@ -35,16 +35,16 @@ export default async function HostDashboardPage() {
       <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <h1 className="font-display text-[28px] font-bold text-text">Your Dream Boards</h1>
         <Link href="/create/child" className="w-full md:w-auto">
-          <Button className="w-full bg-primary-700 hover:bg-primary-800 md:w-auto">Create a Dream Board +</Button>
+          <Button className="w-full bg-primary-700 hover:bg-primary-800 md:w-auto">Create a Dreamboard +</Button>
         </Link>
       </header>
 
       {cards.length === 0 ? (
         <div className="rounded-2xl border border-border bg-white px-6 py-12 text-center">
-          <h2 className="text-lg text-gray-600">You haven&apos;t created a Dream Board yet.</h2>
+          <h2 className="text-lg text-gray-600">You haven&apos;t created a Dreamboard yet.</h2>
           <div className="mt-6">
             <Link href="/create/child">
-              <Button size="lg">Create your first Dream Board</Button>
+              <Button size="lg">Create your first Dreamboard</Button>
             </Link>
           </div>
         </div>
@@ -104,7 +104,7 @@ export default async function HostDashboardPage() {
               className="flex min-h-[292px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-white p-5 text-center text-gray-500 transition hover:border-teal-300 hover:text-teal-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <span className="text-[32px] leading-none">+</span>
-              <span className="mt-3 text-base font-medium">Create a Dream Board</span>
+              <span className="mt-3 text-base font-medium">Create a Dreamboard</span>
             </Link>
           </li>
         </ul>

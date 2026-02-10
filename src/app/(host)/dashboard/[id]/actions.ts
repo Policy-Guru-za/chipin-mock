@@ -50,10 +50,10 @@ export async function updateDreamBoard(
 
   const board = await getDashboardDetailExpanded(parsed.data.boardId, session.hostId);
   if (!board) {
-    return { success: false, error: 'Dream Board not found.' };
+    return { success: false, error: 'Dreamboard not found.' };
   }
   if (!EDITABLE_STATUSES.has(board.status)) {
-    return { success: false, error: 'This Dream Board can no longer be edited.' };
+    return { success: false, error: 'This Dreamboard can no longer be edited.' };
   }
 
   const today = parseDateOnly(new Date());

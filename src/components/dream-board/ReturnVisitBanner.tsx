@@ -61,7 +61,7 @@ export function ReturnVisitBanner({ slug, childName, href, isExpired }: ReturnVi
   const handleShare = async () => {
     const text = `Help make ${childName}'s birthday extra special! 💝`;
     if (navigator.share) {
-      await navigator.share({ title: `${childName}'s Dream Board`, text, url: shareUrl });
+      await navigator.share({ title: `${childName}'s Dreamboard`, text, url: shareUrl });
       return;
     }
     await navigator.clipboard.writeText(shareUrl);
@@ -87,7 +87,7 @@ export function ReturnVisitBanner({ slug, childName, href, isExpired }: ReturnVi
           onClick={handleShare}
           className="mt-3 min-h-11 border border-primary-700 bg-white text-primary-700"
         >
-          {copied ? 'Link copied ✓' : 'Share this Dream Board'}
+          {copied ? 'Link copied ✓' : 'Share this Dreamboard'}
         </Button>
       </section>
     );
@@ -100,7 +100,7 @@ export function ReturnVisitBanner({ slug, childName, href, isExpired }: ReturnVi
         variant="ghost"
         onClick={handleCtaClick}
         disabled={isExpired || loading}
-        title={isExpired ? 'This Dream Board is closed to new contributions.' : undefined}
+        title={isExpired ? 'This Dreamboard is closed to new contributions.' : undefined}
         className="min-h-11 w-full border-2 border-primary-700 bg-white text-text hover:bg-[#F0F7F4]"
       >
         {loading ? 'Loading...' : `Chip in for ${childName} 💝`}

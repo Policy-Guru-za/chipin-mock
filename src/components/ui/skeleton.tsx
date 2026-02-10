@@ -43,7 +43,7 @@ interface SkeletonCardProps {
   ariaLabel?: string;
 }
 
-export function DreamBoardCardSkeleton({ ariaLabel = 'Loading dream board' }: SkeletonCardProps) {
+export function DreamBoardCardSkeleton({ ariaLabel = 'Loading Dreamboard' }: SkeletonCardProps) {
   return (
     <div
       className="rounded-2xl border border-border bg-surface p-4 space-y-4"

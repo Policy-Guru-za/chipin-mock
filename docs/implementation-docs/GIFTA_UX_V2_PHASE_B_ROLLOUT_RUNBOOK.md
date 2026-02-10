@@ -65,8 +65,8 @@ Hard stop if critical path fails.
 
 Validate:
 
-- dream board create with `karri_card`
-- dream board create with `bank`
+- Dreamboard create with `karri_card`
+- Dreamboard create with `bank`
 - charity-enabled board creation
 - payout generation for closed board
 - reminder scheduling API

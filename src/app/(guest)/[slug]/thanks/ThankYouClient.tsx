@@ -45,7 +45,7 @@ export function ThankYouClient({ view, slug, requestReceiptAction }: ThankYouCli
   }, [slug]);
 
   const handleShare = async () => {
-    const title = `${view.childName}'s Dream Board`;
+    const title = `${view.childName}'s Dreamboard`;
     const text = view.isContributionCompleted
       ? `Your contribution helped make ${view.childName}'s birthday extra special. 💝`
       : `Help make ${view.childName}'s birthday extra special. 💝`;
@@ -166,7 +166,7 @@ export function ThankYouClient({ view, slug, requestReceiptAction }: ThankYouCli
             onClick={handleShare}
             className="min-h-11 w-full bg-primary-700 text-white hover:bg-primary-800"
           >
-            📤 Share This Dream Board
+            📤 Share This Dreamboard
           </Button>
           {shareFeedback ? (
             <p role="status" className="text-sm text-gray-600">
@@ -178,7 +178,7 @@ export function ThankYouClient({ view, slug, requestReceiptAction }: ThankYouCli
 
       <footer className="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-text-muted">
         <Link href={`/${slug}`} className="hover:text-text">
-          ← Back to Dream Board
+          ← Back to Dreamboard
         </Link>
         <a href="mailto:support@gifta.co" className="hover:text-text">
           Need help? Contact us

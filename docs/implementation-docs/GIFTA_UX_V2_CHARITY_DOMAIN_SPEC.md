@@ -24,7 +24,7 @@ Optional:
 
 - `website`
 
-### Dream Board Charity Config
+### Dreamboard Charity Config
 
 - `charity_enabled`
 - `charity_id`

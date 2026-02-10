@@ -32,7 +32,7 @@ const columns: AdminDataColumn<AdminContributionDataset>[] = [
   },
   {
     key: 'dream-board',
-    header: 'Dream board',
+    header: 'Dreamboard',
     render: (item) => (
       <Link
         href={`/${item.dreamBoardSlug}`}

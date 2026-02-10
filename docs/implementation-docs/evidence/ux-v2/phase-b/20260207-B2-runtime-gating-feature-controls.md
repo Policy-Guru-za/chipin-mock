@@ -14,9 +14,9 @@ Read order completed as requested:
 Implemented B2 scope only (no B3/B4/B6 work):
 - Env-driven runtime write-path gates:
   - `src/lib/ux-v2/write-path-gates.ts`
-- Dream board create/write path gating + validation alignment:
+- Dreamboard create/write path gating + validation alignment:
   - `src/app/api/v1/dream-boards/route.ts`
-- Dream board update/write path gating + validation alignment:
+- Dreamboard update/write path gating + validation alignment:
   - `src/app/api/v1/dream-boards/[id]/route.ts`
 - Active charity lookup for write validation:
   - `src/lib/db/queries.ts`

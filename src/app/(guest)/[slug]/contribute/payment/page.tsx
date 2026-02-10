@@ -29,7 +29,7 @@ export async function generateMetadata({
 
   return {
     title: 'Complete Payment | Gifta',
-    description: `Complete your contribution to ${board.childName}'s Dream Board`,
+    description: `Complete your contribution to ${board.childName}'s Dreamboard`,
   };
 }
 

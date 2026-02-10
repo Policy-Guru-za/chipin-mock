@@ -39,7 +39,7 @@ const getStepTitle = (step: CreateFlowStep, childName?: string) => {
   if (step === 'dates') return "When's the big day?";
   if (step === 'giving-back') return 'Want to share the love? 💚';
   if (step === 'payout') return 'How should we send your payout?';
-  return 'Review your Dream Board';
+  return 'Review your Dreamboard';
 };
 
 const getStepSubtitle = (step: CreateFlowStep, childName?: string) => {

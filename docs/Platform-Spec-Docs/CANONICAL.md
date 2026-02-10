@@ -28,7 +28,7 @@ This document reflects both the current codebase state and the locked UX v2 deci
 
 ### Product Scope
 
-- **Dream Board:** one manual gift goal (parent-written) with curated static icon imagery.
+- **Dreamboard:** one manual gift goal (parent-written) with curated static icon imagery.
 - **Guest flow:** mobile-web; single CTA ("Chip in"); no sign-in required.
 - **Host flow:** Clerk authentication; 5-step creation wizard + review/confirmation.
   - Step 1: The Child (name, photo, age, birthday)
@@ -47,9 +47,9 @@ This document reflects both the current codebase state and the locked UX v2 deci
   - Bank fields: `bank_name`, `bank_account_number_encrypted`, `bank_account_last4`, `bank_branch_code`, `bank_account_holder`.
   - Payout method is selected by the host during creation (Step 5) and determines which fields are required.
 - **Payout types:** `karri_card`, `bank`, `charity` (Decision Register D-002, LOCKED).
-  - A single Dream Board may produce multiple payout rows: one gift payout (type matches `payout_method`) and optionally one charity payout (type = `charity`).
+  - A single Dreamboard may produce multiple payout rows: one gift payout (type matches `payout_method`) and optionally one charity payout (type = `charity`).
   - Uniqueness constraint: one payout per `(dream_board_id, type)`.
-  - Dream Board transitions to `paid_out` only when all required payout rows for that board are `completed`.
+  - Dreamboard transitions to `paid_out` only when all required payout rows for that board are `completed`.
 - **Current runtime state:** payout service implements `karri_card` only. Bank and charity payout processing are schema-ready but not yet wired in runtime (Phase B deliverable, gated by D-006).
 
 ### Charity Model
@@ -72,7 +72,7 @@ Decision Register D-004 (LOCKED): transparent fee model.
 - **Fee calculation:** 3% of gift amount, minimum R3 (300 cents), maximum R500 (50,000 cents).
 - **Checkout display:** itemized as "R350 gift + R10.50 processing fee = R360.50 total".
 - **`raised_cents` tracks gift amount only** (excludes platform fee). This prevents fee distortion in goal progress.
-- **Funded condition** (Decision Register D-005, LOCKED): Dream Board is funded when `raised_cents >= goal_cents`, where `raised_cents` = `SUM(contributions.amount_cents)` for completed contributions.
+- **Funded condition** (Decision Register D-005, LOCKED): Dreamboard is funded when `raised_cents >= goal_cents`, where `raised_cents` = `SUM(contributions.amount_cents)` for completed contributions.
 - **`contributions.net_cents`** is a generated column: `amount_cents - fee_cents`.
   - `amount_cents` = the gift amount the contributor chose and the amount that counts toward the gift goal.
   - `fee_cents` = the platform fee calculated on that amount and added at checkout.
@@ -243,7 +243,7 @@ Timestamps:
 - **Gift payout calculation:** `gross_cents = raised_cents`; `net_cents = gross_cents - charity_total_cents`.
 - **Charity payout calculation:** `gross_cents = charity_total_cents`; `net_cents = charity_total_cents` (no additional fee on charity payouts).
 - **Payout state machine:** `pending` → `processing` → `completed` or `failed`. Failed payouts may be retried (`failed` → `processing`).
-- **Board `paid_out` transition:** the Dream Board status moves to `paid_out` only when all required payout rows for that board have status `completed`.
+- **Board `paid_out` transition:** the Dreamboard status moves to `paid_out` only when all required payout rows for that board have status `completed`.
 - **Current runtime:** only `karri_card` payouts are processed automatically via the Karri credit queue. Bank and charity payout processing will be enabled in Phase B (gated by Decision Register D-006).
 
 ### Reminder System

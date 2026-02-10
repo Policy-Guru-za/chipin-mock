@@ -19,7 +19,7 @@ Each architecture section must map to:
 |---|---|---|---|
 | Landing/onboarding | `/` | confirm parity with architecture hero/social/trust blocks | marketing page components |
 | Auth | `/sign-in`, `/sign-up` | confirm Clerk UX states and redirects | auth wrappers, header auth state |
-| Public dream board | `/(guest)/[slug]` | add/align charity display block, contributor display rules, return states | `DreamBoardCard`, progress, contributor chips |
+| Public Dreamboard | `/(guest)/[slug]` | add/align charity display block, contributor display rules, return states | `DreamBoardCard`, progress, contributor chips |
 | Contribution page | `/(guest)/[slug]/contribute` | align 4-step architecture intent with current flow UX; add remind-me entry point | `ContributionForm*` components |
 | Thank-you | `/(guest)/[slug]/thanks` | charity visibility + post-contribution messaging parity | thank-you components/view model |
 | Host create flow | `/(host)/create/*` | restructure to architecture-aligned step model; ensure giving-back + payout UX clarity | create pages, flow shell, draft logic |

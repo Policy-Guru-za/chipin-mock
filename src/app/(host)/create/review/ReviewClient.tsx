@@ -185,7 +185,7 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
 
         <header className="space-y-2 text-center">
           <h1 className="font-display text-4xl text-primary animate-fade-up sm:text-5xl">
-            🎉 {draft.childName}&apos;s Dream Board is ready!
+            🎉 {draft.childName}&apos;s Dreamboard is ready!
           </h1>
         </header>
 
@@ -243,7 +243,7 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
       currentStep={6}
       totalSteps={6}
       stepLabel="Step 6 of 6 — Review"
-      title="Review your Dream Board"
+      title="Review your Dreamboard"
       subtitle="Everything looks good? Create and start sharing."
     >
       <div className="space-y-5">
@@ -261,7 +261,7 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
 
         <form action={formAction}>
           <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? 'Creating...' : 'Create Dream Board'}
+            {pending ? 'Creating...' : 'Create Dreamboard'}
           </Button>
         </form>
       </div>

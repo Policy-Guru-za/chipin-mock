@@ -26,7 +26,7 @@ A locked decision may change only via explicit update in this file with rational
 ## Derived Implementation Rules
 
 - Any code path assuming Karri-only payout behavior is a defect after Phase B completion.
-- OpenAPI enums must match runtime enums in all payout and dream board schemas.
+- OpenAPI enums must match runtime enums in all payout and Dreamboard schemas.
 - Charity-enabled boards require complete charity configuration; partial payloads rejected.
 - Reminder scheduling and dispatch must be idempotent by `(dream_board_id, email, remind_at)`.
 

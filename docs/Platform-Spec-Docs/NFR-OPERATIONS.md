@@ -11,7 +11,7 @@ Applies to all phases. Use as acceptance criteria for enterprise-grade delivery.
 
 ## Availability and Reliability
 
-- Service availability: 99.9% monthly for core flows (Dream Board view, contribution, payment redirects, webhooks).
+- Service availability: 99.9% monthly for core flows (Dreamboard view, contribution, payment redirects, webhooks).
 - Error budget: 43.2 minutes/month.
 - Webhook processing: 99.9% of valid events processed within 2 minutes.
 - Payment status reconciliation: eventual consistency within 5 minutes (webhook + poll fallback).

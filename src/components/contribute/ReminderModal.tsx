@@ -117,7 +117,7 @@ export function ReminderModal({ dreamBoardId, isOpen, onClose, onSuccess }: Remi
               Get a reminder 🔔
             </h2>
             <p className="text-sm text-text-muted">
-              We&apos;ll send one reminder before this Dream Board closes.
+              We&apos;ll send one reminder before this Dreamboard closes.
             </p>
           </div>
           <button

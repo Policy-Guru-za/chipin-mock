@@ -34,7 +34,7 @@ Parents face three acute pain points around birthday gifts:
 
 ## The Solution
 
-Gifta provides a **Dream Board** — a single, specific gift goal that guests contribute toward. The psychological reframe is critical:
+Gifta provides a **Dreamboard** — a single, specific gift goal that guests contribute toward. The psychological reframe is critical:
 
 | Old Framing | Gifta Framing |
 |-------------|----------------|
@@ -47,7 +47,7 @@ Gifta provides a **Dream Board** — a single, specific gift goal that guests co
 ## Core Product Principles
 
 ### 1. One Dream Gift, Not a Registry
-This is not a wedding registry. Each Dream Board has **one item** — a single, focused goal that creates urgency and clarity.
+This is not a wedding registry. Each Dreamboard has **one item** — a single, focused goal that creates urgency and clarity.
 
 ### 2. Mobile Web First
 60-80% of guests won't download an app. The guest experience is **entirely browser-based** — click link, view, contribute, done. Zero friction.
@@ -82,7 +82,7 @@ Gifta exposes APIs that partners integrate with — not the reverse. We control 
 
 | Feature | Description | Priority |
 |---------|-------------|----------|
-| Dream Board Creation | Host creates board with child photo, name, gift description | P0 |
+| Dreamboard Creation | Host creates board with child photo, name, gift description | P0 |
 | AI Gift Artwork | Generate whimsical illustration from gift description | P0 |
 | Karri Card Setup | Host provides Karri Card details during creation | P0 |
 | WhatsApp Number | Host provides WhatsApp for notifications | P0 |
@@ -92,7 +92,7 @@ Gifta exposes APIs that partners integrate with — not the reverse. We control 
 | Contribution Tracking | Progress bar (%), contributor list (names only) | P0 |
 | WhatsApp Notifications | Alert host on contributions and payout | P0 |
 | Pot Closure & Payout | Close via partner API; Karri credit via internal batch job (external scheduler required) | P0 |
-| Host Dashboard | View Rand amounts, manage Dream Board | P0 |
+| Host Dashboard | View Rand amounts, manage Dreamboard | P0 |
 
 ### Post-MVP Features (v1.x)
 
@@ -127,8 +127,8 @@ Gifta exposes APIs that partners integrate with — not the reverse. We control 
 |--------|------------|---------------|
 | Pot Completion Rate | % of Dream Boards that reach goal or close with funds | >70% |
 | Guest Conversion Rate | % of link clicks that result in contribution | >25% |
-| Average Pot Size | Mean total contributions per Dream Board | R2,500+ |
-| Time to First Contribution | Hours from Dream Board creation to first contribution | <24h |
+| Average Pot Size | Mean total contributions per Dreamboard | R2,500+ |
+| Time to First Contribution | Hours from Dreamboard creation to first contribution | <24h |
 
 ### Secondary Metrics
 
@@ -136,7 +136,7 @@ Gifta exposes APIs that partners integrate with — not the reverse. We control 
 |--------|------------|--------|
 | Host Satisfaction | NPS score from hosts | >50 |
 | Guest Satisfaction | Post-contribution rating | >4.5/5 |
-| Viral Coefficient | New hosts generated per Dream Board | >0.3 |
+| Viral Coefficient | New hosts generated per Dreamboard | >0.3 |
 | Karri Payout Success | % of payouts successfully credited | >99% |
 
 ---
@@ -249,10 +249,10 @@ Gifta occupies a unique position: **purpose-built for parents** + **seamless loc
 
 | Term | Definition |
 |------|------------|
-| **Dream Board** | The single-page representation of a child's birthday gift goal |
+| **Dreamboard** | The single-page representation of a child's birthday gift goal |
 | **Dream Gift** | The gift described by the parent, illustrated with AI-generated artwork |
 | **Pot** | The accumulated contributions toward a Dream Gift |
-| **Host** | The parent creating the Dream Board |
+| **Host** | The parent creating the Dreamboard |
 | **Guest** | A party invitee who may contribute |
 | **Payout** | The disbursement of pot funds (credited to host's Karri Card) |
 | **Party Date** | The birthday party date (used for UX and ops views). Pots are closed explicitly via API; no auto-close scheduler exists in-repo. |
