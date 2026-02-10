@@ -744,7 +744,7 @@ Rotating testimonial card that cycles through 3 testimonials every 5 seconds. Pr
 ### 6. CTA Section (LandingCTA)
 
 #### 6.1 Overview
-Flexible CTA section with primary action button. Used in hero area and repeated at page bottom.
+Flexible CTA section with primary action button used in the hero area. A separate closing CTA banner appears near the footer.
 
 #### 6.2 Container
 
@@ -781,12 +781,11 @@ Flexible CTA section with primary action button. Used in hero area and repeated 
 #### 7.1 Section Container
 
 - **Section ID:** `id="how-it-works"` (anchor link target)
-- **Padding:** `px-5 py-12 md:px-10 md:py-[60px]` (mobile/tablet) to (desktop)
+- **Padding:** `px-6 pt-14 pb-10 md:px-10 md:pt-20 md:pb-14`
 - **Max width:** `max-w-[1000px]`
 - **Margin:** `mx-auto` (centered)
 - **Position:** `relative z-[5]` (above gradients)
-- **Background gradient:** `bg-gradient-to-b from-[rgba(228,240,232,0.3)] to-transparent` (subtle green fade)
-- **Border:** `border-t border-[rgba(107,158,136,0.1)]` (teal separator)
+- **Background:** `bg-[#FAF7F2]` (warm linen band for section rhythm)
 
 #### 7.2 Section Heading
 
@@ -811,8 +810,8 @@ Flexible CTA section with primary action button. Used in hero area and repeated 
 - **Background:** White
 - **Border radius:** `rounded-[20px]`
 - **Padding:** `px-6 py-7` (24px/28px)
-- **Shadow:** `shadow-[0_8px_32px_rgba(0,0,0,0.04)]`
-- **Border:** `border border-black/[0.04]`
+- **Shadow:** `shadow-[0_2px_12px_rgba(0,0,0,0.04)]`
+- **Border:** `border border-[rgba(0,0,0,0.03)]`
 - **Text align:** center
 - **Position:** `relative`
 
@@ -878,12 +877,29 @@ Flexible CTA section with primary action button. Used in hero area and repeated 
 
 #### 8.1 Container
 
-- **Display:** `flex justify-center`
-- **Padding:** `px-5 pb-[60px] md:px-10 md:pb-20`
-- **Position:** `relative z-[5]` (above gradients)
-- **Button styling:** Identical to primary CTA above
-- **Text:** "Create Your Free Dreamboard"
-- **Link:** `/create`
+- **Tag:** `section`
+- **Padding:** `px-6 py-14 md:px-10 md:py-20`
+- **Purpose:** final conversion block with headline, support copy, and primary CTA
+
+#### 8.2 Inner Banner
+
+- **Width:** `max-w-[760px] mx-auto`
+- **Shape:** `rounded-[28px]`
+- **Border:** `border border-[rgba(107,158,136,0.14)]`
+- **Background:** `bg-[linear-gradient(180deg,rgba(250,247,242,0.96)_0%,rgba(255,252,249,0.96)_100%)]`
+- **Depth:** `shadow-[0_8px_28px_rgba(90,142,120,0.08)]`
+- **Padding:** `px-6 py-10 md:px-10 md:py-14`
+- **Alignment:** `text-center`
+
+#### 8.3 Closing Copy + CTA
+
+- **Headline (h2):** "Ready to make gift-giving magic?" with DM Serif display styling
+- **Subtitle:** "It takes less than a minute. No app needed."
+- **Primary CTA:**
+  - **Link:** `/create`
+  - **Text:** "Create Your Free Dreamboard"
+  - **Class contract:** must retain exact `from-[#6B9E88] to-[#5A8E78]` substring
+  - **Display:** `inline-block` for centered alignment
 
 ---
 

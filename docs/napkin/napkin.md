@@ -3,6 +3,7 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-10 | self | Tried to stop a dev server started under escalation with plain sandbox `kill`; received `operation not permitted` | When a process is launched with escalated permissions, stop it with an escalated `kill` command and include the short approval justification |
 | 2026-02-10 | self | Ran `sed` against `src/app/(host)/create/payout/actions.ts` without quoting parentheses and hit `zsh: no matches found` again | Quote any path containing route-group parentheses every time (`'src/app/(host)/...'`) and copy the quoted pattern from prior commands |
 | 2026-02-10 | self | Used `rg -ho ...` expecting grep-style hidden no-filename behavior; `-h` in `rg` prints help, so key extraction command failed | Use `rg -o --no-filename ...` (or `-I`) for match-only extraction; avoid mixing grep short flags with ripgrep |
 | 2026-02-10 | self | Homepage parity run restored `next/font/google`; `pnpm build` failed in sandbox with `ENOTFOUND fonts.googleapis.com` and can look like implementation drift | For design-parity restorations that explicitly require Google fonts, keep the imports intact and report build as environment-blocked with exact DNS error instead of swapping to offline font fallbacks |

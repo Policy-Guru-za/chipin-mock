@@ -96,7 +96,7 @@ function StoryCard({ step, idx, show }: {
   const isLight = step.theme === 'light';
 
   return (
-    <div className="rounded-[22px] overflow-hidden" style={fadeStyle(show, CARD_DELAYS[idx], 0.45)}>
+    <div className="rounded-[22px] overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-[rgba(0,0,0,0.03)]" style={fadeStyle(show, CARD_DELAYS[idx], 0.45)}>
       <div
         className="h-[110px] flex items-center gap-4 px-6 relative overflow-hidden"
         style={{ background: `linear-gradient(145deg, ${step.gradientFrom} 0%, ${step.gradientTo} 100%)` }}
@@ -123,7 +123,7 @@ function StoryCard({ step, idx, show }: {
 
 function SocialProof({ show }: { show: boolean }) {
   return (
-    <div className="mt-7 px-5 py-4 bg-white rounded-2xl border-[1.5px] border-[rgba(107,158,136,0.08)] flex items-center gap-3.5" style={fadeStyle(show, 0.4)}>
+    <div className="mt-7 px-5 py-4 bg-white rounded-2xl border-[1.5px] border-[rgba(107,158,136,0.12)] flex items-center gap-3.5" style={fadeStyle(show, 0.4)}>
       <div className="flex-shrink-0 text-center min-w-[56px]">
         <div className="text-[22px] font-bold leading-[1.1] text-[#6B9E88]" style={{ fontFamily: 'var(--font-dm-serif)' }}>
           {howItWorksSocialProof.stat}
@@ -146,7 +146,7 @@ export function LandingHowItWorks() {
   const show = visible || prefersReducedMotion;
 
   return (
-    <section ref={sectionRef} id="how-it-works" className="px-6 pt-12 pb-6 md:px-10 md:pt-16 md:pb-8 relative z-[5]">
+    <section ref={sectionRef} id="how-it-works" className="scroll-mt-24 md:scroll-mt-28 px-6 pt-14 pb-10 md:px-10 md:pt-20 md:pb-14 relative z-[5] bg-[#FAF7F2]">
       <div className="max-w-[420px] md:max-w-[520px] mx-auto">
         <div className="text-center mb-9">
           <p className="text-[11px] font-semibold tracking-[2.5px] uppercase text-[#6B9E88] mb-2.5" style={fadeStyle(show, 0)}>

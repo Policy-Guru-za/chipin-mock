@@ -84,7 +84,7 @@ export function LandingFooter() {
   return (
     <footer
       id="trust"
-      className="relative px-5 py-10 md:px-10 md:py-12 bg-gradient-to-b from-transparent to-[rgba(255,252,249,0.95)] flex flex-col items-center gap-6"
+      className="scroll-mt-24 md:scroll-mt-28 relative px-5 py-10 md:px-10 md:py-12 bg-gradient-to-b from-transparent to-[rgba(255,252,249,0.95)] flex flex-col items-center gap-6"
     >
       <div className="text-center">
         <div

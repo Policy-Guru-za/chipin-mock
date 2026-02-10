@@ -60,15 +60,26 @@ export function LandingPage() {
 
       <LandingHowItWorks />
 
-      {/* Page-level CTA — contract: copy-matrix-compliance + colour-contrast */}
-      <div className="flex justify-center px-5 py-10 md:py-14">
-        <Link
-          href="/create"
-          className="bg-gradient-to-br from-[#6B9E88] to-[#5A8E78] text-white border-none px-9 py-[18px] rounded-xl font-semibold text-base lg:text-[17px] text-center shadow-[0_4px_16px_rgba(107,158,136,0.3)] transition-all min-h-[44px] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(107,158,136,0.4)] active:translate-y-0 active:shadow-[0_2px_12px_rgba(107,158,136,0.3)]"
-        >
-          Create Your Free Dreamboard
-        </Link>
-      </div>
+      {/* Closing CTA — contract: copy-matrix-compliance + colour-contrast */}
+      <section className="px-6 py-14 md:px-10 md:py-20">
+        <div className="max-w-[760px] mx-auto rounded-[28px] border border-[rgba(107,158,136,0.14)] bg-[linear-gradient(180deg,rgba(250,247,242,0.96)_0%,rgba(255,252,249,0.96)_100%)] shadow-[0_8px_28px_rgba(90,142,120,0.08)] px-6 py-10 md:px-10 md:py-14 text-center">
+          <h2
+            className="text-[24px] md:text-[32px] font-bold leading-[1.2] text-[#2D2D2D] mb-2"
+            style={{ fontFamily: 'var(--font-dm-serif)' }}
+          >
+            Ready to make gift-giving magic?
+          </h2>
+          <p className="text-[14px] md:text-[15px] text-[#7A8D83] mb-8">
+            It takes less than a minute. No app needed.
+          </p>
+          <Link
+            href="/create"
+            className="bg-gradient-to-br from-[#6B9E88] to-[#5A8E78] text-white border-none px-9 py-[18px] rounded-xl font-semibold text-base lg:text-[17px] text-center shadow-[0_4px_16px_rgba(107,158,136,0.3)] transition-all min-h-[44px] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(107,158,136,0.4)] active:translate-y-0 active:shadow-[0_2px_12px_rgba(107,158,136,0.3)] inline-block"
+          >
+            Create Your Free Dreamboard
+          </Link>
+        </div>
+      </section>
 
       <LandingFooter />
     </div>
