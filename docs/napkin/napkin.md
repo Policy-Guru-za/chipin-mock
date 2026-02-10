@@ -3,6 +3,8 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-10 | self | Ran `sed` against `src/app/(host)/create/payout/actions.ts` without quoting parentheses and hit `zsh: no matches found` again | Quote any path containing route-group parentheses every time (`'src/app/(host)/...'`) and copy the quoted pattern from prior commands |
+| 2026-02-10 | self | Used `rg -ho ...` expecting grep-style hidden no-filename behavior; `-h` in `rg` prints help, so key extraction command failed | Use `rg -o --no-filename ...` (or `-I`) for match-only extraction; avoid mixing grep short flags with ripgrep |
 | 2026-02-10 | self | Homepage parity run restored `next/font/google`; `pnpm build` failed in sandbox with `ENOTFOUND fonts.googleapis.com` and can look like implementation drift | For design-parity restorations that explicitly require Google fonts, keep the imports intact and report build as environment-blocked with exact DNS error instead of swapping to offline font fallbacks |
 | 2026-02-09 | self | C9A sub-step 0 drift checks can be misread as "any dirty tree means stop" even when diffs predate gates | Capture pre/post `git status --short` and treat only newly introduced non-doc diffs as gate drift; list carryover non-doc diffs separately in evidence |
 | 2026-02-09 | self | Started command verification in this session before re-reading napkin docs | Always read `docs/napkin/SKILL.md` and `docs/napkin/napkin.md` first at turn start, then run any diagnostic/gate commands |

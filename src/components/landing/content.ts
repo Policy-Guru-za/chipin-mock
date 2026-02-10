@@ -52,25 +52,45 @@ export const DEMO_DATA = {
 
 export const howItWorksSteps = [
   {
-    number: '1',
-    icon: '🎁',
-    title: 'Create a Dream Board',
-    description: "Add your child's one big wish and set a goal.",
-  },
-  {
-    number: '2',
-    icon: '📲',
-    title: 'Share your Dream Board',
+    stepLabel: 'Step one',
+    title: 'Create a Dreamboard',
     description:
-      'Send via WhatsApp. Friends and family chip in any amount — even from afar.',
+      "Pick the dream gift, set your goal — you're live and sharing in under a minute. No app download needed.",
+    gradientFrom: '#6B9E88',
+    gradientTo: '#5A8E78',
+    theme: 'light' as const,
   },
   {
-    number: '3',
-    icon: '🎉',
-    title: 'Gift funded',
-    description: 'Funds go to your Karri Card. You buy the dream gift.',
+    stepLabel: 'Step two',
+    title: 'Share via WhatsApp',
+    description:
+      'Drop it in the group chat. Friends and family chip in any amount — no awkward "who\'s paying?" conversations.',
+    gradientFrom: '#E8D5BD',
+    gradientTo: '#D4B896',
+    theme: 'dark' as const,
+  },
+  {
+    stepLabel: 'Step three',
+    title: 'Gift funded!',
+    description:
+      'Funds land straight on your Karri Card. Go buy the dream gift — magic made together.',
+    gradientFrom: '#C4785A',
+    gradientTo: '#B06A4A',
+    theme: 'light' as const,
   },
 ];
+
+export const howItWorksSocialProof = {
+  stat: '2.4k+',
+  unit: 'Gifts',
+  text: 'Families across South Africa are already making gift-giving magic together',
+};
+
+export const howItWorksCTA = {
+  label: 'Start a Dreamboard',
+  subtitle: 'Free to create · No app needed',
+  href: '/create',
+};
 
 export const socialLinks = [
   {

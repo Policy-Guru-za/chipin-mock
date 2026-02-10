@@ -234,3 +234,15 @@ a:focus-visible {
 .animate-landing-progress-shine {
   animation: landing-progress-shine 2s ease-in-out infinite;
 }
+
+/* How It Works decorative elements */
+.hiw-card-circle {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  top: -50px;
+  right: -30px;
+  pointer-events: none;
+}
