@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import middleware from '../../middleware';
+import middleware from '../../src/middleware';
 
 const runMiddleware = async (path: string) =>
   middleware(new NextRequest(`http://localhost${path}`), {} as never);

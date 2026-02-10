@@ -7,13 +7,13 @@ const readSource = (path: string) => readFileSync(join(process.cwd(), path), 'ut
 
 describe('middleware Clerk protect usage', () => {
   it('uses auth.protect and not auth().protect', () => {
-    const middleware = readSource('middleware.ts');
+    const middleware = readSource('src/middleware.ts');
     expect(middleware).toContain('auth.protect');
     expect(middleware).not.toContain('auth().protect');
   });
 
   it('does not branch on auth.protect return values', () => {
-    const middleware = readSource('middleware.ts');
+    const middleware = readSource('src/middleware.ts');
     expect(middleware).not.toContain('protectResponse');
     expect(middleware).not.toContain('if (protectResponse)');
   });

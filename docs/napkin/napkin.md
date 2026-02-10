@@ -3,6 +3,8 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-10 | self | Fired an Axiom APL curl with bracket-heavy JSON inline and zsh interpreted parts as shell patterns (`bad pattern`) | For complex APL payloads with brackets/quotes, write JSON to a temp file and send via `--data-binary @file` to avoid shell glob/quote breakage |
+| 2026-02-10 | self | Moved `middleware.ts` to `src/middleware.ts` but forgot middleware-focused tests read/import the root file directly, causing immediate suite failures | After relocating framework entrypoints, run `rg` for path-based test references (imports + `readFileSync`) and patch them in the same change |
 | 2026-02-10 | self | Built one-off curl command using inline env assignment and then expanded `$AXIOM_*` in the same shell line; headers were empty and Axiom returned missing org error | For ad-hoc authenticated curl calls, either export vars first or inject literal header values in that command to avoid pre-expansion bugs |
 | 2026-02-10 | self | Assumed debug auth-events endpoint would immediately return logs once `x-debug-key` was valid; endpoint can still fail if deployment `AXIOM_API_TOKEN` lacks query read permission | If `/api/internal/debug/auth-events` returns `axiom_query_failed` 403 (`query with action: read`), rotate/provide an Axiom token with dataset read/query scope before further log triage |
 | 2026-02-10 | self | Assumed `/sign-up` health meant auth routes were generally healthy while `/sign-in` has a unique server `auth()` call and can fail independently | For auth incident triage, probe `/sign-in`, `/sign-up`, `/create`, and `/create/child` separately before concluding root cause |

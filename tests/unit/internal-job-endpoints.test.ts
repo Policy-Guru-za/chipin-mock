@@ -51,7 +51,7 @@ const hasJobSecretGuard = (content: string) =>
 
 describe('internal job endpoints', () => {
   it('allowlists job-secret endpoints in middleware', () => {
-    const middleware = readSource('middleware.ts');
+    const middleware = readSource('src/middleware.ts');
 
     for (const endpoint of jobEndpoints) {
       expect(middleware).toContain(endpoint.path);

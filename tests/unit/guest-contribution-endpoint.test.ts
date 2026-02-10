@@ -7,7 +7,7 @@ const readSource = (path: string) => readFileSync(join(process.cwd(), path), 'ut
 
 describe('guest contribution endpoint', () => {
   it('remains allowlisted in middleware', () => {
-    const middleware = readSource('middleware.ts');
+    const middleware = readSource('src/middleware.ts');
     expect(middleware).toContain("'/api/internal/contributions/create'");
     expect(middleware).toContain("'/api/internal/contributions/reminders'");
   });
