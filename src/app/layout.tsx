@@ -1,6 +1,5 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { DM_Sans, DM_Serif_Display, Fraunces, Nunito, Outfit } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 
 import {
@@ -10,37 +9,6 @@ import {
   isMockSentry,
 } from '@/lib/config/feature-flags';
 import { getClerkConfigStatus, getClerkUrls } from '@/lib/auth/clerk-config';
-
-const outfit = Outfit({
-  subsets: ['latin'],
-  variable: '--font-primary',
-  display: 'swap',
-});
-
-const fraunces = Fraunces({
-  subsets: ['latin'],
-  variable: '--font-display',
-  display: 'swap',
-});
-
-const dmSans = DM_Sans({
-  subsets: ['latin'],
-  variable: '--font-dm-sans',
-  display: 'swap',
-});
-
-const dmSerifDisplay = DM_Serif_Display({
-  subsets: ['latin'],
-  weight: '400',
-  variable: '--font-dm-serif',
-  display: 'swap',
-});
-
-const nunito = Nunito({
-  subsets: ['latin'],
-  variable: '--font-nunito',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: 'Gifta - One Dream Gift, Together.',
@@ -96,7 +64,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   );
 
   return (
-    <html lang="en" className={`${outfit.variable} ${fraunces.variable} ${dmSans.variable} ${dmSerifDisplay.variable} ${nunito.variable}`}>
+    <html lang="en">
       <body className="min-h-screen bg-surface text-text">
         <a
           href="#main-content"

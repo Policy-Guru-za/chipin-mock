@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { createRequire } from 'node:module';
+import { join } from 'node:path';
 
 import fontkit from '@pdf-lib/fontkit';
 import { NextRequest } from 'next/server';
@@ -14,8 +14,16 @@ const querySchema = z.object({
   dreamBoardId: z.string().uuid(),
 });
 
-const require = createRequire(import.meta.url);
-const UNICODE_FONT_PATH = require.resolve('next/dist/compiled/@vercel/og/noto-sans-v27-latin-regular.ttf');
+const UNICODE_FONT_PATH = join(
+  process.cwd(),
+  'node_modules',
+  'next',
+  'dist',
+  'compiled',
+  '@vercel',
+  'og',
+  'noto-sans-v27-latin-regular.ttf',
+);
 
 const PAGE_WIDTH = 595;
 const PAGE_HEIGHT = 842;

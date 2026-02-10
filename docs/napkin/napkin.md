@@ -3,6 +3,10 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-09 | self | C9A sub-step 0 drift checks can be misread as "any dirty tree means stop" even when diffs predate gates | Capture pre/post `git status --short` and treat only newly introduced non-doc diffs as gate drift; list carryover non-doc diffs separately in evidence |
+| 2026-02-09 | self | Started command verification in this session before re-reading napkin docs | Always read `docs/napkin/SKILL.md` and `docs/napkin/napkin.md` first at turn start, then run any diagnostic/gate commands |
+| 2026-02-09 | self | Kept retrying `pnpm build` Turbopack runs that appeared frozen at `Creating an optimized production build ...` without extracting a low-level panic signature | For Turbopack stalls, run a single isolated `pnpm build:turbopack` check and capture `/tmp/next-panic-*.log`; if panic shows `creating new process -> binding to a port -> Operation not permitted`, switch build gate to Webpack in sandboxed environments |
+| 2026-02-09 | self | Assumed font fetch was the only blocker after seeing `ENOTFOUND fonts.googleapis.com`; Turbopack still stalled even after removing Google font imports | Treat network font fetch errors and Turbopack process-binding panics as separate failure classes; remove `next/font/google` for offline-safe builds and keep Turbopack isolated from release gate when sandbox EPERM is present |
 | 2026-02-09 | self | Split create/thanks server actions into `actions.ts` for tests but left duplicate page-local handlers wired in runtime | After extracting action modules, delete page-local copies and import the shared action so tests and production execute identical code |
 | 2026-02-09 | self | Replaced Unicode PDF font loading with Helvetica-only fallback, causing non-ASCII birthday messages to degrade to `?` | Keep Unicode-capable font embedding (`fontkit` + Noto bytes) with Helvetica only as fallback when embed fails |
 | 2026-02-09 | self | Updated C8 to require full gate chain but initially left `pnpm build` out of the Sub-step 11 command block | After doc-wide command-list changes, sweep all repeated command blocks to keep gate definitions consistent |
@@ -68,6 +72,7 @@
 - For startup validation parity, legacy WhatsApp config requires all three keys (`WHATSAPP_BUSINESS_API_URL`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_BUSINESS_API_TOKEN`) or dispatch can fail after boot.
 - For admin dataset services under strict TypeScript, `COALESCE` nullable SQL fields (for example `hostEmail`, `netCents`) at select-time to keep DTOs stable and avoid mapper null-guards everywhere.
 - For rollout-decision milestones, keep one canonical milestone evidence file plus supporting artifacts (runbook execution, checklist, GO/NO-GO, exit memo) and mark live-prod steps as manual rather than guessing outcomes.
+- For C9 pre-flight rollback validation (C0-05), always include three explicit confirmations in evidence: Vercel rollback location path, exact UX toggle-off vars, and pre-rollback evidence capture list.
 - For admin CSV exports, use shared header lists and always emit header-only CSV for empty datasets to keep download behavior deterministic.
 
 ## Patterns That Don't Work
@@ -132,3 +137,9 @@
 - Escalated build runs can expose different failure classes than sandbox runs (fonts DNS/network vs Turbopack/Webpack asset-loader errors); capture both in evidence to avoid misdiagnosis.
 - `pnpm typecheck` reliability in this repo depends on Next-generated route types; `pnpm exec next typegen` helps refresh generated files but does not resolve real page/route signature drift.
 - C8 telemetry contract expansion is safest when constrained to internal analytics surfaces (`src/lib/analytics/metrics.ts`, `src/app/api/internal/metrics/route.ts`) with no public API changes.
+
+## C9 Learnings (2026-02-09)
+- For C9A completion, treat checklist/template population as first-class deliverables: update both authoritative docs and mirror the same evidence mapping in C9 evidence to avoid drift.
+- Pre-GO gates should be marked PASS only after direct linkage to C8 Section 12/13 and C9 Section 2 gate outputs; avoid generic "report link" placeholders.
+- C-R2/C-R3/C-R4 prep quality depends on concrete healthy/unhealthy definitions and threshold values in the checklist itself, not only in the runbook/prompt.
+- C9A handoff payload is strongest when it includes exact C9B operator steps, rollback triggers, and explicit pending sections for human-run fields.
