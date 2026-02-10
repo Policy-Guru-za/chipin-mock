@@ -11,7 +11,7 @@ export const openApiSpec = {
   info: {
     title: 'Gifta Public API',
     version: '1.0.0',
-    description: 'Partner API for Dream Boards, contributions, payouts, and webhooks.',
+    description: 'Partner API for Dreamboards, contributions, payouts, and webhooks.',
   },
   servers: [
     {
@@ -30,8 +30,8 @@ export const openApiSpec = {
   ],
   tags: [
     {
-      name: 'Dream Boards',
-      description: 'Create and retrieve Dream Boards.',
+      name: 'Dreamboards',
+      description: 'Create and retrieve Dreamboards.',
     },
     {
       name: 'Contributions',
@@ -49,7 +49,7 @@ export const openApiSpec = {
   paths: {
     '/dream-boards': {
       get: {
-        tags: ['Dream Boards'],
+        tags: ['Dreamboards'],
         summary: 'List dream boards',
         parameters: [
           {
@@ -117,7 +117,7 @@ export const openApiSpec = {
         },
       },
       post: {
-        tags: ['Dream Boards'],
+        tags: ['Dreamboards'],
         summary: 'Create a dream board',
         requestBody: {
           required: true,
@@ -177,7 +177,7 @@ export const openApiSpec = {
     },
     '/dream-boards/{id}': {
       get: {
-        tags: ['Dream Boards'],
+        tags: ['Dreamboards'],
         summary: 'Get a dream board',
         parameters: [
           {
@@ -227,7 +227,7 @@ export const openApiSpec = {
         },
       },
       patch: {
-        tags: ['Dream Boards'],
+        tags: ['Dreamboards'],
         summary: 'Update a dream board',
         parameters: [
           {

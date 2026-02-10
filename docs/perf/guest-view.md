@@ -3,7 +3,7 @@
 ## Record
 - Date: 2026-01-22
 - Environment: Staging (URL missing)
-- Page: `/[slug]` guest Dream Board view
+- Page: `/[slug]` guest Dreamboard view
 - Method: Lighthouse (mobile, 4G, mid-tier device) + server timing (TTFB)
 - Status: BLOCKED
 - Blocker: Staging URL not provided

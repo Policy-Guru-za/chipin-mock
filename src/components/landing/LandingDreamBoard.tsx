@@ -2,22 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { contributors, TIMING, DEMO_DATA } from './content';
+import { contributors, TIMING } from './content';
 
 export function LandingDreamBoard() {
-  const [progress, setProgress] = useState(0);
   const [contributorPulse, setContributorPulse] = useState(-1);
 
   useEffect(() => {
-    const timeout = setTimeout(
-      () => setProgress(DEMO_DATA.PROGRESS_TARGET),
-      TIMING.PROGRESS_DELAY
-    );
     const pulseInterval = setInterval(() => {
       setContributorPulse((prev) => (prev + 1) % contributors.length);
     }, TIMING.CONTRIBUTOR_PULSE);
     return () => {
-      clearTimeout(timeout);
       clearInterval(pulseInterval);
     };
   }, []);
@@ -68,27 +62,19 @@ export function LandingDreamBoard() {
             </div>
           </div>
 
-          {/* Progress */}
+          {/* Status */}
           <div className="mb-7">
-            <div className="flex justify-between mb-2.5">
-              <div>
-                <span
-                  className="text-[28px] font-semibold text-[#2D2D2D]"
-                  style={{ fontFamily: 'var(--font-display)' }}
-                >
-                  {progress}%
-                </span>
-                <span className="text-[#999] text-sm ml-2">funded</span>
-              </div>
-              <span className="text-[#999] text-sm self-end">18 days left</span>
-            </div>
-            <div className="h-2.5 bg-[#F5EFE8] rounded-[10px] overflow-hidden relative">
-              <div
-                className="h-full bg-gradient-to-r from-[#6B9E88] to-[#5A8E78] rounded-[10px] transition-[width] duration-[1.5s] ease-out relative overflow-hidden"
-                style={{ width: `${progress}%` }}
+            <div className="rounded-[14px] border border-[#E5E0DA] bg-[#FAF7F3] p-4 text-center">
+              <p className="text-2xl" aria-hidden="true">
+                🎁
+              </p>
+              <p
+                className="mt-2 text-[18px] font-semibold text-[#2D2D2D]"
+                style={{ fontFamily: 'var(--font-display)' }}
               >
-                <div className="absolute top-0 left-[-100%] w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-landing-progress-shine" />
-              </div>
+                Contributions are coming in!
+              </p>
+              <p className="mt-1 text-[#777] text-sm">18 days left to chip in</p>
             </div>
           </div>
 

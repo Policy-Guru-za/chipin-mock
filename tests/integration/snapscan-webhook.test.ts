@@ -32,6 +32,7 @@ afterEach(() => {
   vi.unmock('@/lib/dream-boards/cache');
   vi.unmock('@/lib/db/queries');
   vi.unmock('@/lib/charities/allocation');
+  vi.unmock('@/lib/webhooks');
   vi.clearAllMocks();
   vi.resetModules();
 });
@@ -52,8 +53,9 @@ describe('SnapScan webhook integration - success', () => {
 
     const getContributionByPaymentRef = vi.fn(async () => contribution);
     const updateContributionStatus = vi.fn(async () => undefined);
-    const markDreamBoardFundedIfNeeded = vi.fn(async () => undefined);
+    const markDreamBoardFundedIfNeeded = vi.fn(async () => false);
     const completeContributionWithResolvedCharity = vi.fn(async () => null);
+    const emitWebhookEventForPartner = vi.fn(async () => ['evt-1']);
 
     vi.doMock('@/lib/db/queries', () => ({
       getContributionByPaymentRef,
@@ -62,6 +64,9 @@ describe('SnapScan webhook integration - success', () => {
     }));
     vi.doMock('@/lib/charities/allocation', () => ({
       completeContributionWithResolvedCharity,
+    }));
+    vi.doMock('@/lib/webhooks', () => ({
+      emitWebhookEventForPartner,
     }));
 
     const payload = {
@@ -98,6 +103,18 @@ describe('SnapScan webhook integration - success', () => {
     expect(completeContributionWithResolvedCharity).toHaveBeenCalledWith('contrib-1');
     expect(updateContributionStatus).not.toHaveBeenCalled();
     expect(markDreamBoardFundedIfNeeded).toHaveBeenCalledWith('board-1');
+    expect(emitWebhookEventForPartner).toHaveBeenCalledWith(
+      contribution.partnerId,
+      'contribution.received',
+      expect.any(Object),
+      expect.anything()
+    );
+    expect(emitWebhookEventForPartner).not.toHaveBeenCalledWith(
+      expect.any(String),
+      'pot.funded',
+      expect.anything(),
+      expect.anything()
+    );
   });
 });
 

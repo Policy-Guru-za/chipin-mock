@@ -69,6 +69,7 @@ export async function getDreamBoardById(id: string, hostId: string) {
       childName: dreamBoards.childName,
       childPhotoUrl: dreamBoards.childPhotoUrl,
       partyDate: dreamBoards.partyDate,
+      partyDateTime: dreamBoards.partyDateTime,
       giftName: dreamBoards.giftName,
       giftImageUrl: dreamBoards.giftImageUrl,
       goalCents: dreamBoards.goalCents,
@@ -102,6 +103,7 @@ export async function getDreamBoardBySlug(slug: string, partnerId?: string) {
       childAge: dreamBoards.childAge,
       birthdayDate: dreamBoards.birthdayDate,
       partyDate: dreamBoards.partyDate,
+      partyDateTime: dreamBoards.partyDateTime,
       campaignEndDate: dreamBoards.campaignEndDate,
       giftName: dreamBoards.giftName,
       giftDescription: dreamBoards.giftDescription,
@@ -169,6 +171,7 @@ export const getDreamBoardByPublicId = async (identifier: string, partnerId?: st
       childAge: dreamBoards.childAge,
       birthdayDate: dreamBoards.birthdayDate,
       partyDate: dreamBoards.partyDate,
+      partyDateTime: dreamBoards.partyDateTime,
       campaignEndDate: dreamBoards.campaignEndDate,
       giftName: dreamBoards.giftName,
       giftDescription: dreamBoards.giftDescription,
@@ -231,6 +234,7 @@ export async function listDreamBoardsForHost(hostId: string) {
       giftName: dreamBoards.giftName,
       giftImageUrl: dreamBoards.giftImageUrl,
       partyDate: dreamBoards.partyDate,
+      partyDateTime: dreamBoards.partyDateTime,
       goalCents: dreamBoards.goalCents,
       status: dreamBoards.status,
       raisedCents: sql<number>`COALESCE(SUM(${contributions.amountCents}), 0)`.as('raised_cents'),
@@ -257,6 +261,7 @@ export async function getDreamBoardDetailForHost(id: string, hostId: string) {
       childName: dreamBoards.childName,
       childPhotoUrl: dreamBoards.childPhotoUrl,
       partyDate: dreamBoards.partyDate,
+      partyDateTime: dreamBoards.partyDateTime,
       giftName: dreamBoards.giftName,
       giftImageUrl: dreamBoards.giftImageUrl,
       giftImagePrompt: dreamBoards.giftImagePrompt,
@@ -312,22 +317,8 @@ export async function listContributionsForDreamBoard(
 }
 
 export async function listRecentContributors(dreamBoardId: string, limit = 6) {
-  const AVATAR_COLORS = [
-    '#F5C6AA',
-    '#A8D4E6',
-    '#B8E0B8',
-    '#E6B8B8',
-    '#F0E68C',
-    '#B8D4E0',
-    '#D8B8E8',
-  ] as const;
-
-  const hashCode = (value: string) =>
-    value.split('').reduce((acc, char) => ((acc << 5) - acc + char.charCodeAt(0)) | 0, 0);
-
   const rows = await db
     .select({
-      id: contributions.id,
       contributorName: contributions.contributorName,
       isAnonymous: contributions.isAnonymous,
       netCents: contributions.netCents,
@@ -345,7 +336,6 @@ export async function listRecentContributors(dreamBoardId: string, limit = 6) {
   return rows.map((contributor) => ({
     ...contributor,
     isAnonymous: contributor.isAnonymous || !contributor.contributorName,
-    avatarColorIndex: Math.abs(hashCode(contributor.id)) % AVATAR_COLORS.length,
   }));
 }
 
@@ -535,6 +525,7 @@ export async function markDreamBoardFundedIfNeeded(dreamBoardId: string): Promis
 
   if (!board) return false;
   if (board.status !== 'active') return false;
+  if (board.goalCents <= 0) return false;
   if (board.raisedCents < board.goalCents) return false;
 
   await db

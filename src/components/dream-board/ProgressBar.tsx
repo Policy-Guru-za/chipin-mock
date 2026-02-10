@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { CheckIcon } from '@/components/icons';
 
+// DEPRECATED for public Dreamboard display (Phase D).
 type ProgressBarProps = {
   /** Current value (e.g., amount raised in cents) */
   value: number;

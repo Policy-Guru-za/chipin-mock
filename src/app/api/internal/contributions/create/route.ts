@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
       amountCents: payload.payment.totalCents,
       reference: payload.payment.paymentRef,
       contributionId: payload.payment.contributionId,
-      description: `Contribution to ${board.childName}'s Dream Board`,
+      description: `Contribution to ${board.childName}'s Dreamboard`,
       returnUrl: `${baseUrl}/${board.slug}/thanks?ref=${payload.payment.paymentRef}&provider=${parsed.data.paymentProvider}`,
       cancelUrl: `${baseUrl}/${board.slug}?cancelled=1&provider=${parsed.data.paymentProvider}`,
       notifyUrl: `${baseUrl}/api/webhooks/${parsed.data.paymentProvider}`,

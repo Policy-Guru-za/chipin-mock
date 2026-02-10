@@ -10,6 +10,8 @@ type DatesFormProps = {
   defaultBirthdayDate: string;
   defaultPartyDate: string;
   defaultCampaignEndDate: string;
+  defaultPartyDateTimeDate: string;
+  defaultPartyDateTimeTime: string;
   defaultPartyDateEnabled: boolean;
 };
 
@@ -27,12 +29,16 @@ export function DatesForm({
   defaultBirthdayDate,
   defaultPartyDate,
   defaultCampaignEndDate,
+  defaultPartyDateTimeDate,
+  defaultPartyDateTimeTime,
   defaultPartyDateEnabled,
 }: DatesFormProps) {
   const [partyDateEnabled, setPartyDateEnabled] = useState(defaultPartyDateEnabled);
   const [birthdayDate, setBirthdayDate] = useState(defaultBirthdayDate);
   const [partyDate, setPartyDate] = useState(defaultPartyDate || defaultBirthdayDate);
   const [campaignEndDate, setCampaignEndDate] = useState(defaultCampaignEndDate || defaultPartyDate);
+  const [partyDateTimeDate, setPartyDateTimeDate] = useState(defaultPartyDateTimeDate);
+  const [partyDateTimeTime, setPartyDateTimeTime] = useState(defaultPartyDateTimeTime);
 
   const effectivePartyDate = partyDateEnabled ? partyDate : birthdayDate;
   const effectiveCampaignEndDate = partyDateEnabled ? campaignEndDate : birthdayDate;
@@ -127,6 +133,48 @@ export function DatesForm({
           <input type="hidden" name="campaignEndDate" value={birthdayDate} />
         </>
       )}
+
+      <div className="space-y-3 rounded-2xl border border-border p-4">
+        <div className="space-y-1">
+          <p className="text-sm font-medium text-text">Birthday party date &amp; time (optional)</p>
+          <p className="text-xs text-text-muted">
+            If set, this will show on the public Dreamboard as the party event time.
+          </p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-2">
+            <label htmlFor="partyDateTimeDate" className="text-sm font-medium text-text">
+              Party date
+            </label>
+            <Input
+              id="partyDateTimeDate"
+              name="partyDateTimeDate"
+              type="date"
+              value={partyDateTimeDate}
+              onChange={(event) => {
+                const value = event.currentTarget.value;
+                setPartyDateTimeDate(value);
+                if (!value) {
+                  setPartyDateTimeTime('');
+                }
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="partyDateTimeTime" className="text-sm font-medium text-text">
+              Party time
+            </label>
+            <Input
+              id="partyDateTimeTime"
+              name="partyDateTimeTime"
+              type="time"
+              value={partyDateTimeTime}
+              disabled={!partyDateTimeDate}
+              onChange={(event) => setPartyDateTimeTime(event.currentTarget.value)}
+            />
+          </div>
+        </div>
+      </div>
 
       <div
         aria-live="polite"

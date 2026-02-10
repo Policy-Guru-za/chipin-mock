@@ -40,6 +40,7 @@ const makeBoard = (overrides: Partial<BoardRecord> = {}) =>
     childAge: 7,
     birthdayDate: addDays(20),
     partyDate: addDays(20),
+    partyDateTime: null,
     campaignEndDate: addDays(10),
     giftName: 'Scooter',
     giftDescription: 'Mint scooter',

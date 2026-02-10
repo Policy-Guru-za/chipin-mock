@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { ProgressBar } from '@/components/dream-board/ProgressBar';
 import { Button } from '@/components/ui/button';
 import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
 import { buildDashboardCardViewModel } from '@/lib/host/dashboard-view-model';
@@ -33,7 +32,7 @@ export default async function HostDashboardPage() {
   return (
     <section className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-12">
       <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <h1 className="font-display text-[28px] font-bold text-text">Your Dream Boards</h1>
+        <h1 className="font-display text-[28px] font-bold text-text">Your Dreamboards</h1>
         <Link href="/create/child" className="w-full md:w-auto">
           <Button className="w-full bg-primary-700 hover:bg-primary-800 md:w-auto">Create a Dreamboard +</Button>
         </Link>
@@ -79,10 +78,6 @@ export default async function HostDashboardPage() {
                     <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${badgeClass}`}>
                       {card.statusLabel}
                     </span>
-                  </div>
-
-                  <div className="mt-4">
-                    <ProgressBar value={card.percentage} max={100} size="sm" showMilestones={false} />
                   </div>
 
                   <div className="mt-4 space-y-1 text-sm">

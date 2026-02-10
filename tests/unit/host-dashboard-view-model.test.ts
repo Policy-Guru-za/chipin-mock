@@ -8,7 +8,7 @@ import {
 } from '@/lib/host/dashboard-view-model';
 
 describe('host dashboard view model', () => {
-  it('maps statuses and caps percentage at 100 on cards', () => {
+  it('maps statuses on cards', () => {
     const card = buildDashboardCardViewModel({
       id: 'board-1',
       slug: 'maya-birthday-123',
@@ -28,7 +28,6 @@ describe('host dashboard view model', () => {
 
     expect(card.statusLabel).toBe('Complete');
     expect(card.statusVariant).toBe('paid_out');
-    expect(card.percentage).toBe(100);
     expect(card.timeLabel).toMatch(/days left/);
   });
 
@@ -134,7 +133,7 @@ describe('host dashboard view model', () => {
       { baseUrl: 'https://chipin.co.za' }
     );
 
-    expect(view.boardTitle).toBe("Maya's Dream Board");
+    expect(view.boardTitle).toBe("Maya's Dreamboard");
     expect(view.shareUrl).toBe('https://chipin.co.za/maya-birthday-123');
   });
 });

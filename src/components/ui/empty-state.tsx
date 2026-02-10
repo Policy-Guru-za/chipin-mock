@@ -29,7 +29,7 @@ const variantConfig: Record<
 > = {
   boards: {
     icon: <GiftIcon size="xl" />,
-    defaultTitle: 'No Dream Boards yet',
+    defaultTitle: 'No Dreamboards yet',
     defaultDescription:
       "Create your first board and start collecting contributions for your child's special day.",
   },

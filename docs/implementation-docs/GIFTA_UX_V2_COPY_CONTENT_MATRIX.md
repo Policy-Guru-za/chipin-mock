@@ -35,9 +35,10 @@ Canonical copy source for UX v2 UI and communication surfaces.
 | Location | Copy |
 |---|---|
 | Hero title | "Help make this gift happen" |
-| Progress support text | "[percentage]% funded" |
-| Closed state | "This Dreamboard is closed to new contributions." |
-| Funded state banner | "Goal reached! Extra contributions still help." |
+| Status badge (open, with contributions) | "Contributions are coming in! 🎁" |
+| Status badge (open, no contributions) | "Be the first to chip in! 🎁" |
+| Status badge (closed) | "This Dreamboard is closed to new contributions." |
+| Status badge (funded) | "Gift funded - thank you, everyone! 🎉" |
 
 ### Marketing Homepage CTA
 
@@ -59,7 +60,7 @@ Canonical copy source for UX v2 UI and communication surfaces.
 
 | Location | Copy |
 |---|---|
-| Dashboard title | "Your Dream Boards" |
+| Dashboard title | "Your Dreamboards" |
 | Empty state | "You haven’t created a Dreamboard yet." |
 | Payout section | "Payout details" |
 | Post-campaign | "Campaign complete" |

@@ -23,7 +23,7 @@ type AdminSidebarProps = {
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', Icon: DashboardIcon },
-  { href: '/admin/dream-boards', label: 'Dream Boards', Icon: GiftIcon },
+  { href: '/admin/dream-boards', label: 'Dreamboards', Icon: GiftIcon },
   { href: '/admin/contributions', label: 'Contributions', Icon: WalletIcon },
   { href: '/admin/payouts', label: 'Payout queue', Icon: BanknotesIcon },
   { href: '/admin/charities', label: 'Charity management', Icon: HeartIcon },

@@ -207,7 +207,7 @@ Both must pass. If the test runner is unavailable, verify manually:
 grep -c "Create Your Free Dreamboard" src/components/landing/LandingPage.tsx
 
 # Must output 0
-grep -c "Create your free Dream Board" src/components/landing/LandingPage.tsx
+grep -c "Create your free Dreamboard" src/components/landing/LandingPage.tsx
 
 # Must output 1
 grep -c "from-\[#6B9E88\] to-\[#5A8E78\]" src/components/landing/LandingPage.tsx

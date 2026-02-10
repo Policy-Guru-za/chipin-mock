@@ -36,7 +36,7 @@ Gifta follows a **modern serverless architecture** optimized for:
 │   Neon DB    │  │  Vercel KV   │  │ Vercel Blob  │
 │ (PostgreSQL) │  │   (Redis)    │  │  (Images)    │
 │              │  │              │  │              │
-│ - Dream Boards│  │ - Rate limits│ │ - Child photos│
+│ - Dreamboards│  │ - Rate limits│ │ - Child photos│
 │ - Contributions│ │ - Caching   │  │ - Gift icons  │
 │ - Payouts    │  │             │  │              │
 └──────────────┘  └──────────────┘  └──────────────┘
@@ -213,7 +213,7 @@ chipin/
 
 ### Entity Relationships
 
-- **Host** → **Dreamboard**: One-to-Many (a host can create multiple Dream Boards)
+- **Host** → **Dreamboard**: One-to-Many (a host can create multiple Dreamboards)
 - **Dreamboard** → **Contribution**: One-to-Many (a Dreamboard receives many contributions)
 - **Dreamboard** → **Payout**: One-to-One (single Karri payout)
 
@@ -268,7 +268,7 @@ Hosts authenticate via **Clerk** (email + OTP/password):
 
 ### Guest Authentication
 
-Guests are **unauthenticated**. They access Dream Boards via unique slug:
+Guests are **unauthenticated**. They access Dreamboards via unique slug:
 
 ```
 https://<APP_DOMAIN>/maya-7th-birthday-abc123
@@ -631,10 +631,10 @@ Deploy to Production
 
 ### Future Scaling Path
 
-If Gifta reaches >100k Dream Boards:
+If Gifta reaches >100k Dreamboards:
 1. Move to dedicated PostgreSQL (Neon Pro or Supabase)
 2. Add job queue (Inngest or Trigger.dev) for async processing
-3. Consider edge caching for high-traffic Dream Boards
+3. Consider edge caching for high-traffic Dreamboards
 4. Evaluate moving compute to Fly.io for more control
 
 ---

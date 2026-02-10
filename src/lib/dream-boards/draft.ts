@@ -7,6 +7,7 @@ export type DreamBoardDraftInput = {
   childAge?: number;
   birthdayDate?: string;
   partyDate?: string;
+  partyDateTime?: string | null;
   campaignEndDate?: string;
   childPhotoUrl?: string;
   photoFilename?: string;
@@ -39,6 +40,7 @@ export type DreamBoardDraft = {
   childAge?: number;
   birthdayDate?: string;
   partyDate?: string;
+  partyDateTime?: string | null;
   campaignEndDate?: string;
   childPhotoUrl?: string;
   photoFilename?: string;

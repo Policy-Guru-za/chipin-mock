@@ -93,7 +93,7 @@ describe('payout service creation', () => {
         dreamBoardId: 'board-1',
         actor: { type: 'admin' },
       })
-    ).rejects.toThrow('Dream Board is not ready for payout');
+    ).rejects.toThrow('Dreamboard is not ready for payout');
   });
 
   it('skips legacy karri boards without throwing', async () => {

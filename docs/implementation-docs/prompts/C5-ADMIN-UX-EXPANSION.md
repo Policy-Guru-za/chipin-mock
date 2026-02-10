@@ -149,7 +149,7 @@ Create `src/components/admin/AdminSidebar.tsx` (`'use client'`):
   **NOT "ChipIn Admin"**
 - Navigation items (vertical stack, 8px gap):
   1. `"Dashboard"` → `/admin` (grid/chart icon)
-  2. `"Dream Boards"` → `/admin/dream-boards` (gift icon)
+  2. `"Dreamboards"` → `/admin/dream-boards` (gift icon)
   3. `"Contributions"` → `/admin/contributions` (wallet icon)
   4. `"Payouts"` → `/admin/payouts` (banknotes icon)
   5. `"Charities"` → `/admin/charities` (heart icon)
@@ -325,8 +325,8 @@ place the dashboard at the admin index route so navigating to
 - Cards:
   - **GMV:** `"R{grossMerchandiseValueCents formatted}"`
     (label: `"Total GMV"`)
-  - **Dream Boards:** `"{totalBoards}"` (label:
-    `"Dream Boards"`, subtitle: `"{activeBoards} active"`)
+  - **Dreamboards:** `"{totalBoards}"` (label:
+    `"Dreamboards"`, subtitle: `"{activeBoards} active"`)
   - **Contributors:** `"{totalContributors}"` (label:
     `"Contributors"`)
   - **Fees Retained:** `"R{totalFeesRetainedCents formatted}"`
@@ -346,25 +346,25 @@ place the dashboard at the admin index route so navigating to
 
 #### 2c — Quick Links
 - Row of outline buttons linking to key sections:
-  `"View payouts"`, `"View Dream Boards"`, `"Export reports"`
+  `"View payouts"`, `"View Dreamboards"`, `"Export reports"`
 - Links to respective admin routes
 
 ---
 
-### Sub-step 3: Dream Boards + Contributions Management
+### Sub-step 3: Dreamboards + Contributions Management
 
 These two sections follow the same pattern: server-component page
 reading URL search params, calling the B7 service with parsed
 filters, rendering an `AdminDataTable` with `AdminFilterPanel`
 and `AdminPagination`.
 
-#### 3a — Dream Boards Page
+#### 3a — Dreamboards Page
 
 Create `src/app/(admin)/dream-boards/page.tsx` (server component):
 
 - Parse filters from URL: `parseAdminDreamBoardFilters(searchParams)`
 - Fetch: `listAdminDreamBoards(filters)`
-- Page title: `"Dream Boards"` (Fraunces 24px, 700)
+- Page title: `"Dreamboards"` (Fraunces 24px, 700)
 
 **Filter fields:**
 - Status: select (active, funded, closed, paid_out, expired,
@@ -622,7 +622,7 @@ with optional summary stats.
 
 | Report | Description | Export Action |
 |--------|-------------|---------------|
-| Dream Boards | All boards with progress and host info | CSV download → `/admin/dream-boards/export` |
+| Dreamboards | All boards with progress and host info | CSV download → `/admin/dream-boards/export` |
 | Contributions | All contributions with fees and status | CSV download → `/admin/contributions/export` |
 | Payouts | All payouts with status and amounts | CSV download → `/admin/payouts/export` |
 | Charities | Charity summary with lifetime totals | CSV download → `/admin/charities/export` |

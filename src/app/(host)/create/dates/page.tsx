@@ -14,6 +14,8 @@ const datesErrorMessages: Record<string, string> = {
   party_date: 'Party date must be within the next 6 months.',
   campaign_end: 'Campaign end date must be on/before party date and in the future.',
   birthday_order: 'Party date must be on or after birthday date.',
+  party_datetime_invalid: 'Enter a valid birthday party date and time.',
+  party_datetime_range: 'Birthday party date and time must be in the future and within 6 months.',
 };
 
 const getDatesErrorMessage = (error?: string) => (error ? (datesErrorMessages[error] ?? null) : null);
@@ -25,6 +27,24 @@ const getDateAfterDays = (days: number) => {
 };
 
 const getDefaultBirthdayDate = (birthdayDate?: string) => birthdayDate ?? getDateAfterDays(1);
+const SA_OFFSET_MS = 2 * 60 * 60 * 1000;
+
+const getPartyDateTimeDefaults = (partyDateTime?: string | null) => {
+  if (!partyDateTime) {
+    return { date: '', time: '' };
+  }
+
+  const parsed = new Date(partyDateTime);
+  if (Number.isNaN(parsed.getTime())) {
+    return { date: '', time: '' };
+  }
+
+  const johannesburgTime = new Date(parsed.getTime() + SA_OFFSET_MS).toISOString();
+  return {
+    date: johannesburgTime.slice(0, 10),
+    time: johannesburgTime.slice(11, 16),
+  };
+};
 
 type DatesSearchParams = {
   error?: string;
@@ -50,6 +70,7 @@ export default async function CreateDatesPage({
   const defaultBirthdayDate = getDefaultBirthdayDate(draft.birthdayDate);
   const defaultPartyDate = draft.partyDate ?? defaultBirthdayDate;
   const defaultCampaignEndDate = draft.campaignEndDate ?? defaultPartyDate;
+  const partyDateTimeDefaults = getPartyDateTimeDefaults(draft.partyDateTime);
   const defaultPartyDateEnabled = Boolean(
     draft.birthdayDate &&
       draft.partyDate &&
@@ -81,6 +102,8 @@ export default async function CreateDatesPage({
             defaultBirthdayDate={defaultBirthdayDate}
             defaultPartyDate={defaultPartyDate}
             defaultCampaignEndDate={defaultCampaignEndDate}
+            defaultPartyDateTimeDate={partyDateTimeDefaults.date}
+            defaultPartyDateTimeTime={partyDateTimeDefaults.time}
             defaultPartyDateEnabled={defaultPartyDateEnabled}
           />
         </CardContent>

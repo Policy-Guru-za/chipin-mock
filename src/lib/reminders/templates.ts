@@ -78,13 +78,13 @@ export const buildReminderEmailPayload = (params: {
     subject: `🔔 Reminder: chip in for ${vars.childName}'s gift`,
     html: [
       `<p>Hi there,</p>`,
-      `<p>${safeChildName}'s Dream Board for <strong>${safeGiftName}</strong> is still open.</p>`,
+      `<p>${safeChildName}'s Dreamboard for <strong>${safeGiftName}</strong> is still open.</p>`,
       `<p>Please chip in before <strong>${safeCloseDate}</strong>.</p>`,
       `<p><a href="${safeUrl}">Chip in now</a></p>`,
       `<p>If you've already chipped in, thank you.</p>`,
     ].join(''),
     text: [
-      `Reminder: ${vars.childName}'s Dream Board for ${vars.giftName} is still open.`,
+      `Reminder: ${vars.childName}'s Dreamboard for ${vars.giftName} is still open.`,
       `Chip in before ${vars.campaignCloseDate}.`,
       `Chip in now: ${vars.dreamBoardUrl}`,
     ].join('\n'),

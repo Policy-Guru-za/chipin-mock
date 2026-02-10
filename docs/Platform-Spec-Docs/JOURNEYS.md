@@ -340,7 +340,7 @@ You'll receive notifications when friends chip in.
 **URL:** `<APP_DOMAIN>/dashboard`
 
 **Screen Elements:**
-- List of host's Dream Boards
+- List of host's Dreamboards
 - Each card shows:
   - Child name + photo thumbnail
   - Progress: "R1,200 / R2,499 (48%)"

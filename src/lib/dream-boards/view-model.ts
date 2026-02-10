@@ -22,6 +22,7 @@ export type GuestViewModel = {
   childName: string;
   childPhotoUrl: string;
   slug: string;
+  partyDateTime: string | null;
   giftTitle: string;
   giftSubtitle: string;
   giftImage: string;
@@ -38,13 +39,9 @@ export type GuestViewModel = {
   isActive: boolean;
   isFunded: boolean;
   isExpired: boolean;
-  funded: boolean;
   isClosed: boolean;
-  percentage: number;
   daysLeft: number;
   contributionCount: number;
-  raisedCents: number;
-  goalCents: number;
   message: string | null;
 };
 
@@ -55,7 +52,6 @@ export type ContributionViewModel = GuestViewModel & {
 export type ThankYouViewModel = {
   headline: string;
   message: string;
-  percentage: number;
   shareHref: string;
   contributeHref: string;
   isContributionCompleted: boolean;
@@ -70,6 +66,13 @@ export type ThankYouViewModel = {
   childName: string;
   contributionId: string | null;
   contributorEmail: string | null;
+};
+
+const toIsoDateTime = (value: Date | string | null | undefined) => {
+  if (!value) return null;
+  const parsed = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed.toISOString();
 };
 
 const toEndOfDay = (date: Date) => {
@@ -244,7 +247,7 @@ export const buildGuestViewModel = (
   const timeRemaining = getTimeRemainingInfo({ board, now });
   const isExpired = isBoardExpired(board, now);
   const isActive = board.status === 'active';
-  const isFunded = board.raisedCents >= board.goalCents;
+  const isFunded = board.status === 'funded';
   const { giftTitle, giftSubtitle, giftImage } = getGiftInfo({
     giftName: board.giftName ?? null,
     giftDescription: null,
@@ -263,6 +266,7 @@ export const buildGuestViewModel = (
     childName: board.childName,
     childPhotoUrl: board.childPhotoUrl,
     slug: board.slug,
+    partyDateTime: toIsoDateTime(board.partyDateTime),
     giftTitle,
     giftSubtitle,
     giftImage,
@@ -279,13 +283,9 @@ export const buildGuestViewModel = (
     isActive,
     isFunded,
     isExpired,
-    funded: isFunded,
     isClosed: board.status !== 'active' && board.status !== 'funded',
-    percentage: Math.min(100, Math.round((board.raisedCents / board.goalCents) * 100)),
     daysLeft: timeRemaining.daysLeft,
     contributionCount: board.contributionCount,
-    raisedCents: board.raisedCents,
-    goalCents: board.goalCents,
     message: board.message ?? null,
   };
 };
@@ -304,15 +304,10 @@ export const buildThankYouViewModel = (params: {
   contribution?: ContributionRecord | null;
 }): ThankYouViewModel => {
   const { headline, message, isComplete } = getThankYouCopy(params);
-  const percentage = Math.min(
-    100,
-    Math.round((params.board.raisedCents / params.board.goalCents) * 100)
-  );
 
   return {
     headline,
     message,
-    percentage,
     shareHref: `/${params.board.slug}`,
     contributeHref: `/${params.board.slug}/contribute`,
     isContributionCompleted: isComplete,

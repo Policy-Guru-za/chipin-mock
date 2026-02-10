@@ -1,5 +1,7 @@
 # 20260208-C1 Host Create Flow Restructure
 
+> **Phase D update:** Goal amount input removed from the gift step. New Dreamboards persist `goalCents = 0` by default.
+
 ## 1) Summary
 Milestone C1 completed.
 

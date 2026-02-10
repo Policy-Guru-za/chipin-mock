@@ -18,7 +18,6 @@ export type CreateFlowViewModel = {
   childPhotoUrl?: string;
   giftPreview?: GiftPreview;
   giftTitle?: string;
-  goalLabel?: string;
   message?: string;
 };
 
@@ -65,16 +64,11 @@ const getGiftTitle = (draft?: DreamBoardDraft) => {
   return draft?.giftName;
 };
 
-const getGoalLabel = (draft?: DreamBoardDraft) => {
-  if (!draft?.goalCents) return undefined;
-  return `R${(draft.goalCents / 100).toFixed(2)}`;
-};
-
 const isChildComplete = (draft?: DreamBoardDraft | null) =>
   [draft?.childName, draft?.childPhotoUrl, draft?.childAge].every(Boolean);
 
 const isGiftComplete = (draft?: DreamBoardDraft | null) =>
-  [draft?.giftName, draft?.giftImageUrl, draft?.goalCents].every(Boolean);
+  [draft?.giftName, draft?.giftImageUrl].every(Boolean);
 
 const isDatesComplete = (draft?: DreamBoardDraft | null) =>
   Boolean(draft?.birthdayDate && draft?.partyDate && draft?.campaignEndDate);
@@ -161,7 +155,6 @@ export const buildCreateFlowViewModel = (params: {
     childPhotoUrl: draft?.childPhotoUrl,
     giftPreview: buildGiftPreview(draft ?? undefined),
     giftTitle: getGiftTitle(draft ?? undefined),
-    goalLabel: getGoalLabel(draft ?? undefined),
     message: draft?.message,
   };
 };

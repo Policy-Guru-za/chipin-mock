@@ -196,7 +196,7 @@ Seven discrete edits. Apply each one precisely using find-and-replace.
 
 **Find (line 106):**
 ```
-              Create a free Dream Board
+              Create a free Dreamboard
 ```
 
 **Replace with:**
@@ -232,7 +232,7 @@ Seven discrete edits. Apply each one precisely using find-and-replace.
 
 **Find (line 138):**
 ```
-            Create a free Dream Board
+            Create a free Dreamboard
 ```
 
 **Replace with:**
@@ -274,7 +274,7 @@ One edit.
 
 **Find (line 43):**
 ```
-            Mia&apos;s Dream Board
+            Mia&apos;s Dreamboard
 ```
 
 **Replace with:**
@@ -304,7 +304,7 @@ Two edits.
 
 **Find (line 68):**
 ```
-          Create your free Dream Board
+          Create your free Dreamboard
 ```
 
 **Replace with:**
@@ -334,7 +334,7 @@ Two edits.
 
 **Find (line 10):**
 ```
-        Create your free Dream Board
+        Create your free Dreamboard
 ```
 
 **Replace with:**

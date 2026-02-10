@@ -6,7 +6,6 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { EditDreamBoardModal } from '@/components/host/EditDreamBoardModal';
 import { CheckIcon, CopyIcon } from '@/components/icons';
-import { ProgressBar } from '@/components/dream-board/ProgressBar';
 import { Button } from '@/components/ui/button';
 import type { DashboardDetailViewModel } from '@/lib/host/dashboard-view-model';
 import type { HostBirthdayMessageRow, HostContributionRow } from '@/lib/host/queries';
@@ -130,7 +129,7 @@ export function DashboardDetailClient({
   return (
     <section className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10">
       <Link href="/dashboard" className="text-sm font-medium text-primary-700 hover:underline">
-        ← Back to Dream Boards
+        ← Back to Dreamboards
       </Link>
 
       <article className="rounded-xl bg-white p-6 shadow-sm">
@@ -161,10 +160,7 @@ export function DashboardDetailClient({
           </div>
           <p className="text-sm text-gray-500">{view.timeLabel}</p>
         </div>
-        <div className="mt-5">
-          <ProgressBar value={view.percentage} max={100} size="lg" showMilestones={false} />
-          <p className="mt-2 text-sm text-gray-500">{view.progressLabel}</p>
-        </div>
+        <p className="mt-5 text-sm text-gray-500">Total raised: {view.raisedLabel}</p>
       </article>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">

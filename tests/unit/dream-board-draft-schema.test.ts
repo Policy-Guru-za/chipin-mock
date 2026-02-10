@@ -7,6 +7,7 @@ const validDraft = {
   childAge: 7,
   birthdayDate: '2026-06-10',
   partyDate: '2026-06-12',
+  partyDateTime: '2026-06-12T10:00:00.000Z',
   campaignEndDate: '2026-06-12',
   childPhotoUrl: 'https://images.example/child.jpg',
   giftName: 'Ballet shoes',
@@ -34,5 +35,13 @@ describe('dreamBoardDraftSchema', () => {
       giftImageUrl: 'https://images.example/gift.jpg',
     });
     expect(parsed.success).toBe(false);
+  });
+
+  it('accepts null partyDateTime when omitted from dates step', () => {
+    const parsed = dreamBoardDraftSchema.safeParse({
+      ...validDraft,
+      partyDateTime: null,
+    });
+    expect(parsed.success).toBe(true);
   });
 });

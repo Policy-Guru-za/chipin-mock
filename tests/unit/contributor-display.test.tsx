@@ -1,79 +1,86 @@
 /**
  * @vitest-environment jsdom
  */
-import { afterEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { afterEach } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
 
 import { ContributorDisplay } from '@/components/dream-board/ContributorDisplay';
 
-const makeContributors = (count: number, anonymousAt: number[] = []) =>
-  Array.from({ length: count }, (_, index) => ({
-    name: anonymousAt.includes(index) ? null : `Person ${index + 1}`,
-    isAnonymous: anonymousAt.includes(index),
-    avatarColorIndex: index,
-  }));
+const makeContributor = (params: {
+  name: string | null;
+  isAnonymous?: boolean;
+}) => ({
+  name: params.name,
+  isAnonymous: params.isAnonymous ?? false,
+});
+
+afterEach(() => {
+  cleanup();
+});
 
 describe('ContributorDisplay', () => {
-  afterEach(() => {
-    cleanup();
-  });
-
   it('shows empty state when there are no contributors', () => {
     render(<ContributorDisplay contributors={[]} totalCount={0} />);
     expect(screen.getByText('Be the first to chip in... 🎁')).toBeInTheDocument();
   });
 
-  it('shows all contributors when count is 1-5', () => {
-    render(<ContributorDisplay contributors={makeContributors(3)} totalCount={3} />);
-
-    expect(screen.getByText('3 loved ones have chipped in')).toBeInTheDocument();
-    expect(screen.getByText('Person 1')).toBeInTheDocument();
-    expect(screen.getByText('Person 2')).toBeInTheDocument();
-    expect(screen.getByText('Person 3')).toBeInTheDocument();
-    expect(screen.queryByText(/\+ .* others/)).not.toBeInTheDocument();
-  });
-
-  it('shows first 5 and +X others link for 6+ contributors', async () => {
-    const user = userEvent.setup();
-    render(<ContributorDisplay contributors={makeContributors(7)} totalCount={7} />);
-
-    expect(screen.getByText('7 amazing people have chipped in')).toBeInTheDocument();
-    expect(screen.getByText('+ 2 others ➜')).toBeInTheDocument();
-    expect(screen.queryByText('Person 6')).not.toBeInTheDocument();
-
-    await user.click(screen.getByText('+ 2 others ➜'));
-    expect(screen.getByRole('dialog', { name: 'All contributors' })).toBeInTheDocument();
-    expect(screen.getByText('Person 6')).toBeInTheDocument();
-  });
-
-  it('renders anonymous contributors with heart icon label', () => {
-    render(<ContributorDisplay contributors={makeContributors(2, [1])} totalCount={2} />);
-    expect(screen.getByText('💝 Anonymous contributor')).toBeInTheDocument();
-  });
-
-  it('applies avatar colors using provided color index', () => {
-    const { container } = render(
-      <ContributorDisplay contributors={makeContributors(2)} totalCount={2} />
+  it('formats contributor names as first + last initial', () => {
+    render(
+      <ContributorDisplay
+        contributors={[makeContributor({ name: 'Katie Miller' })]}
+        totalCount={1}
+      />
     );
 
-    const avatars = container.querySelectorAll('div[style]');
-    expect(avatars[0]).toHaveStyle({ backgroundColor: '#F5C6AA' });
-    expect(avatars[1]).toHaveStyle({ backgroundColor: '#A8D4E6' });
+    expect(screen.getByText('Katie M.')).toBeInTheDocument();
+    expect(screen.getByText(/has chipped in!/)).toBeInTheDocument();
   });
 
-  it('uses dynamic heading emoji tiers', () => {
-    const { rerender } = render(<ContributorDisplay contributors={makeContributors(2)} totalCount={2} />);
-    expect(screen.getByText('2 loved ones have chipped in')).toBeInTheDocument();
+  it('keeps first-name-only entries as-is', () => {
+    render(
+      <ContributorDisplay contributors={[makeContributor({ name: 'Thabo' })]} totalCount={1} />
+    );
 
-    rerender(<ContributorDisplay contributors={makeContributors(5)} totalCount={5} />);
-    expect(screen.getByText('5 loved ones have chipped in')).toBeInTheDocument();
+    expect(screen.getByText('Thabo')).toBeInTheDocument();
+  });
 
-    rerender(<ContributorDisplay contributors={makeContributors(6)} totalCount={6} />);
-    expect(screen.getByText('6 amazing people have chipped in')).toBeInTheDocument();
+  it('renders anonymous for null or empty names', () => {
+    render(
+      <ContributorDisplay
+        contributors={[
+          makeContributor({ name: null, isAnonymous: true }),
+          makeContributor({ name: '' }),
+        ]}
+        totalCount={2}
+      />
+    );
 
-    rerender(<ContributorDisplay contributors={makeContributors(11)} totalCount={11} />);
-    expect(screen.getByText('11 amazing people have chipped in')).toBeInTheDocument();
+    expect(screen.getAllByText('Anonymous')).toHaveLength(2);
+  });
+
+  it('shows max 6 contributors and overflow copy', () => {
+    const contributors = Array.from({ length: 8 }, (_, index) =>
+      makeContributor({ name: `Person ${index + 1}` })
+    );
+
+    render(<ContributorDisplay contributors={contributors} totalCount={8} />);
+
+    expect(screen.getByText('Person 1.')).toBeInTheDocument();
+    expect(screen.getByText('Person 6.')).toBeInTheDocument();
+    expect(screen.queryByText('Person 7.')).not.toBeInTheDocument();
+    expect(screen.queryByText('Person 8.')).not.toBeInTheDocument();
+    expect(screen.getByText('and 2 others')).toBeInTheDocument();
+  });
+
+  it('does not show overflow copy when total contributors are within limit', () => {
+    const contributors = Array.from({ length: 3 }, (_, index) =>
+      makeContributor({ name: `Person ${index + 1}` })
+    );
+
+    render(<ContributorDisplay contributors={contributors} totalCount={3} />);
+
+    expect(screen.queryByText(/and \d+ others?/)).not.toBeInTheDocument();
   });
 });

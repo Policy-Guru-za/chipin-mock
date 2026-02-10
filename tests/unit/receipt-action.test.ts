@@ -115,7 +115,7 @@ describe('requestReceiptAction', () => {
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
         to: 'ava@example.com',
-        subject: "Your contribution receipt for Maya's Dream Board",
+        subject: "Your contribution receipt for Maya's Dreamboard",
       }),
       expect.objectContaining({
         idempotencyKey: expect.stringMatching(/^receipt:contribution-1:ava@example.com:/),

@@ -89,7 +89,7 @@ gap between the copy matrix definitions and the implemented strings.
 ### Host Dashboard
 | Location | Canonical copy |
 |----------|---------------|
-| Title | `"Your Dream Boards"` |
+| Title | `"Your Dreamboards"` |
 | Empty state | `"You haven't created a Dreamboard yet."` |
 | Payout section | `"Payout details"` |
 | Post-campaign | `"Campaign complete"` |

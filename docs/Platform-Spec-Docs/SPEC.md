@@ -125,7 +125,7 @@ Gifta exposes APIs that partners integrate with — not the reverse. We control 
 
 | Metric | Definition | Target (v1.0) |
 |--------|------------|---------------|
-| Pot Completion Rate | % of Dream Boards that reach goal or close with funds | >70% |
+| Pot Completion Rate | % of Dreamboards that reach goal or close with funds | >70% |
 | Guest Conversion Rate | % of link clicks that result in contribution | >25% |
 | Average Pot Size | Mean total contributions per Dreamboard | R2,500+ |
 | Time to First Contribution | Hours from Dreamboard creation to first contribution | <24h |
@@ -184,7 +184,7 @@ Gifta occupies a unique position: **purpose-built for parents** + **seamless loc
 - 99.9% uptime target
 
 ### Scale
-- Support 10,000 concurrent Dream Boards
+- Support 10,000 concurrent Dreamboards
 - Handle 100 contributions/minute at peak
 - 1M+ total contributions in Year 1
 
@@ -207,7 +207,7 @@ Gifta occupies a unique position: **purpose-built for parents** + **seamless loc
 ## Go-to-Market Strategy
 
 ### Phase 1: Seed (Months 1-3)
-- 100 Dream Boards from founder's network
+- 100 Dreamboards from founder's network
 - Iterate based on feedback
 - Target: 70%+ pot completion rate
 

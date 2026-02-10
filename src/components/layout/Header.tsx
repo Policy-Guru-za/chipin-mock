@@ -30,8 +30,13 @@ export function Header({ isClerkEnabled = false }: HeaderProps) {
     <>
       <header className="sticky top-0 z-40 border-b border-border bg-surface/90 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
-          <Link href="/" className="text-xl font-display text-text">
-            Gifta
+          <Link
+            href="/"
+            className="flex items-center gap-2.5 no-underline"
+            style={{ fontFamily: 'var(--font-nunito)' }}
+          >
+            <span className="text-[30px]">🎁</span>
+            <span className="text-[28px] font-bold text-[#3D3D3D]">Gifta</span>
           </Link>
 
           {/* Desktop nav */}

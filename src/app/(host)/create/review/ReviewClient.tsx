@@ -7,6 +7,7 @@ import { useActionState, useEffect, useMemo, useState } from 'react';
 import { ConfettiTrigger } from '@/components/effects/ConfettiTrigger';
 import { CreateFlowShell } from '@/components/layout/CreateFlowShell';
 import { Button } from '@/components/ui/button';
+import { formatPartyDateTime } from '@/lib/dream-boards/party-date-time';
 import { parseDateOnly } from '@/lib/utils/date';
 
 type ReviewDraftData = {
@@ -15,10 +16,10 @@ type ReviewDraftData = {
   childPhotoUrl: string;
   birthdayDate: string;
   partyDate: string;
+  partyDateTime?: string | null;
   campaignEndDate: string;
   giftName: string;
   giftImageUrl: string;
-  goalCents: number;
   payoutMethod: 'karri_card' | 'bank';
   payoutEmail: string;
   hostWhatsAppNumber: string;
@@ -68,7 +69,7 @@ function PreviewCard({ draft, shareUrl, readonlyMode }: PreviewCardProps) {
       return 'No charity split selected.';
     }
     if (draft.charitySplitType === 'percentage' && draft.charityPercentageBps) {
-      return `Charity split: ${Math.round(draft.charityPercentageBps / 100)}% of goal.`;
+      return `Charity split: ${Math.round(draft.charityPercentageBps / 100)}% of contributions.`;
     }
     if (draft.charitySplitType === 'threshold' && draft.charityThresholdCents) {
       return `Charity split: ${formatRand(draft.charityThresholdCents)} fixed amount.`;
@@ -80,6 +81,7 @@ function PreviewCard({ draft, shareUrl, readonlyMode }: PreviewCardProps) {
     draft.payoutMethod === 'bank'
       ? `Bank transfer${draft.bankName ? ` (${draft.bankName})` : ''}${draft.bankAccountLast4 ? ` •••• ${draft.bankAccountLast4}` : ''}`
       : `Karri Card${draft.karriCardHolderName ? ` (${draft.karriCardHolderName})` : ''}`;
+  const partyDateTimeSummary = formatPartyDateTime(draft.partyDateTime ?? null);
 
   return (
     <div className="rounded-3xl border border-border bg-white p-5 shadow-soft sm:p-8">
@@ -113,10 +115,10 @@ function PreviewCard({ draft, shareUrl, readonlyMode }: PreviewCardProps) {
           </div>
           <div className="space-y-1">
             <p className="text-sm font-semibold text-text">{draft.giftName}</p>
-            <p className="text-xs text-text-muted">Goal: {formatRand(draft.goalCents)}</p>
           </div>
         </div>
         <div className="space-y-1 text-xs text-text-secondary sm:text-sm">
+          {partyDateTimeSummary ? <p>Birthday party: {partyDateTimeSummary}</p> : null}
           <p>Campaign closes: {formatDate(draft.campaignEndDate)}</p>
           <p>Payout: {payoutSummary}</p>
           <p>{charitySummary}</p>
@@ -171,7 +173,7 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
   };
 
   const whatsappShareMessage = shareUrl
-    ? `🎁 Help make ${draft.childName}'s birthday extra special!\n\n${draft.childName} is dreaming of ${draft.giftName} (${formatRand(draft.goalCents)}).\n\nChip in here: ${shareUrl}`
+    ? `🎁 Help make ${draft.childName}'s birthday extra special!\n\n${draft.childName} is dreaming of ${draft.giftName}.\n\nChip in here: ${shareUrl}`
     : '';
   const emailSubject = `Help ${draft.childName}'s Birthday Dream Come True! 🎉`;
   const emailBody = shareUrl

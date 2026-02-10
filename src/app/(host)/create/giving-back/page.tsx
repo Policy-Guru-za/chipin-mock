@@ -13,7 +13,7 @@ import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
 const givingBackErrorMessages: Record<string, string> = {
   invalid: 'Please complete the giving-back details.',
   charity_required: 'Please select a charity.',
-  split_required: 'Please choose how to split the goal.',
+  split_required: 'Please choose how to split contributions.',
   percentage_range: 'Set a percentage between 5% and 50%.',
   threshold_range: 'Set a fixed amount between R50 and R500.',
 };
@@ -36,8 +36,8 @@ export default async function CreateGivingBackPage({
   if (view.redirectTo) {
     redirect(view.redirectTo);
   }
-  if (!draft?.goalCents) {
-    redirect('/create/gift');
+  if (!draft) {
+    redirect('/create/dates');
   }
 
   const charities = await listActiveCharities();
@@ -69,7 +69,7 @@ export default async function CreateGivingBackPage({
       <Card>
         <CardHeader>
           <CardTitle>Giving back</CardTitle>
-          <CardDescription>Choose whether to share a portion of the goal with charity.</CardDescription>
+          <CardDescription>Choose whether to share a portion of contributions with charity.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {errorMessage ? (
@@ -101,7 +101,6 @@ export default async function CreateGivingBackPage({
               defaultThresholdAmount={
                 draft.charityThresholdCents ? Math.round(draft.charityThresholdCents / 100) : 100
               }
-              goalCents={draft.goalCents}
               childName={draft.childName}
             />
           )}

@@ -77,7 +77,7 @@ Data we explicitly do not store:
 
 **Method:** None required
 
-Guests access Dream Boards via public URLs. No authentication needed.
+Guests access Dreamboards via public URLs. No authentication needed.
 
 **Security Controls:**
 - Slug contains random suffix (not guessable)

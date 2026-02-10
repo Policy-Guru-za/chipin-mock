@@ -91,7 +91,7 @@ Gifta uses PostgreSQL (via Neon) with Drizzle ORM. This document defines all dat
 
 ### hosts
 
-Stores authenticated users who create Dream Boards.
+Stores authenticated users who create Dreamboards.
 
 ```sql
 CREATE TABLE hosts (
@@ -301,7 +301,7 @@ export const dreamBoards = pgTable('dream_boards', {
 
 ### contributions
 
-Tracks individual contributions to Dream Boards.
+Tracks individual contributions to Dreamboards.
 
 ```sql
 CREATE TYPE payment_status AS ENUM (
@@ -402,7 +402,7 @@ export const contributions = pgTable('contributions', {
 
 ### payouts
 
-Tracks payout execution for closed Dream Boards. Each Dreamboard has a **single Karri payout**.
+Tracks payout execution for closed Dreamboards. Each Dreamboard has a **single Karri payout**.
 
 ```sql
 CREATE TYPE payout_status AS ENUM (
@@ -698,7 +698,7 @@ LEFT JOIN contributions c ON c.dream_board_id = db.id
 GROUP BY db.id;
 ```
 
-### Active Dream Boards Expiring Soon
+### Active Dreamboards Expiring Soon
 
 ```sql
 CREATE VIEW expiring_dream_boards AS
@@ -730,8 +730,8 @@ ORDER BY party_date ASC;
 
 ### Data Retention Policy
 
-1. **Active Dream Boards:** Retained indefinitely
-2. **Closed Dream Boards:** Retained for 90 days, then anonymized
+1. **Active Dreamboards:** Retained indefinitely
+2. **Closed Dreamboards:** Retained for 90 days, then anonymized
 3. **Contribution IP/User Agent:** Deleted after 30 days
 4. **Payout Records:** Retained for 7 years (legal requirement)
 5. **Auth Sessions:** Managed by Clerk; no KV-based magic links
@@ -774,7 +774,7 @@ WHERE dream_board_id IN (
 | Query Pattern | Index |
 |--------------|-------|
 | Find Dreamboard by slug | `idx_dream_boards_slug` |
-| List host's Dream Boards | `idx_dream_boards_host` |
+| List host's Dreamboards | `idx_dream_boards_host` |
 | Find active boards expiring soon | `idx_dream_boards_party_date` (partial) |
 | Look up payment by provider ref | `idx_contributions_payment_ref` |
 | List contributions for board | `idx_contributions_dream_board` |

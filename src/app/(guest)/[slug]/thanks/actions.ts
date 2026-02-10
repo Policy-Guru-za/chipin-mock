@@ -44,7 +44,7 @@ const buildReceiptEmail = (params: {
     month: 'long',
     day: 'numeric',
   });
-  const subject = `Your contribution receipt for ${params.childName}'s Dream Board`;
+  const subject = `Your contribution receipt for ${params.childName}'s Dreamboard`;
   const safeChildName = escapeHtml(params.childName);
   const safeGiftName = escapeHtml(params.giftName);
   const safeBoardUrl = escapeHtml(params.boardUrl);
@@ -53,19 +53,19 @@ const buildReceiptEmail = (params: {
     to: params.to,
     subject,
     text: [
-      `Thanks for contributing to ${params.childName}'s Dream Board for ${params.giftName}.`,
+      `Thanks for contributing to ${params.childName}'s Dreamboard for ${params.giftName}.`,
       `Gift contribution: ${formatZar(params.amountCents)}`,
       `Processing fee: ${formatZar(params.feeCents)}`,
       `Total paid: ${formatZar(totalCents)}`,
       `Date: ${contributionDate}`,
-      `View Dream Board: ${params.boardUrl}`,
+      `View Dreamboard: ${params.boardUrl}`,
       '',
       'Thank you for helping make this birthday extra special.',
       'Gifta',
     ].join('\n'),
     html: [
       '<p>Hi there,</p>',
-      `<p>Thanks for contributing to <strong>${safeChildName}</strong>'s Dream Board for <strong>${safeGiftName}</strong>.</p>`,
+      `<p>Thanks for contributing to <strong>${safeChildName}</strong>'s Dreamboard for <strong>${safeGiftName}</strong>.</p>`,
       '<p><strong>Receipt details</strong></p>',
       '<ul>',
       `<li>Gift contribution: ${formatZar(params.amountCents)}</li>`,
@@ -73,7 +73,7 @@ const buildReceiptEmail = (params: {
       `<li>Total paid: ${formatZar(totalCents)}</li>`,
       `<li>Date: ${contributionDate}</li>`,
       '</ul>',
-      `<p><a href="${safeBoardUrl}">View Dream Board</a></p>`,
+      `<p><a href="${safeBoardUrl}">View Dreamboard</a></p>`,
       '<p>Thank you for helping make this birthday extra special.</p>',
       '<p>Gifta</p>',
     ].join(''),

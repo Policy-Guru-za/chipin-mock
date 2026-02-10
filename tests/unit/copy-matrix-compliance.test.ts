@@ -21,6 +21,7 @@ const makeBoard = (overrides: Partial<BoardRecord> = {}) =>
     childAge: 7,
     birthdayDate: '2026-02-15',
     partyDate: '2026-02-15',
+    partyDateTime: null,
     campaignEndDate: '2026-02-12',
     giftName: 'Scooter',
     giftDescription: 'Mint scooter',
@@ -69,12 +70,12 @@ describe('copy matrix compliance', () => {
     expect(emailIntegration).toContain("process.env.RESEND_FROM_EMAIL ?? 'noreply@gifta.co.za'");
   });
 
-  it('uses Dream Board closed-state copy exactly in view model', () => {
+  it('uses Dreamboard closed-state copy exactly in view model', () => {
     const view = buildGuestViewModel(makeBoard({ campaignEndDate: '2026-01-15' }), {
       now: new Date('2026-02-01T12:00:00.000Z'),
     });
 
-    expect(view.timeRemainingMessage).toBe('This Dream Board is closed to new contributions.');
+    expect(view.timeRemainingMessage).toBe('This Dreamboard is closed to new contributions.');
   });
 
   it('uses chip-in wording for contribution headline', () => {
@@ -112,7 +113,7 @@ describe('copy matrix compliance', () => {
     expect(payload.text).toContain('Chip in now: https://gifta.example/maya');
   });
 
-  it('uses Dream Board terminology on landing CTAs', () => {
+  it('uses Dreamboard terminology on landing CTAs', () => {
     const cta = readSource('src/components/landing/LandingCTA.tsx');
     const nav = readSource('src/components/landing/LandingNav.tsx');
     const page = readSource('src/components/landing/LandingPage.tsx');
@@ -120,21 +121,21 @@ describe('copy matrix compliance', () => {
     expect(cta).toContain('Create Your Free Dreamboard');
     expect(nav).toContain('Create a Free Dreamboard');
     expect(page).toContain('Create Your Free Dreamboard');
-    expect(cta).not.toContain('Create your free Dream Board');
-    expect(nav).not.toContain('Create a free Dream Board');
-    expect(page).not.toContain('Create your free Dream Board');
+    expect(cta).not.toContain('Create your free Dreamboard');
+    expect(nav).not.toContain('Create a free Dreamboard');
+    expect(page).not.toContain('Create your free Dreamboard');
   });
 
-  it('uses Create Dream Board CTA in host review', () => {
+  it('uses Create Dreamboard CTA in host review', () => {
     const review = readSource('src/app/(host)/create/review/ReviewClient.tsx');
 
-    expect(review).toContain('Create Dream Board');
-    expect(review).not.toContain('Publish Dream Board');
+    expect(review).toContain('Create Dreamboard');
+    expect(review).not.toContain('Publish Dreamboard');
   });
 
-  it('uses funded banner copy from matrix', () => {
-    const guestPage = readSource('src/app/(guest)/[slug]/page.tsx');
-    expect(guestPage).toContain('Goal reached! Extra contributions still help.');
+  it('uses Phase D status-badge funded copy', () => {
+    const statusBadge = readSource('src/components/dream-board/DreamboardStatusBadge.tsx');
+    expect(statusBadge).toContain('Gift funded - thank you, everyone! 🎉');
   });
 
   it('uses remind-me copy from matrix', () => {
@@ -142,6 +143,6 @@ describe('copy matrix compliance', () => {
     const reminderModal = readSource('src/components/contribute/ReminderModal.tsx');
 
     expect(details).toContain('Remind me later');
-    expect(reminderModal).toContain("We&apos;ll send one reminder before this Dream Board closes.");
+    expect(reminderModal).toContain("We&apos;ll send one reminder before this Dreamboard closes.");
   });
 });

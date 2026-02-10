@@ -272,7 +272,7 @@ charityLabel, payoutLabel }`. Uses `formatZar` for all labels.
 Keep as server component. Expand data fetching and rendering.
 
 #### 2a — Page Header
-- Title: `"Your Dream Boards"` (Fraunces 28px, 700) — per copy
+- Title: `"Your Dreamboards"` (Fraunces 28px, 700) — per copy
   matrix
 - CTA: `"Create a Dreamboard +"` (Sage filled button `#6B9E88`,
   right-aligned on desktop, full-width below title on mobile)
@@ -352,7 +352,7 @@ Create `src/app/(host)/dashboard/[id]/DashboardDetailClient.tsx`
 (`'use client'`):
 
 #### 3a — Back Navigation
-- `"← Back to Dream Boards"` (Outfit 14px, sage `#6B9E88`,
+- `"← Back to Dreamboards"` (Outfit 14px, sage `#6B9E88`,
   link to `/dashboard`)
 
 #### 3b — Header Card
@@ -456,7 +456,7 @@ Create `src/app/(host)/dashboard/[id]/DashboardPostCampaignClient
 .tsx` (`'use client'`):
 
 #### 4a — Back Navigation
-- Same as 3a: `"← Back to Dream Boards"` link
+- Same as 3a: `"← Back to Dreamboards"` link
 
 #### 4b — Celebration Header
 - `"🎉"` (40px, block, centered)
@@ -759,7 +759,7 @@ Create these test files:
 - Empty state renders when no boards with correct CTA
 - Time remaining displays correctly for various date scenarios
 - Cards link to `/dashboard/{id}`
-- Page title is "Your Dream Boards"
+- Page title is "Your Dreamboards"
 
 **`tests/unit/dashboard-detail.test.tsx`** (~10 tests):
 - Summary stats render correctly (raised, contributors, time)
@@ -893,7 +893,7 @@ Verify all new and modified components meet WCAG 2.1 AA:
 - Status badges display correct variant/color for all statuses
 - Time remaining / ended labels display correctly
 - Create-new card and empty state render correctly
-- Copy matrix terms used throughout: `"Your Dream Boards"`,
+- Copy matrix terms used throughout: `"Your Dreamboards"`,
   `"Payout Details"`, `"Campaign complete"`
 - Download endpoints return correctly formatted PDF and CSV
 

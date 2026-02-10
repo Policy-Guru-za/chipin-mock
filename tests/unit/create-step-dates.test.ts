@@ -11,6 +11,9 @@ const addDays = (days: number) => {
   return date.toISOString().split('T')[0];
 };
 
+const toJohannesburgIso = (date: string, time = '12:00') =>
+  new Date(`${date}T${time}:00+02:00`).toISOString();
+
 const makeDraft = (overrides: Record<string, unknown> = {}) => ({
   childName: 'Maya',
   childAge: 7,
@@ -55,6 +58,7 @@ describe('saveDatesAction', () => {
       birthdayDate: addDays(20),
       partyDate: addDays(22),
       campaignEndDate: addDays(22),
+      partyDateTime: null,
     });
   });
 
@@ -168,7 +172,65 @@ describe('saveDatesAction', () => {
       birthdayDate: addDays(20),
       partyDate: addDays(20),
       campaignEndDate: addDays(20),
+      partyDateTime: null,
     });
+  });
+
+  it('stores partyDateTime with noon fallback when party date is set without time', async () => {
+    const redirectMock = vi.fn((url: string) => {
+      throw new Error(`REDIRECT:${url}`);
+    });
+    const updateDreamBoardDraft = vi.fn(async () => undefined);
+    const partyDateTimeDate = addDays(30);
+
+    vi.doMock('next/navigation', () => ({ redirect: redirectMock }));
+    vi.doMock('@/lib/auth/clerk-wrappers', () => ({ requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })) }));
+    vi.doMock('@/lib/dream-boards/draft', () => ({
+      getDreamBoardDraft: vi.fn(async () => makeDraft()),
+      updateDreamBoardDraft,
+    }));
+
+    const { saveDatesAction } = await loadModule();
+    const formData = new FormData();
+    formData.set('birthdayDate', addDays(20));
+    formData.set('partyDateEnabled', 'on');
+    formData.set('partyDate', addDays(22));
+    formData.set('campaignEndDate', addDays(22));
+    formData.set('partyDateTimeDate', partyDateTimeDate);
+
+    await expect(saveDatesAction(formData)).rejects.toThrow('REDIRECT:/create/giving-back');
+    expect(updateDreamBoardDraft).toHaveBeenCalledWith('host-1', {
+      birthdayDate: addDays(20),
+      partyDate: addDays(22),
+      campaignEndDate: addDays(22),
+      partyDateTime: toJohannesburgIso(partyDateTimeDate),
+    });
+  });
+
+  it('returns party_datetime_range when party date-time is outside 6 months', async () => {
+    const redirectMock = vi.fn((url: string) => {
+      throw new Error(`REDIRECT:${url}`);
+    });
+
+    vi.doMock('next/navigation', () => ({ redirect: redirectMock }));
+    vi.doMock('@/lib/auth/clerk-wrappers', () => ({ requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })) }));
+    vi.doMock('@/lib/dream-boards/draft', () => ({
+      getDreamBoardDraft: vi.fn(async () => makeDraft()),
+      updateDreamBoardDraft: vi.fn(async () => undefined),
+    }));
+
+    const { saveDatesAction } = await loadModule();
+    const formData = new FormData();
+    formData.set('birthdayDate', addDays(20));
+    formData.set('partyDateEnabled', 'on');
+    formData.set('partyDate', addDays(22));
+    formData.set('campaignEndDate', addDays(22));
+    formData.set('partyDateTimeDate', addDays(220));
+    formData.set('partyDateTimeTime', '14:30');
+
+    await expect(saveDatesAction(formData)).rejects.toThrow(
+      'REDIRECT:/create/dates?error=party_datetime_range'
+    );
   });
 
   it('returns invalid on schema validation failure', async () => {

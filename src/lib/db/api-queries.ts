@@ -17,6 +17,7 @@ const dreamBoardApiFields = {
   childAge: dreamBoards.childAge,
   birthdayDate: dreamBoards.birthdayDate,
   partyDate: dreamBoards.partyDate,
+  partyDateTime: dreamBoards.partyDateTime,
   campaignEndDate: dreamBoards.campaignEndDate,
   giftName: dreamBoards.giftName,
   giftDescription: dreamBoards.giftDescription,

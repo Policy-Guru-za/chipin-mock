@@ -46,7 +46,7 @@ Authorization: Bearer cpk_live_xxxxxxxxxxxxxxxxxxxx
 | Scope | Description |
 |-------|-------------|
 | `dreamboards:read` | Read Dreamboard data |
-| `dreamboards:write` | Create/update Dream Boards |
+| `dreamboards:write` | Create/update Dreamboards |
 | `contributions:read` | Read contribution data |
 | `payouts:read` | Read payout status |
 | `payouts:write` | Confirm payout execution |
@@ -159,7 +159,7 @@ Response includes pagination metadata:
 
 ## Endpoints
 
-### Dream Boards
+### Dreamboards
 
 #### Create Dreamboard
 
@@ -254,7 +254,7 @@ GET /v1/dream-boards/{id}
 }
 ```
 
-#### List Dream Boards
+#### List Dreamboards
 
 ```http
 GET /v1/dream-boards

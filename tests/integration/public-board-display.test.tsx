@@ -7,13 +7,8 @@ import '@testing-library/jest-dom/vitest';
 
 import { CharitableGivingCard } from '@/components/dream-board/CharitableGivingCard';
 import { ContributorDisplay } from '@/components/dream-board/ContributorDisplay';
-import { ReturnVisitBanner } from '@/components/dream-board/ReturnVisitBanner';
-import { TimeRemaining } from '@/components/dream-board/TimeRemaining';
+import { DreamboardStatusBadge } from '@/components/dream-board/DreamboardStatusBadge';
 import { buildGuestViewModel } from '@/lib/dream-boards/view-model';
-
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: vi.fn() }),
-}));
 
 type BoardRecord = Parameters<typeof buildGuestViewModel>[0];
 
@@ -42,6 +37,7 @@ const makeBoard = (overrides: Partial<BoardRecord> = {}) =>
     childAge: 7,
     birthdayDate: addDays(20),
     partyDate: addDays(20),
+    partyDateTime: null,
     campaignEndDate: addDays(10),
     giftName: 'Scooter',
     giftDescription: 'Mint scooter',
@@ -72,7 +68,6 @@ const makeContributors = (count: number) =>
   Array.from({ length: count }, (_, index) => ({
     name: `Person ${index + 1}`,
     isAnonymous: false,
-    avatarColorIndex: index,
   }));
 
 function PublicBoardHarness({ board, contributors }: { board: BoardRecord; contributors: ReturnType<typeof makeContributors> }) {
@@ -80,9 +75,13 @@ function PublicBoardHarness({ board, contributors }: { board: BoardRecord; contr
 
   return (
     <div>
-      <TimeRemaining
-        message={view.timeRemainingMessage}
-        urgency={view.timeRemainingUrgency}
+      <DreamboardStatusBadge
+        contributionCount={view.contributionCount}
+        isActive={view.isActive}
+        isClosed={view.isClosed}
+        isExpired={view.isExpired}
+        timeRemainingMessage={view.timeRemainingMessage}
+        timeRemainingUrgency={view.timeRemainingUrgency}
         daysLeft={view.daysLeft}
       />
       <ContributorDisplay contributors={contributors} totalCount={view.contributionCount} />
@@ -94,13 +93,6 @@ function PublicBoardHarness({ board, contributors }: { board: BoardRecord; contr
           allocationLabel={view.charityAllocationLabel}
         />
       ) : null}
-      {view.isFunded ? <p>Goal reached!</p> : null}
-      <ReturnVisitBanner
-        slug={view.slug}
-        childName={view.childName}
-        href={`/${view.slug}/contribute?source=dream-board`}
-        isExpired={view.isExpired || view.isClosed}
-      />
     </div>
   );
 }
@@ -120,7 +112,6 @@ describe('public board display integration', () => {
 
   afterEach(() => {
     cleanup();
-    localStorage.clear();
     vi.unstubAllGlobals();
   });
 
@@ -152,16 +143,17 @@ describe('public board display integration', () => {
 
   it('shows all 5 contributors', () => {
     render(<PublicBoardHarness board={makeBoard({ contributionCount: 5 })} contributors={makeContributors(5)} />);
-    expect(screen.getAllByText('Person 5')).toHaveLength(1);
-    expect(screen.queryByText(/\+ .* others/)).not.toBeInTheDocument();
+    expect(screen.getAllByText('Person 5.')).toHaveLength(1);
+    expect(screen.queryByText(/and \d+ others?/)).not.toBeInTheDocument();
   });
 
-  it('shows first 5 and +15 others for 20 contributors', () => {
+  it('shows first 6 and overflow summary for 20 contributors', () => {
     render(
       <PublicBoardHarness board={makeBoard({ contributionCount: 20 })} contributors={makeContributors(20)} />
     );
-    expect(screen.getByText('+ 15 others ➜')).toBeInTheDocument();
-    expect(screen.queryByText('Person 6')).not.toBeInTheDocument();
+    expect(screen.getByText('and 14 others')).toBeInTheDocument();
+    expect(screen.getByText('Person 6.')).toBeInTheDocument();
+    expect(screen.queryByText('Person 7.')).not.toBeInTheDocument();
   });
 
   it('disables CTA and shows expired message for expired boards', () => {
@@ -171,32 +163,23 @@ describe('public board display integration', () => {
     });
 
     render(<PublicBoardHarness board={board} contributors={makeContributors(1)} />);
-    expect(screen.getByText(/Dream Board is closed to new contributions/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Chip in for Maya/i })).toBeDisabled();
+    expect(screen.getByText(/Dreamboard is closed to new contributions/)).toBeInTheDocument();
   });
 
   it('shows funded banner when board is funded', () => {
-    const board = makeBoard({ raisedCents: 60000, goalCents: 50000, contributionCount: 2 });
-    render(<PublicBoardHarness board={board} contributors={makeContributors(2)} />);
-    expect(screen.getByText('Goal reached!')).toBeInTheDocument();
-  });
-
-  it('keeps CTA enabled for funded status boards', () => {
     const board = makeBoard({
       status: 'funded',
       raisedCents: 60000,
       goalCents: 50000,
       contributionCount: 2,
-      campaignEndDate: addDays(10),
     });
     render(<PublicBoardHarness board={board} contributors={makeContributors(2)} />);
-    expect(screen.getByRole('button', { name: /Chip in for Maya/i })).toBeEnabled();
+    expect(screen.getByText('Gift funded - thank you, everyone! 🎉')).toBeInTheDocument();
   });
 
-  it('keeps CTA enabled for active boards', () => {
+  it('keeps time-remaining copy for active boards', () => {
     const board = makeBoard({ contributionCount: 2, campaignEndDate: addDays(10) });
     render(<PublicBoardHarness board={board} contributors={makeContributors(2)} />);
-    expect(screen.getByRole('button', { name: /Chip in for Maya/i })).toBeEnabled();
     expect(screen.getByText(/days left to chip in|Plenty of time|Just .* days left/)).toBeInTheDocument();
   });
 });

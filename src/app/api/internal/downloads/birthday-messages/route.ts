@@ -207,7 +207,7 @@ export async function GET(request: NextRequest) {
   const now = new Date();
   const lines: string[] = [
     `${boardAccess.childName}'s Birthday Messages`,
-    'From their Dream Board on Gifta',
+    'From their Dreamboard on Gifta',
     '',
   ];
 

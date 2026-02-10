@@ -1,0 +1,2 @@
+ALTER TABLE dream_boards
+  ADD COLUMN IF NOT EXISTS party_date_time TIMESTAMPTZ;

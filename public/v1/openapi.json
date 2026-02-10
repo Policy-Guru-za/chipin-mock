@@ -3,7 +3,7 @@
   "info": {
     "title": "Gifta Public API",
     "version": "1.0.0",
-    "description": "Partner API for Dream Boards, contributions, payouts, and webhooks."
+    "description": "Partner API for Dreamboards, contributions, payouts, and webhooks."
   },
   "servers": [
     {
@@ -22,8 +22,8 @@
   ],
   "tags": [
     {
-      "name": "Dream Boards",
-      "description": "Create and retrieve Dream Boards."
+      "name": "Dreamboards",
+      "description": "Create and retrieve Dreamboards."
     },
     {
       "name": "Contributions",
@@ -42,7 +42,7 @@
     "/dream-boards": {
       "get": {
         "tags": [
-          "Dream Boards"
+          "Dreamboards"
         ],
         "summary": "List dream boards",
         "parameters": [
@@ -112,7 +112,7 @@
       },
       "post": {
         "tags": [
-          "Dream Boards"
+          "Dreamboards"
         ],
         "summary": "Create a dream board",
         "requestBody": {
@@ -174,7 +174,7 @@
     "/dream-boards/{id}": {
       "get": {
         "tags": [
-          "Dream Boards"
+          "Dreamboards"
         ],
         "summary": "Get a dream board",
         "parameters": [
@@ -226,7 +226,7 @@
       },
       "patch": {
         "tags": [
-          "Dream Boards"
+          "Dreamboards"
         ],
         "summary": "Update a dream board",
         "parameters": [

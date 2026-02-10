@@ -21,7 +21,6 @@ export type DashboardStatusVariant =
 export interface DashboardCardViewModel {
   boardId: string;
   boardTitle: string;
-  percentage: number;
   raisedLabel: string;
   contributionCount: number;
   statusLabel: string;
@@ -69,10 +68,7 @@ export interface DashboardDetailViewModel {
   message: string | null;
   goalCents: number;
   raisedCents: number;
-  percentage: number;
   raisedLabel: string;
-  goalLabel: string;
-  progressLabel: string;
   totalFeeCents: number;
   totalCharityCents: number;
   netPayoutCents: number;
@@ -99,7 +95,6 @@ export interface DashboardDetailViewModel {
 export type DashboardViewModel = {
   boardTitle: string;
   statusLabel: string;
-  percentage: number;
   raisedLabel: string;
   contributionCount: number;
   manageHref: string;
@@ -226,8 +221,6 @@ export const buildDashboardCardViewModel = (
   options?: { baseUrl?: string }
 ): DashboardCardViewModel => {
   const gift = resolveGiftInfo(board);
-  const percentage =
-    board.goalCents > 0 ? Math.min(100, Math.round((board.raisedCents / board.goalCents) * 100)) : 0;
   const deadline = board.campaignEndDate ?? board.partyDate;
   const { daysRemaining, timeLabel } = resolveTime(deadline);
   const isComplete = board.status === 'closed' || board.status === 'paid_out';
@@ -236,7 +229,6 @@ export const buildDashboardCardViewModel = (
     boardId: board.id,
     slug: board.slug,
     boardTitle: `${board.childName}'s Dreamboard`,
-    percentage,
     raisedLabel: formatZar(board.raisedCents),
     contributionCount: board.contributionCount,
     statusLabel: getStatusLabel(board.status),
@@ -261,7 +253,6 @@ export const buildDashboardDetailViewModel = (
   options: { baseUrl: string }
 ): DashboardDetailViewModel => {
   const raisedCents = board.totalRaisedCents;
-  const percentage = board.goalCents > 0 ? Math.min(100, Math.round((raisedCents / board.goalCents) * 100)) : 0;
   const { daysRemaining, timeLabel } = resolveTime(board.campaignEndDate ?? board.partyDate);
   const { netPayoutCents, feeLabel, charityLabel, payoutLabel } = buildFinancialBreakdown(
     raisedCents,
@@ -291,10 +282,7 @@ export const buildDashboardDetailViewModel = (
     message: board.message,
     goalCents: board.goalCents,
     raisedCents,
-    percentage,
     raisedLabel: formatZar(raisedCents),
-    goalLabel: formatZar(board.goalCents),
-    progressLabel: `${percentage}% funded · ${formatZar(raisedCents)} of ${formatZar(board.goalCents)}`,
     totalFeeCents: board.totalFeeCents,
     totalCharityCents: board.totalCharityCents,
     netPayoutCents,
@@ -328,7 +316,6 @@ export const buildDashboardViewModel = (
   return {
     boardTitle: card.boardTitle,
     statusLabel: card.statusLabel,
-    percentage: card.percentage,
     raisedLabel: card.raisedLabel,
     contributionCount: card.contributionCount,
     manageHref: card.manageHref,

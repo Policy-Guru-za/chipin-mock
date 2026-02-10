@@ -31,7 +31,7 @@ Define required parity between API runtime behavior, OpenAPI schema, DB enums, a
 
 ## Required Endpoint Parity
 
-## 1) Dream Boards API
+## 1) Dreamboards API
 
 ### `POST /api/v1/dream-boards`
 

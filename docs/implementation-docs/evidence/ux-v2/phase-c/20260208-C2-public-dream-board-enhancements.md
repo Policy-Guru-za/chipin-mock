@@ -1,5 +1,8 @@
 # 20260208-C2 Public Dreamboard Enhancements
 
+> **Phase D update:** ReturnVisitBanner has been removed from the public Dreamboard per parent feedback.
+> **Phase D update:** Financial goal display (progress bar, percentage, and amount targets) was removed from the public Dreamboard and replaced by `DreamboardStatusBadge`.
+
 ## 1) Summary
 Milestone C2 completed.
 

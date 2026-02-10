@@ -31,7 +31,7 @@ describe('UAT data validation', () => {
     expect(payout.giftCents + payout.charityCents + payout.platformFeeCents).toBe(100000);
   });
 
-  it('keeps funded and overfunded presentation logic stable on guest view model', () => {
+  it('keeps funded presentation logic status-driven on guest view model', () => {
     const board = {
       hostId: 'host-1',
       childName: 'Maya',
@@ -47,6 +47,7 @@ describe('UAT data validation', () => {
       charityPercentageBps: null,
       charityThresholdCents: null,
       partyDate: null,
+      partyDateTime: null,
       campaignEndDate: null,
       status: 'funded',
       contributionCount: 5,
@@ -58,9 +59,9 @@ describe('UAT data validation', () => {
     };
 
     const view = buildGuestViewModel(board as never, { now: new Date('2099-01-01T00:00:00.000Z') });
-    expect(view.funded).toBe(true);
-    expect(view.raisedCents).toBeGreaterThan(view.goalCents);
-    expect(view.percentage).toBe(100);
+    expect(view.isFunded).toBe(true);
+    expect((view as { goalCents?: number }).goalCents).toBeUndefined();
+    expect((view as { raisedCents?: number }).raisedCents).toBeUndefined();
     expect(view.isClosed).toBe(false);
   });
 

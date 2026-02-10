@@ -23,11 +23,8 @@ type GivingBackFormProps = {
   defaultSplitType?: SplitType;
   defaultPercentage?: number;
   defaultThresholdAmount?: number;
-  goalCents: number;
   childName?: string;
 };
-
-const toRandLabel = (amount: number) => `R${amount.toLocaleString('en-ZA')}`;
 
 export function GivingBackForm({
   action,
@@ -37,7 +34,6 @@ export function GivingBackForm({
   defaultSplitType = 'percentage',
   defaultPercentage = 25,
   defaultThresholdAmount = 100,
-  goalCents,
   childName,
 }: GivingBackFormProps) {
   const [charityEnabled, setCharityEnabled] = useState(defaultCharityEnabled ?? false);
@@ -45,24 +41,23 @@ export function GivingBackForm({
   const [splitType, setSplitType] = useState<SplitType>(defaultSplitType);
   const [percentage, setPercentage] = useState(defaultPercentage);
   const [thresholdAmount, setThresholdAmount] = useState(defaultThresholdAmount);
-  const goalAmount = Math.round(goalCents / 100);
 
   const selectedCharity = useMemo(
     () => charities.find((charity) => charity.id === selectedCharityId),
     [charities, selectedCharityId]
   );
 
-  const charityAmount = useMemo(() => {
+  const splitPreview = useMemo(() => {
     if (!charityEnabled || !selectedCharityId) {
-      return 0;
+      return null;
     }
-    if (splitType === 'percentage') {
-      return Math.round((goalAmount * percentage) / 100);
-    }
-    return Math.min(goalAmount, thresholdAmount);
-  }, [charityEnabled, goalAmount, percentage, selectedCharityId, splitType, thresholdAmount]);
 
-  const giftAmount = Math.max(0, goalAmount - charityAmount);
+    if (splitType === 'percentage') {
+      return `${percentage}% of each contribution supports ${selectedCharity?.name ?? 'your selected charity'}.`;
+    }
+
+    return `The first R${thresholdAmount.toLocaleString('en-ZA')} of contributions supports ${selectedCharity?.name ?? 'your selected charity'}.`;
+  }, [charityEnabled, percentage, selectedCharity?.name, selectedCharityId, splitType, thresholdAmount]);
 
   return (
     <form action={action} className="space-y-6">
@@ -110,7 +105,7 @@ export function GivingBackForm({
           </fieldset>
 
           <fieldset className="space-y-3">
-            <legend className="text-sm font-medium text-text">How should we split the goal?</legend>
+            <legend className="text-sm font-medium text-text">How should we split contributions?</legend>
             <div className="flex flex-col gap-2 sm:flex-row">
               <label className="flex items-center gap-2 text-sm text-text">
                 <input
@@ -120,7 +115,7 @@ export function GivingBackForm({
                   checked={splitType === 'percentage'}
                   onChange={() => setSplitType('percentage')}
                 />
-                Percentage of goal
+                Percentage of each contribution
               </label>
               <label className="flex items-center gap-2 text-sm text-text">
                 <input
@@ -130,7 +125,7 @@ export function GivingBackForm({
                   checked={splitType === 'threshold'}
                   onChange={() => setSplitType('threshold')}
                 />
-                Fixed amount
+                First fixed amount raised
               </label>
             </div>
           </fieldset>
@@ -175,14 +170,14 @@ export function GivingBackForm({
             <input type="hidden" name="charityPercentage" value="" />
           )}
 
-          <div
-            aria-live="polite"
-            className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-text-secondary"
-          >
-            Out of your {toRandLabel(goalAmount)} goal: {toRandLabel(charityAmount)} goes to{' '}
-            {selectedCharity?.name ?? 'your selected charity'}, {toRandLabel(giftAmount)} goes to{' '}
-            {(childName ?? 'your child') + "'s gift"}.
-          </div>
+          {splitPreview ? (
+            <div
+              aria-live="polite"
+              className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-text-secondary"
+            >
+              {splitPreview} The rest goes to {(childName ?? 'your child') + "'s gift"}.
+            </div>
+          ) : null}
         </div>
       ) : (
         <>

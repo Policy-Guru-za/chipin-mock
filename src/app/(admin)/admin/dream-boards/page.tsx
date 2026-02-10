@@ -48,7 +48,7 @@ const columns: AdminDataColumn<AdminDreamBoardDataset>[] = [
   {
     key: 'goal',
     header: 'Goal',
-    render: (item) => <span>{formatZar(item.goalCents)}</span>,
+    render: (item) => <span>{item.goalCents > 0 ? formatZar(item.goalCents) : 'No goal set'}</span>,
   },
   {
     key: 'raised',
@@ -101,7 +101,7 @@ export default async function AdminDreamBoardsPage({
     <section className="space-y-4">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold text-text">Dream Boards</h1>
+          <h1 className="font-display text-2xl font-bold text-text">Dreamboards</h1>
           <p className="text-sm text-gray-500">Read-only view of host campaigns and progress.</p>
         </div>
         <Button asChild variant="outline" size="sm">

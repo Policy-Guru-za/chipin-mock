@@ -11,7 +11,7 @@ Compaction-safe entrypoints:
 ## 1) Executive summary
 
 This repository is a single Next.js (App Router) application that ships:
-- a mobile-first guest web experience for “Dream Boards” (`/[slug]`)
+- a mobile-first guest web experience for “Dreamboards” (`/[slug]`)
 - a Clerk-authenticated host experience (`/create/*`, `/dashboard/*`)
 - an admin payouts console (`/admin/payouts*`)
 - payment-provider webhooks (`/api/webhooks/*`)
@@ -154,7 +154,7 @@ DB views:
 - `dream_boards_with_totals`: includes `raised_cents = SUM(contributions.net_cents WHERE completed)` and contribution_count
 - `expiring_dream_boards`: active boards with party_date within next 7 days
 
-## 7) Dream Board lifecycle (implemented reality)
+## 7) Dreamboard lifecycle (implemented reality)
 
 State transitions:
 - `draft` created during host wizard (draft persistence via server actions + storage)

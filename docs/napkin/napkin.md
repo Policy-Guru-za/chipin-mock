@@ -3,6 +3,9 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-10 | self | Ran `rg` over route-group/bracket paths without quotes (`(host)`, `[slug]`) and triggered `zsh: no matches found` before inspection | Treat all App Router grouped/dynamic paths as shell-globs by default and always single-quote these path arguments in `rg/sed/nl/cat` commands |
+| 2026-02-10 | self | Refactored public Dreamboard sections and removed the non-host contribute CTA block, leaving no direct path to `/{slug}/contribute` from the main page | In guest-page UI simplifications, keep an explicit non-host CTA/link to the contribute route and verify it in integration coverage |
+| 2026-02-10 | self | Added multiple `render(...)` calls in `ContributorDisplay` unit tests without cleanup, so stale DOM from earlier cases caused false failures on later assertions | In jsdom component suites that render multiple cases in one file, include `afterEach(cleanup)` to isolate each test reliably |
 | 2026-02-10 | self | Tried to stop a dev server started under escalation with plain sandbox `kill`; received `operation not permitted` | When a process is launched with escalated permissions, stop it with an escalated `kill` command and include the short approval justification |
 | 2026-02-10 | self | Ran `sed` against `src/app/(host)/create/payout/actions.ts` without quoting parentheses and hit `zsh: no matches found` again | Quote any path containing route-group parentheses every time (`'src/app/(host)/...'`) and copy the quoted pattern from prior commands |
 | 2026-02-10 | self | Used `rg -ho ...` expecting grep-style hidden no-filename behavior; `-h` in `rg` prints help, so key extraction command failed | Use `rg -o --no-filename ...` (or `-I`) for match-only extraction; avoid mixing grep short flags with ripgrep |
@@ -78,6 +81,7 @@
 - For rollout-decision milestones, keep one canonical milestone evidence file plus supporting artifacts (runbook execution, checklist, GO/NO-GO, exit memo) and mark live-prod steps as manual rather than guessing outcomes.
 - For C9 pre-flight rollback validation (C0-05), always include three explicit confirmations in evidence: Vercel rollback location path, exact UX toggle-off vars, and pre-rollback evidence capture list.
 - For admin CSV exports, use shared header lists and always emit header-only CSV for empty datasets to keep download behavior deterministic.
+- For implementation-plan docs, lock repo execution constraints up front (`pnpm`, main-only strategy, Conventional Commits) and explicitly include generated-artifact sync rules when source contracts (like `src/lib/api/openapi.ts`) are edited.
 
 ## Patterns That Don't Work
 - Skipping preflight docs causes rework and misalignment.

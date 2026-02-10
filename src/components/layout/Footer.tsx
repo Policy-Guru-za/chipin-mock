@@ -2,7 +2,13 @@ export function Footer() {
   return (
     <footer className="border-t border-border bg-surface">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-6 py-8 text-sm text-text-muted">
-        <span className="font-medium text-text">Gifta</span>
+        <div
+          className="flex items-center gap-2 text-[22px] font-bold text-[#3D3D3D]"
+          style={{ fontFamily: 'var(--font-nunito)' }}
+        >
+          <span className="text-xl">🎁</span>
+          <span>Gifta</span>
+        </div>
         <p>A joyful, secure way to pool gifts for birthdays and celebrations.</p>
         <span>© {new Date().getFullYear()} Gifta. All rights reserved.</span>
       </div>

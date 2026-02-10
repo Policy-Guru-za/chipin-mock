@@ -17,7 +17,7 @@ Gifta integrates with external services for payments, payouts, notifications, an
 │                         Gifta Platform                          │
 │  ┌──────────────────────────────────────────────────────────┐  │
 │  │                     Core Application                      │  │
-│  │   Dream Boards │ Contributions │ Payouts │ Users          │  │
+│  │   Dreamboards │ Contributions │ Payouts │ Users          │  │
 │  └──────────────────────────────────────────────────────────┘  │
 │                              │                                  │
 │                     Gifta Public API                           │

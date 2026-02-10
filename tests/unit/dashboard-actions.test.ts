@@ -82,7 +82,7 @@ describe('updateDreamBoard action', () => {
 
     expect(result).toEqual({
       success: false,
-      error: 'This Dream Board can no longer be edited.',
+      error: 'This Dreamboard can no longer be edited.',
     });
     expect(queryMocks.updateDreamBoardForHost).not.toHaveBeenCalled();
     expect(cacheMocks.revalidatePath).not.toHaveBeenCalled();

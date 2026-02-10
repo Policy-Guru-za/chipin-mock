@@ -21,7 +21,6 @@ const manualGiftSchema = z.object({
   giftName: z.string().min(2).max(200),
   giftDescription: z.string().max(500).optional(),
   giftIconId: z.string().min(1),
-  goalAmount: z.coerce.number().int().min(20),
 });
 
 type GiftSearchParams = {
@@ -40,9 +39,6 @@ const resolveDefaultGiftName = (draft?: Awaited<ReturnType<typeof getDreamBoardD
 
 const resolveDefaultGiftDescription = (draft?: Awaited<ReturnType<typeof getDreamBoardDraft>>) =>
   draft?.giftDescription ?? '';
-
-const resolveDefaultGoal = (draft?: Awaited<ReturnType<typeof getDreamBoardDraft>>) =>
-  draft?.goalCents ? Math.round(draft.goalCents / 100) : '';
 
 const resolveDefaultIconId = (draft?: Awaited<ReturnType<typeof getDreamBoardDraft>>) => {
   const draftIconId = draft?.giftIconId;
@@ -78,13 +74,11 @@ async function saveManualGiftAction(formData: FormData) {
   const giftName = formData.get('giftName');
   const giftDescription = formData.get('giftDescription');
   const giftIconId = formData.get('giftIconId');
-  const goalAmount = formData.get('goalAmount');
 
   const result = manualGiftSchema.safeParse({
     giftName,
     giftDescription,
     giftIconId,
-    goalAmount,
   });
 
   if (!result.success) {
@@ -97,7 +91,6 @@ async function saveManualGiftAction(formData: FormData) {
   }
 
   const normalizedGiftDescription = result.data.giftDescription?.trim();
-  const goalCents = Math.round(result.data.goalAmount * 100);
 
   await updateDreamBoardDraft(session.hostId, {
     giftName: result.data.giftName.trim(),
@@ -105,7 +98,7 @@ async function saveManualGiftAction(formData: FormData) {
     giftIconId: icon.id,
     giftImageUrl: icon.src,
     giftImagePrompt: undefined,
-    goalCents,
+    goalCents: 0,
   });
 
   redirect('/create/dates');
@@ -130,7 +123,6 @@ export default async function CreateGiftPage({
   const errorMessage = getErrorMessage(resolvedSearchParams?.error);
   const defaultGiftName = resolveDefaultGiftName(draft);
   const defaultGiftDescription = resolveDefaultGiftDescription(draft);
-  const defaultGoal = resolveDefaultGoal(draft);
   const defaultIconId = resolveDefaultIconId(draft);
 
   return (
@@ -143,8 +135,8 @@ export default async function CreateGiftPage({
     >
       <Card>
         <CardHeader>
-          <CardTitle>Dream gift</CardTitle>
-          <CardDescription>Describe the dream gift and the goal amount.</CardDescription>
+          <CardTitle>The dream gift</CardTitle>
+          <CardDescription>Describe the dream gift.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {errorMessage ? (
@@ -190,21 +182,6 @@ export default async function CreateGiftPage({
               defaultGiftDescription={defaultGiftDescription}
               childAge={draft?.childAge}
             />
-
-            <div className="space-y-2">
-              <label htmlFor="goalAmount" className="text-sm font-medium text-text">
-                Goal amount (R)
-              </label>
-              <Input
-                id="goalAmount"
-                name="goalAmount"
-                type="number"
-                min={20}
-                step={1}
-                defaultValue={defaultGoal}
-                required
-              />
-            </div>
 
             <Button type="submit">Continue to dates</Button>
           </form>

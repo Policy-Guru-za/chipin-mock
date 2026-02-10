@@ -5,7 +5,7 @@ import { getPayoutQueueErrorMessage } from '@/lib/payouts/admin-copy';
 describe('getPayoutQueueErrorMessage', () => {
   it('returns no-contributions message', () => {
     expect(getPayoutQueueErrorMessage('no-contributions')).toBe(
-      'No contributions collected yet for that Dream Board.'
+      'No contributions collected yet for that Dreamboard.'
     );
   });
 

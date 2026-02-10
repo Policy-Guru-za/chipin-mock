@@ -16,6 +16,7 @@ const makeBoard = (overrides: Partial<DreamBoardRecord> = {}) =>
     childName: 'Maya',
     childPhotoUrl: 'https://example.com/child.jpg',
     partyDate: new Date('2026-02-01'),
+    partyDateTime: null,
     giftName: 'Scooter',
     giftImageUrl: 'https://example.com/scooter.jpg',
     giftImagePrompt: 'A mint green scooter',
@@ -91,7 +92,6 @@ describe('buildThankYouViewModel', () => {
 
     expect(view.headline).toBe('Thank you, Ava!');
     expect(view.message).toMatch(/You're helping Maya get their dream gift\./);
-    expect(view.percentage).toBe(20);
     expect(view.isContributionCompleted).toBe(true);
   });
 

@@ -29,6 +29,7 @@ const makeBoard = (overrides: Partial<BoardRecord> = {}) =>
     childAge: 7,
     birthdayDate: addDays(now, 10),
     partyDate: addDays(now, 12),
+    partyDateTime: null,
     campaignEndDate: addDays(now, 10),
     giftName: 'Scooter',
     giftDescription: 'Mint scooter',
@@ -89,7 +90,7 @@ describe('GuestViewModel time remaining', () => {
   it('maps past campaign end to expired', () => {
     const view = buildGuestViewModel(makeBoard({ campaignEndDate: addDays(now, -1) }), { now });
     expect(view.timeRemainingUrgency).toBe('expired');
-    expect(view.timeRemainingMessage).toBe('This Dream Board is closed to new contributions.');
+    expect(view.timeRemainingMessage).toBe('This Dreamboard is closed to new contributions.');
   });
 });
 
@@ -102,10 +103,12 @@ describe('GuestViewModel board states', () => {
     expect(view.isExpired).toBe(false);
   });
 
-  it('marks funded based on raised >= goal', () => {
-    const view = buildGuestViewModel(makeBoard({ raisedCents: 60000, goalCents: 50000 }), { now });
+  it('marks funded based on board status', () => {
+    const view = buildGuestViewModel(
+      makeBoard({ status: 'funded', raisedCents: 60000, goalCents: 50000 }),
+      { now }
+    );
     expect(view.isFunded).toBe(true);
-    expect(view.funded).toBe(true);
   });
 
   it('marks closed when status is not active', () => {
@@ -118,7 +121,7 @@ describe('GuestViewModel board states', () => {
     const view = buildGuestViewModel(makeBoard({ status: 'funded' }), { now });
     expect(view.isActive).toBe(false);
     expect(view.isClosed).toBe(false);
-    expect(view.isFunded).toBe(false);
+    expect(view.isFunded).toBe(true);
   });
 
   it('marks expired when party date has passed', () => {

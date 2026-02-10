@@ -151,7 +151,7 @@ const getRecipientDataForCharityPayout = (board: BoardPayoutContext): PayoutReci
 const ensureBoardReady = (status: string) => {
   const readyStatuses = ['closed'] as const;
   if (!readyStatuses.includes(status as (typeof readyStatuses)[number])) {
-    throw new Error('Dream Board is not ready for payout');
+    throw new Error('Dreamboard is not ready for payout');
   }
 };
 
@@ -216,7 +216,7 @@ export async function createPayoutsForDreamBoard(params: {
 }) {
   const board = await getDreamBoardPayoutContext(params.dreamBoardId);
   if (!board) {
-    throw new Error('Dream Board not found');
+    throw new Error('Dreamboard not found');
   }
 
   ensureBoardReady(board.status);

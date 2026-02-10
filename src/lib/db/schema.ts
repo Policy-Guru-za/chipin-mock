@@ -128,6 +128,7 @@ export const dreamBoards = pgTable(
     childAge: integer('child_age'),
     birthdayDate: date('birthday_date'),
     partyDate: date('party_date').notNull(),
+    partyDateTime: timestamp('party_date_time', { withTimezone: true }),
     campaignEndDate: date('campaign_end_date'),
 
     // v4.0: Manual gift definition with static icon imagery
@@ -135,7 +136,7 @@ export const dreamBoards = pgTable(
     giftDescription: text('gift_description'),
     giftImageUrl: text('gift_image_url').notNull(), // Static icon path, e.g. /icons/gifts/ballet.png
     giftImagePrompt: text('gift_image_prompt'), // Deprecated, null for icon-based boards
-    goalCents: integer('goal_cents').notNull(),
+    goalCents: integer('goal_cents').notNull().default(0),
 
     // v3.0: Karri Card or bank transfer payout
     payoutMethod: payoutMethodEnum('payout_method').notNull().default('karri_card'),
@@ -182,7 +183,7 @@ export const dreamBoards = pgTable(
       .where(sql`${table.status} = 'active'`),
     charityEnabledIdx: index('idx_dream_boards_charity_enabled').on(table.charityEnabled),
     payoutMethodIdx: index('idx_dream_boards_payout_method').on(table.payoutMethod),
-    validGoal: check('valid_goal', sql`${table.goalCents} >= 2000`), // R20 minimum (kept for backward compat)
+    validGoal: check('valid_goal', sql`${table.goalCents} >= 0`),
     validDates: check(
       'valid_dream_board_dates',
       sql`(${table.birthdayDate} IS NULL OR ${table.partyDate} >= ${table.birthdayDate})

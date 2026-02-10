@@ -10,7 +10,7 @@ export const uiCopy = {
   },
   dashboard: {
     empty: {
-      body: 'You don’t have any Dream Boards yet. Create your first one to get started.',
+      body: 'You don’t have any Dreamboards yet. Create your first one to get started.',
     },
   },
   contributions: {

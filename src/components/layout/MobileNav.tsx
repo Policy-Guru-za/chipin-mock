@@ -129,7 +129,15 @@ export function MobileNav({ isOpen, onClose, isClerkEnabled = false }: MobileNav
               <div className="flex h-full flex-col">
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-border px-6 py-4">
-                  <span className="font-display text-lg text-text">Menu</span>
+                  <Link
+                    href="/"
+                    onClick={handleLinkClick}
+                    className="flex items-center gap-2.5 no-underline"
+                    style={{ fontFamily: 'var(--font-nunito)' }}
+                  >
+                    <span className="text-[30px]">🎁</span>
+                    <span className="text-[28px] font-bold text-[#3D3D3D]">Gifta</span>
+                  </Link>
                   <button
                     ref={closeButtonRef}
                     onClick={onClose}
