@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
-import { howItWorksSteps, howItWorksSocialProof, howItWorksCTA } from './content';
+import { howItWorksSteps, howItWorksSocialProof } from './content';
 
 /* ------------------------------------------------------------------ */
 /*  SVG Icons                                                          */
@@ -147,7 +146,7 @@ export function LandingHowItWorks() {
   const show = visible || prefersReducedMotion;
 
   return (
-    <section ref={sectionRef} id="how-it-works" className="px-6 py-12 md:px-10 md:py-16 relative z-[5]">
+    <section ref={sectionRef} id="how-it-works" className="px-6 pt-12 pb-6 md:px-10 md:pt-16 md:pb-8 relative z-[5]">
       <div className="max-w-[420px] md:max-w-[520px] mx-auto">
         <div className="text-center mb-9">
           <p className="text-[11px] font-semibold tracking-[2.5px] uppercase text-[#6B9E88] mb-2.5" style={fadeStyle(show, 0)}>
@@ -165,16 +164,6 @@ export function LandingHowItWorks() {
         </div>
 
         <SocialProof show={show} />
-
-        <div className="mt-6" style={fadeStyle(show, 0.5)}>
-          <Link href={howItWorksCTA.href} className="flex items-center justify-center gap-2 w-full bg-[#1A2B22] text-white border-none px-6 py-[18px] rounded-2xl font-semibold text-[15px] shadow-[0_6px_28px_rgba(26,43,34,0.18)] transition-all min-h-[52px] hover:shadow-[0_8px_32px_rgba(26,43,34,0.25)] active:scale-[0.97]">
-            {howItWorksCTA.label}
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </Link>
-          <p className="text-center mt-3 text-[12px] text-[#7A8D83]">{howItWorksCTA.subtitle}</p>
-        </div>
       </div>
     </section>
   );

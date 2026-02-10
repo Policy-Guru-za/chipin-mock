@@ -86,12 +86,6 @@ export const howItWorksSocialProof = {
   text: 'Families across South Africa are already making gift-giving magic together',
 };
 
-export const howItWorksCTA = {
-  label: 'Start a Dreamboard',
-  subtitle: 'Free to create · No app needed',
-  href: '/create',
-};
-
 export const socialLinks = [
   {
     name: 'Instagram',
