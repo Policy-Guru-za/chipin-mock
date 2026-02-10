@@ -39,6 +39,12 @@ Canonical copy source for UX v2 UI and communication surfaces.
 | Closed state | "This Dream Board is closed to new contributions." |
 | Funded state banner | "Goal reached! Extra contributions still help." |
 
+### Marketing Homepage CTA
+
+- Landing surface keeps one-word product term: `Dreamboard`.
+- Nav CTA: "Create a Free Dreamboard"
+- Primary CTA buttons: "Create Your Free Dreamboard"
+
 ## Contribution Flow Copy
 
 | Location | Copy |

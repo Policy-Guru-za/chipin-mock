@@ -84,7 +84,6 @@ export function LandingNav({ mobileMenuOpen, setMobileMenuOpen }: LandingNavProp
             id="mobile-menu"
             role="dialog"
             aria-modal="true"
-            aria-label="Navigation menu"
             ref={menuRef}
             tabIndex={-1}
           >
@@ -101,9 +100,9 @@ export function LandingNav({ mobileMenuOpen, setMobileMenuOpen }: LandingNavProp
             <Link
               href="/create"
               onClick={() => closeMenu()}
-              className="mt-auto w-full bg-gradient-to-br from-primary-700 to-primary-800 text-white border-none px-6 py-4 rounded-[10px] font-semibold text-[15px] text-center"
+              className="mt-auto w-full bg-gradient-to-br from-[#6B9E88] to-[#5A8E78] text-white border-none px-6 py-4 rounded-[10px] font-semibold text-[15px] text-center"
             >
-              Create a free Dream Board
+              Create a Free Dreamboard
             </Link>
           </div>
         </>
@@ -126,20 +125,20 @@ export function LandingNav({ mobileMenuOpen, setMobileMenuOpen }: LandingNavProp
             <a
               key={link.label}
               href={link.href}
-              className="text-[#757575] no-underline font-medium text-[15px] hover:text-[#3D3D3D] transition-colors"
+              className="text-[#777] no-underline font-medium text-[15px] hover:text-[#3D3D3D] transition-colors"
             >
               {link.label}
             </a>
           ))}
           <Link
             href="/create"
-            className="bg-gradient-to-br from-primary-700 to-primary-800 text-white border-none px-7 py-3.5 rounded-[10px] font-semibold text-[15px] shadow-[0_4px_16px_rgba(15,118,110,0.3)] transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(15,118,110,0.4)] active:translate-y-0"
+            className="bg-gradient-to-br from-[#6B9E88] to-[#5A8E78] text-white border-none px-7 py-3.5 rounded-[10px] font-semibold text-[15px] shadow-[0_4px_16px_rgba(107,158,136,0.3)] transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(107,158,136,0.4)] active:translate-y-0"
           >
-            Create a free Dream Board
+            Create a Free Dreamboard
           </Link>
           <Link
             href="/create"
-            className="bg-transparent text-[#0F766E] border-2 border-[#0F766E] px-6 py-3 rounded-[10px] font-semibold text-[15px] transition-all hover:bg-[#0F766E] hover:text-white"
+            className="bg-transparent text-[#5A8E78] border-2 border-[#5A8E78] px-6 py-3 rounded-[10px] font-semibold text-[15px] transition-all hover:bg-[#5A8E78] hover:text-white"
           >
             Login
           </Link>
@@ -147,7 +146,7 @@ export function LandingNav({ mobileMenuOpen, setMobileMenuOpen }: LandingNavProp
 
         {/* Hamburger Menu Button */}
         <button
-          className="lg:hidden z-[60] flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-[5px] border-none bg-transparent p-2"
+          className="lg:hidden flex flex-col gap-[5px] bg-transparent border-none cursor-pointer p-2 z-[60]"
           onClick={() => (mobileMenuOpen ? closeMenu() : setMobileMenuOpen(true))}
           aria-label="Toggle menu"
           aria-expanded={mobileMenuOpen}

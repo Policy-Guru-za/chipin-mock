@@ -308,6 +308,11 @@ Rollback execution playbook:
 - Smoke execution notes: `PENDING (human-run)`
 - Full-exposure steps: `PENDING (human-run)`
 
+Execution attempt note (agent workspace):
+- Attempted to start C9B deploy/smoke from this environment on `2026-02-10`.
+- Blocked: `vercel` CLI is unavailable (`command not found`), so production deploy + smoke steps cannot be executed from this workspace.
+- Required to proceed: Ryan/Ops runs C9B manually (or provides an environment with Vercel CLI/auth and production access).
+
 ## 15) C9B Validation Outcomes
 
 - CV-01 through CV-07: `PENDING (human-run)`

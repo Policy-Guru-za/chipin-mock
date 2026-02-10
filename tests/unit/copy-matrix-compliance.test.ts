@@ -117,9 +117,12 @@ describe('copy matrix compliance', () => {
     const nav = readSource('src/components/landing/LandingNav.tsx');
     const page = readSource('src/components/landing/LandingPage.tsx');
 
-    expect(cta).toContain('Create your free Dream Board');
-    expect(nav).toContain('Create a free Dream Board');
-    expect(page).toContain('Create your free Dream Board');
+    expect(cta).toContain('Create Your Free Dreamboard');
+    expect(nav).toContain('Create a Free Dreamboard');
+    expect(page).toContain('Create Your Free Dreamboard');
+    expect(cta).not.toContain('Create your free Dream Board');
+    expect(nav).not.toContain('Create a free Dream Board');
+    expect(page).not.toContain('Create your free Dream Board');
   });
 
   it('uses Create Dream Board CTA in host review', () => {

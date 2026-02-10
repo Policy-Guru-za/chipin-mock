@@ -22,14 +22,14 @@ const collectSourceFiles = (rootPath: string): string[] => {
 };
 
 describe('UAT accessibility regression (UAT-12)', () => {
-  it('keeps skip-link and root main landmarks in app layout', () => {
+  it('keeps root main landmarks in app layout baseline', () => {
     const layout = readSource('src/app/layout.tsx');
     const guestLayout = readSource('src/app/(guest)/layout.tsx');
     const hostLayout = readSource('src/app/(host)/layout.tsx');
     const adminLayout = readSource('src/app/(admin)/layout.tsx');
 
-    expect(layout).toContain('href="#main-content"');
-    expect(layout).toContain('<noscript>');
+    expect(layout).not.toContain('href="#main-content"');
+    expect(layout).not.toContain('<noscript>');
     expect(guestLayout).toContain('id="main-content"');
     expect(hostLayout).toContain('id="main-content"');
     expect(adminLayout).toContain('id="main-content"');

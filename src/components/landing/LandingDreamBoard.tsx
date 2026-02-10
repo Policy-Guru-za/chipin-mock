@@ -40,7 +40,7 @@ export function LandingDreamBoard() {
             className="text-[22px] font-medium text-[#2D2D2D] mb-1"
             style={{ fontFamily: 'var(--font-dm-serif)' }}
           >
-            Mia&apos;s Dream Board
+            Mia&apos;s Dreamboard
           </h3>
           <p className="text-[#999] text-[13px]">Turning 6 • March 28th</p>
         </div>

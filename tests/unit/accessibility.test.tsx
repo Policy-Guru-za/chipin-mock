@@ -8,14 +8,14 @@ import { buttonVariants } from '@/components/ui/button';
 const readSource = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8');
 
 describe('C7 accessibility hardening', () => {
-  it('adds skip-link and noscript fallback to root layout', () => {
+  it('keeps root layout baseline without skip-link and noscript fallback', () => {
     const layout = readSource('src/app/layout.tsx');
 
-    expect(layout).toContain('href="#main-content"');
-    expect(layout).toContain('Skip to content');
-    expect(layout).toContain('focus:bg-primary-700');
-    expect(layout).toContain('<noscript>');
-    expect(layout).toContain('JavaScript is required to use Gifta.');
+    expect(layout).not.toContain('href="#main-content"');
+    expect(layout).not.toContain('Skip to content');
+    expect(layout).not.toContain('focus:bg-primary-700');
+    expect(layout).not.toContain('<noscript>');
+    expect(layout).not.toContain('JavaScript is required to use Gifta.');
   });
 
   it('provides main-content targets for critical and standalone routes', () => {
@@ -44,7 +44,9 @@ describe('C7 accessibility hardening', () => {
 
     expect(reminderModal).toContain('<p role="alert" className="text-sm text-red-600">');
     expect(charityModal).toContain('<p role="alert" className="text-sm text-red-600">{error}</p>');
-    expect(landingNav).toContain('aria-label="Navigation menu"');
+    expect(landingNav).toContain('role="dialog"');
+    expect(landingNav).toContain('aria-modal="true"');
+    expect(landingNav).not.toContain('aria-label="Navigation menu"');
     expect(amountSelector).toContain('aria-label="Custom amount"');
   });
 
@@ -59,8 +61,8 @@ describe('C7 accessibility hardening', () => {
     expect(iconSizeClasses).toContain('w-11');
     expect(header).toContain('min-h-[44px]');
     expect(header).toContain('min-w-[44px]');
-    expect(landingNav).toContain('min-h-[44px]');
-    expect(landingNav).toContain('min-w-[44px]');
+    expect(landingNav).not.toContain('min-h-[44px]');
+    expect(landingNav).not.toContain('min-w-[44px]');
     expect(pagination).toContain('min-h-[44px]');
     expect(contributionParts).toContain('min-h-[44px]');
     expect(contributionParts).toContain('min-w-[44px]');

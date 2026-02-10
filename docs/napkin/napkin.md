@@ -3,6 +3,7 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-10 | self | Homepage parity run restored `next/font/google`; `pnpm build` failed in sandbox with `ENOTFOUND fonts.googleapis.com` and can look like implementation drift | For design-parity restorations that explicitly require Google fonts, keep the imports intact and report build as environment-blocked with exact DNS error instead of swapping to offline font fallbacks |
 | 2026-02-09 | self | C9A sub-step 0 drift checks can be misread as "any dirty tree means stop" even when diffs predate gates | Capture pre/post `git status --short` and treat only newly introduced non-doc diffs as gate drift; list carryover non-doc diffs separately in evidence |
 | 2026-02-09 | self | Started command verification in this session before re-reading napkin docs | Always read `docs/napkin/SKILL.md` and `docs/napkin/napkin.md` first at turn start, then run any diagnostic/gate commands |
 | 2026-02-09 | self | Kept retrying `pnpm build` Turbopack runs that appeared frozen at `Creating an optimized production build ...` without extracting a low-level panic signature | For Turbopack stalls, run a single isolated `pnpm build:turbopack` check and capture `/tmp/next-panic-*.log`; if panic shows `creating new process -> binding to a port -> Operation not permitted`, switch build gate to Webpack in sandboxed environments |
@@ -143,3 +144,4 @@
 - Pre-GO gates should be marked PASS only after direct linkage to C8 Section 12/13 and C9 Section 2 gate outputs; avoid generic "report link" placeholders.
 - C-R2/C-R3/C-R4 prep quality depends on concrete healthy/unhealthy definitions and threshold values in the checklist itself, not only in the runbook/prompt.
 - C9A handoff payload is strongest when it includes exact C9B operator steps, rollback triggers, and explicit pending sections for human-run fields.
+- C9B live deploy/smoke cannot be executed from this workspace if `vercel` CLI is missing; record blocker explicitly in C9 evidence instead of implying execution happened.

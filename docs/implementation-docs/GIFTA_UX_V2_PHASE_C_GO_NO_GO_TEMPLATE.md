@@ -1,10 +1,10 @@
 # Gifta UX v2 Phase C GO / NO-GO Template
 
 Date: `2026-02-09`
-Window: `C9A pre-live preparation (C9B live window pending)`
+Window: `2026-02-10 09:00-10:30 (SAST)`
 Release lead: `Ryan Laubscher`
 Operator: `AI Agent (Phase C C9A)`
-On-call: `Pending manual assignment for C9B live window (Ryan/Ops)`
+On-call: `Ryan Laubscher`
 
 ## Scope Confirmation
 
