@@ -1,7 +1,14 @@
 # 19. SHARED COMPONENTS — UI Specification
-**Gifta UX v2 | Implementation-Ready**
+**Gifta UX v2 | Runtime-aligned with inventory corrections**
 
 ---
+
+## Runtime Alignment (2026-02-11)
+
+- Runtime source: `src/components/ui/*`, `src/components/dream-board/*`, `src/components/admin/*`, `src/components/landing/*`, `src/components/effects/*`.
+- Legacy references to `src/components/layout/Header.tsx` in this document are stale; runtime uses route-specific layouts and `src/components/admin/AdminSidebar.tsx` for admin nav.
+- Current shared UI primitives are in `src/components/ui` (button/input/textarea/card/skeleton/state-card/error fallback).
+- Dreamboard shared components are implemented in `src/components/dream-board` (status badge, progress bar, contributor display, charity card, time remaining).
 
 ## Table of Contents
 1. [Navigation & Layout Components](#navigation--layout-components)
@@ -1346,4 +1353,4 @@ interface ContributorListProps {
 
 ---
 
-*Document Version: 1.0 | Last Updated: 2024 | Implementation-Ready for AI Coding Agents*
+*Document Version: 1.1 | Last Updated: 2026-02-11 | Runtime-aligned with inventory corrections*

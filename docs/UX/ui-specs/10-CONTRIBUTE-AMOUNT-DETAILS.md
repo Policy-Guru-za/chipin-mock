@@ -8,6 +8,14 @@
 
 ---
 
+## Runtime Alignment (2026-02-11)
+
+- Runtime source: `src/app/(guest)/[slug]/contribute/page.tsx`, `src/app/(guest)/[slug]/contribute/ContributeDetailsClient.tsx`, `src/components/contribute/ReminderModal.tsx`.
+- Amount presets and limits in runtime: R150 / R250 / R500 presets, custom amount from R20 to R10,000.
+- Contributor message is capped in UI and persisted at 280 chars for payment initiation.
+- Reminder modal currently captures email only and schedules a 3-day reminder via `/api/internal/contributions/reminders`.
+- WhatsApp reminder opt-in fields exist in API schema but are not currently exposed in this UI.
+
 ## 1. Screen Overview
 
 This is the **information gathering screen** where contributors specify:
@@ -1102,4 +1110,3 @@ Dreamboard not found. It may have been deleted.
 - **Reminder signup rate:** 15-25%
 - **Form validation errors:** <5% (smooth UX)
 - **Mobile completion rate:** >85% (device parity with desktop)
-

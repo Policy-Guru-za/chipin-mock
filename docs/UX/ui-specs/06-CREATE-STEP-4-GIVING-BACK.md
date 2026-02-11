@@ -4,9 +4,18 @@
 **Document Version:** 1.0
 **Route:** `/create/giving-back`
 **Step Number:** 4 of 6
-**Status:** Implementation-Ready
+**Status:** Runtime-aligned with goal-model notes
 
 ---
+
+## Runtime Alignment (2026-02-11)
+
+- Runtime source: `src/app/(host)/create/giving-back/page.tsx`, `src/app/(host)/create/giving-back/actions.ts`, `src/lib/charities/service.ts`.
+- Charity split logic in runtime is contribution-based:
+  - Percentage split: 5% to 50% of each contribution.
+  - Threshold split: fixed R50 to R500 total charity allocation cap.
+- Host create flow does not collect goal amount; any references below to “% of goal amount” are historical wording and should be interpreted as contribution-based split behavior.
+- If no active charities exist, runtime shows an informational state and allows continuing without charity.
 
 ## 1. SCREEN OVERVIEW
 
@@ -1457,4 +1466,3 @@ This specification provides complete details for implementing Step 4 (Giving Bac
 - **Comprehensive:** Edge case handling, draft persistence, session recovery
 
 Ready for implementation by an AI agent using Next.js, React, TypeScript, Tailwind CSS, and Zod validation.
-

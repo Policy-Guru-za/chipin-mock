@@ -1,11 +1,18 @@
 # Landing Page UI Specification (01-LANDING-PAGE.md)
 
 **Version:** 2.0
-**Last Updated:** February 2026
-**Status:** Implementation-Ready
+**Last Updated:** February 11, 2026
+**Status:** Runtime-aligned with noted target-state sections
 **Target:** AI Coding Agent Implementation
 
 ---
+
+## Runtime Alignment (2026-02-11)
+
+- Runtime source: `src/app/(marketing)/page.tsx` and `src/components/landing/*`.
+- `/` is public and does not currently auto-redirect authenticated users to dashboard/create.
+- CTA links route to `/create`; unauthenticated access is redirected to Clerk sign-in from `src/app/(host)/create/page.tsx`.
+- Layout, hero, stats, testimonial rotation, and warm gradient treatment are implemented.
 
 ## Table of Contents
 

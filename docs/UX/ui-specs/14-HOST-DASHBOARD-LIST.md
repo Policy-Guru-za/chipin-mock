@@ -2,12 +2,19 @@
 ## Comprehensive UI Specification
 
 **Document Version:** 1.0
-**Status:** Implementation-Ready
+**Status:** Runtime-aligned with inventory/model notes
 **Route:** `/dashboard`
-**Last Updated:** February 2025
+**Last Updated:** February 11, 2026
 **Target Audience:** AI coding agents, UI developers
 
 ---
+
+## Runtime Alignment (2026-02-11)
+
+- Runtime source: `src/app/(host)/dashboard/page.tsx`, `src/lib/host/queries.ts`, `src/lib/host/dashboard-view-model.ts`.
+- Dashboard list cards are generated from live host query totals (`raisedCents`, contribution count, status labels/variants).
+- Legacy file-path references in this doc to shared `Header.tsx` are historical; runtime uses route layouts and in-page header sections.
+- Goal values can be zero in runtime (`goal_cents` default 0), and list cards prioritize raised totals/status over goal progression.
 
 ## Table of Contents
 

@@ -2,12 +2,19 @@
 ## All 7 Admin Sections
 
 **Document Version:** 1.0
-**Status:** Implementation-Ready
-**Route:** `/admin/*` (protected, admin role only)
-**Last Updated:** February 2025
+**Status:** Runtime-aligned with authorization/model corrections
+**Route:** `/admin/*` (protected)
+**Last Updated:** February 11, 2026
 **Target Audience:** AI coding agents, UI developers, admin implementers
 
 ---
+
+## Runtime Alignment (2026-02-11)
+
+- Runtime source: `src/app/(admin)/layout.tsx`, `src/lib/auth/clerk.ts`, `src/lib/auth/admin-allowlist.ts`, `src/app/(admin)/admin/*`.
+- Admin access is authenticated Clerk user + email allowlist check (`ADMIN_EMAIL_ALLOWLIST`), not Clerk role-claim enforcement.
+- Implemented admin sections are: dashboard, dreamboards, contributions, payouts, charities, reports, settings.
+- Admin surfaces are primarily read-only operations plus charity CRUD/edit actions and payout review actions.
 
 ## Table of Contents
 
@@ -34,7 +41,7 @@ The Admin Panel provides Gifta operations team with complete visibility into pla
 
 ### Access Control
 - **Route Protection:** `/admin/*` requires authentication
-- **Role Required:** `admin` role (from Clerk custom claims)
+- **Role Required:** email in `ADMIN_EMAIL_ALLOWLIST`
 - **Redirect:** Unauthorized → `/`
 - **Bypass:** No bypass possible; enforced server-side
 
@@ -1384,8 +1391,8 @@ export default async function DreamBoardsPage({
 }) {
   const { userId } = await auth();
 
-  // Verify admin role
-  const isAdmin = await verifyAdminRole(userId);
+  // Verify admin access (Clerk user + allowlisted email)
+  const isAdmin = await verifyAdminAllowlist(userId);
   if (!isAdmin) {
     redirect('/');
   }
@@ -1495,8 +1502,7 @@ export async function getDreamBoards(
 
 ---
 
-**Document Version:** 1.0
-**Status:** Implementation-Ready
-**Last Updated:** February 2025
+**Document Version:** 1.1
+**Status:** Runtime-aligned with authorization/model corrections
+**Last Updated:** February 11, 2026
 **Line Count:** 650+ lines of comprehensive specifications
-

@@ -8,13 +8,23 @@
 
 ---
 
+## Runtime Alignment (2026-02-11)
+
+- Runtime source: `src/app/(guest)/[slug]/contribute/payment/page.tsx`, `src/app/(guest)/[slug]/contribute/payment/PaymentClient.tsx`, `src/lib/payments/index.ts`.
+- Runtime payment methods are:
+  - PayFast (POST form handoff)
+  - Ozow (redirect)
+  - SnapScan (QR panel)
+- Provider availability is environment-config driven and can change by deployment config.
+- Fee display uses current runtime fee rules (3%, min R3, max R500) and total is shown before submission.
+
 ## 1. Screen Overview
 
 This is the **payment collection screen** where contributors select a payment method and complete the transaction:
 
 1. **Contribution summary** (amount + child name)
-2. **Payment method selection** (Credit/Debit Card or SnapScan)
-3. **Process payment** via selected provider (PayFast redirect or SnapScan QR)
+2. **Payment method selection** (PayFast card, Ozow EFT, or SnapScan)
+3. **Process payment** via provider-specific flow (form post, redirect, or QR)
 
 Philosophy: **Frictionless, secure, trusted.** Contributors want to complete payment in <60 seconds. Clear trust signals (lock icon, provider logos) build confidence.
 
@@ -1088,19 +1098,16 @@ Connection error. Please check your internet and try again.
 
 ## 13. Testing Checklist
 
-- [ ] Payment method cards render correctly (card selected by default)
+- [ ] Payment method cards render correctly (default provider honors availability)
 - [ ] Method cards are clickable and show selection state
 - [ ] "Pay R[amount]" button shows correct amount
 - [ ] Button disabled until method selected
-- [ ] Click button with card → PayFast form submits
-- [ ] Click button with SnapScan → QR modal opens
+- [ ] Click button with PayFast → form submit handoff works
+- [ ] Click button with Ozow → redirect handoff works
+- [ ] Click button with SnapScan → QR panel opens
 - [ ] SnapScan QR code generates and displays correctly
-- [ ] Timer counts down from 5:00 correctly
-- [ ] Close button closes modal, returns to method selection
-- [ ] "Try card instead" button closes modal, selects card option
-- [ ] Polling checks status every 2 seconds
-- [ ] Success redirects to `/thanks` page
-- [ ] Timeout closes modal after 5 minutes
+- [ ] SnapScan "Check payment status" and "Choose another method" actions work
+- [ ] Successful provider callback reaches `/thanks`
 - [ ] Network errors show error message
 - [ ] Trust badge displays correctly
 - [ ] Keyboard navigation works (Tab, Enter, Esc)
@@ -1114,12 +1121,11 @@ Connection error. Please check your internet and try again.
 
 ## 14. Success Metrics
 
-- **Payment method selection:** Card 85%, SnapScan 15% (or adjust based on market)
+- **Payment method selection mix:** PayFast / Ozow / SnapScan distribution tracked and reviewed
 - **Payment completion rate:** 95%+ (industry standard ~90%)
 - **Time to complete payment:** <60 seconds (after page load)
 - **SnapScan success rate:** 80%+ (QR generation + scan success)
-- **Fallback usage:** <5% (users who abandon SnapScan and try card)
+- **Fallback usage:** <5% (users who switch provider after a failed first attempt)
 - **Error rate:** <1% (network, processing)
 - **Mobile completion rate:** 85%+ (device parity)
 - **Bounce rate:** <10% (after clicking "Pay")
-

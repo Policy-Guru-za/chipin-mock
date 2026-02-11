@@ -3,6 +3,21 @@
 
 ---
 
+## Runtime Alignment (2026-02-11)
+
+- Runtime source: `src/lib/integrations/email.ts`, `src/lib/integrations/whatsapp.ts`, `src/lib/reminders/templates.ts`, `src/app/(guest)/[slug]/thanks/actions.ts`, `src/lib/reminders/service.ts`, `src/lib/payments/reconciliation-job.ts`.
+- Email templates actively implemented in code:
+  - Contribution receipt email
+  - Contribution reminder email
+  - Reconciliation mismatch alert email (ops)
+- WhatsApp template calls actively implemented in code:
+  - `dream_board_created`
+  - `contribution_received`
+  - `funding_complete`
+  - `payout_confirmed`
+  - `contribution_reminder` (dispatch feature-flagged)
+- This document includes broader target-state template inventory; treat runtime files as source of truth for what currently sends.
+
 ## Table of Contents
 1. [Email Template System](#email-template-system)
 2. [Email Templates (Resend)](#email-templates-resend)
@@ -1095,4 +1110,4 @@ function selectEmailVariant(templateId: string, userId: string): EmailVariant {
 
 ---
 
-*Document Version: 1.0 | Last Updated: 2024 | Implementation-Ready for AI Coding Agents*
+*Document Version: 1.1 | Last Updated: 2026-02-11 | Runtime-aligned with template inventory notes*

@@ -1,7 +1,7 @@
 # Gifta Canonical Spec (Source of Truth)
 
-> **Version:** 2.0.0
-> **Last Updated:** February 7, 2026
+> **Version:** 2.0.1
+> **Last Updated:** February 11, 2026
 > **Status:** Authoritative
 > **Supersedes:** v1.1.1 (January 21, 2026)
 
@@ -11,7 +11,7 @@
 
 Resolve conflicts across docs. When anything disagrees, this file wins.
 
-This document reflects both the current codebase state and the locked UX v2 decisions that are being implemented across Phase B (backend enablement) and Phase C (UI/UX rollout). Where current runtime behavior differs from the target state, both are noted explicitly.
+This document reflects current runtime behavior in `src/` and `drizzle/migrations/`, plus locked UX v2 decisions. Where a decision is locked but runtime is still gated by feature flags, the runtime gate is noted explicitly.
 
 ---
 
@@ -19,6 +19,7 @@ This document reflects both the current codebase state and the locked UX v2 deci
 
 | Version | Date | Summary |
 |---------|------|---------|
+| 2.0.1 | 2026-02-11 | Runtime alignment pass: corrected goal/net semantics, close-path ownership, payout automation scope, reminder schema/dispatch details, and UI rollout status. |
 | 2.0.0 | 2026-02-07 | Major update for UX v2: multi-payout (Karri + bank), charity domain, 5-step host flow, fee semantics clarification, new data model fields, payout engine architecture, reminder system. Aligned with Decision Register D-001 through D-010. |
 | 1.1.1 | 2026-01-21 | Previous baseline (Karri-only, no charity, 4-step host flow). |
 
@@ -28,11 +29,11 @@ This document reflects both the current codebase state and the locked UX v2 deci
 
 ### Product Scope
 
-- **Dreamboard:** one manual gift goal (parent-written) with curated static icon imagery.
+- **Dreamboard:** one manual gift definition with curated static icon imagery.
 - **Guest flow:** mobile-web; single CTA ("Chip in"); no sign-in required.
 - **Host flow:** Clerk authentication; 5-step creation wizard + review/confirmation.
   - Step 1: The Child (name, photo, age, birthday)
-  - Step 2: The Gift (name, description, goal amount, icon selection)
+  - Step 2: The Gift (name, description, icon selection; host UI does not collect goal amount)
   - Step 3: The Dates (birthday, party date, campaign end date)
   - Step 4: Giving Back (optional charity selection and split configuration)
   - Step 5: Payout Setup (Karri Card or bank transfer)
@@ -46,11 +47,12 @@ This document reflects both the current codebase state and the locked UX v2 deci
   - Karri Card fields: `karri_card_number`, `karri_card_holder_name`.
   - Bank fields: `bank_name`, `bank_account_number_encrypted`, `bank_account_last4`, `bank_branch_code`, `bank_account_holder`.
   - Payout method is selected by the host during creation (Step 5) and determines which fields are required.
+  - Host create flow supports both methods. Partner API bank writes are still gated by `UX_V2_ENABLE_BANK_WRITE_PATH`.
 - **Payout types:** `karri_card`, `bank`, `charity` (Decision Register D-002, LOCKED).
   - A single Dreamboard may produce multiple payout rows: one gift payout (type matches `payout_method`) and optionally one charity payout (type = `charity`).
   - Uniqueness constraint: one payout per `(dream_board_id, type)`.
   - Dreamboard transitions to `paid_out` only when all required payout rows for that board are `completed`.
-- **Current runtime state:** payout service implements `karri_card` only. Bank and charity payout processing are schema-ready but not yet wired in runtime (Phase B deliverable, gated by D-006).
+- **Current runtime state:** payout row creation supports `karri_card`, `bank`, and `charity` based on board configuration and contribution totals. Automated execution is implemented for `karri_card` only (`KARRI_AUTOMATION_ENABLED`); bank and charity payouts currently require manual completion.
 
 ### Charity Model
 
@@ -63,6 +65,7 @@ This document reflects both the current codebase state and the locked UX v2 deci
 - **Charity entity:** managed by admin; must be `is_active = true` to be selectable. Fields: name, description, category, logo, website, encrypted bank details, contact info.
 - **Charity payout cadence:** monthly batch with per-charity reconciliation report (Decision Register D-008, LOCKED).
 - **Validation:** incomplete charity configuration is rejected at both API and database constraint levels.
+- **Runtime gate:** partner API charity writes are blocked unless `UX_V2_ENABLE_CHARITY_WRITE_PATH=true`.
 
 ### Fee Semantics
 
@@ -73,6 +76,7 @@ Decision Register D-004 (LOCKED): transparent fee model.
 - **Checkout display:** itemized as "R350 gift + R10.50 processing fee = R360.50 total".
 - **`raised_cents` tracks gift amount only** (excludes platform fee). This prevents fee distortion in goal progress.
 - **Funded condition** (Decision Register D-005, LOCKED): Dreamboard is funded when `raised_cents >= goal_cents`, where `raised_cents` = `SUM(contributions.amount_cents)` for completed contributions.
+- **Runtime rule for status transition:** auto-transition to `funded` is executed only when current status is `active` and `goal_cents > 0`.
 - **`contributions.net_cents`** is a generated column: `amount_cents - fee_cents`.
   - `amount_cents` = the gift amount the contributor chose and the amount that counts toward the gift goal.
   - `fee_cents` = the platform fee calculated on that amount and added at checkout.
@@ -127,11 +131,12 @@ Identity and content:
 - `id` (UUID, PK), `slug` (unique, URL-friendly), `partner_id` (FK), `host_id` (FK)
 - `child_name`, `child_photo_url`, `child_age` (nullable), `birthday_date` (nullable)
 - `gift_name`, `gift_description` (nullable), `gift_image_url` (icon path), `gift_image_prompt` (nullable, deprecated legacy field)
-- `goal_cents` (integer, minimum 2000 = R20)
+- `goal_cents` (integer, minimum 0 in DB, default 0)
 - `message` (nullable, host message to contributors)
 
 Dates:
 - `party_date` (date, not null — pot close reference date)
+- `party_date_time` (timestamp with timezone, nullable)
 - `campaign_end_date` (date, nullable — explicit campaign deadline)
 - Constraint: `birthday_date <= party_date` and `campaign_end_date <= party_date` when set.
 
@@ -170,7 +175,7 @@ Timestamps:
 - `message` (nullable)
 - `amount_cents` (integer, not null, minimum 2000 = R20) — the gift amount chosen by the contributor.
 - `fee_cents` (integer, not null) — platform fee calculated on the gift amount.
-- `net_cents` (generated column: `amount_cents - fee_cents`) — amount counting toward the gift goal.
+- `net_cents` (generated column: `amount_cents - fee_cents`) — payout-ledger amount after platform fee; does not drive goal progress.
 - `charity_cents` (integer, nullable) — portion allocated to charity from this contribution.
 - `payment_provider` = `payfast | ozow | snapscan` (enum, not null)
 - `payment_ref` (not null, unique with provider), `payment_status` = `pending | processing | completed | failed | refunded`
@@ -208,10 +213,12 @@ Timestamps:
 
 ### contribution_reminders
 
-- `id` (UUID, PK), `dream_board_id` (FK), `email`, `remind_at`
-- `sent_at` (nullable — null until dispatched)
+- Core fields: `id` (UUID, PK), `dream_board_id` (FK), `email`, `remind_at`, `sent_at` (nullable)
+- Retry fields: `attempt_count`, `last_attempt_at`, `next_attempt_at` (not null)
+- Email delivery fields: `email_sent_at`
+- WhatsApp fields: `whatsapp_phone_e164`, `whatsapp_wa_id`, `whatsapp_opt_in_at`, `whatsapp_opt_out_at`, `whatsapp_sent_at`, `whatsapp_message_id`
 - Unique constraint: `(dream_board_id, email, remind_at)` — idempotent deduplication (Decision Register D-007).
-- Reminder scheduling maximum: 14 days. Send pipeline retries with idempotent dedupe.
+- Reminder scheduling maximum: 14 days. Send pipeline retries with idempotent dedupe and exponential backoff.
 
 ---
 
@@ -221,7 +228,7 @@ Timestamps:
 
 - **Funding phase:** gift progress advances as contributions complete; contributions can continue after goal is reached until the board is closed.
 - **Raised calculations:** `raised_cents = SUM(contributions.amount_cents WHERE payment_status = 'completed')`.
-- **Funded condition:** `raised_cents >= goal_cents`. Fee amounts are excluded from goal progress.
+- **Funded condition:** `raised_cents >= goal_cents` and `goal_cents > 0`. Fee amounts are excluded from goal progress.
 - **Contributions continue past funded:** reaching the goal does not auto-close the board. The host or an explicit trigger closes it.
 
 ### Charity Allocation
@@ -233,44 +240,44 @@ Timestamps:
 ### Close Conditions
 
 - **Explicit close:** `POST /v1/dream-boards/{id}/close` with reason (`manual`, `party_date_reached`, `goal_reached`).
-- **Auto-close on `campaign_end_date`:** planned for Phase B (not yet implemented in runtime). There is currently no in-repo scheduler that auto-closes on `party_date` or `campaign_end_date`.
-- **Manual close by host:** available via dashboard. Requires confirmation showing total raised and contributor count before irreversible action.
+- **Auto-close on `campaign_end_date`:** not implemented in runtime. There is currently no in-repo scheduler that auto-closes on `party_date` or `campaign_end_date`.
+- **Host/admin UI close control:** not currently exposed in dashboard/admin pages. Close is executed through partner API or direct operational tooling.
 - **On close:** status transitions to `closed`; payout rows are created for the board.
 
 ### Payout Lifecycle
 
 - On board close, the payout engine creates payout rows: one gift payout (type matches `payout_method`) and, if charity allocation > 0, one charity payout (type = `charity`).
-- **Gift payout calculation:** `gross_cents = raised_cents`; `net_cents = gross_cents - charity_total_cents`.
+- **Gift payout calculation:** `gross_cents = raised_cents`; `fee_cents = platform_fee_cents`; `net_cents = raised_cents - platform_fee_cents - charity_total_cents`.
 - **Charity payout calculation:** `gross_cents = charity_total_cents`; `net_cents = charity_total_cents` (no additional fee on charity payouts).
 - **Payout state machine:** `pending` → `processing` → `completed` or `failed`. Failed payouts may be retried (`failed` → `processing`).
 - **Board `paid_out` transition:** the Dreamboard status moves to `paid_out` only when all required payout rows for that board have status `completed`.
-- **Current runtime:** only `karri_card` payouts are processed automatically via the Karri credit queue. Bank and charity payout processing will be enabled in Phase B (gated by Decision Register D-006).
+- **Current runtime:** `karri_card` payouts can be processed automatically via Karri queue/automation. Bank and charity payout rows are created and tracked but not auto-executed.
 
 ### Reminder System
 
 - Contributors may opt into a reminder when visiting a board.
 - Reminders are scheduled with a maximum horizon of 14 days (Decision Register D-007).
 - Deduplication is enforced by the unique constraint on `(dream_board_id, email, remind_at)`.
-- The send pipeline must retry with idempotent dispatch to prevent duplicate notifications.
+- Dispatch runs through `POST /api/internal/reminders/dispatch` (job-secret protected) and retries with backoff.
+- Email reminder dispatch is active; WhatsApp reminder dispatch is feature-flagged (`UX_V2_ENABLE_WHATSAPP_REMINDER_DISPATCH`).
 
 ---
 
 ## Implementation Phase Context
 
-UX v2 is being delivered in three phases:
+UX v2 delivery status in runtime:
 
-- **Phase A (Schema):** completed. Database schema supports all UX v2 fields (bank, charity, reminders, expanded enums).
-- **Phase B (Backend Enablement):** in progress. Enables multi-payout processing, charity domain services, reminder pipeline, and API contract parity. Bank and charity write paths are gated until B4 milestone passes (D-006).
-- **Phase C (UI/UX Rollout):** pending Phase B completion. Full visual redesign of all screens per UI spec suite (`docs/UX/ui-specs/`).
-
-Where this document describes behavior not yet live in runtime, it is noted with "Phase B deliverable" or similar. Once each phase completes and its GO decision is signed, those qualifiers should be removed.
+- **Schema:** expanded schema is live (bank payout fields, charity split fields, reminder retry/WhatsApp fields, expanded enums).
+- **Host UX flow:** 6-step create flow (`/create/child` → `/create/review`) and dashboard/admin surfaces are live.
+- **Partner API write gates:** bank and charity writes remain feature-flagged (`UX_V2_ENABLE_BANK_WRITE_PATH`, `UX_V2_ENABLE_CHARITY_WRITE_PATH`).
+- **Payout execution:** automated execution is Karri-only; bank/charity payouts remain manual completion paths.
 
 ---
 
-## Documents Updated to Match
+## Sync Rule
 
-All docs in `docs/Platform-Spec-Docs/`, plus `README.md`, `AGENTS.md`, and `docs/implementation-docs/GIFTA_UX_V2_DECISION_REGISTER.md`.
+When code and docs diverge, update this file first, then sync supporting docs:
 
-UI specification suite: `docs/UX/ui-specs/` (22 documents).
-
-Implementation execution docs: `docs/implementation-docs/` (Phase B and C plans, domain specs, test matrices, rollout runbooks).
+- `docs/Platform-Spec-Docs/` (cross-cutting platform guarantees)
+- `docs/UX/ui-specs/` (screen-level UX specs and runtime overrides)
+- `docs/implementation-docs/` (delivery plans and historical phase notes)

@@ -2,11 +2,18 @@
 ## Single Source of Truth for UX Specifications
 
 **Document Version:** 2.0
-**Last Updated:** February 2025
-**Status:** Active / Implementation-Ready
+**Last Updated:** February 11, 2026
+**Status:** Active reference with runtime overrides
 **Target Audience:** AI coding agents, UI developers, design implementers
 
 ---
+
+## Runtime Alignment (2026-02-11)
+
+- Runtime source: `src/app/layout.tsx`, `src/app/globals.css`, `tailwind.config.ts`, `src/components/ui/*`.
+- Core color/spacing/token direction remains usable for UX intent.
+- Runtime font stack now includes `Outfit`, `Fraunces`, `DM Sans`, `DM Serif Display`, and `Nunito` (see root layout font variables).
+- Some component/file-path inventories in this document are target-state and may not map 1:1 to runtime component filenames.
 
 ## Table of Contents
 1. [Overview & Purpose](#overview--purpose)
@@ -2202,5 +2209,5 @@ Before implementing any UI component or page, verify:
 This design system is the authoritative reference for all Gifta v2 UI implementations. All other specification documents reference this single source of truth. When ambiguity arises, this document provides the definitive answer.
 
 **Last Updated:** February 2025
-**Status:** Active / Implementation-Ready
+**Status:** Active reference with runtime overrides
 **Maintenance:** Update this document whenever design tokens or component specifications change

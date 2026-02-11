@@ -4,9 +4,18 @@
 **Document Version:** 1.0
 **Route:** `/create/dates`
 **Step Number:** 3 of 6
-**Status:** Implementation-Ready
+**Status:** Runtime-aligned with noted validation updates
 
 ---
+
+## Runtime Alignment (2026-02-11)
+
+- Runtime source: `src/app/(host)/create/dates/page.tsx`, `src/app/(host)/create/dates/actions.ts`, `src/app/(host)/create/dates/DatesForm.tsx`.
+- Birthday is required and must be future.
+- Party date and campaign end date are persisted on every save. If the optional "set separate party date" toggle is off, both default to birthday.
+- Optional `party_date_time` is supported and validated (future, within 6 months, stored as Johannesburg-time-based ISO).
+- Date inputs are enforced against the 6-month window and ordering rules used in runtime validation helpers.
+- If deeper sections below conflict with these bullets, runtime source files above take precedence.
 
 ## 1. SCREEN OVERVIEW
 
@@ -35,16 +44,17 @@ Files:
 1. User lands on `/create/dates` (redirects if gift step not completed)
 2. Load existing draft dates if present
 3. Set birthday date (required, future date)
-4. Set party date (optional, >= birthday date)
-5. Set campaign end date (optional, <= party date)
-6. Smart defaults:
+4. Set party date (required in persisted draft; can mirror birthday)
+5. Set campaign end date (required in persisted draft; can mirror party date)
+6. Optional: set party date + time
+7. Smart defaults:
    - Birthday: User input required
    - Party date: Same as birthday (unless toggled)
    - Campaign end: Same as party date (auto-adjusts)
-7. Click "Continue to giving back"
-8. Server validates all dates
-9. On success: Save draft and redirect to `/create/giving-back`
-10. On error: Show error banner and allow retry
+8. Click "Continue to giving back"
+9. Server validates all dates (plus optional party time)
+10. On success: Save draft and redirect to `/create/giving-back`
+11. On error: Show error banner and allow retry
 
 ---
 
@@ -1283,14 +1293,13 @@ export default async function CreateDatesPage({
 
 ## SUMMARY
 
-This specification provides complete details for implementing Step 3 (The Dates) of Gifta's Create Flow. The page establishes campaign timeline with smart date picking and conditional fields. Key features:
+This specification provides complete details for implementing Step 3 (The Dates) of Gifta's Create Flow. The page establishes campaign timeline with smart date handling and optional party time support. Key features:
 
 - **Smart Defaults:** Campaign ends on party date automatically
-- **Conditional Disclosure:** Party date/campaign end only shown if needed
+- **Conditional Disclosure:** Optional separate party date controls and optional party time
 - **Real-Time Feedback:** Campaign duration updates as dates change
 - **Enterprise-Grade:** Full accessibility, robust validation, error recovery
 - **Mobile-First:** Native date pickers on mobile, custom calendars as fallback
 - **Comprehensive:** Edge case handling, timezone awareness, robust error messages
 
-Ready for implementation by an AI agent using Next.js, React, TypeScript, Tailwind CSS, date-fns library, and Zod validation.
-
+Ready for implementation by an AI agent using Next.js, React, TypeScript, Tailwind CSS, and Zod validation.

@@ -3,6 +3,7 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-11 | self | Ran `rg` with a pattern containing backticks and zsh performed command substitution (`command not found`) | For grep/search patterns that include backticks, wrap the pattern in single quotes and escape/avoid literal backticks |
 | 2026-02-10 | self | Fired an Axiom APL curl with bracket-heavy JSON inline and zsh interpreted parts as shell patterns (`bad pattern`) | For complex APL payloads with brackets/quotes, write JSON to a temp file and send via `--data-binary @file` to avoid shell glob/quote breakage |
 | 2026-02-10 | self | Moved `middleware.ts` to `src/middleware.ts` but forgot middleware-focused tests read/import the root file directly, causing immediate suite failures | After relocating framework entrypoints, run `rg` for path-based test references (imports + `readFileSync`) and patch them in the same change |
 | 2026-02-10 | self | Built one-off curl command using inline env assignment and then expanded `$AXIOM_*` in the same shell line; headers were empty and Axiom returned missing org error | For ad-hoc authenticated curl calls, either export vars first or inject literal header values in that command to avoid pre-expansion bugs |
@@ -67,6 +68,7 @@
 ## User Preferences
 - Start with required doc read order before implementation.
 - Use `pnpm` for all script gates.
+- For current Dreamboard refactor work, prioritize main `/{slug}` content UI changes; keep shared header/footer unchanged unless explicitly requested.
 
 ## Patterns That Work
 - Follow milestone sequence strictly; no progression when gate fails.

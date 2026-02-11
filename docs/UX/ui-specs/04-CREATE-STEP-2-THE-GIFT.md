@@ -4,23 +4,30 @@
 **Document Version:** 1.0
 **Route:** `/create/gift`
 **Step Number:** 2 of 6
-**Status:** Implementation-Ready
+**Status:** Runtime-aligned with major behavior changes from original draft
 
 ---
+
+## Runtime Alignment (2026-02-11)
+
+- Runtime source: `src/app/(host)/create/gift/page.tsx`, `src/components/gift/GiftIconPicker.tsx`, `src/lib/icons/*`.
+- This step uses static curated gift icons (`/icons/gifts/*.png`), not AI image generation or upload.
+- Goal amount is not collected in host create flow; `goalCents` is persisted as `0` in draft and publish path.
+- Legacy references to `GiftArtworkGenerator`/Claude image generation in this file are target-state only and not in runtime.
+- If any section below conflicts with these bullets, treat runtime source files above as authoritative.
 
 ## 1. SCREEN OVERVIEW
 
 ### Purpose
-Step 2 transforms the Dreamboard from a person into a purpose. This screen captures the dream gift's name, optional description, and generates or uploads a charming visual representation. The AI image generation feature delights parents with illustrated gift options, adding a celebratory layer to the experience.
+Step 2 transforms the Dreamboard from a person into a purpose. This screen captures gift name, optional description, and a curated icon selection.
 
 ### Route & File Structure
 ```
 Route: /create/gift (GET, POST via server action)
 Files:
   ├── src/app/(host)/create/gift/page.tsx (Main page component)
-  ├── src/app/(host)/create/gift/layout.tsx (Optional nested layout)
-  ├── src/components/gift/GiftArtworkGenerator.tsx (AI image + upload)
-  └── lib/integrations/ai-image-gen.ts (Claude image generation)
+  ├── src/components/gift/GiftIconPicker.tsx (Icon selection)
+  └── src/lib/icons/gift-icons.ts (Icon catalog and lookup helpers)
 ```
 
 ### Layout Container
@@ -34,18 +41,14 @@ Files:
 
 ### User Flow
 1. Authenticated user lands on `/create/gift` (redirects if child step not completed)
-2. If draft exists, pre-populate gift name, description, and images
+2. If draft exists, pre-populate gift name, description, and selected icon
 3. User enters gift name (real-time validation)
 4. User optionally adds description
-5. User either:
-   a. Clicks "✨ Generate gift image" → AI generates 3-4 illustrated options
-   b. Uploads custom image (JPG/PNG/WebP, max 5MB)
-6. User selects one image or keeps uploaded
-7. User sets goal amount in ZAR (R)
-8. User clicks "Continue to dates"
-9. Server validates all fields
-10. On success: Save draft and redirect to `/create/dates`
-11. On error: Show error banner and allow retry
+5. User selects a curated icon (with suggestion based on gift text and child age)
+6. User clicks "Continue to dates"
+7. Server validates all fields
+8. On success: Save draft and redirect to `/create/dates`
+9. On error: Show error banner and allow retry
 
 ---
 
@@ -1501,13 +1504,12 @@ export function GiftArtworkGenerator({
 
 ## SUMMARY
 
-This specification provides comprehensive details for implementing Step 2 of Gifta's Create Flow. The page captures essential gift information with delightful AI-powered image generation features. Key highlights:
+This specification provides comprehensive details for implementing Step 2 of Gifta's Create Flow. Runtime implementation captures gift information with curated icon selection. Key highlights:
 
-- **Warmth & Delight:** Emoji titles, AI-generated illustrations, celebratory tone
+- **Warmth & Delight:** Emoji titles, curated icon visuals, celebratory tone
 - **Enterprise-Grade:** Full accessibility, robust validation, error recovery
 - **Mobile-First:** Responsive layouts, touch-friendly interactions
-- **AI Integration:** Claude-powered image generation with fallback uploads
+- **Deterministic Visuals:** Curated gift icon catalog with suggestion helper
 - **Robust:** Comprehensive error handling, draft persistence, edge case coverage
 
-Ready for implementation by an AI agent using Next.js, React, TypeScript, Tailwind CSS, Zod, and Claude API.
-
+Ready for implementation by an AI agent using Next.js, React, TypeScript, Tailwind CSS, Zod, and icon catalog helpers.

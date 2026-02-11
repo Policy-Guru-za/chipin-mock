@@ -1,12 +1,19 @@
 # Authentication UI Specification (02-AUTHENTICATION.md)
 
 **Version:** 2.0
-**Last Updated:** February 2026
-**Status:** Implementation-Ready
+**Last Updated:** February 11, 2026
+**Status:** Runtime-aligned with noted target-state sections
 **Target:** AI Coding Agent Implementation
 **Auth Provider:** Clerk (https://clerk.com)
 
 ---
+
+## Runtime Alignment (2026-02-11)
+
+- Runtime source: `src/app/sign-in/[[...sign-in]]/page.tsx`, `src/app/sign-up/[[...sign-up]]/page.tsx`, `src/lib/auth/clerk.ts`, `src/lib/auth/clerk-wrappers.ts`.
+- Host-protected routes use server-side wrappers (`requireHostAuth`) rather than middleware-based auth redirects.
+- Admin access is enforced by email allowlist (`ADMIN_EMAIL_ALLOWLIST`) via `isAdminEmail`, not Clerk role claims.
+- Sign-in fallback redirect is `/create/child` by default (`getClerkUrls`), and legacy `/auth/*` redirects to sign-up with a dashboard redirect param.
 
 ## Table of Contents
 
@@ -1457,17 +1464,17 @@ useEffect(() => {
 
 ## Final Checklist
 
+- Runtime note: auth protection is implemented via server-side wrappers in route/layout components, not `middleware.ts`.
 - [ ] Clerk publishable + secret keys configured
 - [ ] Sign Up route `/sign-up` tested and styled
 - [ ] Sign In route `/sign-in` tested and styled
-- [ ] Forgot password flow implemented (`/forgot-password`)
+- [ ] Clerk-hosted password recovery flow verified
 - [ ] Post-auth redirect logic working (dashboard vs create/child)
-- [ ] Header updates when user signs in/out
+- [ ] Route/layout behavior verified for signed-in and signed-out states
 - [ ] UserButton menu implemented and styled
 - [ ] Protected routes blocked without auth
 - [ ] Legacy routes (`/auth/*`) redirecting correctly
-- [ ] Old session cookies cleaned up on new sign-in
-- [ ] Middleware.ts protecting routes correctly
+- [ ] Admin allowlist gate enforced (`ADMIN_EMAIL_ALLOWLIST`)
 - [ ] OAuth buttons (Google, Apple) configured
 - [ ] Email verification flow tested (if enabled)
 - [ ] Error messages user-friendly and styled

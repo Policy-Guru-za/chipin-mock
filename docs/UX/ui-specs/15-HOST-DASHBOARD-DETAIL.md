@@ -2,12 +2,19 @@
 ## Comprehensive UI Specification
 
 **Document Version:** 1.0
-**Status:** Implementation-Ready
+**Status:** Runtime-aligned with noted action-surface differences
 **Route:** `/dashboard/[id]`
-**Last Updated:** February 2025
+**Last Updated:** February 11, 2026
 **Target Audience:** AI coding agents, UI developers
 
 ---
+
+## Runtime Alignment (2026-02-11)
+
+- Runtime source: `src/app/(host)/dashboard/[id]/page.tsx`, `src/app/(host)/dashboard/[id]/DashboardDetailClient.tsx`, `src/lib/host/dashboard-view-model.ts`.
+- Implemented quick actions: share link copy, edit modal, and view public page.
+- Host close action is not currently exposed in dashboard UI; close is handled via partner API (`POST /api/v1/dream-boards/{id}/close`).
+- Payout status list and contribution/message sections are live and match runtime data queries.
 
 ## Table of Contents
 
@@ -1206,6 +1213,6 @@ const displayedContributions = contributions.slice(0, page * itemsPerPage);
 
 ---
 
-**Document Version:** 1.0
-**Status:** Implementation-Ready
-**Last Updated:** February 2025
+**Document Version:** 1.1
+**Status:** Runtime-aligned with noted action-surface differences
+**Last Updated:** February 11, 2026

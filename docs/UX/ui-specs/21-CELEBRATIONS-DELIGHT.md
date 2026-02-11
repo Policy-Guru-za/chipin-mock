@@ -3,6 +3,18 @@
 
 ---
 
+## Runtime Alignment (2026-02-11)
+
+- Runtime source: `src/lib/effects/confetti.ts`, `src/components/effects/ConfettiTrigger.tsx`, `src/components/effects/PaymentOverlay.tsx`, `src/lib/animations/tokens.ts`, `src/lib/animations/variants.ts`.
+- Implemented and used:
+  - Confetti burst/celebration variants with reduced-motion guard.
+  - Payment redirect overlay for PayFast/Ozow transitions.
+  - Shared motion tokens/variants for UI animation consistency.
+- Not implemented in runtime:
+  - Haptic feedback subsystem
+  - Sound effects subsystem
+- Keep haptic/sound sections as target-state only unless code is added.
+
 ## Table of Contents
 1. [Confetti System](#confetti-system)
 2. [Subtle Animations](#subtle-animations)
@@ -1294,4 +1306,4 @@ src/
 
 ---
 
-*Document Version: 1.0 | Last Updated: 2024 | Implementation-Ready for AI Coding Agents*
+*Document Version: 1.1 | Last Updated: 2026-02-11 | Runtime-aligned (haptic/sound remain target-state)*

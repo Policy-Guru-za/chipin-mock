@@ -1,18 +1,59 @@
 # Gifta UX v2 — UI Specification Suite
 
-> **Version:** 2.0
+> **Version:** 2.1
 > **Created:** February 6, 2026
+> **Last Updated:** February 11, 2026
 > **Total Documents:** 22
 > **Total Lines:** 29,100
-> **Purpose:** Implementation-ready UI specifications for AI coding agents
+> **Purpose:** Screen-level UX specs with runtime alignment notes
 
 ---
 
 ## Overview
 
-This folder contains the complete set of UI specification documents for Gifta's UX v2 redesign. Each document is a self-contained blueprint that provides an AI coding agent with everything needed to build that screen — visual layout, typography, colors, spacing, component trees, TypeScript interfaces, file paths, accessibility requirements, animations, error handling, and edge cases.
+This folder contains the UX v2 screen specifications. Some documents now match runtime closely; others are still target-state and include runtime overrides.
 
-**All documents reference `00-DESIGN-SYSTEM.md` as the single source of truth for design tokens.** Read that document first before implementing any screen.
+For implementation, always verify against runtime in `src/app`, `src/components`, and `src/lib`.
+
+### Runtime Source of Truth (for UI behavior)
+
+- `src/app/(marketing)/page.tsx`
+- `src/app/sign-in/[[...sign-in]]/page.tsx`
+- `src/app/sign-up/[[...sign-up]]/page.tsx`
+- `src/app/(host)/create/*`
+- `src/app/(guest)/[slug]/*`
+- `src/app/(host)/dashboard/*`
+- `src/app/(admin)/admin/*`
+- `src/components/*`
+
+---
+
+## Runtime Alignment Snapshot (2026-02-11)
+
+| Doc | Alignment | Notes |
+|---|---|---|
+| 00 | Partial | Token intent is useful; component/file inventory is stale in places. |
+| 01 | Partial | Landing visuals align; auth redirect assumptions were outdated. |
+| 02 | Partial | Clerk usage aligns; admin authorization model needed correction. |
+| 03 | High | Matches current child step flow. |
+| 04 | Low | Replaced AI image generation + goal input with static gift icon picker and no goal field in host UI. |
+| 05 | Partial | Date logic updated for required `campaign_end_date` and optional `party_date_time`. |
+| 06 | Partial | Giving-back flow aligns; legacy goal-based wording is now flagged as historical. |
+| 07 | High | Payout setup broadly aligned (Karri + bank). |
+| 08 | Partial | Publish flow corrected to preview-first, publish-on-submit, slug sharing URL. |
+| 09 | High | Public Dreamboard largely aligned. |
+| 10 | Partial | Reminder UI is email-only (3-day reminder). |
+| 11 | Partial | Payment methods now include PayFast, Ozow, and SnapScan. |
+| 12 | High | Thank-you flow + receipt capture aligns. |
+| 13 | High | Failure-recovery flow aligns. |
+| 14 | Partial | Dashboard list runtime aligns; legacy shared-header references are stale. |
+| 15 | Partial | No host close action in runtime; detail and payouts are aligned otherwise. |
+| 16 | High | Edit modal aligns with constrained fields. |
+| 17 | High | Post-campaign view aligns. |
+| 18 | Partial | Admin auth model corrected to email allowlist; no Clerk role-claim gate. |
+| 19 | Low | Shared component inventory required runtime correction. |
+| 20 | Low | Runtime templates are fewer than the full target matrix in spec. |
+| 21 | Partial | Confetti + reduced-motion logic align; haptic/sound systems are not implemented. |
 
 ---
 
@@ -36,8 +77,8 @@ This folder contains the complete set of UI specification documents for Gifta's 
 | # | Document | Lines | Route | Purpose |
 |---|----------|-------|-------|---------|
 | 03 | [Step 1: The Child](./03-CREATE-STEP-1-THE-CHILD.md) | 1,327 | `/create/child` | Child name, photo upload, age selector |
-| 04 | [Step 2: The Gift](./04-CREATE-STEP-2-THE-GIFT.md) | 1,513 | `/create/gift` | Gift name, description, AI image generation |
-| 05 | [Step 3: The Dates](./05-CREATE-STEP-3-THE-DATES.md) | 1,296 | `/create/dates` | Birthday, party date, campaign end date |
+| 04 | [Step 2: The Gift](./04-CREATE-STEP-2-THE-GIFT.md) | 1,513 | `/create/gift` | Gift name, description, static icon selection |
+| 05 | [Step 3: The Dates](./05-CREATE-STEP-3-THE-DATES.md) | 1,296 | `/create/dates` | Birthday, party date, campaign end date, optional party time |
 | 06 | [Step 4: Giving Back](./06-CREATE-STEP-4-GIVING-BACK.md) | 1,460 | `/create/giving-back` | Optional charity selection and split configuration |
 | 07 | [Step 5: Payout Setup](./07-CREATE-STEP-5-PAYOUT-SETUP.md) | 1,598 | `/create/payout` | Karri Card or bank transfer payout method |
 | 08 | [Confirmation & Share](./08-CREATE-CONFIRMATION.md) | 1,353 | `/create/review` | Celebration, share links, dashboard redirect |
@@ -48,7 +89,7 @@ This folder contains the complete set of UI specification documents for Gifta's 
 |---|----------|-------|-------|---------|
 | 09 | [Public Dreamboard](./09-PUBLIC-DREAM-BOARD.md) | 981 | `/[slug]` | The WhatsApp-shared board contributors see |
 | 10 | [Contribute: Amount & Details](./10-CONTRIBUTE-AMOUNT-DETAILS.md) | 1,105 | `/[slug]/contribute` | Amount selector, name, message, reminder |
-| 11 | [Contribute: Payment](./11-CONTRIBUTE-PAYMENT.md) | 1,125 | `/[slug]/contribute` | PayFast card / SnapScan QR payment |
+| 11 | [Contribute: Payment](./11-CONTRIBUTE-PAYMENT.md) | 1,125 | `/[slug]/contribute/payment` | PayFast form, Ozow redirect, SnapScan QR |
 | 12 | [Contribute: Thank You](./12-CONTRIBUTE-THANK-YOU.md) | 1,081 | `/[slug]/thanks` | Confetti celebration, receipt, share prompt |
 | 13 | [Contribute: Payment Failed](./13-CONTRIBUTE-PAYMENT-FAILED.md) | 872 | `/[slug]/payment-failed` | Friendly error recovery with retry |
 
@@ -72,8 +113,8 @@ This folder contains the complete set of UI specification documents for Gifta's 
 | # | Document | Lines | Purpose |
 |---|----------|-------|---------|
 | 19 | [Shared Components](./19-SHARED-COMPONENTS.md) | 1,349 | Headers, footers, loading/empty/error states, form components |
-| 20 | [Communications](./20-COMMUNICATIONS.md) | 1,098 | Email templates (9), WhatsApp templates (3) |
-| 21 | [Celebrations & Delight](./21-CELEBRATIONS-DELIGHT.md) | 1,297 | Confetti, animations, haptic feedback, sound effects |
+| 20 | [Communications](./20-COMMUNICATIONS.md) | 1,098 | Reminder + receipt emails, WhatsApp integration templates, delivery rules |
+| 21 | [Celebrations & Delight](./21-CELEBRATIONS-DELIGHT.md) | 1,297 | Confetti and motion system (haptic/sound target-state noted) |
 
 ---
 
@@ -106,11 +147,11 @@ This folder contains the complete set of UI specification documents for Gifta's 
 
 ## How to Use These Specs
 
-**For AI coding agents:** Read `00-DESIGN-SYSTEM.md` first, then the specific screen spec. Each document contains everything you need — do not guess at values, every color, size, and behavior is specified.
+**For AI coding agents:** read `00-DESIGN-SYSTEM.md`, then the target screen doc, then verify behavior against runtime files listed above.
 
-**For human developers:** Use these as acceptance criteria. Every field, state, animation, and error message is defined.
+**For human developers:** use the spec for intent, and runtime files for current behavior where a runtime override is noted.
 
-**For design review:** ASCII wireframes show layout intent at each breakpoint. Copy matrices provide exact text.
+**For design review:** use wireframes/copy matrices for UX intent, and validate shipped behavior directly in route/component code.
 
 ---
 

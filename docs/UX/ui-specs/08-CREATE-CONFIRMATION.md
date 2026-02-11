@@ -2,11 +2,21 @@
 ## Gifta UX v2 Implementation Specification
 
 **Document Version:** 1.0
-**Route:** `/create/review` (renamed from `/create/review` or `/create/confirmation`)
+**Route:** `/create/review`
 **Step Number:** 6 of 6 (FINAL)
-**Status:** Implementation-Ready
+**Status:** Runtime-aligned with publish-flow corrections
 
 ---
+
+## Runtime Alignment (2026-02-11)
+
+- Runtime source: `src/app/(host)/create/review/page.tsx`, `src/app/(host)/create/review/ReviewClient.tsx`.
+- `/create/review` has two states:
+  - Preview state before publish (uses `CreateFlowShell` and explicit "Create Dreamboard" submit).
+  - Success state after publish (celebration layout + share controls).
+- Publish happens only when the host submits the final form; it is not auto-published on page load.
+- Share URL format is `https://<base>/<slug>` (for example, `/maya-birthday-abc123`), not `/boards/[dreamboardId]`.
+- If deeper sections below conflict with these bullets, runtime source files above take precedence.
 
 ## 1. SCREEN OVERVIEW
 
@@ -18,23 +28,22 @@ The final confirmation screen celebrates the creation of the Dreamboard and tran
 Route: /create/review (GET, POST via server action)
 Files:
   ├── src/app/(host)/create/review/page.tsx (Final step)
-  ├── src/components/celebration/Confetti.tsx (Animation)
-  ├── src/components/dreamboard/DreamBoardPreview.tsx (Live preview)
-  ├── src/components/share/ShareButtons.tsx (Social sharing)
-  └── lib/dream-boards/publish.ts (Create board from draft)
+  ├── src/app/(host)/create/review/ReviewClient.tsx (Preview + success UI)
+  ├── src/components/effects/ConfettiTrigger.tsx (Animation)
+  └── server action in page component (persist board + send WhatsApp link)
 ```
 
 ### Layout Container
-- **Component:** Full-width celebration layout (not CreateFlowShell)
-- **Background:** #FEFDFB with optional subtle gradient
-- **Center alignment:** All content centered on page
-- **Width:** Max-w-2xl for preview card, centered
+- **Preview mode:** `CreateFlowShell` step layout with edit links and publish button
+- **Published mode:** Full-width celebration layout with confetti and sharing controls
+- **Background:** #FEFDFB
 
 ### User Flow
 1. User lands on `/create/review` after payout setup
-2. Server publishes draft as live Dreamboard
-3. Generate shareable link: `/boards/[dreamboardId]`
-4. Page displays:
+2. Review screen displays draft preview + edit links
+3. User submits "Create Dreamboard"
+4. Server creates Dreamboard, clears draft, and generates share URL `/<slug>`
+5. Success page displays:
    - Confetti animation (plays once)
    - Large celebration text: "🎉 [Child]'s Dreamboard is ready!"
    - Live preview of Dreamboard (thumbnail)
@@ -42,8 +51,7 @@ Files:
    - WhatsApp share button
    - Email share button
    - "Go to your Dashboard" button
-5. User can share immediately or navigate away
-6. No "Back" button (progression complete)
+6. User can share immediately or navigate away
 
 ---
 
@@ -281,7 +289,7 @@ Content:
 
    Variant: secondary
    Size: md (h-11)
-   Href: /boards/[dreamboardId]
+   Href: /[slug]
    Opens in new tab (optional)
    ```
 
@@ -297,7 +305,7 @@ Content:
 
 **Type:** Display text + copy button
 **Content:** Full shareable URL
-**Format:** `https://gifta.co/boards/[dreamboardId]`
+**Format:** `https://gifta.co/[slug]`
 **Styling:**
 ```
 Container:
@@ -368,7 +376,7 @@ Button Layout:
 
 She's turning 7 and dreaming of a Pink Electric Scooter (R 600).
 
-Chip in here: https://gifta.co/boards/[dreamboardId]
+Chip in here: https://gifta.co/[slug]
 
 Every contribution helps make her birthday magical! 🎉"
 ```
@@ -414,7 +422,7 @@ Sophie is turning 7 and we're collecting contributions for her dream gift: a Pin
 
 Would you like to chip in to make her birthday extra special?
 
-View and contribute here: https://gifta.co/boards/[dreamboardId]
+View and contribute here: https://gifta.co/[slug]
 
 Every amount helps!
 
@@ -1319,7 +1327,7 @@ function showFallbackCopy(url: string) {
 **Scenario:** ID generation creates long URL
 
 **Behavior:**
-- URL format: `https://gifta.co/boards/[32-char-id]`
+- URL format: `https://gifta.co/[slug]`
 - Fits in copy box
 - Wraps to multiple lines if needed
 - Copy button always visible
@@ -1338,10 +1346,10 @@ function showFallbackCopy(url: string) {
 
 ## SUMMARY
 
-This specification provides complete details for implementing the final confirmation screen of Gifta's Create Flow. The page celebrates the user's achievement and facilitates immediate sharing. Key features:
+This specification provides complete details for implementing the final confirmation screen of Gifta's Create Flow. Runtime behavior uses preview-first, publish-on-submit flow, then celebration and sharing.
 
 - **Celebratory Moment:** Confetti animation, large heading, success messaging
-- **Live Preview:** Shows exactly how the Dreamboard will appear to supporters
+- **Preview + Publish:** Review before creation, then success-state sharing after publish
 - **Multiple Share Options:** WhatsApp, email, copy link, dashboard navigation
 - **Enterprise-Grade:** Full accessibility, error handling, graceful fallbacks
 - **Mobile-Optimized:** Responsive layout, touch-friendly buttons, no friction
@@ -1349,5 +1357,4 @@ This specification provides complete details for implementing the final confirma
 
 This marks the end of the 6-step Create Flow. Users have successfully created a Dreamboard and are now ready to share it with supporters.
 
-Ready for implementation by an AI agent using Next.js, React, TypeScript, Tailwind CSS, and confetti animation library.
-
+Ready for implementation by an AI agent using Next.js, React, TypeScript, Tailwind CSS, and confetti animation utilities.
