@@ -8,6 +8,7 @@
   --font-display: 'Fraunces', Georgia, serif;
   --font-dm-sans: 'DM Sans', -apple-system, sans-serif;
   --font-dm-serif: 'DM Serif Display', Georgia, serif;
+  --font-libre-baskerville: 'Libre Baskerville', Georgia, serif;
   --font-nunito: 'Nunito', sans-serif;
 
   /* Primary scale */
@@ -53,6 +54,26 @@
   /* Borders */
   --color-border: #e7e5e4;
   --color-border-strong: #d6d3d1;
+  --color-border-warmth: #ede7de;
+  --color-border-soft: #f5f1ea;
+
+  /* Warmth palette */
+  --color-sage: #4a7e66;
+  --color-sage-deep: #3b6b55;
+  --color-sage-light: #e9f3ed;
+  --color-sage-wash: #f1f7f4;
+  --color-amber: #c49a5c;
+  --color-amber-light: #f7efe2;
+  --color-amber-glow: #ebdcc8;
+  --color-plum: #7e6b9b;
+  --color-plum-wash: #f1edf7;
+  --color-plum-soft: #e4ddf0;
+  --color-ink: #2c2520;
+  --color-ink-mid: #5c544c;
+  --color-ink-soft: #8a827a;
+  --color-ink-faint: #b5aea5;
+  --color-ink-ghost: #d1cbc3;
+  --color-bg-warmth: #fbf8f3;
 
   /* Status */
   --color-success: #059669;

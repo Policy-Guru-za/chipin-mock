@@ -5,6 +5,29 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        sage: {
+          DEFAULT: '#4A7E66',
+          deep: '#3B6B55',
+          light: '#E9F3ED',
+          wash: '#F1F7F4',
+        },
+        amber: {
+          DEFAULT: '#C49A5C',
+          light: '#F7EFE2',
+          glow: '#EBDCC8',
+        },
+        plum: {
+          DEFAULT: '#7E6B9B',
+          wash: '#F1EDF7',
+          soft: '#E4DDF0',
+        },
+        ink: {
+          DEFAULT: '#2C2520',
+          mid: '#5C544C',
+          soft: '#8A827A',
+          faint: '#B5AEA5',
+          ghost: '#D1CBC3',
+        },
         primary: {
           DEFAULT: '#0D9488',
           50: '#F0FDFA',
@@ -32,6 +55,7 @@ const config: Config = {
         surface: '#FEFDFB',
         subtle: '#FDF8F3',
         muted: '#FAF9F7',
+        'bg-warmth': '#FBF8F3',
         text: {
           DEFAULT: '#1C1917',
           secondary: '#57534E',
@@ -40,6 +64,8 @@ const config: Config = {
         border: {
           DEFAULT: '#E7E5E4',
           strong: '#D6D3D1',
+          warmth: '#EDE7DE',
+          soft: '#F5F1EA',
         },
         success: '#059669',
         warning: '#D97706',
@@ -48,6 +74,8 @@ const config: Config = {
       fontFamily: {
         sans: ['var(--font-primary)', 'system-ui', 'sans-serif'],
         display: ['var(--font-display)', 'Georgia', 'serif'],
+        'warmth-sans': ['var(--font-dm-sans)', '-apple-system', 'sans-serif'],
+        'warmth-serif': ['var(--font-libre-baskerville)', 'Georgia', 'serif'],
       },
       borderRadius: {
         '2xl': '1rem',
@@ -57,6 +85,7 @@ const config: Config = {
         soft: '0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04)',
         lifted: '0 4px 8px rgba(0,0,0,0.04), 0 12px 24px rgba(0,0,0,0.06)',
         hero: '0 8px 24px rgba(0,0,0,0.08), 0 2px 8px rgba(13,148,136,0.15)',
+        card: '0 1px 2px rgba(44,37,32,0.03), 0 4px 12px rgba(44,37,32,0.04), 0 12px 36px rgba(44,37,32,0.04)',
       },
       animation: {
         shimmer: 'shimmer 2s infinite',

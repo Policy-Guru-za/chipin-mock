@@ -1,3 +1,5 @@
+import { PlusIcon, UserSilhouetteIcon } from '@/components/icons/dreamboard-icons';
+
 type ContributorItem = {
   name: string | null;
   isAnonymous: boolean;
@@ -9,29 +11,6 @@ type ContributorDisplayProps = {
 };
 
 const DISPLAY_LIMIT = 6;
-
-const getHeadingCopy = (count: number) => {
-  const text = count === 1 ? '1 loved one has chipped in' : `${count} loved ones have chipped in`;
-
-  if (count < 3) {
-    return {
-      emoji: '🎁',
-      text,
-    };
-  }
-
-  if (count <= 10) {
-    return {
-      emoji: '🎉',
-      text: count >= 6 ? `${count} amazing people have chipped in` : text,
-    };
-  }
-
-  return {
-    emoji: '✨',
-    text: `${count} amazing people have chipped in`,
-  };
-};
 
 const formatContributorName = (contributor: ContributorItem) => {
   if (contributor.isAnonymous || !contributor.name) {
@@ -50,41 +29,81 @@ const formatContributorName = (contributor: ContributorItem) => {
   return `${firstName} ${lastInitial}.`;
 };
 
+const getInitials = (name: string) =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('');
+
 export function ContributorDisplay({ contributors, totalCount }: ContributorDisplayProps) {
   if (totalCount === 0) {
     return (
-      <section className="rounded-2xl border border-border bg-white p-5">
-        <p className="italic text-gray-400">Be the first to chip in... 🎁</p>
+      <section className="space-y-4 rounded-[20px] border border-border-soft bg-white p-5 shadow-card sm:p-6">
+        <p className="font-warmth-sans text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-faint">
+          Friends and family chipping in
+        </p>
+        <div className="flex items-center">
+          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-sage-wash text-sage shadow-[0_0_0_1px_rgba(0,0,0,0.04)]">
+            <UserSilhouetteIcon className="h-4 w-4" />
+          </span>
+          <span className="-ml-2 inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-sage-wash text-sage shadow-[0_0_0_1px_rgba(0,0,0,0.04)]">
+            <UserSilhouetteIcon className="h-4 w-4" />
+          </span>
+          <span className="-ml-2 inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-plum-soft text-plum shadow-[0_0_0_1px_rgba(0,0,0,0.04)]">
+            <PlusIcon className="h-4 w-4" />
+          </span>
+        </div>
+        <p className="font-warmth-sans text-sm text-ink-soft">
+          Be the first to contribute and start the celebration.
+        </p>
+        <p className="sr-only">No contributors yet.</p>
       </section>
     );
   }
 
-  const headingCopy = getHeadingCopy(totalCount);
   const displayContributors = contributors.slice(0, DISPLAY_LIMIT);
   const overflowCount = Math.max(0, totalCount - DISPLAY_LIMIT);
+  const summaryText =
+    totalCount === 1
+      ? '1 loved one has chipped in.'
+      : `${totalCount} loved ones have chipped in.`;
 
   return (
-    <section className="space-y-3 rounded-2xl border border-border bg-white p-5">
-      <h2 className="font-display text-xl text-gray-900">
-        <span aria-hidden="true" className="mr-2">
-          {headingCopy.emoji}
-        </span>
-        {headingCopy.text}
-      </h2>
+    <section className="space-y-4 rounded-[20px] border border-border-soft bg-white p-5 shadow-card sm:p-6">
+      <p className="font-warmth-sans text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-faint">
+        Friends and family chipping in
+      </p>
+      <div className="flex items-center">
+        {displayContributors.map((contributor, index) => {
+          const formattedName = formatContributorName(contributor);
+          const initials = formattedName === 'Anonymous' ? 'AN' : getInitials(formattedName);
 
-      <ul className="space-y-2">
+          return (
+            <span
+              key={`${contributor.name ?? 'anonymous'}-${index}`}
+              title={formattedName}
+              className={`inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-sage text-xs font-semibold text-white shadow-[0_0_0_1px_rgba(0,0,0,0.04)] ${index > 0 ? '-ml-2' : ''}`}
+            >
+              {initials}
+            </span>
+          );
+        })}
+        {overflowCount > 0 ? (
+          <span className="-ml-2 inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-amber text-xs font-semibold text-white shadow-[0_0_0_1px_rgba(0,0,0,0.04)]">
+            +{overflowCount}
+          </span>
+        ) : null}
+      </div>
+      <p className="font-warmth-sans text-sm text-ink-soft">{summaryText}</p>
+      <ul className="sr-only">
         {displayContributors.map((contributor, index) => (
-          <li key={`${contributor.name ?? 'anonymous'}-${index}`} className="text-sm text-gray-700">
-            <span className="font-semibold">{formatContributorName(contributor)}</span> has chipped in!
+          <li key={`${contributor.name ?? 'anonymous'}-sr-${index}`}>
+            {formatContributorName(contributor)}
           </li>
         ))}
       </ul>
-
-      {overflowCount > 0 ? (
-        <p className="text-sm italic text-gray-500">
-          and {overflowCount} {overflowCount === 1 ? 'other' : 'others'}
-        </p>
-      ) : null}
     </section>
   );
 }

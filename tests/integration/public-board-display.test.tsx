@@ -6,8 +6,12 @@ import { cleanup, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
 import { CharitableGivingCard } from '@/components/dream-board/CharitableGivingCard';
+import {
+  buildDreamboardCtaStateMessage,
+  DreamboardCtaCard,
+} from '@/components/dream-board/DreamboardCtaCard';
+import { DreamboardDetailsCard } from '@/components/dream-board/DreamboardDetailsCard';
 import { ContributorDisplay } from '@/components/dream-board/ContributorDisplay';
-import { DreamboardStatusBadge } from '@/components/dream-board/DreamboardStatusBadge';
 import { buildGuestViewModel } from '@/lib/dream-boards/view-model';
 
 type BoardRecord = Parameters<typeof buildGuestViewModel>[0];
@@ -70,21 +74,32 @@ const makeContributors = (count: number) =>
     isAnonymous: false,
   }));
 
-function PublicBoardHarness({ board, contributors }: { board: BoardRecord; contributors: ReturnType<typeof makeContributors> }) {
+function PublicBoardHarness({
+  board,
+  contributors,
+}: {
+  board: BoardRecord;
+  contributors: ReturnType<typeof makeContributors>;
+}) {
   const view = buildGuestViewModel(board, { now });
+  const ctaStateMessage = buildDreamboardCtaStateMessage({
+    contributionCount: view.contributionCount,
+    isFunded: view.isFunded,
+    isExpired: view.isExpired,
+    isClosed: view.isClosed,
+    timeRemainingMessage: view.timeRemainingMessage,
+  });
 
   return (
     <div>
-      <DreamboardStatusBadge
-        contributionCount={view.contributionCount}
-        isActive={view.isActive}
-        isClosed={view.isClosed}
-        isExpired={view.isExpired}
-        timeRemainingMessage={view.timeRemainingMessage}
-        timeRemainingUrgency={view.timeRemainingUrgency}
-        daysLeft={view.daysLeft}
+      <DreamboardCtaCard
+        slug={view.slug}
+        childName={view.childName}
+        stateMessage={ctaStateMessage}
+        disabled={view.isExpired || view.isClosed}
       />
       <ContributorDisplay contributors={contributors} totalCount={view.contributionCount} />
+      <DreamboardDetailsCard partyDateTimeLine={null} />
       {view.charityEnabled && view.charityName && view.charityAllocationLabel ? (
         <CharitableGivingCard
           charityName={view.charityName}
@@ -138,35 +153,35 @@ describe('public board display integration', () => {
 
   it('shows empty contributor state for zero contributors', () => {
     render(<PublicBoardHarness board={makeBoard({ contributionCount: 0 })} contributors={[]} />);
-    expect(screen.getByText('Be the first to chip in... 🎁')).toBeInTheDocument();
+    expect(screen.getAllByText('Be the first to contribute and start the celebration.')).toHaveLength(2);
   });
 
-  it('shows all 5 contributors', () => {
+  it('shows all 5 contributors without overflow indicator', () => {
     render(<PublicBoardHarness board={makeBoard({ contributionCount: 5 })} contributors={makeContributors(5)} />);
-    expect(screen.getAllByText('Person 5.')).toHaveLength(1);
-    expect(screen.queryByText(/and \d+ others?/)).not.toBeInTheDocument();
+    expect(screen.getByText('P5')).toBeInTheDocument();
+    expect(screen.queryByText(/^\+\d+$/)).not.toBeInTheDocument();
   });
 
-  it('shows first 6 and overflow summary for 20 contributors', () => {
+  it('shows first 6 and overflow indicator for 20 contributors', () => {
     render(
       <PublicBoardHarness board={makeBoard({ contributionCount: 20 })} contributors={makeContributors(20)} />
     );
-    expect(screen.getByText('and 14 others')).toBeInTheDocument();
-    expect(screen.getByText('Person 6.')).toBeInTheDocument();
-    expect(screen.queryByText('Person 7.')).not.toBeInTheDocument();
+    expect(screen.getByText('+14')).toBeInTheDocument();
+    expect(screen.getByText('P6')).toBeInTheDocument();
+    expect(screen.queryByText('P7')).not.toBeInTheDocument();
   });
 
-  it('disables CTA and shows expired message for expired boards', () => {
+  it('disables CTA and shows closed message for expired boards', () => {
     const board = makeBoard({
       campaignEndDate: addDays(-1),
       contributionCount: 1,
     });
 
     render(<PublicBoardHarness board={board} contributors={makeContributors(1)} />);
-    expect(screen.getByText(/Dreamboard is closed to new contributions/)).toBeInTheDocument();
+    expect(screen.getByText('This Dreamboard is closed to new contributions.')).toBeInTheDocument();
   });
 
-  it('shows funded banner when board is funded', () => {
+  it('shows funded celebration copy when board is funded', () => {
     const board = makeBoard({
       status: 'funded',
       raisedCents: 60000,
@@ -177,9 +192,14 @@ describe('public board display integration', () => {
     expect(screen.getByText('Gift funded - thank you, everyone! 🎉')).toBeInTheDocument();
   });
 
-  it('keeps time-remaining copy for active boards', () => {
+  it('keeps time-remaining copy for active boards with contributors', () => {
     const board = makeBoard({ contributionCount: 2, campaignEndDate: addDays(10) });
     render(<PublicBoardHarness board={board} contributors={makeContributors(2)} />);
     expect(screen.getByText(/days left to chip in|Plenty of time|Just .* days left/)).toBeInTheDocument();
+  });
+
+  it('uses fixed location copy in details card', () => {
+    render(<PublicBoardHarness board={makeBoard({ contributionCount: 2 })} contributors={makeContributors(2)} />);
+    expect(screen.getByText('Shared after you chip in')).toBeInTheDocument();
   });
 });

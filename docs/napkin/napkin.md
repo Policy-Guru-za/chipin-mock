@@ -3,6 +3,7 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-11 | self | Applied a partial patch while rewriting `ContributorDisplay` and accidentally left duplicate legacy JSX + misplaced import ordering | For full component redesigns, replace the file in one pass (or verify tail of file immediately) instead of incremental hunks that can leave old blocks behind |
 | 2026-02-11 | self | Ran `rg` with a pattern containing backticks and zsh performed command substitution (`command not found`) | For grep/search patterns that include backticks, wrap the pattern in single quotes and escape/avoid literal backticks |
 | 2026-02-10 | self | Fired an Axiom APL curl with bracket-heavy JSON inline and zsh interpreted parts as shell patterns (`bad pattern`) | For complex APL payloads with brackets/quotes, write JSON to a temp file and send via `--data-binary @file` to avoid shell glob/quote breakage |
 | 2026-02-10 | self | Moved `middleware.ts` to `src/middleware.ts` but forgot middleware-focused tests read/import the root file directly, causing immediate suite failures | After relocating framework entrypoints, run `rg` for path-based test references (imports + `readFileSync`) and patch them in the same change |

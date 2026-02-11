@@ -1,6 +1,13 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { DM_Sans, DM_Serif_Display, Fraunces, Nunito, Outfit } from 'next/font/google';
+import {
+  DM_Sans,
+  DM_Serif_Display,
+  Fraunces,
+  Libre_Baskerville,
+  Nunito,
+  Outfit,
+} from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 
 import {
@@ -33,6 +40,13 @@ const dmSerifDisplay = DM_Serif_Display({
   subsets: ['latin'],
   weight: '400',
   variable: '--font-dm-serif',
+  display: 'swap',
+});
+
+const libreBaskerville = Libre_Baskerville({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-libre-baskerville',
   display: 'swap',
 });
 
@@ -98,7 +112,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${outfit.variable} ${fraunces.variable} ${dmSans.variable} ${dmSerifDisplay.variable} ${nunito.variable}`}
+      className={`${outfit.variable} ${fraunces.variable} ${dmSans.variable} ${dmSerifDisplay.variable} ${libreBaskerville.variable} ${nunito.variable}`}
     >
       <body className="min-h-screen bg-surface text-text">
         {clerkConfig.isEnabled ? (

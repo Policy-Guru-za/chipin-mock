@@ -23,10 +23,11 @@ afterEach(() => {
 describe('ContributorDisplay', () => {
   it('shows empty state when there are no contributors', () => {
     render(<ContributorDisplay contributors={[]} totalCount={0} />);
-    expect(screen.getByText('Be the first to chip in... 🎁')).toBeInTheDocument();
+    expect(screen.getByText('Friends and family chipping in')).toBeInTheDocument();
+    expect(screen.getByText('Be the first to contribute and start the celebration.')).toBeInTheDocument();
   });
 
-  it('formats contributor names as first + last initial', () => {
+  it('renders initials for contributors with first + last names', () => {
     render(
       <ContributorDisplay
         contributors={[makeContributor({ name: 'Katie Miller' })]}
@@ -34,19 +35,19 @@ describe('ContributorDisplay', () => {
       />
     );
 
-    expect(screen.getByText('Katie M.')).toBeInTheDocument();
-    expect(screen.getByText(/has chipped in!/)).toBeInTheDocument();
+    expect(screen.getByText('KM')).toBeInTheDocument();
+    expect(screen.getByText('1 loved one has chipped in.')).toBeInTheDocument();
   });
 
-  it('keeps first-name-only entries as-is', () => {
+  it('renders a single initial for first-name-only entries', () => {
     render(
       <ContributorDisplay contributors={[makeContributor({ name: 'Thabo' })]} totalCount={1} />
     );
 
-    expect(screen.getByText('Thabo')).toBeInTheDocument();
+    expect(screen.getByText('T')).toBeInTheDocument();
   });
 
-  it('renders anonymous for null or empty names', () => {
+  it('renders AN initials for anonymous contributors', () => {
     render(
       <ContributorDisplay
         contributors={[
@@ -57,30 +58,31 @@ describe('ContributorDisplay', () => {
       />
     );
 
-    expect(screen.getAllByText('Anonymous')).toHaveLength(2);
+    expect(screen.getAllByText('AN')).toHaveLength(2);
+    expect(screen.getByText('2 loved ones have chipped in.')).toBeInTheDocument();
   });
 
-  it('shows max 6 contributors and overflow copy', () => {
+  it('shows max 6 contributors and overflow badge', () => {
     const contributors = Array.from({ length: 8 }, (_, index) =>
       makeContributor({ name: `Person ${index + 1}` })
     );
 
     render(<ContributorDisplay contributors={contributors} totalCount={8} />);
 
-    expect(screen.getByText('Person 1.')).toBeInTheDocument();
-    expect(screen.getByText('Person 6.')).toBeInTheDocument();
-    expect(screen.queryByText('Person 7.')).not.toBeInTheDocument();
-    expect(screen.queryByText('Person 8.')).not.toBeInTheDocument();
-    expect(screen.getByText('and 2 others')).toBeInTheDocument();
+    expect(screen.getByText('P1')).toBeInTheDocument();
+    expect(screen.getByText('P6')).toBeInTheDocument();
+    expect(screen.queryByText('P7')).not.toBeInTheDocument();
+    expect(screen.queryByText('P8')).not.toBeInTheDocument();
+    expect(screen.getByText('+2')).toBeInTheDocument();
   });
 
-  it('does not show overflow copy when total contributors are within limit', () => {
+  it('does not show overflow badge when total contributors are within limit', () => {
     const contributors = Array.from({ length: 3 }, (_, index) =>
       makeContributor({ name: `Person ${index + 1}` })
     );
 
     render(<ContributorDisplay contributors={contributors} totalCount={3} />);
 
-    expect(screen.queryByText(/and \d+ others?/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/^\+\d+$/)).not.toBeInTheDocument();
   });
 });
