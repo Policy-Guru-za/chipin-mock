@@ -3,6 +3,7 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-11 | self | Used `first:`/`last:` row spacing utilities while each row was wrapped in its own border container | For utility-driven list spacing, keep row items as direct siblings and move separators onto row root via non-last-child selectors |
 | 2026-02-11 | self | Added new jsdom tests without `afterEach(cleanup)`, causing duplicate elements across test cases and false failures | In this repo, always include explicit `afterEach(cleanup)` in new Testing Library suites, even for small files |
 | 2026-02-11 | self | Wrote UI test expecting a "Shareable link" label before adding that label to the component | Align tests to explicit UX copy requirements first, then verify component emits that copy |
 | 2026-02-11 | self | Applied a partial patch while rewriting `ContributorDisplay` and accidentally left duplicate legacy JSX + misplaced import ordering | For full component redesigns, replace the file in one pass (or verify tail of file immediately) instead of incremental hunks that can leave old blocks behind |

@@ -159,6 +159,7 @@ Track mistakes and fixes in this table after each refactor:
 |------|-------|---------|--------|-----------------|
 | YYYY-MM-DD | /example | Example issue | Example impact | Example prevention |
 | 2026-02-11 | /create/review | New jsdom tests omitted cleanup between cases | Duplicate element matches and false negatives | Always add `afterEach(cleanup)` in new Testing Library suites |
+| 2026-02-11 | /create/review | Applied `first:` and `last:` spacing utilities to rows that were each wrapped in their own border container | Pseudo-class logic collapsed row padding and created inconsistent vertical rhythm | Keep rows as direct siblings and apply separators on row root with non-last-child utility selectors |
 
 Anti-patterns to avoid:
 - Copying guide HTML wholesale into production route file.
@@ -171,6 +172,7 @@ Anti-patterns to avoid:
 |------|------------------|--------------------------------|--------|
 | 2026-02-11 | /create/review | Initial version: guardrails, algorithm, fidelity rubric, handoff template | Codex |
 | 2026-02-11 | /create/review | Added real pitfall pattern for test isolation (`afterEach(cleanup)`) based on implementation feedback loop | Codex |
+| 2026-02-11 | /create/review | Added spacing-rhythm safeguard: avoid wrapper containers that break `first`/`last` row utility behavior | Codex |
 
 ## Mandatory Post-Refactor Update Rule
 After each successful UI refactor, you must update this playbook with new constraints, pitfalls, fidelity lessons, and verification improvements before closing the task.

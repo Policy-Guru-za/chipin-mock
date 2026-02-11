@@ -39,14 +39,14 @@ function Row({
   value: string;
 }) {
   return (
-    <div className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+    <div className="flex items-center gap-3 py-3 first:pt-0 last:pb-0 [&:not(:last-child)]:border-b [&:not(:last-child)]:border-border-soft">
       <div
         className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[10px] ${iconContainerClassName}`}
       >
         {icon}
       </div>
       <div className="min-w-0">
-        <p className="mb-0.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-faint">
+        <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-faint">
           {label}
         </p>
         <p className="text-sm text-ink-mid">{value}</p>
@@ -64,43 +64,35 @@ export function ReviewDetailRows({
 }: ReviewDetailRowsProps) {
   return (
     <div>
-      <div className="border-b border-border-soft">
-        <Row
-          icon={<GiftIcon className="h-4 w-4 text-plum" />}
-          iconContainerClassName="bg-plum-wash"
-          label="Dream gift"
-          value={giftName}
-        />
-      </div>
+      <Row
+        icon={<GiftIcon className="h-4 w-4 text-plum" />}
+        iconContainerClassName="bg-plum-wash"
+        label="Dream gift"
+        value={giftName}
+      />
 
       {partyDateTimeLabel ? (
-        <div className="border-b border-border-soft">
-          <Row
-            icon={<CalendarIcon className="h-4 w-4 text-amber" />}
-            iconContainerClassName="bg-amber-light"
-            label="Birthday party"
-            value={partyDateTimeLabel}
-          />
-        </div>
+        <Row
+          icon={<CalendarIcon className="h-4 w-4 text-amber" />}
+          iconContainerClassName="bg-amber-light"
+          label="Birthday party"
+          value={partyDateTimeLabel}
+        />
       ) : null}
 
-      <div className="border-b border-border-soft">
-        <Row
-          icon={<ClockIcon className="h-4 w-4 text-sage" />}
-          iconContainerClassName="bg-sage-light"
-          label="Campaign closes"
-          value={campaignCloseLabel}
-        />
-      </div>
+      <Row
+        icon={<ClockIcon className="h-4 w-4 text-sage" />}
+        iconContainerClassName="bg-sage-light"
+        label="Campaign closes"
+        value={campaignCloseLabel}
+      />
 
-      <div className="border-b border-border-soft">
-        <Row
-          icon={<WalletIcon className="h-4 w-4 text-ink-faint" />}
-          iconContainerClassName="bg-border-soft"
-          label="Payout"
-          value={payoutSummary}
-        />
-      </div>
+      <Row
+        icon={<WalletIcon className="h-4 w-4 text-ink-faint" />}
+        iconContainerClassName="bg-border-soft"
+        label="Payout"
+        value={payoutSummary}
+      />
 
       <Row
         icon={<HeartIcon className="h-4 w-4 text-sage" />}
