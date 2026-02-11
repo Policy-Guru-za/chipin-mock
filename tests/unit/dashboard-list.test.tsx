@@ -53,7 +53,7 @@ describe('HostDashboardPage', () => {
     expect(html).toContain('href="/dashboard/board-1"');
     expect(html).toContain('Happening now');
     expect(html).toContain('from 3 contributors');
-    expect(html).toContain('Create a Dreamboard +');
+    expect(html).not.toContain('Create a Dreamboard +');
     expect(html).toContain('Create another Dreamboard');
   });
 

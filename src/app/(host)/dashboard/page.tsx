@@ -15,9 +15,6 @@ export default async function HostDashboardPage() {
     <section className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-12">
       <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <h1 className="font-display text-[28px] font-bold text-text">Your Dreamboards</h1>
-        <Link href="/create/child" className="w-full md:w-auto">
-          <Button className="w-full bg-primary-700 hover:bg-primary-800 md:w-auto">Create a Dreamboard +</Button>
-        </Link>
       </header>
 
       {cards.length === 0 ? (
