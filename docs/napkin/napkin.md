@@ -3,6 +3,8 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-11 | self | Added new jsdom tests without `afterEach(cleanup)`, causing duplicate elements across test cases and false failures | In this repo, always include explicit `afterEach(cleanup)` in new Testing Library suites, even for small files |
+| 2026-02-11 | self | Wrote UI test expecting a "Shareable link" label before adding that label to the component | Align tests to explicit UX copy requirements first, then verify component emits that copy |
 | 2026-02-11 | self | Applied a partial patch while rewriting `ContributorDisplay` and accidentally left duplicate legacy JSX + misplaced import ordering | For full component redesigns, replace the file in one pass (or verify tail of file immediately) instead of incremental hunks that can leave old blocks behind |
 | 2026-02-11 | self | Ran `rg` with a pattern containing backticks and zsh performed command substitution (`command not found`) | For grep/search patterns that include backticks, wrap the pattern in single quotes and escape/avoid literal backticks |
 | 2026-02-10 | self | Fired an Axiom APL curl with bracket-heavy JSON inline and zsh interpreted parts as shell patterns (`bad pattern`) | For complex APL payloads with brackets/quotes, write JSON to a temp file and send via `--data-binary @file` to avoid shell glob/quote breakage |
@@ -70,6 +72,7 @@
 - Start with required doc read order before implementation.
 - Use `pnpm` for all script gates.
 - For current Dreamboard refactor work, prioritize main `/{slug}` content UI changes; keep shared header/footer unchanged unless explicitly requested.
+- For UI refactors, keep scope to main user-facing content and maintain a reusable AI playbook under `docs/UI-refactors/` that can drive future refactors from HTML + screenshot + URL inputs.
 
 ## Patterns That Work
 - Follow milestone sequence strictly; no progression when gate fails.
