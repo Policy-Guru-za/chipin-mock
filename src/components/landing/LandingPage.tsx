@@ -13,7 +13,11 @@ import {
   LandingFooter,
 } from './index';
 
-export function LandingPage() {
+interface LandingPageProps {
+  isClerkEnabled?: boolean;
+}
+
+export function LandingPage({ isClerkEnabled = false }: LandingPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -27,7 +31,11 @@ export function LandingPage() {
         <div className="absolute w-[250px] h-[250px] lg:w-[400px] lg:h-[400px] bg-[radial-gradient(circle,rgba(220,190,160,0.1)_0%,transparent_70%)] -bottom-[50px] lg:-bottom-[100px] -right-[30px] lg:-right-[50px]" />
       </div>
 
-      <LandingNav mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
+      <LandingNav
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
+        isClerkEnabled={isClerkEnabled}
+      />
       <div aria-hidden="true" className="h-[73px] md:h-[97px] lg:h-[121px]" />
 
       {/* Main Content - Hero Grid */}

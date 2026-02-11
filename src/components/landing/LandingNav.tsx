@@ -2,14 +2,23 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import { SignedIn, SignedOut } from '@clerk/nextjs';
+
+import { UserAvatarMenu } from '@/components/auth/UserAvatarMenu';
+
 import { navLinks } from './content';
 
 interface LandingNavProps {
   mobileMenuOpen: boolean;
   setMobileMenuOpen: (open: boolean) => void;
+  isClerkEnabled?: boolean;
 }
 
-export function LandingNav({ mobileMenuOpen, setMobileMenuOpen }: LandingNavProps) {
+export function LandingNav({
+  mobileMenuOpen,
+  setMobileMenuOpen,
+  isClerkEnabled = false,
+}: LandingNavProps) {
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -97,6 +106,24 @@ export function LandingNav({ mobileMenuOpen, setMobileMenuOpen }: LandingNavProp
                 {link.label}
               </a>
             ))}
+            {isClerkEnabled ? (
+              <>
+                <SignedOut>
+                  <Link
+                    href="/sign-in"
+                    onClick={() => closeMenu()}
+                    className="block px-4 py-3 text-[#5A8E78] border-2 border-[#5A8E78] rounded-[10px] font-semibold text-[15px] text-center transition-all hover:bg-[#5A8E78] hover:text-white"
+                  >
+                    Sign in
+                  </Link>
+                </SignedOut>
+                <SignedIn>
+                  <div className="flex justify-center px-4 py-1">
+                    <UserAvatarMenu afterSignOutUrl="/" />
+                  </div>
+                </SignedIn>
+              </>
+            ) : null}
             <Link
               href="/create"
               onClick={() => closeMenu()}
@@ -136,12 +163,21 @@ export function LandingNav({ mobileMenuOpen, setMobileMenuOpen }: LandingNavProp
           >
             Create a Free Dreamboard
           </Link>
-          <Link
-            href="/create"
-            className="bg-transparent text-[#5A8E78] border-2 border-[#5A8E78] px-6 py-3 rounded-[10px] font-semibold text-[15px] transition-all hover:bg-[#5A8E78] hover:text-white"
-          >
-            Login
-          </Link>
+          {isClerkEnabled ? (
+            <>
+              <SignedOut>
+                <Link
+                  href="/sign-in"
+                  className="bg-transparent text-[#5A8E78] border-2 border-[#5A8E78] px-6 py-3 rounded-[10px] font-semibold text-[15px] transition-all hover:bg-[#5A8E78] hover:text-white"
+                >
+                  Sign in
+                </Link>
+              </SignedOut>
+              <SignedIn>
+                <UserAvatarMenu afterSignOutUrl="/" />
+              </SignedIn>
+            </>
+          ) : null}
         </div>
 
         {/* Hamburger Menu Button */}

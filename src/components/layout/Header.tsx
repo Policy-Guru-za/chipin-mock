@@ -2,8 +2,9 @@
 
 import { useCallback, useState } from 'react';
 import Link from 'next/link';
-import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { SignedIn, SignedOut } from '@clerk/nextjs';
 
+import { UserAvatarMenu } from '@/components/auth/UserAvatarMenu';
 import { buttonVariants } from '@/components/ui/button';
 import { MenuIcon } from '@/components/icons';
 import { MobileNav } from '@/components/layout/MobileNav';
@@ -61,7 +62,7 @@ export function Header({ isClerkEnabled = false }: HeaderProps) {
                   </Link>
                 </SignedOut>
                 <SignedIn>
-                  <UserButton afterSignOutUrl="/" />
+                  <UserAvatarMenu afterSignOutUrl="/" />
                 </SignedIn>
               </>
             ) : null}

@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion';
-import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { SignedIn, SignedOut } from '@clerk/nextjs';
 
+import { UserAvatarMenu } from '@/components/auth/UserAvatarMenu';
 import { buttonVariants } from '@/components/ui/button';
 import { XIcon } from '@/components/icons';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
@@ -179,7 +180,7 @@ export function MobileNav({ isOpen, onClose, isClerkEnabled = false }: MobileNav
                         </Link>
                       </SignedOut>
                       <SignedIn>
-                        <UserButton afterSignOutUrl="/" />
+                        <UserAvatarMenu afterSignOutUrl="/" />
                       </SignedIn>
                     </div>
                   ) : null}

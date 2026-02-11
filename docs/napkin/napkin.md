@@ -80,6 +80,7 @@
 - Follow milestone sequence strictly; no progression when gate fails.
 - Use `nl -ba` + `sed -n` for line-precise evidence extraction in milestone audits.
 - Capture milestone evidence in `docs/implementation-docs/evidence/ux-v2/...` during execution, not after.
+- For auth UI parity across route groups, pass `isClerkEnabled` from server page into client landing nav and reuse a shared `UserAvatarMenu` (`UserButton.MenuItems`) across header/mobile/landing.
 - For rollout milestones, split agent-prep (documentation and pre-gates) from human-live execution (deploy, smoke, GO sign-off) so acceptance criteria stay satisfiable.
 - For milestone evidence docs, provide a fixed section-locked template file to reduce status drift and missing-gate omissions during handoff.
 - For auth-free UI QA, gate public preview routes behind `DEV_PREVIEW=true` and pair with Playwright CLI screenshot scripts under `scripts/visual/` writing to `output/playwright/`.
