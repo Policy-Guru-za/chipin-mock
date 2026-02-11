@@ -21,7 +21,7 @@ export default async function HostDashboardPage() {
         <div className="rounded-2xl border border-border bg-white px-6 py-12 text-center">
           <h2 className="text-lg text-gray-600">You haven&apos;t created a Dreamboard yet.</h2>
           <div className="mt-6">
-            <Link href="/create/child">
+            <Link href="/create" prefetch={false}>
               <Button size="lg">Create your first Dreamboard</Button>
             </Link>
           </div>

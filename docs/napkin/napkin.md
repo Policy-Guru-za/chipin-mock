@@ -3,6 +3,8 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-11 | self | Wired `/create` fresh-start logic to `getDreamBoardDraft` without handling KV read failures, which can block hosts from entering create flow during transient KV outages | For entry-route hygiene, treat draft reads as best-effort: catch/log read errors, continue with clear + redirect path |
+| 2026-02-11 | self | Deleted draft photo before confirming `clearDreamBoardDraft` success, which can orphan stale draft references on clear failures | Sequence destructive side-effects after primary state-clear succeeds; when clear fails, do not delete related assets |
 | 2026-02-11 | self | Exported `publishDreamBoardAction` directly from `src/app/(host)/create/review/page.tsx`, which broke Next generated type checks because page modules only allow specific exports | Keep server actions in sibling `actions.ts` modules and import them into `page.tsx`; do not add extra named exports to route page files |
 | 2026-02-11 | self | Used `getByText('Funded!')` in a timeline test where that label intentionally appears in multiple places (node label + card status), causing false failures | Prefer role/href assertions for structure and use `getAllByText` when duplicate label rendering is expected |
 | 2026-02-11 | self | Used `first:`/`last:` row spacing utilities while each row was wrapped in its own border container | For utility-driven list spacing, keep row items as direct siblings and move separators onto row root via non-last-child selectors |

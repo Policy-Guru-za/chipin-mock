@@ -13,7 +13,8 @@ export function DashboardTimelineCreateNode() {
       </div>
 
       <Link
-        href="/create/child"
+        href="/create"
+        prefetch={false}
         className="group flex items-center gap-4 rounded-2xl border-2 border-dashed border-border px-6 py-5 text-ink-ghost transition hover:border-sage hover:bg-sage-wash hover:text-sage focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
       >
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-inherit shadow-sm">

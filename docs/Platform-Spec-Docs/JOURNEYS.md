@@ -15,7 +15,7 @@ Gifta has two primary user journeys:
 
 Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 
-**Runtime alignment note (2026-02-11):** the active host wizard is 6 steps: `/create/child` → `/create/gift` → `/create/dates` → `/create/giving-back` → `/create/payout` → `/create/review`. The optional host message (`max 280`) is captured on `/create/gift`.
+**Runtime alignment note (2026-02-11):** host create CTAs enter `/create` first, which resets any existing host draft before redirecting to `/create/child`. The active host wizard is 6 steps: `/create/child` → `/create/gift` → `/create/dates` → `/create/giving-back` → `/create/payout` → `/create/review`. The optional host message (`max 280`) is captured on `/create/gift`.
 
 **Key Changes in v2.0:**
 - Gift is defined manually by parent (not from Takealot catalog)
@@ -71,7 +71,7 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 
 **System Action:**
 1. Clerk creates a session and sets secure cookies
-2. Redirects back to `/create/child` via configured fallback redirect
+2. Redirects back to `/create`, which clears any prior draft and then routes to `/create/child`
 
 **Transition:** → Step 3
 

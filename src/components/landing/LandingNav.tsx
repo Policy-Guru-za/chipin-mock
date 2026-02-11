@@ -126,6 +126,7 @@ export function LandingNav({
             ) : null}
             <Link
               href="/create"
+              prefetch={false}
               onClick={() => closeMenu()}
               className="mt-auto w-full bg-gradient-to-br from-[#6B9E88] to-[#5A8E78] text-white border-none px-6 py-4 rounded-[10px] font-semibold text-[15px] text-center"
             >
@@ -159,6 +160,7 @@ export function LandingNav({
           ))}
           <Link
             href="/create"
+            prefetch={false}
             className="bg-gradient-to-br from-[#6B9E88] to-[#5A8E78] text-white border-none px-7 py-3.5 rounded-[10px] font-semibold text-[15px] shadow-[0_4px_16px_rgba(107,158,136,0.3)] transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(107,158,136,0.4)] active:translate-y-0"
           >
             Create a Free Dreamboard

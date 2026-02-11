@@ -47,6 +47,7 @@ The Host Dashboard List View displays all Dreamboards created by the authenticat
 ### Key Features
 - Visual overview of all active and completed Dreamboards
 - Quick action to create new Dreamboards
+  - Runtime behavior: create CTAs navigate to `/create` (fresh-start entry) and clear any existing host draft before landing on `/create/child`
 - Status indicators (Active, Complete)
 - Progress metrics (contributions, money raised, time remaining)
 - Empty state with call-to-action
@@ -432,6 +433,7 @@ The Host Dashboard List View displays all Dreamboards created by the authenticat
 - **Heading:** `text-lg font-semibold text-text`
 - **Description:** `text-sm text-text-secondary`
 - **Link:** Wraps entire card as `<Link href="/create">` for navigation
+  - Route behavior: `/create` starts a fresh flow and clears prior draft state before Step 1
 - **Accessibility:** Semantic link element, descriptive text
 
 ---

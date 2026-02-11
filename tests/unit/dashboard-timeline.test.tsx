@@ -74,6 +74,10 @@ describe('DashboardTimeline', () => {
       '/dashboard/board-2'
     );
     expect(screen.getByText('Create another Dreamboard')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Create another Dreamboard/i })).toHaveAttribute(
+      'href',
+      '/create'
+    );
   });
 
   it('treats first live board as hero and keeps additional live boards visible', () => {
@@ -138,6 +142,10 @@ describe('DashboardTimeline', () => {
 
     expect(screen.queryByText('Happening now')).not.toBeInTheDocument();
     expect(screen.getByText('Create another Dreamboard')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Create another Dreamboard/i })).toHaveAttribute(
+      'href',
+      '/create'
+    );
 
     const boardLinks = screen
       .getAllByRole('link')

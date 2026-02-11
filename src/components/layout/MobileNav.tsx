@@ -186,6 +186,7 @@ export function MobileNav({ isOpen, onClose, isClerkEnabled = false }: MobileNav
                   ) : null}
                   <Link
                     href="/create"
+                    prefetch={false}
                     onClick={handleLinkClick}
                     className={buttonVariants({ size: 'lg', className: 'w-full justify-center' })}
                   >

@@ -64,5 +64,6 @@ describe('HostDashboardPage', () => {
 
     expect(html).toContain("You haven&#x27;t created a Dreamboard yet.");
     expect(html).toContain('Create your first Dreamboard');
+    expect(html).toContain('href="/create"');
   });
 });

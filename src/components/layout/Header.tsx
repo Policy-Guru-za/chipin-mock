@@ -48,7 +48,7 @@ export function Header({ isClerkEnabled = false }: HeaderProps) {
             <Link href="/#safety" className={navLinkClasses}>
               Trust & safety
             </Link>
-            <Link href="/create" className={buttonVariants({ size: 'sm' })}>
+            <Link href="/create" prefetch={false} className={buttonVariants({ size: 'sm' })}>
               Create a Dreamboard
             </Link>
             {isClerkEnabled ? (
