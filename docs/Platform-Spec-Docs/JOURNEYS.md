@@ -15,6 +15,8 @@ Gifta has two primary user journeys:
 
 Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 
+**Runtime alignment note (2026-02-11):** the active host wizard is 6 steps: `/create/child` → `/create/gift` → `/create/dates` → `/create/giving-back` → `/create/payout` → `/create/review`. The optional host message (`max 280`) is captured on `/create/gift`.
+
 **Key Changes in v2.0:**
 - Gift is defined manually by parent (not from Takealot catalog)
 - AI generates whimsical artwork for the gift
@@ -118,7 +120,7 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 **URL:** `<APP_DOMAIN>/create/gift`
 
 **Screen Elements:**
-- Progress indicator: Step 2 of 4
+- Progress indicator: Step 2 of 6
 - Heading: "What's {childName}'s dream gift?"
 - Subheading: "Describe the gift in your own words"
 
@@ -127,8 +129,9 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 | Field | Type | Validation | Required |
 |-------|------|------------|----------|
 | Gift name | Text input | 2-200 chars | Yes |
-| Gift description | Textarea | 10-500 chars (for AI artwork) | Yes |
-| Goal amount | Currency input | R100 - R50,000 | Yes |
+| Gift description | Textarea | Max 500 chars | No |
+| Gift icon | Curated picker | Valid icon ID | Yes |
+| Host message | Textarea | Max 280 chars | No |
 
 **AI Artwork Generation:**
 
@@ -178,7 +181,7 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 - Goal amount required (R100 minimum)
 - "Please generate artwork before continuing"
 
-**User Action:** Enters gift details, generates artwork, clicks "Continue"
+**User Action:** Enters gift details, optionally adds host message, selects an icon, clicks "Continue"
 
 **Transition:** → Step 5
 
@@ -186,10 +189,10 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 
 ### Step 5: Payout & Contact Details
 
-**URL:** `<APP_DOMAIN>/create/details`
+**URL:** `<APP_DOMAIN>/create/payout`
 
 **Screen Elements:**
-- Progress indicator: Step 3 of 4
+- Progress indicator: Step 5 of 6
 - Heading: "Almost done!"
 
 **Form Fields:**
@@ -200,7 +203,6 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 | Cardholder name | Text input | 2-100 chars | Yes |
 | WhatsApp number | Phone input | Valid SA mobile (07x/08x/06x) | Yes |
 | Email address | Email input | Valid email format | Yes |
-| Personal message | Textarea | Max 280 chars | No |
 
 **Karri Card Section:**
 ```
@@ -241,9 +243,9 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 └─────────────────────────────────────┘
 ```
 
-**Personal Message:**
-- Placeholder: "E.g., Maya would love your contribution toward her dream bike!"
-- Character counter: "0/280"
+**Host Message Capture Note:**
+- The host message is captured earlier on `/create/gift` and persisted with the draft.
+- This payout step does not collect or modify the host message.
 
 **Note:** Party date from Step 3 serves as the pot close date.
 

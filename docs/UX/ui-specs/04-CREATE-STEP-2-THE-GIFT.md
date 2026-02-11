@@ -13,13 +13,15 @@
 - Runtime source: `src/app/(host)/create/gift/page.tsx`, `src/components/gift/GiftIconPicker.tsx`, `src/lib/icons/*`.
 - This step uses static curated gift icons (`/icons/gifts/*.png`), not AI image generation or upload.
 - Goal amount is not collected in host create flow; `goalCents` is persisted as `0` in draft and publish path.
+- This step captures an optional host message via `message` (`maxLength: 280`) using label `A message from {childName}` and stores it in draft.
+- This pass does not change contributor-facing placement of the saved message; only capture/persistence is handled here.
 - Legacy references to `GiftArtworkGenerator`/Claude image generation in this file are target-state only and not in runtime.
 - If any section below conflicts with these bullets, treat runtime source files above as authoritative.
 
 ## 1. SCREEN OVERVIEW
 
 ### Purpose
-Step 2 transforms the Dreamboard from a person into a purpose. This screen captures gift name, optional description, and a curated icon selection.
+Step 2 transforms the Dreamboard from a person into a purpose. This screen captures gift name, optional description, curated icon selection, and an optional host message for contributors.
 
 ### Route & File Structure
 ```
@@ -45,10 +47,11 @@ Files:
 3. User enters gift name (real-time validation)
 4. User optionally adds description
 5. User selects a curated icon (with suggestion based on gift text and child age)
-6. User clicks "Continue to dates"
-7. Server validates all fields
-8. On success: Save draft and redirect to `/create/dates`
-9. On error: Show error banner and allow retry
+6. User optionally adds a host message (max 280 characters)
+7. User clicks "Continue to dates"
+8. Server validates all fields
+9. On success: Save draft and redirect to `/create/dates`
+10. On error: Show error banner and allow retry
 
 ---
 
@@ -301,6 +304,28 @@ giftDescription: z
 - Display helper text below: "Help your guests understand why this gift is special"
 - Allow line breaks (Shift+Enter)
 - Trim whitespace on save
+
+---
+
+### Runtime Field Addendum: Host Message (Optional)
+
+**Label:** `A message from {childName}` (fallback: `A message from your child`)  
+**Input Type:** Textarea (`<textarea>`)  
+**HTML Name Attribute:** `message`  
+**Placeholder:** `E.g., Thank you for helping make this dream gift possible.`  
+**Max Length:** 280 characters  
+**Required:** No
+
+**Helper Copy:** `This note is saved with this Dreamboard and may appear on the public Dreamboard.`
+
+**Runtime Save Behavior:**
+- Server action parses `message` as optional string.
+- Value is normalized with `trim()`.
+- Blank/whitespace-only values are persisted as `undefined`.
+- Saved on the same submit as gift name/description/icon.
+
+**Out of Scope in This Pass:**
+- No change to contributor-facing placement or usage of this message on public Dreamboard screens.
 
 ---
 

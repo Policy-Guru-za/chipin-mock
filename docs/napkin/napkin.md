@@ -3,6 +3,7 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-11 | self | Exported `publishDreamBoardAction` directly from `src/app/(host)/create/review/page.tsx`, which broke Next generated type checks because page modules only allow specific exports | Keep server actions in sibling `actions.ts` modules and import them into `page.tsx`; do not add extra named exports to route page files |
 | 2026-02-11 | self | Used `getByText('Funded!')` in a timeline test where that label intentionally appears in multiple places (node label + card status), causing false failures | Prefer role/href assertions for structure and use `getAllByText` when duplicate label rendering is expected |
 | 2026-02-11 | self | Used `first:`/`last:` row spacing utilities while each row was wrapped in its own border container | For utility-driven list spacing, keep row items as direct siblings and move separators onto row root via non-last-child selectors |
 | 2026-02-11 | self | Added new jsdom tests without `afterEach(cleanup)`, causing duplicate elements across test cases and false failures | In this repo, always include explicit `afterEach(cleanup)` in new Testing Library suites, even for small files |

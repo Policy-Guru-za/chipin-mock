@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
-import { z } from 'zod';
 
+import { saveManualGiftAction } from '@/app/(host)/create/gift/actions';
 import { GiftIconPicker } from '@/components/gift/GiftIconPicker';
 import { CreateFlowShell } from '@/components/layout/CreateFlowShell';
 import { Button } from '@/components/ui/button';
@@ -8,20 +8,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
-import { getDreamBoardDraft, updateDreamBoardDraft } from '@/lib/dream-boards/draft';
+import { getDreamBoardDraft } from '@/lib/dream-boards/draft';
 import {
   extractIconIdFromPath,
-  getGiftIconById,
   isValidGiftIconId,
 } from '@/lib/icons/gift-icons';
 import { suggestGiftIcon } from '@/lib/icons/suggest-icon';
 import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
-
-const manualGiftSchema = z.object({
-  giftName: z.string().min(2).max(200),
-  giftDescription: z.string().max(500).optional(),
-  giftIconId: z.string().min(1),
-});
 
 type GiftSearchParams = {
   error?: string;
@@ -40,6 +33,9 @@ const resolveDefaultGiftName = (draft?: Awaited<ReturnType<typeof getDreamBoardD
 const resolveDefaultGiftDescription = (draft?: Awaited<ReturnType<typeof getDreamBoardDraft>>) =>
   draft?.giftDescription ?? '';
 
+const resolveDefaultMessage = (draft?: Awaited<ReturnType<typeof getDreamBoardDraft>>) =>
+  draft?.message ?? '';
+
 const resolveDefaultIconId = (draft?: Awaited<ReturnType<typeof getDreamBoardDraft>>) => {
   const draftIconId = draft?.giftIconId;
   if (draftIconId && isValidGiftIconId(draftIconId)) {
@@ -57,52 +53,6 @@ const resolveDefaultIconId = (draft?: Awaited<ReturnType<typeof getDreamBoardDra
     childAge: draft?.childAge,
   }).id;
 };
-
-async function saveManualGiftAction(formData: FormData) {
-  'use server';
-
-  const session = await requireHostAuth();
-  const draft = await getDreamBoardDraft(session.hostId);
-  const view = buildCreateFlowViewModel({ step: 'gift', draft });
-  if (view.redirectTo) {
-    redirect(view.redirectTo);
-  }
-  if (!draft?.childPhotoUrl) {
-    redirect('/create/child');
-  }
-
-  const giftName = formData.get('giftName');
-  const giftDescription = formData.get('giftDescription');
-  const giftIconId = formData.get('giftIconId');
-
-  const result = manualGiftSchema.safeParse({
-    giftName,
-    giftDescription,
-    giftIconId,
-  });
-
-  if (!result.success) {
-    redirect('/create/gift?error=invalid');
-  }
-
-  const icon = getGiftIconById(result.data.giftIconId);
-  if (!icon) {
-    redirect('/create/gift?error=invalid');
-  }
-
-  const normalizedGiftDescription = result.data.giftDescription?.trim();
-
-  await updateDreamBoardDraft(session.hostId, {
-    giftName: result.data.giftName.trim(),
-    giftDescription: normalizedGiftDescription && normalizedGiftDescription.length ? normalizedGiftDescription : undefined,
-    giftIconId: icon.id,
-    giftImageUrl: icon.src,
-    giftImagePrompt: undefined,
-    goalCents: 0,
-  });
-
-  redirect('/create/dates');
-}
 
 export default async function CreateGiftPage({
   searchParams,
@@ -123,7 +73,9 @@ export default async function CreateGiftPage({
   const errorMessage = getErrorMessage(resolvedSearchParams?.error);
   const defaultGiftName = resolveDefaultGiftName(draft);
   const defaultGiftDescription = resolveDefaultGiftDescription(draft);
+  const defaultMessage = resolveDefaultMessage(draft);
   const defaultIconId = resolveDefaultIconId(draft);
+  const messageAuthor = draft.childName?.trim() ? draft.childName.trim() : 'your child';
 
   return (
     <CreateFlowShell
@@ -182,6 +134,22 @@ export default async function CreateGiftPage({
               defaultGiftDescription={defaultGiftDescription}
               childAge={draft?.childAge}
             />
+
+            <div className="space-y-2">
+              <label htmlFor="message" className="text-sm font-medium text-text">
+                {`A message from ${messageAuthor}`}
+              </label>
+              <Textarea
+                id="message"
+                name="message"
+                maxLength={280}
+                placeholder="E.g., Thank you for helping make this dream gift possible."
+                defaultValue={defaultMessage}
+              />
+              <p className="text-xs text-text-muted">
+                This note is saved with this Dreamboard and may appear on the public Dreamboard.
+              </p>
+            </div>
 
             <Button type="submit">Continue to dates</Button>
           </form>
