@@ -32,6 +32,7 @@ If any input is missing, inform the user and ask whether to proceed with availab
    - Locate route entrypoint and rendered client component(s).
    - Locate shared shell boundaries (layout/header/footer) and mark read-only.
    - Locate tests currently guarding copy/flow/contract behavior.
+   - Ask the user any clarifying questions at this point, if necessary.
 2. Visual mapping:
    - Decompose guide HTML into sections: hierarchy, spacing, typography, cards, controls, motion.
    - Map sections to current component tree and identify extraction boundaries.
@@ -160,6 +161,8 @@ Track mistakes and fixes in this table after each refactor:
 | YYYY-MM-DD | /example | Example issue | Example impact | Example prevention |
 | 2026-02-11 | /create/review | New jsdom tests omitted cleanup between cases | Duplicate element matches and false negatives | Always add `afterEach(cleanup)` in new Testing Library suites |
 | 2026-02-11 | /create/review | Applied `first:` and `last:` spacing utilities to rows that were each wrapped in their own border container | Pseudo-class logic collapsed row padding and created inconsistent vertical rhythm | Keep rows as direct siblings and apply separators on row root with non-last-child utility selectors |
+| 2026-02-11 | /dashboard | Built timeline card tests with `getByText` for status labels that appear in multiple locations inside one node | False-negative unit failures during gate runs | Use role-based assertions first (`link` with aria-label/href), and use `getAllByText` only when duplicate labels are intentional |
+| 2026-02-11 | /dashboard | Timeline refactor risked hiding boards when introducing hero treatment | Missing board visibility and behavior drift risk | Partition boards into explicit live/archived buckets and render all boards (hero = first live only, never a filter) |
 
 Anti-patterns to avoid:
 - Copying guide HTML wholesale into production route file.
@@ -173,6 +176,8 @@ Anti-patterns to avoid:
 | 2026-02-11 | /create/review | Initial version: guardrails, algorithm, fidelity rubric, handoff template | Codex |
 | 2026-02-11 | /create/review | Added real pitfall pattern for test isolation (`afterEach(cleanup)`) based on implementation feedback loop | Codex |
 | 2026-02-11 | /create/review | Added spacing-rhythm safeguard: avoid wrapper containers that break `first`/`last` row utility behavior | Codex |
+| 2026-02-11 | /dashboard | Added timeline-mode guidance: preserve board completeness via live/archived bucketing and first-live hero treatment only | Codex |
+| 2026-02-11 | /dashboard | Added testing guardrail for duplicated status copy in timeline nodes (`getAllByText` + role/href checks) | Codex |
 
 ## Mandatory Post-Refactor Update Rule
 After each successful UI refactor, you must update this playbook with new constraints, pitfalls, fidelity lessons, and verification improvements before closing the task.

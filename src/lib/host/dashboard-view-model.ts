@@ -22,6 +22,8 @@ export interface DashboardCardViewModel {
   boardId: string;
   boardTitle: string;
   raisedLabel: string;
+  raisedCents: number;
+  goalCents: number;
   contributionCount: number;
   statusLabel: string;
   manageHref: string;
@@ -230,6 +232,8 @@ export const buildDashboardCardViewModel = (
     slug: board.slug,
     boardTitle: `${board.childName}'s Dreamboard`,
     raisedLabel: formatZar(board.raisedCents),
+    raisedCents: board.raisedCents,
+    goalCents: board.goalCents,
     contributionCount: board.contributionCount,
     statusLabel: getStatusLabel(board.status),
     manageHref: `/dashboard/${board.id}`,

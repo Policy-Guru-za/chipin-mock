@@ -48,11 +48,13 @@ describe('HostDashboardPage', () => {
 
     const html = renderToStaticMarkup(await HostDashboardPage());
 
+    expect(html).toContain('Your Dreamboards');
     expect(html).toContain("Maya&#x27;s Dreamboard");
     expect(html).toContain('href="/dashboard/board-1"');
+    expect(html).toContain('Happening now');
     expect(html).toContain('from 3 contributors');
     expect(html).toContain('Create a Dreamboard +');
-    expect(html).toContain('Create a Dreamboard</span>');
+    expect(html).toContain('Create another Dreamboard');
   });
 
   it('renders empty state when host has no boards', async () => {

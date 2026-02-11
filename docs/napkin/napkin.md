@@ -3,6 +3,7 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-11 | self | Used `getByText('Funded!')` in a timeline test where that label intentionally appears in multiple places (node label + card status), causing false failures | Prefer role/href assertions for structure and use `getAllByText` when duplicate label rendering is expected |
 | 2026-02-11 | self | Used `first:`/`last:` row spacing utilities while each row was wrapped in its own border container | For utility-driven list spacing, keep row items as direct siblings and move separators onto row root via non-last-child selectors |
 | 2026-02-11 | self | Added new jsdom tests without `afterEach(cleanup)`, causing duplicate elements across test cases and false failures | In this repo, always include explicit `afterEach(cleanup)` in new Testing Library suites, even for small files |
 | 2026-02-11 | self | Wrote UI test expecting a "Shareable link" label before adding that label to the component | Align tests to explicit UX copy requirements first, then verify component emits that copy |
