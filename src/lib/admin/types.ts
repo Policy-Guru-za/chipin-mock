@@ -113,8 +113,8 @@ export type AdminCharityDataset = {
   category: string;
   logoUrl: string;
   website: string | null;
-  contactName: string;
-  contactEmail: string;
+  contactName: string | null;
+  contactEmail: string | null;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;

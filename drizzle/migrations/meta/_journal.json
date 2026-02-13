@@ -120,6 +120,13 @@
       "when": 1770485000000,
       "tag": "0016_add_party_date_time",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1771000000000,
+      "tag": "0017_make_charity_ops_fields_nullable",
+      "breakpoints": true
     }
   ]
 }

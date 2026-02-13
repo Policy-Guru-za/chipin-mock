@@ -132,20 +132,24 @@ const getRecipientDataForCharityPayout = (board: BoardPayoutContext): PayoutReci
     throw new Error('Charity payout is not enabled for this board');
   }
 
-  if (!board.charityId || !board.charityName || !board.charityBankDetailsEncrypted) {
+  if (!board.charityId || !board.charityName) {
     throw new Error('Charity payout details are missing');
   }
 
   const now = new Date();
-
-  return {
+  const recipientData: PayoutRecipientData = {
     payoutMethod: 'charity',
     charityId: board.charityId,
     charityName: board.charityName,
-    bankDetailsEncrypted: board.charityBankDetailsEncrypted,
     settlementMonth: now.getUTCMonth() + 1,
     settlementYear: now.getUTCFullYear(),
   };
+
+  if (board.charityBankDetailsEncrypted) {
+    recipientData.bankDetailsEncrypted = board.charityBankDetailsEncrypted;
+  }
+
+  return recipientData;
 };
 
 const ensureBoardReady = (status: string) => {

@@ -14,7 +14,12 @@ import { Button } from '@/components/ui/button';
 import type { AdminCharityDataset } from '@/lib/admin';
 import { formatZar } from '@/lib/utils/money';
 
-import { createCharityAction, toggleCharityStatusAction, updateCharityAction } from './actions';
+import {
+  createCharityAction,
+  generateCharityDraftFromUrlAction,
+  toggleCharityStatusAction,
+  updateCharityAction,
+} from './actions';
 import { formatAdminDate } from '../_lib/format';
 
 interface CharitiesClientProps {
@@ -49,8 +54,8 @@ export function CharitiesClient({
           category: modalState.charity.category,
           logoUrl: modalState.charity.logoUrl,
           website: modalState.charity.website ?? '',
-          contactName: modalState.charity.contactName,
-          contactEmail: modalState.charity.contactEmail,
+          contactName: modalState.charity.contactName ?? '',
+          contactEmail: modalState.charity.contactEmail ?? '',
           bankDetailsEncrypted: '',
         }
       : null;
@@ -92,8 +97,8 @@ export function CharitiesClient({
       header: 'Contact',
       render: (item) => (
         <div className="text-sm">
-          <p>{item.contactName}</p>
-          <p className="text-xs text-gray-500">{item.contactEmail}</p>
+          <p>{item.contactName ?? '—'}</p>
+          <p className="text-xs text-gray-500">{item.contactEmail ?? '—'}</p>
         </div>
       ),
     },
@@ -182,6 +187,7 @@ export function CharitiesClient({
         submitLabel="Create charity"
         onClose={closeModal}
         onSubmit={createCharityAction}
+        onGenerateFromUrl={generateCharityDraftFromUrlAction}
         onSuccess={onSaveSuccess}
       />
 

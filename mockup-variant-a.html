@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gifta - One dream gift. Everyone chips in.</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-page: #FFFCF9;
+            --bg-warm: #FAF7F2;
+            --text-primary: #2D2D2D;
+            --text-mid: #666;
+            --text-soft: #999;
+            --text-soft-2: #7A8D83;
+            --text-soft-3: #4A5D53;
+            --sage-green: #6B9E88;
+            --sage-green-deep: #5A8E78;
+            --sage-green-light: #4A7E66;
+            --sage-green-pale: #E4F0E8;
+            --sage-green-pale-2: #D5E8DC;
+            --coral: #C4785A;
+            --coral-deep: #B06A4A;
+            --plum: #7E6B9B;
+            --plum-wash: #F1EDF7;
+            --plum-border: #E4DDF0;
+            --amber: #C49A5C;
+            --card-border: rgba(0, 0, 0, 0.03);
+            --shadow-cta: rgba(107, 158, 136, 0.3);
+            --shadow-soft: rgba(0, 0, 0, 0.04);
+            --shadow-card: rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ========== NAVIGATION ========== */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 72px;
+            background-color: rgba(255, 252, 249, 0.95);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--card-border);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #3D3D3D;
+        }
+
+        .nav-left span {
+            margin-left: 4px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .nav-link {
+            font-size: 14px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--sage-green);
+        }
+
+        .btn-nav {
+            background: linear-gradient(135deg, var(--sage-green) 0%, var(--sage-green-deep) 100%);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 20px var(--shadow-cta);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-nav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px var(--shadow-cta);
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 0 20px;
+            }
+
+            .nav-right {
+                gap: 16px;
+            }
+
+            .nav-link {
+                display: none;
+            }
+
+            .nav-left {
+                font-size: 18px;
+            }
+        }
+
+        /* ========== HERO SECTION ========== */
+        .hero {
+            margin-top: 72px;
+            padding: 80px 32px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            position: relative;
+        }
+
+        .hero-left {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .hero-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 54px;
+            line-height: 1.15;
+            color: var(--text-primary);
+            font-weight: 400;
+        }
+
+        .hero-title-coral {
+            color: var(--coral);
+        }
+
+        .hero-subtitle {
+            font-size: 19px;
+            color: var(--text-mid);
+            line-height: 1.5;
+            max-width: 480px;
+        }
+
+        .stats-badge {
+            background: white;
+            border: 1px solid var(--card-border);
+            border-radius: 32px;
+            padding: 14px 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            width: fit-content;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stats-badge strong {
+            color: var(--sage-green);
+        }
+
+        .testimonial-card {
+            background: white;
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            max-width: 480px;
+        }
+
+        .testimonial-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .testimonial-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #F5C6AA 0%, #E8B8A0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .testimonial-content {
+            flex: 1;
+        }
+
+        .testimonial-text {
+            font-family: 'DM Serif Display', serif;
+            font-size: 16px;
+            font-style: italic;
+            line-height: 1.6;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .testimonial-author {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-mid);
+            margin-bottom: 12px;
+        }
+
+        .testimonial-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #E8E0D8;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .dot.active {
+            background-color: var(--sage-green);
+        }
+
+        .btn-hero {
+            background: linear-gradient(135deg, var(--sage-green) 0%, var(--sage-green-deep) 100%);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 20px var(--shadow-cta);
+            transition: all 0.3s ease;
+            width: fit-content;
+        }
+
+        .btn-hero:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px var(--shadow-cta);
+        }
+
+        .hero-right {
+            position: relative;
+            perspective: 1000px;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-12px);
+            }
+        }
+
+        .dreamboard-card {
+            background: white;
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 20px 48px rgba(0, 0, 0, 0.08);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .dreamboard-header {
+            background: linear-gradient(135deg, var(--sage-green-pale) 0%, var(--sage-green-pale-2) 100%);
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .dreamboard-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFD89B 0%, #FFC75F 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .dreamboard-title {
+            flex: 1;
+        }
+
+        .dreamboard-name {
+            font-family: 'DM Serif Display', serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .dreamboard-date {
+            font-size: 13px;
+            color: var(--text-soft);
+        }
+
+        .dreamboard-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .dream-gift-section {
+            background: #FBF5F0;
+            border-radius: 16px;
+            padding: 16px;
+        }
+
+        .dream-gift-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-soft);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .dream-gift-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .dream-gift-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #F8B4D4 0%, #F590C0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .dream-gift-text h3 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 16px;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .dream-gift-text p {
+            font-size: 13px;
+            color: var(--text-soft);
+        }
+
+        .status-card {
+            background: #F0F7F4;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-icon {
+            font-size: 24px;
+        }
+
+        .status-content h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .status-content p {
+            font-size: 12px;
+            color: var(--text-soft);
+        }
+
+        .contributors-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--text-soft);
+        }
+
+        .contributor-circles {
+            display: flex;
+            align-items: center;
+            gap: -8px;
+        }
+
+        .contributor-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            border: 2px solid white;
+            margin-left: -12px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .contributor-circle:first-child {
+            margin-left: 0;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        .contributor-circle.c1 {
+            background: linear-gradient(135deg, #F5C6AA 0%, #E8B8A0 100%);
+        }
+
+        .contributor-circle.c2 {
+            background: linear-gradient(135deg, #A8D4E6 0%, #98C8DC 100%);
+        }
+
+        .contributor-circle.c3 {
+            background: linear-gradient(135deg, #B8E0B8 0%, #A8D4A8 100%);
+        }
+
+        .contributor-circle.c4 {
+            background: linear-gradient(135deg, #E6B8B8 0%, #D8A8A8 100%);
+        }
+
+        .contributor-circle.c5 {
+            background: linear-gradient(135deg, #F0E68C 0%, #E8DC7C 100%);
+            color: #333;
+        }
+
+        .contributor-circle.c6 {
+            background: linear-gradient(135deg, #B8D4E0 0%, #A8C8D8 100%);
+        }
+
+        .contributor-circle.c7 {
+            background: linear-gradient(135deg, #D8B8E8 0%, #C8A8D8 100%);
+        }
+
+        .contributor-badge {
+            background: var(--sage-green-light);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .btn-chip-in {
+            border: 2px solid var(--sage-green);
+            background: transparent;
+            color: var(--sage-green);
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-chip-in:hover {
+            background: var(--sage-green);
+            color: white;
+        }
+
+        @media (max-width: 1024px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                gap: 48px;
+            }
+
+            .hero {
+                padding: 60px 24px;
+            }
+
+            .hero-title {
+                font-size: 44px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 48px 20px;
+                margin-top: 60px;
+            }
+
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .hero-subtitle {
+                font-size: 16px;
+            }
+
+            .dreamboard-card {
+                margin: 0 auto;
+                max-width: 360px;
+            }
+        }
+
+        /* ========== HOW IT WORKS ========== */
+        .how-it-works {
+            background-color: var(--bg-warm);
+            padding: 80px 32px;
+        }
+
+        .how-it-works-container {
+            max-width: 520px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .section-eyebrow {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--sage-green);
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            margin-bottom: 12px;
+        }
+
+        .section-eyebrow.plum {
+            color: var(--plum);
+        }
+
+        .section-headline {
+            font-family: 'DM Serif Display', serif;
+            font-size: 36px;
+            line-height: 1.2;
+            color: var(--text-primary);
+            font-weight: 400;
+        }
+
+        .section-headline em {
+            font-style: italic;
+            color: var(--coral);
+        }
+
+        .steps-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .step-card {
+            background: white;
+            border: 1px solid var(--card-border);
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .step-header {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .step-header.step-1 {
+            background: linear-gradient(135deg, var(--sage-green) 0%, var(--sage-green-deep) 100%);
+        }
+
+        .step-header.step-2 {
+            background: linear-gradient(135deg, #E8D5BD 0%, #D4B896 100%);
+            color: var(--text-primary);
+        }
+
+        .step-header.step-3 {
+            background: linear-gradient(135deg, var(--coral) 0%, var(--coral-deep) 100%);
+        }
+
+        .step-icon {
+            font-size: 32px;
+        }
+
+        .step-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .step-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 20px;
+            font-weight: 400;
+        }
+
+        .step-body {
+            padding: 24px;
+            background: white;
+            color: var(--text-primary);
+        }
+
+        .step-body p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-mid);
+        }
+
+        .social-proof {
+            background: white;
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin-top: 24px;
+        }
+
+        .social-proof-stat {
+            font-family: 'DM Serif Display', serif;
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--sage-green);
+            margin-bottom: 8px;
+        }
+
+        .social-proof-text {
+            font-size: 13px;
+            color: var(--text-soft);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .how-it-works {
+                padding: 60px 20px;
+            }
+
+            .section-headline {
+                font-size: 28px;
+            }
+        }
+
+        /* ========== GIVING BACK SECTION ========== */
+        .giving-back {
+            background-color: var(--bg-warm);
+            padding: 80px 32px;
+            border-top: 1px solid rgba(0, 0, 0, 0.02);
+        }
+
+        .giving-back-container {
+            max-width: 520px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .giving-back-headline {
+            font-family: 'DM Serif Display', serif;
+            font-size: 36px;
+            line-height: 1.2;
+            color: var(--text-primary);
+            font-weight: 400;
+        }
+
+        .giving-back-body {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text-soft-3);
+            max-width: 100%;
+        }
+
+        .impact-card {
+            background: white;
+            border: 1px solid var(--card-border);
+            border-radius: 22px;
+            padding: 28px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .impact-card.fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .impact-card.fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s ease;
+        }
+
+        .split-bar {
+            display: flex;
+            height: 12px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .split-gift {
+            flex: 0.85;
+            background: linear-gradient(90deg, var(--sage-green-light) 0%, var(--sage-green) 100%);
+        }
+
+        .split-charity {
+            flex: 0.15;
+            background: linear-gradient(90deg, var(--plum) 0%, #8B78AA 100%);
+        }
+
+        .impact-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .impact-line {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .impact-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .impact-dot.sage {
+            background-color: var(--sage-green-light);
+        }
+
+        .impact-dot.plum {
+            background-color: var(--plum);
+        }
+
+        .impact-amount {
+            color: var(--text-soft);
+        }
+
+        .impact-footer {
+            font-size: 12px;
+            color: var(--text-soft);
+            text-align: center;
+            padding-top: 12px;
+            border-top: 1px solid #EFEFEF;
+        }
+
+        .charity-badges {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 28px;
+        }
+
+        .charity-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .charity-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .charity-circle.rf {
+            background: linear-gradient(135deg, var(--plum) 0%, #8B78AA 100%);
+        }
+
+        .charity-circle.ch {
+            background: linear-gradient(135deg, var(--amber) 0%, #B88C4C 100%);
+        }
+
+        .charity-circle.co {
+            background: linear-gradient(135deg, var(--sage-green-light) 0%, #3A6E56 100%);
+        }
+
+        .charity-circle.ll {
+            background: linear-gradient(135deg, #D97706 0%, #B55D00 100%);
+        }
+
+        .charity-circle.at {
+            background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+        }
+
+        .charity-name {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-soft);
+            text-align: center;
+            max-width: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .giving-back {
+                padding: 60px 20px;
+            }
+
+            .giving-back-headline {
+                font-size: 28px;
+            }
+
+            .charity-badges {
+                gap: 12px;
+            }
+
+            .charity-circle {
+                width: 44px;
+                height: 44px;
+                font-size: 11px;
+            }
+        }
+
+        /* ========== CLOSING CTA ========== */
+        .closing-cta {
+            padding: 80px 32px;
+            background-color: var(--bg-page);
+        }
+
+        .closing-cta-card {
+            max-width: 760px;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            padding: 48px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+        }
+
+        .closing-headline {
+            font-family: 'DM Serif Display', serif;
+            font-size: 40px;
+            line-height: 1.2;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            font-weight: 400;
+        }
+
+        .closing-subtitle {
+            font-size: 16px;
+            color: var(--text-mid);
+            margin-bottom: 32px;
+            line-height: 1.5;
+        }
+
+        .btn-closing {
+            background: linear-gradient(135deg, var(--sage-green) 0%, var(--sage-green-deep) 100%);
+            color: white;
+            padding: 14px 40px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 20px var(--shadow-cta);
+            transition: all 0.3s ease;
+        }
+
+        .btn-closing:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px var(--shadow-cta);
+        }
+
+        @media (max-width: 768px) {
+            .closing-cta {
+                padding: 60px 20px;
+            }
+
+            .closing-cta-card {
+                padding: 32px;
+            }
+
+            .closing-headline {
+                font-size: 28px;
+            }
+        }
+
+        /* ========== FOOTER ========== */
+        footer {
+            background-color: #FAF7F2;
+            padding: 60px 32px 40px;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-top {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 48px;
+        }
+
+        .footer-col-1 {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .footer-logo {
+            font-family: 'Nunito', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #3D3D3D;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-tagline {
+            font-size: 13px;
+            color: var(--text-soft);
+            line-height: 1.5;
+        }
+
+        .footer-socials {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            background: var(--sage-green);
+            color: white;
+            border-color: var(--sage-green);
+        }
+
+        .footer-col-2,
+        .footer-col-3 {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-col-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .trust-item {
+            font-size: 13px;
+            color: var(--text-soft);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            font-size: 12px;
+            color: var(--text-soft);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--sage-green);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--card-border);
+            padding-top: 24px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-soft);
+        }
+
+        @media (max-width: 768px) {
+            footer {
+                padding: 48px 20px 32px;
+            }
+
+            .footer-top {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+        }
+
+        /* ========== ANIMATIONS & SCROLL REVEAL ========== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Responsive helpers */
+        @media (max-width: 480px) {
+            nav {
+                padding: 0 16px;
+                height: 64px;
+            }
+
+            .nav-left {
+                font-size: 16px;
+            }
+
+            .nav-right {
+                gap: 12px;
+            }
+
+            .btn-nav {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+
+            .hero {
+                padding: 40px 16px;
+                margin-top: 64px;
+            }
+
+            .hero-title {
+                font-size: 28px;
+            }
+
+            .stats-badge {
+                font-size: 12px;
+                padding: 12px 18px;
+            }
+
+            .testimonial-card {
+                padding: 16px;
+            }
+
+            .testimonial-text {
+                font-size: 14px;
+            }
+
+            .closing-cta-card {
+                padding: 24px;
+            }
+
+            .closing-headline {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-left">
+            🎁<span>Gifta</span>
+        </div>
+        <div class="nav-right">
+            <a href="#how" class="nav-link">How it works</a>
+            <a href="#trust" class="nav-link">Trust & safety</a>
+            <button class="btn-nav">Create a Free Dreamboard</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-grid">
+            <div class="hero-left">
+                <div>
+                    <h1 class="hero-title">One dream gift.<br><span class="hero-title-coral">Everyone chips in.</span></h1>
+                    <p class="hero-subtitle">Friends and family each give a little. Your child gets the gift they've been dreaming of.</p>
+                </div>
+
+                <div class="stats-badge">
+                    🎂 <strong>3,400+</strong> gifts funded this year
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-header">
+                        <div class="testimonial-avatar">💬</div>
+                        <div class="testimonial-content">
+                            <div class="testimonial-text" id="testimonialText">No more wandering toy aisles wondering if they already have it. Sophie got her telescope and the look on her face was everything.</div>
+                            <div class="testimonial-author" id="testimonialAuthor">Rachel K. · Mom of Sophie, 8</div>
+                        </div>
+                    </div>
+                    <div class="testimonial-dots">
+                        <div class="dot active" data-index="0"></div>
+                        <div class="dot" data-index="1"></div>
+                        <div class="dot" data-index="2"></div>
+                    </div>
+                </div>
+
+                <button class="btn-hero">Create Your Free Dreamboard</button>
+            </div>
+
+            <div class="hero-right">
+                <div class="dreamboard-card">
+                    <div class="dreamboard-header">
+                        <div class="dreamboard-photo">👧</div>
+                        <div class="dreamboard-title">
+                            <div class="dreamboard-name">Mia's Dreamboard</div>
+                            <div class="dreamboard-date">Turning 6 · March 28th</div>
+                        </div>
+                    </div>
+
+                    <div class="dreamboard-body">
+                        <div class="dream-gift-section">
+                            <div class="dream-gift-label">✨ Mia's One Big Wish</div>
+                            <div class="dream-gift-content">
+                                <div class="dream-gift-icon">🎀</div>
+                                <div class="dream-gift-text">
+                                    <h3>Ballet Starter Kit</h3>
+                                    <p>Shoes, tutu & dance bag</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="status-card">
+                            <div class="status-icon">🎁</div>
+                            <div class="status-content">
+                                <h4>Contributions are coming in!</h4>
+                                <p>18 days left to chip in</p>
+                            </div>
+                        </div>
+
+                        <div class="contributors-section">
+                            🎉 7 people have chipped in
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div class="contributor-circles">
+                                <div class="contributor-circle c1">C</div>
+                                <div class="contributor-circle c2">M</div>
+                                <div class="contributor-circle c3">N</div>
+                                <div class="contributor-circle c4">T</div>
+                                <div class="contributor-circle c5">J</div>
+                                <div class="contributor-circle c6">P</div>
+                                <div class="contributor-circle c7">K</div>
+                            </div>
+                            <div class="contributor-badge">+3 today!</div>
+                        </div>
+
+                        <button class="btn-chip-in">Chip in for Mia 💝</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how">
+        <div class="how-it-works-container">
+            <div>
+                <div class="section-eyebrow">HOW IT WORKS</div>
+                <h2 class="section-headline">Gifting, <em>together</em></h2>
+            </div>
+
+            <div class="steps-container">
+                <div class="step-card">
+                    <div class="step-header step-1">
+                        <div class="step-icon">🎁</div>
+                        <div>
+                            <div class="step-label">Step one</div>
+                            <div class="step-title">Create a Dreamboard</div>
+                        </div>
+                    </div>
+                    <div class="step-body">
+                        <p>Tell your child's story, add a photo, pick one dream gift, and share your bank details for payout. It takes less than a minute.</p>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-header step-2">
+                        <div class="step-icon">💬</div>
+                        <div>
+                            <div class="step-label">Step two</div>
+                            <div class="step-title">Share via WhatsApp</div>
+                        </div>
+                    </div>
+                    <div class="step-body">
+                        <p>Copy the link and send it to friends and family directly. They'll see exactly what the gift is and how to chip in — no app needed.</p>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-header step-3">
+                        <div class="step-icon">🏆</div>
+                        <div>
+                            <div class="step-label">Step three</div>
+                            <div class="step-title">Gift funded!</div>
+                        </div>
+                    </div>
+                    <div class="step-body">
+                        <p>Watch contributions roll in. Once your campaign closes, the money lands directly in your account. No delays, no fuss.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="social-proof">
+                <div class="social-proof-stat">2.4k+</div>
+                <div class="social-proof-text">Families across South Africa are already making gift-giving magic together</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Giving Back Section -->
+    <section class="giving-back">
+        <div class="giving-back-container">
+            <div>
+                <div class="section-eyebrow plum">GIVING BACK</div>
+                <h2 class="giving-back-headline">A birthday gift that gives twice.</h2>
+                <p class="giving-back-body">When you create a Dreamboard, you can choose to share a portion of every contribution with a South African charity. Your child gets their dream gift — and together, you make a little more magic for someone else.</p>
+            </div>
+
+            <div class="impact-card fade-in">
+                <div class="split-bar">
+                    <div class="split-gift"></div>
+                    <div class="split-charity"></div>
+                </div>
+
+                <div class="impact-summary">
+                    <div class="impact-line">
+                        <div class="impact-dot sage"></div>
+                        <strong>🎁 R85</strong> <span class="impact-amount">→ Mia's dream gift</span>
+                    </div>
+                    <div class="impact-line">
+                        <div class="impact-dot plum"></div>
+                        <strong>💜 R15</strong> <span class="impact-amount">→ Reach for a Dream</span>
+                    </div>
+                </div>
+
+                <div class="impact-footer">For every R100 contributed</div>
+            </div>
+
+            <div class="charity-badges">
+                <div class="charity-badge">
+                    <div class="charity-circle rf">RF</div>
+                    <div class="charity-name">Reach for a<br>Dream</div>
+                </div>
+                <div class="charity-badge">
+                    <div class="charity-circle ch">CH</div>
+                    <div class="charity-name">CHOC Childhood<br>Cancer</div>
+                </div>
+                <div class="charity-badge">
+                    <div class="charity-circle co">CO</div>
+                    <div class="charity-name">Cotlands</div>
+                </div>
+                <div class="charity-badge">
+                    <div class="charity-circle ll">LL</div>
+                    <div class="charity-name">Ladles of<br>Love</div>
+                </div>
+                <div class="charity-badge">
+                    <div class="charity-circle at">AT</div>
+                    <div class="charity-name">Afrika<br>Tikkun</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Closing CTA -->
+    <section class="closing-cta">
+        <div class="closing-cta-card">
+            <h2 class="closing-headline">Ready to make gift-giving magic?</h2>
+            <p class="closing-subtitle">It takes less than a minute. No app needed.</p>
+            <button class="btn-closing">Create Your Free Dreamboard</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="footer-col-1">
+                    <div class="footer-logo">🎁 Gifta</div>
+                    <div class="footer-tagline">Birthday gifting, simplified.</div>
+                    <div class="footer-socials">
+                        <a href="#" class="social-icon">📷</a>
+                        <a href="#" class="social-icon">f</a>
+                        <a href="#" class="social-icon">🔗</a>
+                        <a href="#" class="social-icon">🎵</a>
+                    </div>
+                </div>
+
+                <div class="footer-col-2">
+                    <div class="footer-col-title">Trust & Security</div>
+                    <div class="trust-item">🏦 Payouts via Karri Card</div>
+                    <div class="trust-item">🔒 Secure payments</div>
+                    <div class="trust-item">📱 Share via WhatsApp</div>
+                </div>
+
+                <div class="footer-col-3">
+                    <div class="footer-col-title">Links</div>
+                    <div class="footer-links">
+                        <a href="#" class="footer-link">Privacy Policy</a>
+                        <a href="#" class="footer-link">Terms of Service</a>
+                        <a href="#" class="footer-link">POPIA Notice</a>
+                        <a href="#" class="footer-link">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                © 2026 Gifta (Pty) Ltd. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Testimonial rotation
+        const testimonials = [
+            {
+                text: "No more wandering toy aisles wondering if they already have it. Sophie got her telescope and the look on her face was everything.",
+                author: "Rachel K. · Mom of Sophie, 8"
+            },
+            {
+                text: "My niece had been dropping hints about the gaming chair for months. Everyone chipped in and she was absolutely speechless on her birthday.",
+                author: "James T. · Uncle"
+            },
+            {
+                text: "Taking the guesswork out of gift-giving was a game-changer for us. It felt like the whole family was part of something special.",
+                author: "Amelia S. · Parent of twins"
+            }
+        ];
+
+        let currentTestimonial = 0;
+
+        function rotateTestimonial() {
+            const dots = document.querySelectorAll('.dot');
+            const nextIndex = (currentTestimonial + 1) % testimonials.length;
+
+            // Remove active class and add fade-out
+            dots[currentTestimonial].classList.remove('active');
+
+            // Update testimonial
+            document.getElementById('testimonialText').textContent = testimonials[nextIndex].text;
+            document.getElementById('testimonialAuthor').textContent = testimonials[nextIndex].author;
+
+            // Add active class to new dot
+            dots[nextIndex].classList.add('active');
+
+            currentTestimonial = nextIndex;
+        }
+
+        // Rotate testimonials every 5 seconds
+        setInterval(rotateTestimonial, 5000);
+
+        // Testimonial dot click handlers
+        document.querySelectorAll('.dot').forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                document.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
+                dot.classList.add('active');
+                currentTestimonial = index;
+                document.getElementById('testimonialText').textContent = testimonials[index].text;
+                document.getElementById('testimonialAuthor').textContent = testimonials[index].author;
+            });
+        });
+
+        // Scroll reveal animation for Giving Back section
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        const impactCard = document.querySelector('.impact-card');
+        if (impactCard) {
+            observer.observe(impactCard);
+        }
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href !== '#') {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                }
+            });
+        });
+
+        // Add fade-in animation to page elements on scroll
+        const elementsToAnimate = document.querySelectorAll('.step-card, .charity-badge');
+
+        const animationObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.animation = 'fadeInUp 0.6s ease-out forwards';
+                    animationObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        elementsToAnimate.forEach(el => {
+            el.style.opacity = '0';
+            animationObserver.observe(el);
+        });
+    </script>
+</body>
+</html>

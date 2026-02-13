@@ -104,3 +104,56 @@ export const socialLinks = [
     url: 'https://tiktok.com/@gifta_za',
   },
 ];
+
+export const givingBackMetrics = [
+  {
+    emoji: '💜',
+    value: 'R240,000+',
+    label: 'shared with charities',
+  },
+  {
+    emoji: '🤝',
+    value: '5',
+    sublabel: 'partner charities',
+    label: 'vetted & verified',
+  },
+  {
+    emoji: '🇿🇦',
+    value: '100%',
+    sublabel: 'South African',
+    label: 'supporting local causes',
+  },
+];
+
+export const givingBackCharities = [
+  {
+    initials: 'RF',
+    name: 'Reach for a Dream',
+    tag: 'Children with chronic illnesses',
+    color: '#7E6B9B', // plum
+  },
+  {
+    initials: 'CH',
+    name: 'CHOC Childhood Cancer',
+    tag: 'Cancer research & support',
+    color: '#C49A5C', // amber
+  },
+  {
+    initials: 'CO',
+    name: 'Cotlands',
+    tag: 'Early childhood development',
+    color: '#4A7E66', // sage
+  },
+  {
+    initials: 'LL',
+    name: 'Ladles of Love',
+    tag: 'Feeding the hungry daily',
+    color: '#D97706', // orange/warning
+  },
+  {
+    initials: 'AT',
+    name: 'Afrika Tikkun',
+    tag: 'Youth development & education',
+    color: '#2563EB', // blue
+  },
+];

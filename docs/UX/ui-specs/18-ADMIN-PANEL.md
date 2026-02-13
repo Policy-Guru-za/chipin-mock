@@ -904,136 +904,25 @@ Manage registered charities and their settings.
 
 ### Add/Edit Charity Form
 
-```typescript
-interface AddCharityFormProps {
-  charity?: Charity;
-  onClose: () => void;
-  onSuccess: () => void;
-}
+Runtime behavior (v2 as implemented):
 
-export function AddCharityForm({ charity, onClose, onSuccess }: AddCharityFormProps) {
-  const form = useForm<CharityFormData>({
-    defaultValues: charity ? {
-      name: charity.name,
-      description: charity.description,
-      category: charity.category,
-      website: charity.website,
-      logo_url: charity.logo_url,
-      bank_account: charity.bank_account,
-      contact_name: charity.contact_name,
-      contact_email: charity.contact_email,
-    } : {},
-  });
-
-  return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>
-            {charity ? 'Edit Charity' : 'Add New Charity'}
-          </DialogTitle>
-        </DialogHeader>
-
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <!-- Name -->
-          <FormGroup>
-            <Label htmlFor="name">Charity Name</Label>
-            <Input
-              id="name"
-              {...form.register('name', { required: 'Name is required' })}
-            />
-            {form.formState.errors.name && (
-              <ErrorMessage>{form.formState.errors.name.message}</ErrorMessage>
-            )}
-          </FormGroup>
-
-          <!-- Description -->
-          <FormGroup>
-            <Label htmlFor="description">Description</Label>
-            <textarea
-              id="description"
-              {...form.register('description')}
-              className="w-full min-h-24 p-3 border border-border rounded-lg"
-            />
-          </FormGroup>
-
-          <!-- Category -->
-          <FormGroup>
-            <Label htmlFor="category">Category</Label>
-            <Select {...form.register('category')}>
-              <option>Education</option>
-              <option>Health</option>
-              <option>Environment</option>
-              <option>Community</option>
-              <option>Other</option>
-            </Select>
-          </FormGroup>
-
-          <!-- Website -->
-          <FormGroup>
-            <Label htmlFor="website">Website</Label>
-            <Input
-              id="website"
-              type="url"
-              {...form.register('website')}
-              placeholder="https://example.com"
-            />
-          </FormGroup>
-
-          <!-- Logo URL -->
-          <FormGroup>
-            <Label htmlFor="logo">Logo URL</Label>
-            <Input
-              id="logo"
-              type="url"
-              {...form.register('logo_url')}
-            />
-          </FormGroup>
-
-          <!-- Bank Details -->
-          <FormGroup>
-            <Label htmlFor="bankAccount">Bank Account Details</Label>
-            <textarea
-              id="bankAccount"
-              {...form.register('bank_account')}
-              className="w-full min-h-20 p-3 border border-border rounded-lg"
-              placeholder="Account name, number, branch, etc."
-            />
-          </FormGroup>
-
-          <!-- Contact Info -->
-          <div className="grid grid-cols-2 gap-4">
-            <FormGroup>
-              <Label htmlFor="contactName">Contact Name</Label>
-              <Input
-                id="contactName"
-                {...form.register('contact_name')}
-              />
-            </FormGroup>
-            <FormGroup>
-              <Label htmlFor="contactEmail">Contact Email</Label>
-              <Input
-                id="contactEmail"
-                type="email"
-                {...form.register('contact_email')}
-              />
-            </FormGroup>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button variant="primary" type="submit">
-              {charity ? 'Save Changes' : 'Add Charity'}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-}
-```
+- Add mode (`Add charity`) captures only public-facing required fields:
+  - `name`
+  - `description`
+  - `category`
+  - `logo URL`
+- Add mode also supports optional `Autofill from URL`:
+  - Admin enters a charity website URL.
+  - Server fetches metadata/text, calls Claude, and returns a draft.
+  - Form is prefilled for review.
+  - No record is auto-created from URL ingest.
+- Edit mode keeps full metadata editing and exposes optional operational fields:
+  - `website`
+  - `contact name`
+  - `contact email`
+  - `bank account details (JSON)`
+- Bank JSON is optional at create time and optional at edit time.
+- Contact fields are nullable in admin datasets and can render as `—` when absent.
 
 ---
 

@@ -1,7 +1,7 @@
 # Gifta Canonical Spec (Source of Truth)
 
-> **Version:** 2.0.1
-> **Last Updated:** February 11, 2026
+> **Version:** 2.0.2
+> **Last Updated:** February 13, 2026
 > **Status:** Authoritative
 > **Supersedes:** v1.1.1 (January 21, 2026)
 
@@ -19,6 +19,7 @@ This document reflects current runtime behavior in `src/` and `drizzle/migration
 
 | Version | Date | Summary |
 |---------|------|---------|
+| 2.0.2 | 2026-02-13 | Charity onboarding simplification: create flow requires public-facing fields only (`name`, `description`, `category`, `logo_url`); operational fields (`website`, contacts, bank JSON) are optional and editable later. Added admin URL draft-autofill policy and clarified charity monthly settlement as manual reconciliation over close-created payout ledger rows. |
 | 2.0.1 | 2026-02-11 | Runtime alignment pass: corrected goal/net semantics, close-path ownership, payout automation scope, reminder schema/dispatch details, and UI rollout status. |
 | 2.0.0 | 2026-02-07 | Major update for UX v2: multi-payout (Karri + bank), charity domain, 5-step host flow, fee semantics clarification, new data model fields, payout engine architecture, reminder system. Aligned with Decision Register D-001 through D-010. |
 | 1.1.1 | 2026-01-21 | Previous baseline (Karri-only, no charity, 4-step host flow). |
@@ -62,8 +63,10 @@ This document reflects current runtime behavior in `src/` and `drizzle/migration
 - **Split modes** (Decision Register D-003, LOCKED):
   - `percentage`: a percentage (5%–50%, stored as basis points 500–5000 in `charity_percentage_bps`) of each contribution is allocated to charity.
   - `threshold`: a fixed total amount (minimum R50, stored in `charity_threshold_cents`) is allocated to charity; once the threshold is met, subsequent contributions go entirely to the gift.
-- **Charity entity:** managed by admin; must be `is_active = true` to be selectable. Fields: name, description, category, logo, website, encrypted bank details, contact info.
-- **Charity payout cadence:** monthly batch with per-charity reconciliation report (Decision Register D-008, LOCKED).
+- **Charity entity:** managed by admin; must be `is_active = true` to be selectable.
+  - Create-time required fields: `name`, `description`, `category`, `logo_url`.
+  - Optional operational fields (editable later): `website`, `contact_name`, `contact_email`, `bank_details_encrypted`.
+- **Charity payout cadence:** close-based charity payout rows remain the accounting source; monthly settlement is a manual ops reconciliation/disbursement process over that ledger (Decision Register D-008, LOCKED).
 - **Validation:** incomplete charity configuration is rejected at both API and database constraint levels.
 - **Runtime gate:** partner API charity writes are blocked unless `UX_V2_ENABLE_CHARITY_WRITE_PATH=true`.
 
@@ -206,8 +209,8 @@ Timestamps:
 ### charities
 
 - `id` (UUID, PK), `name` (unique), `description`, `category`, `logo_url`, `website` (nullable)
-- `bank_details_encrypted` (JSONB, not null)
-- `contact_name`, `contact_email`
+- `bank_details_encrypted` (JSONB, nullable)
+- `contact_name` (nullable), `contact_email` (nullable)
 - `is_active` (boolean, default true)
 - `created_at`, `updated_at`
 

@@ -256,6 +256,10 @@ a:focus-visible {
   animation: landing-progress-shine 2s ease-in-out infinite;
 }
 
+/* Giving Back section: scrollbar-hide utility */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
+
 /* How It Works decorative elements */
 .hiw-card-circle {
   position: absolute;

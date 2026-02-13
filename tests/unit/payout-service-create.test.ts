@@ -383,6 +383,78 @@ describe('payout service creation', () => {
     );
   });
 
+  it('creates charity payout rows when charity bank details are missing', async () => {
+    payoutQueryMocks.getDreamBoardPayoutContext.mockResolvedValue({
+      id: 'board-4b',
+      partnerId: 'partner-1',
+      status: 'closed',
+      payoutMethod: 'karri_card',
+      giftName: 'Lego',
+      giftImageUrl: 'https://images.example/lego.jpg',
+      giftImagePrompt: 'A large lego set',
+      payoutEmail: 'host@chipin.co.za',
+      karriCardNumber: 'encrypted-card',
+      karriCardHolderName: 'Host Parent',
+      charityEnabled: true,
+      charityId: 'charity-1',
+      charitySplitType: 'percentage',
+      charityPercentageBps: 1000,
+      charityThresholdCents: null,
+      charityName: 'Save The Ocean',
+      charityBankDetailsEncrypted: null,
+      hostWhatsAppNumber: '+27821234567',
+      childName: 'Aria',
+      hostEmail: 'host@chipin.co.za',
+      hostId: 'host-4b',
+    });
+    payoutQueryMocks.getContributionTotalsForDreamBoard.mockResolvedValue({
+      raisedCents: 20000,
+      platformFeeCents: 800,
+      charityCents: 3000,
+    });
+    payoutQueryMocks.listPayoutsForDreamBoard.mockResolvedValue([]);
+
+    const insertedPayouts: Array<Record<string, unknown>> = [];
+    const insert = vi.fn((table: unknown) => {
+      if (table === payouts) {
+        return {
+          values: vi.fn((values: Record<string, unknown>) => {
+            insertedPayouts.push(values);
+            return {
+              onConflictDoNothing: vi.fn(() => ({
+                returning: vi.fn(async () => [
+                  {
+                    id: `payout-${insertedPayouts.length}`,
+                    type: values.type,
+                  },
+                ]),
+              })),
+            };
+          }),
+        };
+      }
+      if (table === payoutItems) {
+        return { values: vi.fn(async () => undefined) };
+      }
+      return { values: vi.fn(async () => undefined) };
+    });
+
+    dbMock.transaction.mockImplementation(async (callback: any) => callback({ insert }));
+
+    const result = await createPayoutsForDreamBoard({
+      dreamBoardId: 'board-4b',
+      actor: { type: 'admin' },
+    });
+
+    expect(result.created.map((item) => item.type).sort()).toEqual(['charity', 'karri_card']);
+    const charityPayout = insertedPayouts.find((row) => row.type === 'charity');
+    expect(charityPayout).toBeDefined();
+    const recipientData = (charityPayout?.recipientData ?? {}) as Record<string, unknown>;
+    expect(recipientData.charityId).toBe('charity-1');
+    expect(recipientData.charityName).toBe('Save The Ocean');
+    expect(recipientData.bankDetailsEncrypted).toBeUndefined();
+  });
+
   it('skips all payouts when platform fees consume all raised cents', async () => {
     payoutQueryMocks.getDreamBoardPayoutContext.mockResolvedValue({
       id: 'board-5',

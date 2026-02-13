@@ -15,14 +15,14 @@ Required fields:
 - `description`
 - `category`
 - `logo_url`
-- `bank_details_encrypted`
-- `contact_name`
-- `contact_email`
 - `is_active`
 
 Optional:
 
 - `website`
+- `bank_details_encrypted`
+- `contact_name`
+- `contact_email`
 
 ### Dreamboard Charity Config
 
@@ -63,7 +63,8 @@ Optional:
 Required operations:
 
 - list charities with filters (active/category)
-- create charity
+- create charity with minimal public fields (`name`, `description`, `category`, `logo_url`)
+- generate URL draft (AI-assisted, draft-only, admin-reviewed)
 - update charity metadata
 - activate/deactivate charity
 - view donation and payout history
@@ -74,6 +75,7 @@ Required operations:
 - pending charity payout totals
 - completed charity payouts with references
 - downloadable report dataset for reconciliation
+- monthly settlement remains manual, reconciled from close-created charity payout ledger rows
 
 ## B4 Service DTOs
 
@@ -108,7 +110,7 @@ Required operations:
 
 ## Security Requirements
 
-- charity bank details stored encrypted
+- charity bank details stored when provided; field is optional
 - no plaintext bank details in logs
 - API responses expose masked/minimal recipient details only
 

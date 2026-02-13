@@ -32,9 +32,9 @@ export type CreateCharityInput = {
   category: string;
   logoUrl: string;
   website?: string | null;
-  bankDetailsEncrypted: Record<string, unknown>;
-  contactName: string;
-  contactEmail: string;
+  bankDetailsEncrypted?: Record<string, unknown> | null;
+  contactName?: string | null;
+  contactEmail?: string | null;
   isActive?: boolean;
 };
 
@@ -44,9 +44,9 @@ export type UpdateCharityInput = Partial<{
   category: string;
   logoUrl: string;
   website: string | null;
-  bankDetailsEncrypted: Record<string, unknown>;
-  contactName: string;
-  contactEmail: string;
+  bankDetailsEncrypted: Record<string, unknown> | null;
+  contactName: string | null;
+  contactEmail: string | null;
 }>;
 
 const charitySelect = {
@@ -141,9 +141,9 @@ export const createCharity = async (input: CreateCharityInput): Promise<CharityR
       category: input.category,
       logoUrl: input.logoUrl,
       website: input.website ?? null,
-      bankDetailsEncrypted: input.bankDetailsEncrypted,
-      contactName: input.contactName,
-      contactEmail: input.contactEmail,
+      bankDetailsEncrypted: input.bankDetailsEncrypted ?? null,
+      contactName: input.contactName ?? null,
+      contactEmail: input.contactEmail ?? null,
       isActive: input.isActive ?? true,
     })
     .returning(charitySelect);
@@ -159,10 +159,10 @@ export const updateCharity = async (params: {
   id: string;
   input: UpdateCharityInput;
 }): Promise<CharityRecord | null> => {
-  const updates: Partial<typeof charities.$inferInsert> = {
-    ...params.input,
-    updatedAt: new Date(),
-  };
+  const updates = Object.fromEntries(
+    Object.entries(params.input).filter(([, value]) => value !== undefined)
+  ) as Partial<typeof charities.$inferInsert>;
+  updates.updatedAt = new Date();
 
   const [updated] = await db
     .update(charities)

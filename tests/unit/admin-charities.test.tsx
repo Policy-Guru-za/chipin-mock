@@ -9,6 +9,7 @@ import '@testing-library/jest-dom/vitest';
 const mocks = vi.hoisted(() => ({
   refresh: vi.fn(),
   createCharityAction: vi.fn(),
+  generateCharityDraftFromUrlAction: vi.fn(),
   updateCharityAction: vi.fn(),
   toggleCharityStatusAction: vi.fn(),
 }));
@@ -21,6 +22,7 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/app/(admin)/admin/charities/actions', () => ({
   createCharityAction: mocks.createCharityAction,
+  generateCharityDraftFromUrlAction: mocks.generateCharityDraftFromUrlAction,
   updateCharityAction: mocks.updateCharityAction,
   toggleCharityStatusAction: mocks.toggleCharityStatusAction,
 }));
@@ -63,6 +65,7 @@ describe('admin charities ui', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.createCharityAction.mockResolvedValue({ success: true });
+    mocks.generateCharityDraftFromUrlAction.mockResolvedValue({ success: true, draft: undefined });
     mocks.updateCharityAction.mockResolvedValue({ success: true });
     mocks.toggleCharityStatusAction.mockResolvedValue({ success: true });
   });
@@ -88,8 +91,26 @@ describe('admin charities ui', () => {
     expect(bankInput).toHaveValue('');
     expect(bankInput).toHaveAttribute('placeholder', '••• encrypted •••');
     expect(
-      screen.getByText('Leave blank to keep existing encrypted details. Enter JSON only when changing bank details.'),
+      screen.getByText('Leave blank to keep existing details. Enter JSON only when changing bank details.'),
     ).toBeInTheDocument();
+  });
+
+  it('hides operational fields in add mode', () => {
+    render(
+      <CharityFormModal
+        isOpen
+        title="Add charity"
+        submitLabel="Create charity"
+        onClose={() => undefined}
+        onSubmit={async () => ({ success: true })}
+        onSuccess={() => undefined}
+      />,
+    );
+
+    expect(screen.queryByLabelText('Website')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Contact name')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Contact email')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Bank account details (JSON)')).not.toBeInTheDocument();
   });
 
   it('traps focus within the charity modal', () => {
@@ -134,6 +155,33 @@ describe('admin charities ui', () => {
     expect(formData.get('bankDetailsEncrypted')).toBeNull();
   });
 
+  it('submits add mode without operational fields', async () => {
+    const onSubmit = vi.fn(async () => ({ success: false, error: 'mock' }));
+
+    render(
+      <CharityFormModal
+        isOpen
+        title="Add charity"
+        submitLabel="Create charity"
+        onClose={() => undefined}
+        onSubmit={onSubmit}
+        onSuccess={() => undefined}
+      />,
+    );
+
+    await userEvent.type(screen.getByLabelText('Charity name'), 'Tree Trust');
+    await userEvent.type(screen.getByLabelText('Description'), 'Community tree restoration support.');
+    await userEvent.type(screen.getByLabelText('Logo URL'), 'https://example.com/logo.png');
+    await userEvent.click(screen.getByRole('button', { name: /create charity/i }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+    const formData = onSubmit.mock.calls[0][0] as FormData;
+    expect(formData.get('website')).toBeNull();
+    expect(formData.get('contactName')).toBeNull();
+    expect(formData.get('contactEmail')).toBeNull();
+    expect(formData.get('bankDetailsEncrypted')).toBeNull();
+  });
+
   it('submits edit action from charities client and refreshes admin view', async () => {
     render(
       <CharitiesClient
@@ -156,5 +204,24 @@ describe('admin charities ui', () => {
     const formData = mocks.updateCharityAction.mock.calls[0][1] as FormData;
     expect(formData.get('bankDetailsEncrypted')).toBeNull();
     expect(mocks.refresh).toHaveBeenCalled();
+  });
+
+  it('renders contact fallback when charity contact details are missing', () => {
+    render(
+      <CharitiesClient
+        charities={[
+          {
+            ...baseCharityDataset,
+            contactName: null,
+            contactEmail: null,
+          },
+        ]}
+        totalCount={1}
+        nextCursor={null}
+        currentPage={1}
+      />,
+    );
+
+    expect(screen.getAllByText('—').length).toBeGreaterThanOrEqual(2);
   });
 });

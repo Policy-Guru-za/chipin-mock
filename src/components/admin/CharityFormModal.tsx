@@ -19,6 +19,11 @@ export interface CharityFormSeed {
   bankDetailsEncrypted: string;
 }
 
+export type CharityUrlDraft = Partial<Pick<
+  CharityFormSeed,
+  'name' | 'description' | 'category' | 'logoUrl' | 'website' | 'contactName' | 'contactEmail'
+>>;
+
 interface CharityFormModalProps {
   charity?: CharityFormSeed | null;
   isOpen: boolean;
@@ -26,6 +31,11 @@ interface CharityFormModalProps {
   submitLabel: string;
   onClose: () => void;
   onSubmit: (formData: FormData) => Promise<{ success: boolean; error?: string }>;
+  onGenerateFromUrl?: (url: string) => Promise<{
+    success: boolean;
+    error?: string;
+    draft?: CharityUrlDraft;
+  }>;
   onSuccess: () => void;
 }
 
@@ -50,6 +60,7 @@ export function CharityFormModal({
   submitLabel,
   onClose,
   onSubmit,
+  onGenerateFromUrl,
   onSuccess,
 }: CharityFormModalProps) {
   const modalRef = useRef<HTMLDivElement | null>(null);
@@ -58,6 +69,9 @@ export function CharityFormModal({
   const [values, setValues] = useState<CharityFormSeed>(initial);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [urlInput, setUrlInput] = useState('');
+  const [urlGenerating, setUrlGenerating] = useState(false);
+  const [urlError, setUrlError] = useState<string | null>(null);
   const firstFieldRef = useRef<HTMLInputElement | null>(null);
   const restoreFocusRef = useRef<HTMLElement | null>(null);
   const handleCloseRef = useRef<() => void>(() => undefined);
@@ -67,6 +81,8 @@ export function CharityFormModal({
     restoreFocusRef.current = document.activeElement as HTMLElement | null;
     setValues(initial);
     setError(null);
+    setUrlInput('');
+    setUrlError(null);
     const timeout = setTimeout(() => firstFieldRef.current?.focus(), 0);
     return () => clearTimeout(timeout);
   }, [initial, isOpen]);
@@ -128,11 +144,13 @@ export function CharityFormModal({
     formData.set('description', values.description);
     formData.set('category', values.category);
     formData.set('logoUrl', values.logoUrl);
-    formData.set('website', values.website);
-    formData.set('contactName', values.contactName);
-    formData.set('contactEmail', values.contactEmail);
-    if (values.bankDetailsEncrypted.trim().length > 0) {
-      formData.set('bankDetailsEncrypted', values.bankDetailsEncrypted);
+    if (isEditMode) {
+      formData.set('website', values.website);
+      formData.set('contactName', values.contactName);
+      formData.set('contactEmail', values.contactEmail);
+      if (values.bankDetailsEncrypted.trim().length > 0) {
+        formData.set('bankDetailsEncrypted', values.bankDetailsEncrypted);
+      }
     }
 
     try {
@@ -146,6 +164,42 @@ export function CharityFormModal({
       setError('Could not save charity.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleGenerateFromUrl = async () => {
+    if (!onGenerateFromUrl || urlGenerating) return;
+    setUrlGenerating(true);
+    setUrlError(null);
+    setError(null);
+
+    try {
+      const result = await onGenerateFromUrl(urlInput);
+      if (!result.success) {
+        setUrlError(result.error ?? 'Could not generate charity draft from URL.');
+        return;
+      }
+
+      if (!result.draft) {
+        setUrlError('No draft data was returned for this URL.');
+        return;
+      }
+      const draft = result.draft;
+
+      setValues((current) => ({
+        ...current,
+        ...(draft.name ? { name: draft.name } : {}),
+        ...(draft.description ? { description: draft.description } : {}),
+        ...(draft.category ? { category: draft.category } : {}),
+        ...(draft.logoUrl ? { logoUrl: draft.logoUrl } : {}),
+        ...(draft.website ? { website: draft.website } : {}),
+        ...(draft.contactName ? { contactName: draft.contactName } : {}),
+        ...(draft.contactEmail ? { contactEmail: draft.contactEmail } : {}),
+      }));
+    } catch {
+      setUrlError('Could not generate charity draft from URL.');
+    } finally {
+      setUrlGenerating(false);
     }
   };
 
@@ -178,6 +232,37 @@ export function CharityFormModal({
         </div>
 
         <div className="space-y-4">
+          {!isEditMode ? (
+            <div className="rounded-xl border border-border bg-subtle/40 p-4">
+              <label htmlFor="charity-source-url" className="text-xs font-bold uppercase tracking-[0.12em] text-gray-500">
+                Charity website URL (optional AI draft)
+              </label>
+              <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+                <Input
+                  id="charity-source-url"
+                  type="url"
+                  value={urlInput}
+                  onChange={(event) => setUrlInput(event.target.value)}
+                  placeholder="https://example.org"
+                  className="sm:flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  loading={urlGenerating}
+                  onClick={() => void handleGenerateFromUrl()}
+                  disabled={!onGenerateFromUrl || urlInput.trim().length === 0}
+                >
+                  Autofill from URL
+                </Button>
+              </div>
+              {urlError ? <p role="alert" className="mt-2 text-xs text-red-600">{urlError}</p> : null}
+              <p className="mt-2 text-xs text-gray-500">
+                Draft only. Review and edit before saving.
+              </p>
+            </div>
+          ) : null}
+
           <div>
             <label htmlFor="charity-name" className="text-xs font-bold uppercase tracking-[0.12em] text-gray-500">
               Charity name
@@ -224,78 +309,81 @@ export function CharityFormModal({
             </select>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div>
-              <label htmlFor="charity-website" className="text-xs font-bold uppercase tracking-[0.12em] text-gray-500">
-                Website
-              </label>
-              <Input
-                id="charity-website"
-                type="url"
-                value={values.website}
-                onChange={(event) => handleChange('website', event.target.value)}
-                placeholder="https://example.org"
-                className="mt-2"
-              />
-            </div>
-            <div>
-              <label htmlFor="charity-logo" className="text-xs font-bold uppercase tracking-[0.12em] text-gray-500">
-                Logo URL
-              </label>
-              <Input
-                id="charity-logo"
-                type="url"
-                value={values.logoUrl}
-                onChange={(event) => handleChange('logoUrl', event.target.value)}
-                placeholder="https://..."
-                className="mt-2"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div>
-              <label htmlFor="charity-contact-name" className="text-xs font-bold uppercase tracking-[0.12em] text-gray-500">
-                Contact name
-              </label>
-              <Input
-                id="charity-contact-name"
-                value={values.contactName}
-                onChange={(event) => handleChange('contactName', event.target.value)}
-                className="mt-2"
-              />
-            </div>
-            <div>
-              <label htmlFor="charity-contact-email" className="text-xs font-bold uppercase tracking-[0.12em] text-gray-500">
-                Contact email
-              </label>
-              <Input
-                id="charity-contact-email"
-                type="email"
-                value={values.contactEmail}
-                onChange={(event) => handleChange('contactEmail', event.target.value)}
-                className="mt-2"
-              />
-            </div>
-          </div>
-
           <div>
-            <label htmlFor="charity-bank-details" className="text-xs font-bold uppercase tracking-[0.12em] text-gray-500">
-              Bank account details (JSON)
+            <label htmlFor="charity-logo" className="text-xs font-bold uppercase tracking-[0.12em] text-gray-500">
+              Logo URL
             </label>
-            <Textarea
-              id="charity-bank-details"
-              value={values.bankDetailsEncrypted}
-              onChange={(event) => handleChange('bankDetailsEncrypted', event.target.value)}
-              placeholder={isEditMode ? '••• encrypted •••' : '{"bankName":"...","accountNumber":"..."}'}
-              className="mt-2 min-h-[120px] font-mono text-xs"
+            <Input
+              id="charity-logo"
+              type="url"
+              value={values.logoUrl}
+              onChange={(event) => handleChange('logoUrl', event.target.value)}
+              placeholder="https://..."
+              className="mt-2"
             />
-            {isEditMode ? (
-              <p className="mt-1 text-xs text-gray-500">
-                Leave blank to keep existing encrypted details. Enter JSON only when changing bank details.
-              </p>
-            ) : null}
           </div>
+
+          {isEditMode ? (
+            <section className="space-y-4 rounded-xl border border-border bg-subtle/30 p-4">
+              <h3 className="text-sm font-semibold text-text">Operational details (optional)</h3>
+
+              <div>
+                <label htmlFor="charity-website" className="text-xs font-bold uppercase tracking-[0.12em] text-gray-500">
+                  Website
+                </label>
+                <Input
+                  id="charity-website"
+                  type="url"
+                  value={values.website}
+                  onChange={(event) => handleChange('website', event.target.value)}
+                  placeholder="https://example.org"
+                  className="mt-2"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label htmlFor="charity-contact-name" className="text-xs font-bold uppercase tracking-[0.12em] text-gray-500">
+                    Contact name
+                  </label>
+                  <Input
+                    id="charity-contact-name"
+                    value={values.contactName}
+                    onChange={(event) => handleChange('contactName', event.target.value)}
+                    className="mt-2"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="charity-contact-email" className="text-xs font-bold uppercase tracking-[0.12em] text-gray-500">
+                    Contact email
+                  </label>
+                  <Input
+                    id="charity-contact-email"
+                    type="email"
+                    value={values.contactEmail}
+                    onChange={(event) => handleChange('contactEmail', event.target.value)}
+                    className="mt-2"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="charity-bank-details" className="text-xs font-bold uppercase tracking-[0.12em] text-gray-500">
+                  Bank account details (JSON)
+                </label>
+                <Textarea
+                  id="charity-bank-details"
+                  value={values.bankDetailsEncrypted}
+                  onChange={(event) => handleChange('bankDetailsEncrypted', event.target.value)}
+                  placeholder="••• encrypted •••"
+                  className="mt-2 min-h-[120px] font-mono text-xs"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Leave blank to keep existing details. Enter JSON only when changing bank details.
+                </p>
+              </div>
+            </section>
+          ) : null}
 
           {error ? <p role="alert" className="text-sm text-red-600">{error}</p> : null}
 

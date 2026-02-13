@@ -5,5 +5,6 @@ export { LandingStatsLine } from './LandingStatsLine';
 export { LandingTestimonial } from './LandingTestimonial';
 export { LandingCTA } from './LandingCTA';
 export { LandingHowItWorks } from './LandingHowItWorks';
+export { LandingGivingBack } from './LandingGivingBack';
 export { LandingFooter } from './LandingFooter';
 export { LandingPage } from './LandingPage';

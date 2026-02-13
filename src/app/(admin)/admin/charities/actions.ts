@@ -4,24 +4,28 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import { requireAdminAuth } from '@/lib/auth/clerk-wrappers';
+import {
+  CharityDraftGenerationError,
+  generateCharityDraftWithClaude,
+} from '@/lib/charities/claude';
 import { createCharity, setCharityActiveState, updateCharity } from '@/lib/charities/service';
+import { maybeMirrorCharityLogoToBlob } from '@/lib/charities/logo';
+import { CharityUrlIngestError, ingestCharityWebsite } from '@/lib/charities/url-ingest';
 
-const charityBaseSchema = z.object({
+const categories = ['Education', 'Health', 'Environment', 'Community', 'Other'] as const;
+
+const createCharitySchema = z.object({
   name: z.string().trim().min(2).max(120),
   description: z.string().trim().min(2),
-  category: z.string().trim().min(2).max(80),
+  category: z.enum(categories),
   logoUrl: z.string().trim().url(),
-  website: z.string().trim().url().optional().or(z.literal('')),
-  contactName: z.string().trim().min(2).max(120),
-  contactEmail: z.string().trim().email().max(255),
 });
 
-const createCharitySchema = charityBaseSchema.extend({
-  bankDetailsEncrypted: z.string().trim().min(2),
-});
-
-const updateCharitySchema = charityBaseSchema.extend({
-  bankDetailsEncrypted: z.string().trim().optional().or(z.literal('')),
+const updateCharitySchema = createCharitySchema.extend({
+  website: z.string().trim().url().or(z.literal('')),
+  contactName: z.string().trim().min(2).max(120).or(z.literal('')),
+  contactEmail: z.string().trim().email().max(255).or(z.literal('')),
+  bankDetailsEncrypted: z.string().trim(),
 });
 
 const parseBankDetails = (value: string) => {
@@ -60,32 +64,80 @@ const toActionError = (error: unknown, fallback: string) => {
   return fallback;
 };
 
-const toBasePayload = (formData: FormData) => ({
-    name: formData.get('name'),
-    description: formData.get('description'),
-    category: formData.get('category'),
-    logoUrl: formData.get('logoUrl'),
-    website: formData.get('website'),
-    contactName: formData.get('contactName'),
-    contactEmail: formData.get('contactEmail'),
-  });
+const getTrimmedField = (formData: FormData, key: string) => {
+  const value = formData.get(key);
+  return typeof value === 'string' ? value.trim() : '';
+};
+
+const toCreatePayload = (formData: FormData) => ({
+  name: getTrimmedField(formData, 'name'),
+  description: getTrimmedField(formData, 'description'),
+  category: getTrimmedField(formData, 'category'),
+  logoUrl: getTrimmedField(formData, 'logoUrl'),
+});
+
+const toUpdatePayload = (formData: FormData) => ({
+  ...toCreatePayload(formData),
+  website: getTrimmedField(formData, 'website'),
+  contactName: getTrimmedField(formData, 'contactName'),
+  contactEmail: getTrimmedField(formData, 'contactEmail'),
+  bankDetailsEncrypted: getTrimmedField(formData, 'bankDetailsEncrypted'),
+});
+
+const toDraftActionError = (error: unknown) => {
+  if (error instanceof CharityUrlIngestError) {
+    switch (error.code) {
+      case 'invalid_url':
+      case 'invalid_protocol':
+        return 'Please enter a valid HTTPS charity website URL.';
+      case 'forbidden_host':
+        return 'That URL host is not allowed for security reasons.';
+      case 'unsupported_content_type':
+        return 'URL must point to a standard website page (HTML).';
+      case 'content_too_large':
+        return 'That page is too large to analyze. Try a simpler page URL.';
+      default:
+        return 'Could not fetch the charity website for draft generation.';
+    }
+  }
+
+  if (error instanceof CharityDraftGenerationError) {
+    if (error.code === 'missing_api_key') {
+      return 'ANTHROPIC_API_KEY is not configured for this deployment.';
+    }
+
+    if (error.code === 'invalid_output') {
+      return 'The AI draft response was malformed. Please try again or fill fields manually.';
+    }
+
+    return 'AI draft generation failed. Please try again.';
+  }
+
+  return 'Could not generate a charity draft from that URL.';
+};
+
+export type GenerateCharityDraftFromUrlResult = {
+  success: boolean;
+  error?: string;
+  draft?: {
+    name: string;
+    description: string;
+    category: (typeof categories)[number];
+    logoUrl: string;
+    website: string;
+    contactName: string;
+    contactEmail: string;
+  };
+};
 
 export async function createCharityAction(
   formData: FormData
 ): Promise<{ success: boolean; error?: string }> {
   await requireAdminAuth();
 
-  const parsed = createCharitySchema.safeParse({
-    ...toBasePayload(formData),
-    bankDetailsEncrypted: formData.get('bankDetailsEncrypted'),
-  });
+  const parsed = createCharitySchema.safeParse(toCreatePayload(formData));
   if (!parsed.success) {
     return { success: false, error: 'Please complete all required charity fields.' };
-  }
-
-  const bankDetailsEncrypted = parseBankDetails(parsed.data.bankDetailsEncrypted);
-  if (!bankDetailsEncrypted) {
-    return { success: false, error: 'Bank details must be valid JSON.' };
   }
 
   try {
@@ -94,10 +146,6 @@ export async function createCharityAction(
       description: parsed.data.description,
       category: parsed.data.category,
       logoUrl: parsed.data.logoUrl,
-      website: parsed.data.website || null,
-      bankDetailsEncrypted,
-      contactName: parsed.data.contactName,
-      contactEmail: parsed.data.contactEmail,
     });
   } catch (error) {
     return { success: false, error: toActionError(error, 'Could not create charity.') };
@@ -118,17 +166,14 @@ export async function updateCharityAction(
     return { success: false, error: 'Invalid charity id.' };
   }
 
-  const parsed = updateCharitySchema.safeParse({
-    ...toBasePayload(formData),
-    bankDetailsEncrypted: formData.get('bankDetailsEncrypted') ?? undefined,
-  });
+  const parsed = updateCharitySchema.safeParse(toUpdatePayload(formData));
   if (!parsed.success) {
     return { success: false, error: 'Please complete all required charity fields.' };
   }
 
-  const hasBankDetailsUpdate = Boolean(parsed.data.bankDetailsEncrypted?.trim());
+  const hasBankDetailsUpdate = parsed.data.bankDetailsEncrypted.length > 0;
   const bankDetailsEncrypted = hasBankDetailsUpdate
-    ? parseBankDetails(parsed.data.bankDetailsEncrypted ?? '')
+    ? parseBankDetails(parsed.data.bankDetailsEncrypted)
     : null;
   if (hasBankDetailsUpdate && !bankDetailsEncrypted) {
     return { success: false, error: 'Bank details must be valid JSON.' };
@@ -143,9 +188,9 @@ export async function updateCharityAction(
         category: parsed.data.category,
         logoUrl: parsed.data.logoUrl,
         website: parsed.data.website || null,
+        contactName: parsed.data.contactName || null,
+        contactEmail: parsed.data.contactEmail || null,
         ...(bankDetailsEncrypted ? { bankDetailsEncrypted } : {}),
-        contactName: parsed.data.contactName,
-        contactEmail: parsed.data.contactEmail,
       },
     });
 
@@ -194,4 +239,39 @@ export async function toggleCharityStatusAction(
 
   revalidatePath('/admin/charities');
   return { success: true };
+}
+
+export async function generateCharityDraftFromUrlAction(
+  rawUrl: string
+): Promise<GenerateCharityDraftFromUrlResult> {
+  await requireAdminAuth();
+
+  const parsedUrl = z.string().trim().url().safeParse(rawUrl);
+  if (!parsedUrl.success) {
+    return { success: false, error: 'Please enter a valid HTTPS charity website URL.' };
+  }
+
+  try {
+    const page = await ingestCharityWebsite(parsedUrl.data);
+    const aiDraft = await generateCharityDraftWithClaude(page);
+    const mirroredLogoUrl = await maybeMirrorCharityLogoToBlob({
+      logoUrl: aiDraft.logoUrl,
+      charityName: aiDraft.name,
+    });
+
+    return {
+      success: true,
+      draft: {
+        name: aiDraft.name,
+        description: aiDraft.description,
+        category: aiDraft.category,
+        logoUrl: mirroredLogoUrl ?? '',
+        website: aiDraft.website ?? '',
+        contactName: aiDraft.contactName ?? '',
+        contactEmail: aiDraft.contactEmail ?? '',
+      },
+    };
+  } catch (error) {
+    return { success: false, error: toDraftActionError(error) };
+  }
 }
