@@ -34,6 +34,7 @@ interface CharityFormModalProps {
   onGenerateFromUrl?: (url: string) => Promise<{
     success: boolean;
     error?: string;
+    warnings?: Array<{ code: string; message: string }>;
     draft?: CharityUrlDraft;
   }>;
   onSuccess: () => void;
@@ -72,6 +73,7 @@ export function CharityFormModal({
   const [urlInput, setUrlInput] = useState('');
   const [urlGenerating, setUrlGenerating] = useState(false);
   const [urlError, setUrlError] = useState<string | null>(null);
+  const [urlWarnings, setUrlWarnings] = useState<Array<{ code: string; message: string }>>([]);
   const firstFieldRef = useRef<HTMLInputElement | null>(null);
   const restoreFocusRef = useRef<HTMLElement | null>(null);
   const handleCloseRef = useRef<() => void>(() => undefined);
@@ -83,6 +85,7 @@ export function CharityFormModal({
     setError(null);
     setUrlInput('');
     setUrlError(null);
+    setUrlWarnings([]);
     const timeout = setTimeout(() => firstFieldRef.current?.focus(), 0);
     return () => clearTimeout(timeout);
   }, [initial, isOpen]);
@@ -171,6 +174,7 @@ export function CharityFormModal({
     if (!onGenerateFromUrl || urlGenerating) return;
     setUrlGenerating(true);
     setUrlError(null);
+    setUrlWarnings([]);
     setError(null);
 
     try {
@@ -179,6 +183,7 @@ export function CharityFormModal({
         setUrlError(result.error ?? 'Could not generate charity draft from URL.');
         return;
       }
+      setUrlWarnings(result.warnings ?? []);
 
       if (!result.draft) {
         setUrlError('No draft data was returned for this URL.');
@@ -257,6 +262,15 @@ export function CharityFormModal({
                 </Button>
               </div>
               {urlError ? <p role="alert" className="mt-2 text-xs text-red-600">{urlError}</p> : null}
+              {urlWarnings.length > 0 ? (
+                <div className="mt-2 space-y-1">
+                  {urlWarnings.map((warning) => (
+                    <p key={warning.code} className="text-xs text-amber-700">
+                      {warning.message}
+                    </p>
+                  ))}
+                </div>
+              ) : null}
               <p className="mt-2 text-xs text-gray-500">
                 Draft only. Review and edit before saving.
               </p>

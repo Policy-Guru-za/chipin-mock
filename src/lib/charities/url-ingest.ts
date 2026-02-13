@@ -3,7 +3,7 @@ import { isIP } from 'node:net';
 
 const FETCH_TIMEOUT_MS = 10_000;
 const MAX_REDIRECTS = 4;
-const MAX_HTML_BYTES = 800_000;
+const MAX_HTML_BYTES = 2_000_000;
 
 const CHARITY_USER_AGENT = 'GiftaCharityIngest/1.0 (+https://gifta.co.za)';
 
@@ -19,6 +19,11 @@ export type CharitySourcePage = {
   description: string | null;
   ogImageUrl: string | null;
   textSnippet: string;
+  ingest: {
+    bytesRead: number;
+    truncated: boolean;
+    contentType: string;
+  };
 };
 
 export type CharityUrlIngestErrorCode =
@@ -96,8 +101,27 @@ const extractMetaContent = (html: string, selectors: Array<{ key: 'name' | 'prop
   return null;
 };
 
+const dropTrailingIncompleteBlocks = (html: string) => {
+  let current = html;
+
+  for (const tag of ['script', 'style', 'noscript', 'template']) {
+    const lower = current.toLowerCase();
+    const openIndex = lower.lastIndexOf(`<${tag}`);
+    if (openIndex === -1) continue;
+
+    const closeIndex = lower.lastIndexOf(`</${tag}>`);
+    if (closeIndex === -1 || openIndex > closeIndex) {
+      current = current.slice(0, openIndex);
+    }
+  }
+
+  return current;
+};
+
 const extractVisibleText = (html: string) => {
-  const withoutBlocks = html
+  const safeHtml = dropTrailingIncompleteBlocks(html);
+
+  const withoutBlocks = safeHtml
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
     .replace(/<style[\s\S]*?<\/style>/gi, ' ')
     .replace(/<noscript[\s\S]*?<\/noscript>/gi, ' ')
@@ -236,8 +260,128 @@ export const parseHttpsUrl = (rawUrl: string) => {
   return parsed;
 };
 
+export const parseHttpOrHttpsUrl = (rawUrl: string) => {
+  let parsed: URL;
+
+  try {
+    parsed = new URL(rawUrl);
+  } catch {
+    throw new CharityUrlIngestError('invalid_url', 'Please enter a valid charity URL.');
+  }
+
+  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+    throw new CharityUrlIngestError('invalid_protocol', 'Only HTTP(S) URLs are allowed.');
+  }
+
+  if (parsed.username || parsed.password) {
+    throw new CharityUrlIngestError('invalid_url', 'URL credentials are not allowed.');
+  }
+
+  return parsed;
+};
+
 export const assertSafePublicUrl = async (url: URL) => {
   await assertPublicHost(url.hostname);
+};
+
+export const normalizeCharityUrlInput = (rawInput: string) => {
+  const warnings: Array<{ code: string; message: string }> = [];
+  const trimmed = rawInput.trim();
+
+  if (!trimmed) {
+    throw new CharityUrlIngestError('invalid_url', 'Please enter a valid charity URL.');
+  }
+
+  const stripWrappingPunctuation = (value: string) =>
+    value
+      .trim()
+      .replace(/^[<([{'"`]+/g, '')
+      .replace(/[)\]}>\"'`,;:.!?]+$/g, '')
+      .trim();
+
+  const findCandidate = (value: string) => {
+    if (!/\s/.test(value)) return stripWrappingPunctuation(value);
+
+    const httpMatch = value.match(/https?:\/\/\S+/i);
+    if (httpMatch?.[0]) return stripWrappingPunctuation(httpMatch[0]);
+
+    const tokens = value.split(/\s+/).map(stripWrappingPunctuation).filter(Boolean);
+    const token = tokens.find((part) => part.includes('.') || /^\d{1,3}(?:\.\d{1,3}){3}$/.test(part));
+    return token ?? stripWrappingPunctuation(tokens[0] ?? value);
+  };
+
+  const candidate = findCandidate(trimmed);
+  if (!candidate) {
+    throw new CharityUrlIngestError('invalid_url', 'Please enter a valid charity URL.');
+  }
+
+  const hasScheme = /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(candidate);
+
+  let parsed: URL | null = null;
+  if (hasScheme) {
+    try {
+      parsed = new URL(candidate);
+    } catch {
+      parsed = null;
+    }
+  }
+
+  if (!parsed) {
+    try {
+      parsed = new URL(`https://${candidate}`);
+      warnings.push({
+        code: 'missing_scheme_assumed_https',
+        message: 'Assumed https:// for this URL.',
+      });
+    } catch {
+      parsed = null;
+    }
+  }
+
+  if (!parsed) {
+    throw new CharityUrlIngestError('invalid_url', 'Please enter a valid charity URL.');
+  }
+
+  if (parsed.username || parsed.password) {
+    parsed.username = '';
+    parsed.password = '';
+    warnings.push({
+      code: 'stripped_credentials',
+      message: 'Removed credentials from the URL.',
+    });
+  }
+
+  if (parsed.protocol === 'http:') {
+    const upgraded = new URL(parsed.toString());
+    upgraded.protocol = 'https:';
+
+    warnings.push({
+      code: 'upgraded_to_https',
+      message: 'Tried HTTPS first (recommended).',
+    });
+
+    return { primary: upgraded, fallback: parsed, warnings };
+  }
+
+  if (parsed.protocol === 'https:') {
+    return { primary: parsed, warnings };
+  }
+
+  if (!parsed.hostname) {
+    throw new CharityUrlIngestError('invalid_url', 'Please enter a valid charity URL.');
+  }
+
+  const assumed = new URL(`https://${parsed.hostname}${parsed.pathname || '/'}`);
+  assumed.search = parsed.search;
+  assumed.hash = parsed.hash;
+  if (parsed.port) assumed.port = parsed.port;
+
+  warnings.push({
+    code: 'unsupported_scheme_assumed_https',
+    message: 'Unsupported URL scheme; tried https:// instead.',
+  });
+
+  return { primary: assumed, warnings };
 };
 
 const fetchWithRedirectGuards = async (sourceUrl: URL) => {
@@ -267,7 +411,7 @@ const fetchWithRedirectGuards = async (sourceUrl: URL) => {
           throw new CharityUrlIngestError('fetch_failed', 'URL redirect target is missing.');
         }
 
-        currentUrl = parseHttpsUrl(new URL(location, currentUrl).toString());
+        currentUrl = parseHttpOrHttpsUrl(new URL(location, currentUrl).toString());
         continue;
       }
 
@@ -290,15 +434,7 @@ const fetchWithRedirectGuards = async (sourceUrl: URL) => {
   throw new CharityUrlIngestError('fetch_failed', 'Too many redirects for this URL.');
 };
 
-const readTextWithLimit = async (response: Response, maxBytes: number) => {
-  const contentLengthRaw = response.headers.get('content-length');
-  if (contentLengthRaw) {
-    const contentLength = Number.parseInt(contentLengthRaw, 10);
-    if (Number.isFinite(contentLength) && contentLength > maxBytes) {
-      throw new CharityUrlIngestError('content_too_large', 'Charity page is too large to ingest.');
-    }
-  }
-
+const readTextUpTo = async (response: Response, maxBytes: number) => {
   if (!response.body) {
     throw new CharityUrlIngestError('empty_content', 'Charity page returned no content.');
   }
@@ -307,6 +443,7 @@ const readTextWithLimit = async (response: Response, maxBytes: number) => {
   const decoder = new TextDecoder('utf-8');
   let received = 0;
   let text = '';
+  let truncated = false;
 
   while (true) {
     const { value, done } = await reader.read();
@@ -314,11 +451,24 @@ const readTextWithLimit = async (response: Response, maxBytes: number) => {
 
     if (!value) continue;
 
-    received += value.byteLength;
-    if (received > maxBytes) {
-      throw new CharityUrlIngestError('content_too_large', 'Charity page is too large to ingest.');
+    if (received + value.byteLength > maxBytes) {
+      const remaining = maxBytes - received;
+      if (remaining > 0) {
+        const slice = value.subarray(0, remaining);
+        received += slice.byteLength;
+        text += decoder.decode(slice, { stream: true });
+      }
+
+      truncated = true;
+      try {
+        await reader.cancel();
+      } catch {
+        // ignore
+      }
+      break;
     }
 
+    received += value.byteLength;
     text += decoder.decode(value, { stream: true });
   }
 
@@ -327,19 +477,22 @@ const readTextWithLimit = async (response: Response, maxBytes: number) => {
     throw new CharityUrlIngestError('empty_content', 'Charity page returned no content.');
   }
 
-  return text;
+  return { text, bytesRead: received, truncated };
 };
 
 export const ingestCharityWebsite = async (rawUrl: string): Promise<CharitySourcePage> => {
-  const sourceUrl = parseHttpsUrl(rawUrl);
+  const sourceUrl = parseHttpOrHttpsUrl(rawUrl);
   const { response, finalUrl } = await fetchWithRedirectGuards(sourceUrl);
 
-  const contentType = response.headers.get('content-type')?.toLowerCase() ?? '';
-  if (!contentType.includes('text/html') && !contentType.includes('application/xhtml+xml')) {
+  const contentTypeRaw = response.headers.get('content-type') ?? '';
+  const contentType = contentTypeRaw.toLowerCase();
+  const mimeType = contentType.split(';')[0]?.trim() ?? '';
+  const isText = mimeType.length === 0 || mimeType.startsWith('text/') || mimeType.includes('application/xhtml+xml');
+  if (!isText) {
     throw new CharityUrlIngestError('unsupported_content_type', 'URL did not return an HTML page.');
   }
 
-  const html = await readTextWithLimit(response, MAX_HTML_BYTES);
+  const { text: html, bytesRead, truncated } = await readTextUpTo(response, MAX_HTML_BYTES);
   const title = extractTitle(html);
   const description = extractMetaContent(html, [
     { key: 'name', value: 'description' },
@@ -363,13 +516,31 @@ export const ingestCharityWebsite = async (rawUrl: string): Promise<CharitySourc
 
   const textSnippet = extractVisibleText(html);
 
+  const toSanitizedUrlString = (url: URL) => {
+    const sanitized = new URL(url.toString());
+    sanitized.username = '';
+    sanitized.password = '';
+    sanitized.search = '';
+    sanitized.hash = '';
+    return sanitized.toString();
+  };
+
+  const finalParsed = new URL(finalUrl);
+  const sourceUrlSanitized = toSanitizedUrlString(sourceUrl);
+  const finalUrlSanitized = toSanitizedUrlString(finalParsed);
+
   return {
-    sourceUrl: sourceUrl.toString(),
-    finalUrl,
-    domain: new URL(finalUrl).hostname,
+    sourceUrl: sourceUrlSanitized,
+    finalUrl: finalUrlSanitized,
+    domain: finalParsed.hostname,
     title,
     description,
     ogImageUrl,
     textSnippet,
+    ingest: {
+      bytesRead,
+      truncated,
+      contentType: contentTypeRaw,
+    },
   };
 };

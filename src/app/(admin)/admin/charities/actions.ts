@@ -4,13 +4,8 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import { requireAdminAuth } from '@/lib/auth/clerk-wrappers';
-import {
-  CharityDraftGenerationError,
-  generateCharityDraftWithClaude,
-} from '@/lib/charities/claude';
 import { createCharity, setCharityActiveState, updateCharity } from '@/lib/charities/service';
-import { maybeMirrorCharityLogoToBlob } from '@/lib/charities/logo';
-import { CharityUrlIngestError, ingestCharityWebsite } from '@/lib/charities/url-ingest';
+import { autofillCharityDraftFromUrl, type AutofillCharityDraftFromUrlResult } from '@/lib/charities/autofill';
 
 const categories = ['Education', 'Health', 'Environment', 'Community', 'Other'] as const;
 
@@ -84,51 +79,7 @@ const toUpdatePayload = (formData: FormData) => ({
   bankDetailsEncrypted: getTrimmedField(formData, 'bankDetailsEncrypted'),
 });
 
-const toDraftActionError = (error: unknown) => {
-  if (error instanceof CharityUrlIngestError) {
-    switch (error.code) {
-      case 'invalid_url':
-      case 'invalid_protocol':
-        return 'Please enter a valid HTTPS charity website URL.';
-      case 'forbidden_host':
-        return 'That URL host is not allowed for security reasons.';
-      case 'unsupported_content_type':
-        return 'URL must point to a standard website page (HTML).';
-      case 'content_too_large':
-        return 'That page is too large to analyze. Try a simpler page URL.';
-      default:
-        return 'Could not fetch the charity website for draft generation.';
-    }
-  }
-
-  if (error instanceof CharityDraftGenerationError) {
-    if (error.code === 'missing_api_key') {
-      return 'ANTHROPIC_API_KEY is not configured for this deployment.';
-    }
-
-    if (error.code === 'invalid_output') {
-      return 'The AI draft response was malformed. Please try again or fill fields manually.';
-    }
-
-    return 'AI draft generation failed. Please try again.';
-  }
-
-  return 'Could not generate a charity draft from that URL.';
-};
-
-export type GenerateCharityDraftFromUrlResult = {
-  success: boolean;
-  error?: string;
-  draft?: {
-    name: string;
-    description: string;
-    category: (typeof categories)[number];
-    logoUrl: string;
-    website: string;
-    contactName: string;
-    contactEmail: string;
-  };
-};
+export type GenerateCharityDraftFromUrlResult = AutofillCharityDraftFromUrlResult;
 
 export async function createCharityAction(
   formData: FormData
@@ -245,33 +196,5 @@ export async function generateCharityDraftFromUrlAction(
   rawUrl: string
 ): Promise<GenerateCharityDraftFromUrlResult> {
   await requireAdminAuth();
-
-  const parsedUrl = z.string().trim().url().safeParse(rawUrl);
-  if (!parsedUrl.success) {
-    return { success: false, error: 'Please enter a valid HTTPS charity website URL.' };
-  }
-
-  try {
-    const page = await ingestCharityWebsite(parsedUrl.data);
-    const aiDraft = await generateCharityDraftWithClaude(page);
-    const mirroredLogoUrl = await maybeMirrorCharityLogoToBlob({
-      logoUrl: aiDraft.logoUrl,
-      charityName: aiDraft.name,
-    });
-
-    return {
-      success: true,
-      draft: {
-        name: aiDraft.name,
-        description: aiDraft.description,
-        category: aiDraft.category,
-        logoUrl: mirroredLogoUrl ?? '',
-        website: aiDraft.website ?? '',
-        contactName: aiDraft.contactName ?? '',
-        contactEmail: aiDraft.contactEmail ?? '',
-      },
-    };
-  } catch (error) {
-    return { success: false, error: toDraftActionError(error) };
-  }
+  return autofillCharityDraftFromUrl(rawUrl);
 }

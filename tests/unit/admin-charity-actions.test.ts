@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   createCharity: vi.fn(),
   updateCharity: vi.fn(),
   setCharityActiveState: vi.fn(),
+  normalizeCharityUrlInput: vi.fn(),
   ingestCharityWebsite: vi.fn(),
   generateCharityDraftWithClaude: vi.fn(),
   maybeMirrorCharityLogoToBlob: vi.fn(),
@@ -34,6 +35,7 @@ vi.mock('@/lib/charities/url-ingest', () => ({
       this.code = code;
     }
   },
+  normalizeCharityUrlInput: mocks.normalizeCharityUrlInput,
   ingestCharityWebsite: mocks.ingestCharityWebsite,
 }));
 
@@ -53,14 +55,20 @@ vi.mock('@/lib/charities/logo', () => ({
   maybeMirrorCharityLogoToBlob: mocks.maybeMirrorCharityLogoToBlob,
 }));
 
-import { createCharityAction, updateCharityAction } from '@/app/(admin)/admin/charities/actions';
+import { CharityDraftGenerationError } from '@/lib/charities/claude';
+import { CharityUrlIngestError } from '@/lib/charities/url-ingest';
+
+import { createCharityAction, generateCharityDraftFromUrlAction, updateCharityAction } from '@/app/(admin)/admin/charities/actions';
 
 describe('admin charity actions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     mocks.requireAdminAuth.mockResolvedValue({ hostId: 'host-1', email: 'admin@gifta.co.za' });
     mocks.createCharity.mockResolvedValue({ id: 'charity-1' });
     mocks.updateCharity.mockResolvedValue({ id: 'charity-1' });
+    mocks.maybeMirrorCharityLogoToBlob.mockResolvedValue(null);
+    delete process.env.ANTHROPIC_API_KEY;
   });
 
   it('creates a charity without bank/contact/website fields', async () => {
@@ -100,5 +108,67 @@ describe('admin charity actions', () => {
       error: 'Bank details must be valid JSON.',
     });
     expect(mocks.updateCharity).not.toHaveBeenCalled();
+  });
+
+  it('returns a best-effort draft when ingest fails', async () => {
+    mocks.normalizeCharityUrlInput.mockReturnValue({
+      primary: new URL('https://example.org'),
+      warnings: [],
+    });
+    mocks.ingestCharityWebsite.mockRejectedValue(new CharityUrlIngestError('fetch_failed', 'boom'));
+
+    const result = await generateCharityDraftFromUrlAction('example.org');
+
+    expect(result.success).toBe(true);
+    expect(result.draft?.name.length).toBeGreaterThan(0);
+    expect(result.draft?.description.length).toBeGreaterThan(0);
+    expect(result.draft?.logoUrl).toMatch(/^https:\/\//);
+    expect(result.warnings?.some((warning) => warning.code === 'ingest_failed_used_minimal')).toBe(true);
+  });
+
+  it('returns a best-effort draft when AI draft generation fails', async () => {
+    process.env.ANTHROPIC_API_KEY = 'test-key';
+
+    mocks.normalizeCharityUrlInput.mockReturnValue({
+      primary: new URL('https://example.org'),
+      warnings: [],
+    });
+    mocks.ingestCharityWebsite.mockResolvedValue({
+      sourceUrl: 'https://example.org/',
+      finalUrl: 'https://example.org/',
+      domain: 'example.org',
+      title: 'Reach for a Dream',
+      description: 'Supporting children with chronic illnesses.',
+      ogImageUrl: null,
+      textSnippet: 'Reach for a Dream',
+      ingest: {
+        bytesRead: 123,
+        truncated: false,
+        contentType: 'text/html',
+      },
+    });
+    mocks.generateCharityDraftWithClaude.mockRejectedValue(new CharityDraftGenerationError('provider_error', 'nope'));
+
+    const result = await generateCharityDraftFromUrlAction('https://example.org');
+
+    expect(result.success).toBe(true);
+    expect(mocks.generateCharityDraftWithClaude).toHaveBeenCalled();
+    expect(result.warnings?.some((warning) => warning.code === 'ai_failed_used_heuristic')).toBe(true);
+    expect(result.draft?.name).toBe('Reach for a Dream');
+  });
+
+  it('fails when URL host is forbidden', async () => {
+    mocks.normalizeCharityUrlInput.mockReturnValue({
+      primary: new URL('https://localhost'),
+      warnings: [],
+    });
+    mocks.ingestCharityWebsite.mockRejectedValue(new CharityUrlIngestError('forbidden_host', 'nope'));
+
+    const result = await generateCharityDraftFromUrlAction('localhost');
+
+    expect(result).toEqual({
+      success: false,
+      error: 'That URL host is not allowed for security reasons.',
+    });
   });
 });
