@@ -10,7 +10,8 @@ describe('admin charities query source', () => {
     const source = readSource('src/lib/admin/service.ts');
 
     expect(source).toContain(`const charityIdReference = sql.raw('"charities"."id"');`);
+    expect(source).toContain(`const charityIdTextReference = sql.raw('"charities"."id"::text');`);
     expect(source).toContain('db.charity_id = ${charityIdReference}');
-    expect(source).toContain("p.recipient_data ->> 'charityId' = ${charityIdReference}");
+    expect(source).toContain("p.recipient_data ->> 'charityId' = ${charityIdTextReference}");
   });
 });

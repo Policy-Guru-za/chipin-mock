@@ -478,6 +478,7 @@ export const listAdminCharities = async (
   const limit = resolveLimit(filters.limit);
   const conditions: SQL[] = [];
   const charityIdReference = sql.raw('"charities"."id"');
+  const charityIdTextReference = sql.raw('"charities"."id"::text');
 
   if (filters.isActive !== undefined) {
     conditions.push(eq(charities.isActive, filters.isActive));
@@ -538,7 +539,7 @@ export const listAdminCharities = async (
         FROM payouts p
         WHERE p.type = 'charity'
           AND p.status = 'completed'
-          AND p.recipient_data ->> 'charityId' = ${charityIdReference}
+          AND p.recipient_data ->> 'charityId' = ${charityIdTextReference}
       ), 0)`,
     })
     .from(charities)

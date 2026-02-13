@@ -3,6 +3,8 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-13 | self | First `/admin/charities` fix swapped to a qualified outer id but reused UUID reference against `recipient_data ->> 'charityId'` (text), causing `42883 operator does not exist: text = uuid` | For JSON text extraction comparisons, cast outer UUID to text (`"charities"."id"::text`) and keep UUID reference only for UUID columns |
+| 2026-02-13 | self | Axiom log triage used multiple inconsistent query styles before converging, costing time | Use one canonical Axiom fast-path: payload file + `format=tabular` + field aliases + TSV extraction + request-id deep dive |
 | 2026-02-13 | self | In `listAdminCharities`, correlated SQL subqueries compared against `${charities.id}` and Neon/Postgres raised `42702 column reference "id" is ambiguous` on `/admin/charities` | In raw correlated subqueries, use an explicit qualified outer reference (`sql.raw('"charities"."id"')`) and reuse it across all subquery predicates |
 | 2026-02-11 | self | Wired `/create` fresh-start logic to `getDreamBoardDraft` without handling KV read failures, which can block hosts from entering create flow during transient KV outages | For entry-route hygiene, treat draft reads as best-effort: catch/log read errors, continue with clear + redirect path |
 | 2026-02-11 | self | Deleted draft photo before confirming `clearDreamBoardDraft` success, which can orphan stale draft references on clear failures | Sequence destructive side-effects after primary state-clear succeeds; when clear fails, do not delete related assets |
@@ -101,9 +103,43 @@
 - For C9 pre-flight rollback validation (C0-05), always include three explicit confirmations in evidence: Vercel rollback location path, exact UX toggle-off vars, and pre-rollback evidence capture list.
 - For admin CSV exports, use shared header lists and always emit header-only CSV for empty datasets to keep download behavior deterministic.
 - For implementation-plan docs, lock repo execution constraints up front (`pnpm`, main-only strategy, Conventional Commits) and explicitly include generated-artifact sync rules when source contracts (like `src/lib/api/openapi.ts`) are edited.
+- For Axiom/Vercel log triage, default to `format=tabular`, alias dotted fields (`path=['request.path']`, `status=['request.statusCode']`, `deployment=['vercel.deploymentId']`), and extract rows with `jq -r '.tables[0].columns | transpose[] | @tsv'`.
+- For Axiom incidents, start broad (project + path + time window), then pivot to single `request.id` trace; this is fastest to separate edge/lambda/log events.
 
 ## Patterns That Don't Work
 - Skipping preflight docs causes rework and misalignment.
+- Sourcing `.env.local` inline for Axiom auth (`set -a; source ...`) is brittle; values can be empty/quoted unexpectedly in non-interactive shells.
+- Inline bracket-heavy APL JSON in one shell string repeatedly causes quoting/glob failures and parse churn.
+- Jumping straight to advanced aggregates before confirming base field names (`project/path/status/request.id`) wastes cycles.
+
+## Axiom Log Access Fast Path
+1) Credentials check once (avoid retries on bad auth):
+```bash
+curl -sS -X POST 'https://api.axiom.co/v1/datasets/_apl?format=tabular' \
+  -H "Authorization: Bearer $AXIOM_API_TOKEN" \
+  -H "x-axiom-org-id: $AXIOM_ORG_ID" \
+  -H 'Content-Type: application/json' \
+  --data '{"apl":"['\''vercel'\''] | sort by _time desc | limit 1","startTime":"now-30m","endTime":"now"}'
+```
+2) Use payload file for real query (no inline escaping churn):
+```bash
+cat >/tmp/axiom-query.json <<'JSON'
+{"apl":"['vercel'] | where ['vercel.projectName'] == \"chipin-mock\" | where ['request.path'] contains \"/admin/charities\" | project _time, path=['request.path'], status=['request.statusCode'], req=['request.id'], deployment=['vercel.deploymentId'], source=['vercel.source'], region=['vercel.region'], message | sort by _time desc | limit 200","startTime":"now-24h","endTime":"now"}
+JSON
+curl -sS -X POST 'https://api.axiom.co/v1/datasets/_apl?format=tabular' \
+  -H "Authorization: Bearer $AXIOM_API_TOKEN" \
+  -H "x-axiom-org-id: $AXIOM_ORG_ID" \
+  -H 'Content-Type: application/json' \
+  --data-binary @/tmp/axiom-query.json > /tmp/axiom-out.json
+jq -r '.tables[0].columns | transpose[] | @tsv' /tmp/axiom-out.json | head -n 80
+```
+3) If UI shows generic error, immediately pivot with one request id:
+```bash
+cat >/tmp/axiom-req.json <<'JSON'
+{"apl":"['vercel'] | where ['request.id'] == \"<REQUEST_ID>\" | project _time, path=['request.path'], status=['request.statusCode'], source=['vercel.source'], deployment=['vercel.deploymentId'], message | sort by _time asc | limit 50","startTime":"now-6h","endTime":"now"}
+JSON
+```
+4) Read order every time: `status.rowsMatched` -> table fields -> TSV rows -> then hypotheses.
 
 ## Domain Notes
 - Gifta UX v2 rollout is milestone-driven (Phase A complete, executing Phase B).
