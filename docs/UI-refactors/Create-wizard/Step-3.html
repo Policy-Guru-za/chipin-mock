@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gifta – Step 3: The Dates (Variant B: Form Left, Preview Right)</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #FBF8F3;
+            --card: #FFFFFF;
+            --ink: #2C2520;
+            --ink-mid: #5C544C;
+            --ink-soft: #8A827A;
+            --ink-faint: #B5AEA5;
+            --ink-ghost: #D1CBC3;
+            --border: #EDE7DE;
+            --border-soft: #F5F1EA;
+            --sage: #4A7E66;
+            --sage-deep: #3B6B55;
+            --sage-light: #E9F3ED;
+            --sage-wash: #F1F7F4;
+            --amber: #C49A5C;
+            --amber-light: #F7EFE2;
+            --amber-glow: #EBDCC8;
+            --plum: #7E6B9B;
+            --plum-wash: #F1EDF7;
+            --plum-soft: #E4DDF0;
+            --serif: 'Libre Baskerville', Georgia, serif;
+            --sans: 'DM Sans', -apple-system, sans-serif;
+            --radius-lg: 28px;
+            --radius-md: 20px;
+            --radius-sm: 14px;
+            --shadow-card: 0 1px 2px rgba(44,37,32,0.03), 0 4px 12px rgba(44,37,32,0.04), 0 12px 36px rgba(44,37,32,0.04);
+            --shadow-input: 0 1px 3px rgba(44,37,32,0.04);
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--ink);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 48px;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--serif);
+            font-size: 20px;
+            color: var(--ink);
+            text-decoration: none;
+        }
+
+        .nav-logo span {
+            font-size: 17px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .nav-right a {
+            font-size: 13px;
+            color: var(--ink-soft);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav-right a:hover {
+            color: var(--ink);
+        }
+
+        .nav-btn {
+            background: var(--sage) !important;
+            color: #fff !important;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .nav-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--sage);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Animations */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Stepper */
+        .stepper-bar {
+            max-width: 940px;
+            margin: 0 auto;
+            padding: 0 48px;
+            margin-top: 32px;
+            margin-bottom: 36px;
+            animation: fadeUp 0.35s ease-out both;
+        }
+
+        .stepper-track {
+            display: flex;
+            align-items: center;
+        }
+
+        .s-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .s-dot.done {
+            background: var(--sage);
+            color: #fff;
+        }
+
+        .s-dot.active {
+            background: var(--sage);
+            color: #fff;
+            box-shadow: 0 0 0 3px var(--sage-light);
+        }
+
+        .s-dot.upcoming {
+            background: var(--border-soft);
+            color: var(--ink-ghost);
+        }
+
+        .s-line {
+            flex: 1;
+            height: 2px;
+            background: var(--border-soft);
+            margin: 0 4px;
+        }
+
+        .s-line.done {
+            background: var(--sage);
+        }
+
+        /* Split Layout */
+        .split {
+            max-width: 940px;
+            margin: 0 auto;
+            padding: 0 48px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            align-items: start;
+            animation: fadeUp 0.45s ease-out 0.08s both;
+        }
+
+        /* Date Form Panel (Left) */
+        .date-form-panel {
+            background: var(--card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+            padding: 36px 32px 32px;
+        }
+
+        .date-form-panel-header {
+            margin-bottom: 28px;
+        }
+
+        .eyebrow {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--amber);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 8px;
+        }
+
+        .panel-title {
+            font-family: var(--serif);
+            font-size: 22px;
+            color: var(--ink);
+            margin-bottom: 6px;
+        }
+
+        .panel-subtitle {
+            font-size: 13.5px;
+            color: var(--ink-soft);
+            line-height: 1.5;
+        }
+
+        /* Form Fields */
+        .field {
+            margin-bottom: 24px;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--ink-mid);
+            margin-bottom: 8px;
+        }
+
+        .field-input {
+            width: 100%;
+            padding: 14px 18px;
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            font-family: var(--sans);
+            font-size: 15px;
+            color: var(--ink);
+            outline: none;
+            transition: all 0.25s;
+            box-shadow: var(--shadow-input);
+        }
+
+        .field-input::placeholder {
+            color: var(--ink-ghost);
+            font-weight: 300;
+        }
+
+        .field-input:hover {
+            border-color: var(--ink-ghost);
+        }
+
+        .field-input:focus {
+            border-color: var(--sage);
+            box-shadow: 0 0 0 3px var(--sage-light), var(--shadow-input);
+            background: var(--card);
+        }
+
+        /* Checkbox Field */
+        .checkbox-field {
+            margin-bottom: 24px;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-input {
+            display: none;
+        }
+
+        .checkbox-visual {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 1.5px solid var(--border);
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.25s;
+        }
+
+        .checkbox-input:checked ~ .checkbox-visual {
+            background: var(--sage);
+            border-color: var(--sage);
+        }
+
+        .checkbox-visual svg {
+            stroke: #fff;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            width: 12px;
+            height: 12px;
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+
+        .checkbox-input:checked ~ .checkbox-visual svg {
+            opacity: 1;
+        }
+
+        .checkbox-label {
+            font-size: 13px;
+            color: var(--ink-mid);
+            font-weight: 500;
+            user-select: none;
+        }
+
+        /* Party Row (Conditional) */
+        .party-row {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .party-row.show {
+            display: grid;
+        }
+
+        /* Field Tip */
+        .field-tip {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 10px 14px;
+            background: var(--amber-light);
+            border-radius: 10px;
+        }
+
+        .field-tip svg {
+            flex-shrink: 0;
+            color: var(--amber);
+            margin-top: 1px;
+            width: 16px;
+            height: 16px;
+        }
+
+        .field-tip p {
+            font-size: 12px;
+            color: var(--ink-mid);
+            line-height: 1.5;
+        }
+
+        /* Form CTA Buttons */
+        .form-cta {
+            margin-top: 32px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 16px 20px;
+            background: var(--border-soft);
+            color: var(--ink-soft);
+            border: none;
+            border-radius: 14px;
+            font-family: var(--sans);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .back-btn:hover {
+            background: var(--border);
+            color: var(--ink-mid);
+        }
+
+        .back-btn svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .cta-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex: 1;
+            padding: 16px;
+            background: var(--sage);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-family: var(--sans);
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(74,126,102,0.12), 0 4px 12px rgba(74,126,102,0.1);
+        }
+
+        .cta-btn:hover {
+            background: var(--sage-deep);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(74,126,102,0.15), 0 8px 20px rgba(74,126,102,0.12);
+        }
+
+        .cta-btn svg {
+            flex-shrink: 0;
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: transform 0.2s;
+        }
+
+        .cta-btn:hover svg {
+            transform: translateX(2px);
+        }
+
+        /* Preview Panel (Right) */
+        .preview-panel {
+            background: var(--card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: fit-content;
+        }
+
+        .preview-panel-header {
+            padding: 28px 32px 0;
+            margin-bottom: 0;
+        }
+
+        .preview-content {
+            margin: 24px 24px;
+            padding: 32px 28px;
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 16px;
+        }
+
+        .preview-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            box-shadow: 0 2px 8px rgba(44,37,32,0.06);
+        }
+
+        .preview-title {
+            font-family: var(--serif);
+            font-size: 22px;
+            color: var(--ink);
+            font-weight: 700;
+            margin: 4px 0 0;
+        }
+
+        .preview-date {
+            font-size: 14px;
+            color: var(--ink-soft);
+        }
+
+        .preview-divider {
+            width: 100%;
+            height: 1px;
+            background: var(--border);
+            margin: 8px 0;
+        }
+
+        .preview-party-line {
+            font-size: 13px;
+            color: var(--ink-mid);
+            font-weight: 500;
+            display: none;
+        }
+
+        .preview-party-line.show {
+            display: block;
+        }
+
+        .preview-countdown {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: var(--sage-wash);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--sage-deep);
+            font-weight: 500;
+            margin-top: 8px;
+        }
+
+        .preview-countdown svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+
+        /* Timeline */
+        .preview-timeline {
+            width: 100%;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0;
+        }
+
+        .timeline-marker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            text-align: center;
+        }
+
+        .timeline-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--sage);
+            flex-shrink: 0;
+        }
+
+        .timeline-label {
+            font-size: 11px;
+            color: var(--ink-soft);
+            font-weight: 500;
+        }
+
+        .timeline-connector {
+            flex: 1;
+            height: 1px;
+            background: var(--border-soft);
+            margin-top: 4px;
+        }
+
+        /* Footer */
+        footer {
+            max-width: 940px;
+            margin: 56px auto 0;
+            padding: 0 48px 40px;
+            text-align: center;
+        }
+
+        footer p {
+            font-size: 11.5px;
+            color: var(--ink-ghost);
+        }
+
+        /* Responsive */
+        @media (max-width: 800px) {
+            nav {
+                padding: 14px 20px;
+            }
+
+            .nav-right a:not(.nav-btn):not(.nav-avatar) {
+                display: none;
+            }
+
+            .stepper-bar {
+                padding: 0 20px;
+                margin-top: 24px;
+                margin-bottom: 28px;
+            }
+
+            .split {
+                grid-template-columns: 1fr;
+                padding: 0 20px;
+                gap: 24px;
+            }
+
+            .date-form-panel {
+                padding: 28px 24px 24px;
+            }
+
+            .preview-panel-header {
+                padding: 24px 24px 0;
+            }
+
+            .preview-content {
+                margin: 20px 20px;
+                padding: 24px 20px;
+            }
+
+            .form-cta {
+                flex-direction: column-reverse;
+            }
+
+            footer {
+                padding: 0 20px 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="#" class="nav-logo"><span>🎁</span> Gifta</a>
+        <div class="nav-right">
+            <a href="#">How it works</a>
+            <a href="#">Trust &amp; safety</a>
+            <a href="#" class="nav-btn">Create a Dreamboard</a>
+            <div class="nav-avatar">R</div>
+        </div>
+    </nav>
+
+    <!-- Stepper -->
+    <div class="stepper-bar">
+        <div class="stepper-track">
+            <div class="s-dot done">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+            </div>
+            <div class="s-line done"></div>
+            <div class="s-dot done">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+            </div>
+            <div class="s-line done"></div>
+            <div class="s-dot active">3</div>
+            <div class="s-line"></div>
+            <div class="s-dot upcoming">4</div>
+            <div class="s-line"></div>
+            <div class="s-dot upcoming">5</div>
+            <div class="s-line"></div>
+            <div class="s-dot upcoming">6</div>
+        </div>
+    </div>
+
+    <!-- Split Layout -->
+    <div class="split">
+        <!-- Left: Date Form Panel -->
+        <div class="date-form-panel">
+            <div class="date-form-panel-header">
+                <div class="eyebrow">Step 3 of 6 — The dates</div>
+                <h2 class="panel-title">When's the big day?</h2>
+                <p class="panel-subtitle">Set the dates that shape the campaign timeline.</p>
+            </div>
+
+            <form id="dateForm">
+                <!-- Birthday Date -->
+                <div class="field">
+                    <label class="field-label">Birthday date</label>
+                    <input
+                        type="date"
+                        id="birthdayDate"
+                        class="field-input"
+                        value="2026-02-13"
+                        required
+                    >
+                </div>
+
+                <!-- Party Checkbox -->
+                <div class="checkbox-field">
+                    <label class="checkbox-wrapper">
+                        <input
+                            type="checkbox"
+                            id="partyCheckbox"
+                            class="checkbox-input"
+                            checked
+                        >
+                        <div class="checkbox-visual">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </div>
+                        <span class="checkbox-label">Party is on a different day</span>
+                    </label>
+                </div>
+
+                <!-- Party Date & Time (Conditional) -->
+                <div class="party-row show" id="partyRow">
+                    <div class="field">
+                        <label class="field-label">Party date</label>
+                        <input
+                            type="date"
+                            id="partyDate"
+                            class="field-input"
+                            value="2026-02-14"
+                        >
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Party time</label>
+                        <input
+                            type="time"
+                            id="partyTime"
+                            class="field-input"
+                            value="14:00"
+                        >
+                    </div>
+                </div>
+
+                <!-- Field Tip -->
+                <div class="field-tip">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="16" x2="12" y2="12"/>
+                        <line x1="12" y1="8" x2="12.01" y2="8"/>
+                    </svg>
+                    <p>The campaign closes on the birthday. Contributors can chip in until then.</p>
+                </div>
+
+                <!-- CTA Buttons -->
+                <div class="form-cta">
+                    <button class="back-btn" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"/>
+                        </svg>
+                        Back
+                    </button>
+                    <button class="cta-btn" type="button">
+                        Continue to giving back
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right: Preview Panel -->
+        <div class="preview-panel">
+            <div class="preview-panel-header">
+                <div class="eyebrow">Preview</div>
+                <h3 class="panel-title">How it'll look</h3>
+            </div>
+
+            <div class="preview-content">
+                <div class="preview-icon-wrapper">🎂</div>
+                <h4 class="preview-title" id="previewTitle">Maya turns 7!</h4>
+                <p class="preview-date" id="previewDate">February 13, 2026</p>
+                <div class="preview-divider"></div>
+                <div class="preview-party-line show" id="previewPartyLine">
+                    🎈 Party day · February 14, 2026 at 2:00 PM
+                </div>
+                <div class="preview-countdown">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <span id="previewCountdown">Campaign closes in 1 day</span>
+                </div>
+
+                <!-- Timeline -->
+                <div class="preview-timeline">
+                    <div class="timeline-marker">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-label">Today</div>
+                    </div>
+                    <div class="timeline-connector"></div>
+                    <div class="timeline-marker">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-label">Birthday</div>
+                    </div>
+                    <div class="timeline-connector"></div>
+                    <div class="timeline-marker">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-label">Closes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Gifta. A joyful, secure way to pool gifts.</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const birthdayDateInput = document.getElementById('birthdayDate');
+        const partyCheckbox = document.getElementById('partyCheckbox');
+        const partyRow = document.getElementById('partyRow');
+        const partyDateInput = document.getElementById('partyDate');
+        const partyTimeInput = document.getElementById('partyTime');
+
+        const previewTitle = document.getElementById('previewTitle');
+        const previewDate = document.getElementById('previewDate');
+        const previewPartyLine = document.getElementById('previewPartyLine');
+        const previewCountdown = document.getElementById('previewCountdown');
+
+        // Format date to readable string
+        function formatDate(dateString) {
+            const date = new Date(dateString + 'T00:00:00Z');
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // Format time to readable string
+        function formatTime(timeString) {
+            const [hours, minutes] = timeString.split(':');
+            const hour = parseInt(hours);
+            const minute = minutes;
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = hour % 12 || 12;
+            return `${displayHour}:${minute} ${ampm}`;
+        }
+
+        // Calculate days until date
+        function daysUntil(dateString) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const targetDate = new Date(dateString + 'T00:00:00Z');
+            const diffTime = targetDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays;
+        }
+
+        // Update preview
+        function updatePreview() {
+            const birthdayValue = birthdayDateInput.value;
+
+            // Update date display
+            previewDate.textContent = formatDate(birthdayValue);
+
+            // Update countdown
+            const daysLeft = daysUntil(birthdayValue);
+            if (daysLeft === 0) {
+                previewCountdown.textContent = 'Campaign closes today';
+            } else if (daysLeft === 1) {
+                previewCountdown.textContent = 'Campaign closes in 1 day';
+            } else if (daysLeft > 1) {
+                previewCountdown.textContent = `Campaign closes in ${daysLeft} days`;
+            } else {
+                previewCountdown.textContent = 'Campaign has closed';
+            }
+
+            // Update party line if visible
+            if (partyCheckbox.checked && partyDateInput.value && partyTimeInput.value) {
+                previewPartyLine.classList.add('show');
+                const partyDateFormatted = formatDate(partyDateInput.value);
+                const partyTimeFormatted = formatTime(partyTimeInput.value);
+                previewPartyLine.textContent = `🎈 Party day · ${partyDateFormatted} at ${partyTimeFormatted}`;
+            } else {
+                previewPartyLine.classList.remove('show');
+            }
+        }
+
+        // Toggle party fields visibility
+        partyCheckbox.addEventListener('change', () => {
+            if (partyCheckbox.checked) {
+                partyRow.classList.add('show');
+            } else {
+                partyRow.classList.remove('show');
+                previewPartyLine.classList.remove('show');
+            }
+            updatePreview();
+        });
+
+        // Update preview on date changes
+        birthdayDateInput.addEventListener('change', updatePreview);
+        partyDateInput.addEventListener('change', updatePreview);
+        partyTimeInput.addEventListener('change', updatePreview);
+
+        // Initialize preview on page load
+        updatePreview();
+
+        // Button handlers
+        document.querySelector('.back-btn').addEventListener('click', () => {
+            console.log('Back button clicked');
+            // In a real application, navigate to Step 2
+        });
+
+        document.querySelector('.cta-btn').addEventListener('click', () => {
+            console.log('Continue button clicked');
+            // In a real application, navigate to Step 4
+        });
+    </script>
+</body>
+</html>

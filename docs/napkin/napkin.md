@@ -3,6 +3,7 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-13 | self | In `listAdminCharities`, correlated SQL subqueries compared against `${charities.id}` and Neon/Postgres raised `42702 column reference "id" is ambiguous` on `/admin/charities` | In raw correlated subqueries, use an explicit qualified outer reference (`sql.raw('"charities"."id"')`) and reuse it across all subquery predicates |
 | 2026-02-11 | self | Wired `/create` fresh-start logic to `getDreamBoardDraft` without handling KV read failures, which can block hosts from entering create flow during transient KV outages | For entry-route hygiene, treat draft reads as best-effort: catch/log read errors, continue with clear + redirect path |
 | 2026-02-11 | self | Deleted draft photo before confirming `clearDreamBoardDraft` success, which can orphan stale draft references on clear failures | Sequence destructive side-effects after primary state-clear succeeds; when clear fails, do not delete related assets |
 | 2026-02-11 | self | Exported `publishDreamBoardAction` directly from `src/app/(host)/create/review/page.tsx`, which broke Next generated type checks because page modules only allow specific exports | Keep server actions in sibling `actions.ts` modules and import them into `page.tsx`; do not add extra named exports to route page files |

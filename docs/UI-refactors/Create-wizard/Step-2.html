@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gifta – Step 2: The Gift (Variant A: Icon Left, Form Right)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #FBF8F3;
+    --card: #FFFFFF;
+    --ink: #2C2520;
+    --ink-mid: #5C544C;
+    --ink-soft: #8A827A;
+    --ink-faint: #B5AEA5;
+    --ink-ghost: #D1CBC3;
+    --border: #EDE7DE;
+    --border-soft: #F5F1EA;
+    --sage: #4A7E66;
+    --sage-deep: #3B6B55;
+    --sage-light: #E9F3ED;
+    --sage-wash: #F1F7F4;
+    --amber: #C49A5C;
+    --amber-light: #F7EFE2;
+    --amber-glow: #EBDCC8;
+    --plum: #7E6B9B;
+    --plum-wash: #F1EDF7;
+    --plum-soft: #E4DDF0;
+    --serif: 'Libre Baskerville', Georgia, serif;
+    --sans: 'DM Sans', -apple-system, sans-serif;
+    --radius-lg: 28px;
+    --radius-md: 20px;
+    --radius-sm: 14px;
+    --shadow-card: 0 1px 2px rgba(44,37,32,0.03), 0 4px 12px rgba(44,37,32,0.04), 0 12px 36px rgba(44,37,32,0.04);
+    --shadow-input: 0 1px 3px rgba(44,37,32,0.04);
+  }
+
+  body { font-family: var(--sans); background: var(--bg); color: var(--ink); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+  /* NAV — identical to Step 1 */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 48px; }
+  .nav-logo { display: flex; align-items: center; gap: 8px; font-family: var(--serif); font-size: 20px; color: var(--ink); text-decoration: none; }
+  .nav-logo span { font-size: 17px; }
+  .nav-right { display: flex; align-items: center; gap: 28px; }
+  .nav-right a { font-size: 13px; color: var(--ink-soft); text-decoration: none; transition: color 0.2s; }
+  .nav-right a:hover { color: var(--ink); }
+  .nav-btn { background: var(--sage) !important; color: #fff !important; padding: 10px 20px; border-radius: 10px; font-weight: 500; }
+  .nav-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--sage); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* STEPPER — identical structure to Step 1 */
+  .stepper-bar {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 0 48px;
+    margin-top: 32px;
+    margin-bottom: 36px;
+    animation: fadeUp 0.35s ease-out both;
+  }
+  .stepper-track { display: flex; align-items: center; }
+  .s-dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; flex-shrink: 0;
+  }
+  .s-dot.done { background: var(--sage); color: #fff; }
+  .s-dot.active { background: var(--sage); color: #fff; box-shadow: 0 0 0 3px var(--sage-light); }
+  .s-dot.upcoming { background: var(--border-soft); color: var(--ink-ghost); }
+  .s-line { flex: 1; height: 2px; background: var(--border-soft); margin: 0 4px; }
+  .s-line.done { background: var(--sage); }
+
+  /* SPLIT — identical to Step 1 */
+  .split {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 0 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    align-items: start;
+    animation: fadeUp 0.45s ease-out 0.08s both;
+  }
+
+  /* LEFT — Icon picker panel (mirrors photo-panel from Step 1) */
+  .icon-panel {
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .icon-panel-header { padding: 32px 32px 0; }
+  .icon-panel-eyebrow {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--amber); margin-bottom: 8px;
+  }
+  .icon-panel-title {
+    font-family: var(--serif);
+    font-size: 22px; font-weight: 400;
+    color: var(--ink); line-height: 1.3;
+    margin-bottom: 4px;
+  }
+  .icon-panel-sub {
+    font-size: 13.5px; color: var(--ink-soft); font-weight: 300; line-height: 1.5;
+  }
+
+  /* Icon grid area */
+  .icon-grid-area {
+    margin: 24px 32px 0;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    max-height: 380px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .icon-grid-area::-webkit-scrollbar { width: 5px; }
+  .icon-grid-area::-webkit-scrollbar-track { background: transparent; }
+  .icon-grid-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .icon-category { padding: 16px 20px 14px; }
+  .icon-category:not(:last-child) { border-bottom: 1px solid var(--border-soft); }
+  .icon-cat-label {
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--ink-faint); margin-bottom: 10px;
+  }
+  .icon-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .icon-btn {
+    width: 48px; height: 48px; border-radius: 12px;
+    border: 2px solid transparent;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; padding: 0;
+  }
+  .icon-btn:hover { transform: scale(1.1); box-shadow: 0 2px 8px rgba(44,37,32,0.08); }
+  .icon-btn.selected {
+    border-color: var(--sage);
+    box-shadow: 0 0 0 3px var(--sage-light);
+    transform: scale(1.06);
+  }
+  .icon-btn img { width: 32px; height: 32px; object-fit: contain; pointer-events: none; }
+
+  /* Selected bar at bottom of icon panel */
+  .icon-selected-bar {
+    margin: 16px 32px 24px;
+    padding: 12px 16px;
+    background: var(--sage-wash);
+    border: 1.5px solid var(--sage-light);
+    border-radius: 12px;
+    font-size: 13px; color: var(--sage-deep); font-weight: 500;
+    display: none;
+    align-items: center; gap: 10px;
+  }
+  .icon-selected-bar.visible { display: flex; }
+  .icon-selected-bar img { width: 28px; height: 28px; object-fit: contain; }
+
+  /* RIGHT — Form panel (mirrors form-panel from Step 1) */
+  .form-panel {
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: 36px 32px 32px;
+  }
+  .form-panel-title {
+    font-family: var(--serif);
+    font-size: 19px; font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .form-panel-sub {
+    font-size: 13px; color: var(--ink-soft); font-weight: 300;
+    margin-bottom: 28px;
+  }
+
+  .field { margin-bottom: 24px; }
+  .field-label {
+    display: block; font-size: 13px; font-weight: 500;
+    color: var(--ink-mid); margin-bottom: 8px;
+  }
+  .field-input, .field-textarea {
+    width: 100%; padding: 14px 18px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-family: var(--sans); font-size: 15px;
+    color: var(--ink); outline: none;
+    transition: all 0.25s;
+    box-shadow: var(--shadow-input);
+  }
+  .field-input::placeholder, .field-textarea::placeholder { color: var(--ink-ghost); font-weight: 300; }
+  .field-input:hover, .field-textarea:hover { border-color: var(--ink-ghost); }
+  .field-input:focus, .field-textarea:focus {
+    border-color: var(--sage);
+    box-shadow: 0 0 0 3px var(--sage-light), var(--shadow-input);
+    background: var(--card);
+  }
+  .field-textarea { resize: vertical; min-height: 88px; line-height: 1.5; }
+  .field-hint { font-size: 12px; color: var(--ink-ghost); margin-top: 6px; }
+
+  /* Section divider */
+  .section-divider { height: 1px; background: var(--border-soft); margin: 4px 0 24px; }
+
+  /* Inline tip — same as Step 1 */
+  .field-tip {
+    display: flex; align-items: flex-start; gap: 8px;
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: var(--amber-light);
+    border-radius: 10px;
+  }
+  .field-tip svg { flex-shrink: 0; color: var(--amber); margin-top: 1px; }
+  .field-tip p { font-size: 12px; color: var(--ink-mid); line-height: 1.5; }
+
+  /* CTA */
+  .form-cta { margin-top: 32px; display: flex; gap: 12px; }
+  .back-btn {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 16px 20px;
+    background: var(--border-soft); color: var(--ink-soft);
+    border: none; border-radius: 14px;
+    font-family: var(--sans); font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+  }
+  .back-btn:hover { background: var(--border); color: var(--ink-mid); }
+  .cta-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    flex: 1; padding: 16px;
+    background: var(--sage); color: #fff;
+    border: none; border-radius: 14px;
+    font-family: var(--sans); font-size: 15px; font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(74,126,102,0.12), 0 4px 12px rgba(74,126,102,0.1);
+  }
+  .cta-btn:hover {
+    background: var(--sage-deep); transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(74,126,102,0.15), 0 8px 20px rgba(74,126,102,0.12);
+  }
+  .cta-btn svg { flex-shrink: 0; transition: transform 0.2s; }
+  .cta-btn:hover svg { transform: translateX(2px); }
+
+  /* FOOTER — identical to Step 1 */
+  footer {
+    max-width: 940px;
+    margin: 56px auto 0;
+    padding: 0 48px 40px;
+    text-align: center;
+  }
+  footer p { font-size: 11.5px; color: var(--ink-ghost); }
+
+  /* RESPONSIVE — same breakpoint as Step 1 */
+  @media (max-width: 800px) {
+    nav { padding: 14px 20px; }
+    .nav-right a:not(.nav-btn):not(.nav-avatar) { display: none; }
+    .stepper-bar { padding: 0 20px; margin-top: 24px; margin-bottom: 28px; }
+    .split { grid-template-columns: 1fr; padding: 0 20px; }
+    .icon-panel-header { padding: 24px 24px 0; }
+    .icon-grid-area { margin: 20px 24px 0; max-height: 280px; }
+    .icon-selected-bar { margin: 14px 24px 20px; }
+    .icon-btn { width: 44px; height: 44px; }
+    .icon-btn img { width: 28px; height: 28px; }
+    .form-panel { padding: 28px 24px 24px; }
+    .form-cta { flex-direction: column-reverse; }
+    footer { padding: 0 20px 32px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo"><span>🎁</span> Gifta</a>
+  <div class="nav-right">
+    <a href="#">How it works</a>
+    <a href="#">Trust &amp; safety</a>
+    <a href="#" class="nav-btn">Create a Dreamboard</a>
+    <div class="nav-avatar">R</div>
+  </div>
+</nav>
+
+<!-- Stepper — same structure, step 1 done, step 2 active -->
+<div class="stepper-bar">
+  <div class="stepper-track">
+    <div class="s-dot done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <div class="s-line done"></div>
+    <div class="s-dot active">2</div>
+    <div class="s-line"></div>
+    <div class="s-dot upcoming">3</div>
+    <div class="s-line"></div>
+    <div class="s-dot upcoming">4</div>
+    <div class="s-line"></div>
+    <div class="s-dot upcoming">5</div>
+    <div class="s-line"></div>
+    <div class="s-dot upcoming">6</div>
+  </div>
+</div>
+
+<!-- Split Layout — same structure as Step 1 -->
+<div class="split">
+
+  <!-- Left: Icon Picker Panel (mirrors photo-panel) -->
+  <div class="icon-panel">
+    <div class="icon-panel-header">
+      <p class="icon-panel-eyebrow">Step 2 of 6 — The gift</p>
+      <h1 class="icon-panel-title">Choose a gift icon</h1>
+      <p class="icon-panel-sub">This icon will represent Maya's dream gift on the Dreamboard.</p>
+    </div>
+
+    <div class="icon-grid-area">
+      <div class="icon-category">
+        <p class="icon-cat-label">Active &amp; Outdoors</p>
+        <div class="icon-row">
+          <button class="icon-btn" style="background:#E8F0E4" data-name="Bicycle" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/bicycle.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/bicycle.png" alt="Bicycle"></button>
+          <button class="icon-btn selected" style="background:#E8F0E4" data-name="Scooter" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/scooter.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/scooter.png" alt="Scooter"></button>
+          <button class="icon-btn" style="background:#E8F0E4" data-name="Soccer Ball" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/soccer-ball.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/soccer-ball.png" alt="Soccer Ball"></button>
+          <button class="icon-btn" style="background:#E8F0E4" data-name="Skateboard" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/skateboard.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/skateboard.png" alt="Skateboard"></button>
+          <button class="icon-btn" style="background:#E8F0E4" data-name="Swimming" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/swimming.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/swimming.png" alt="Swimming"></button>
+          <button class="icon-btn" style="background:#E8F0E4" data-name="Dinosaur" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/dinosaur.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/dinosaur.png" alt="Dinosaur"></button>
+          <button class="icon-btn" style="background:#E8F0E4" data-name="Race Car" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/race-car.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/race-car.png" alt="Race Car"></button>
+          <button class="icon-btn" style="background:#E8F0E4" data-name="Basketball" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/basketball.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/basketball.png" alt="Basketball"></button>
+          <button class="icon-btn" style="background:#E8F0E4" data-name="Fishing" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/fishing.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/fishing.png" alt="Fishing"></button>
+          <button class="icon-btn" style="background:#E8F0E4" data-name="Cricket" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/cricket.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/cricket.png" alt="Cricket"></button>
+          <button class="icon-btn" style="background:#E8F0E4" data-name="Rugby" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/rugby.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/rugby.png" alt="Rugby"></button>
+          <button class="icon-btn" style="background:#E8F0E4" data-name="Bow and Arrow" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/bow-and-arrow.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/bow-and-arrow.png" alt="Bow and Arrow"></button>
+          <button class="icon-btn" style="background:#E8F0E4" data-name="Martial Arts" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/martial-arts.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/martial-arts.png" alt="Martial Arts"></button>
+          <button class="icon-btn" style="background:#E8F0E4" data-name="Ice Skates" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/ice-skates.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/ice-skates.png" alt="Ice Skates"></button>
+        </div>
+      </div>
+
+      <div class="icon-category">
+        <p class="icon-cat-label">Creative &amp; Performing Arts</p>
+        <div class="icon-row">
+          <button class="icon-btn" style="background:#F8E8EE" data-name="Ballet" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/ballet.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/ballet.png" alt="Ballet"></button>
+          <button class="icon-btn" style="background:#F8E8EE" data-name="Paint Palette" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/paint-palette.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/paint-palette.png" alt="Paint Palette"></button>
+          <button class="icon-btn" style="background:#F8E8EE" data-name="Guitar" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/guitar.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/guitar.png" alt="Guitar"></button>
+          <button class="icon-btn" style="background:#F8E8EE" data-name="Microphone" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/microphone.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/microphone.png" alt="Microphone"></button>
+          <button class="icon-btn" style="background:#F8E8EE" data-name="Camera" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/camera.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/camera.png" alt="Camera"></button>
+          <button class="icon-btn" style="background:#F8E8EE" data-name="Nail Polish" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/nail-polish.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/nail-polish.png" alt="Nail Polish"></button>
+          <button class="icon-btn" style="background:#F8E8EE" data-name="Butterfly" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/butterfly.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/butterfly.png" alt="Butterfly"></button>
+          <button class="icon-btn" style="background:#F8E8EE" data-name="Ribbon" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/ribbon.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/ribbon.png" alt="Ribbon"></button>
+          <button class="icon-btn" style="background:#F8E8EE" data-name="Dress" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/dress.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/dress.png" alt="Dress"></button>
+          <button class="icon-btn" style="background:#F8E8EE" data-name="Lipstick" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/lipstick.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/lipstick.png" alt="Lipstick"></button>
+        </div>
+      </div>
+
+      <div class="icon-category">
+        <p class="icon-cat-label">Learning &amp; Discovery</p>
+        <div class="icon-row">
+          <button class="icon-btn" style="background:#E8EAF6" data-name="Books" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/books.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/books.png" alt="Books"></button>
+          <button class="icon-btn" style="background:#E8EAF6" data-name="Telescope" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/telescope.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/telescope.png" alt="Telescope"></button>
+          <button class="icon-btn" style="background:#E8EAF6" data-name="Microscope" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/microscope.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/microscope.png" alt="Microscope"></button>
+          <button class="icon-btn" style="background:#E8EAF6" data-name="Building Blocks" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/building-blocks.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/building-blocks.png" alt="Building Blocks"></button>
+          <button class="icon-btn" style="background:#E8EAF6" data-name="Globe" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/globe.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/globe.png" alt="Globe"></button>
+          <button class="icon-btn" style="background:#E8EAF6" data-name="Rocket" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/rocket.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/rocket.png" alt="Rocket"></button>
+          <button class="icon-btn" style="background:#E8EAF6" data-name="Toolbox" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/toolbox.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/toolbox.png" alt="Toolbox"></button>
+          <button class="icon-btn" style="background:#E8EAF6" data-name="Mermaid" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/mermaid.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/mermaid.png" alt="Mermaid"></button>
+          <button class="icon-btn" style="background:#E8EAF6" data-name="Crystal Ball" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/crystal-ball.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/crystal-ball.png" alt="Crystal Ball"></button>
+        </div>
+      </div>
+
+      <div class="icon-category">
+        <p class="icon-cat-label">Imaginative Play</p>
+        <div class="icon-row">
+          <button class="icon-btn" style="background:#FFF3E0" data-name="Teddy Bear" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/teddy-bear.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/teddy-bear.png" alt="Teddy Bear"></button>
+          <button class="icon-btn" style="background:#FFF3E0" data-name="Dollhouse" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/dollhouse.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/dollhouse.png" alt="Dollhouse"></button>
+          <button class="icon-btn" style="background:#FFF3E0" data-name="Superhero Cape" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/superhero-cape.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/superhero-cape.png" alt="Superhero Cape"></button>
+          <button class="icon-btn" style="background:#FFF3E0" data-name="Castle" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/castle.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/castle.png" alt="Castle"></button>
+          <button class="icon-btn" style="background:#FFF3E0" data-name="Pirate Ship" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/pirate-ship.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/pirate-ship.png" alt="Pirate Ship"></button>
+          <button class="icon-btn" style="background:#FFF3E0" data-name="Train" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/train.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/train.png" alt="Train"></button>
+          <button class="icon-btn" style="background:#FFF3E0" data-name="Detective" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/detective.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/detective.png" alt="Detective"></button>
+          <button class="icon-btn" style="background:#FFF3E0" data-name="Princess Crown" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/princess-crown.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/princess-crown.png" alt="Princess Crown"></button>
+          <button class="icon-btn" style="background:#FFF3E0" data-name="Unicorn" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/unicorn.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/unicorn.png" alt="Unicorn"></button>
+          <button class="icon-btn" style="background:#FFF3E0" data-name="Fairy" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/fairy.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/fairy.png" alt="Fairy"></button>
+          <button class="icon-btn" style="background:#FFF3E0" data-name="Rainbow" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/rainbow.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/rainbow.png" alt="Rainbow"></button>
+        </div>
+      </div>
+
+      <div class="icon-category">
+        <p class="icon-cat-label">Tech &amp; Gaming</p>
+        <div class="icon-row">
+          <button class="icon-btn" style="background:#E0F2F1" data-name="Tablet" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/tablet.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/tablet.png" alt="Tablet"></button>
+          <button class="icon-btn" style="background:#E0F2F1" data-name="Game Controller" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/game-controller.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/game-controller.png" alt="Game Controller"></button>
+          <button class="icon-btn" style="background:#E0F2F1" data-name="Headphones" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/headphones.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/headphones.png" alt="Headphones"></button>
+          <button class="icon-btn" style="background:#E0F2F1" data-name="Robot" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/robot.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/robot.png" alt="Robot"></button>
+          <button class="icon-btn" style="background:#E0F2F1" data-name="Drone" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/drone.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/drone.png" alt="Drone"></button>
+          <button class="icon-btn" style="background:#E0F2F1" data-name="Joystick" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/joystick.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/joystick.png" alt="Joystick"></button>
+        </div>
+      </div>
+
+      <div class="icon-category">
+        <p class="icon-cat-label">Experiences</p>
+        <div class="icon-row">
+          <button class="icon-btn" style="background:#FFF9E6" data-name="Amusement Park" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/amusement-park.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/amusement-park.png" alt="Amusement Park"></button>
+          <button class="icon-btn" style="background:#FFF9E6" data-name="Camping" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/camping.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/camping.png" alt="Camping"></button>
+          <button class="icon-btn" style="background:#FFF9E6" data-name="Plane Ticket" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/plane-ticket.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/plane-ticket.png" alt="Plane Ticket"></button>
+          <button class="icon-btn" style="background:#FFF9E6" data-name="Zoo" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/zoo.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/zoo.png" alt="Zoo"></button>
+          <button class="icon-btn" style="background:#FFF9E6" data-name="Movie" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/movie.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/movie.png" alt="Movie"></button>
+          <button class="icon-btn" style="background:#FFF9E6" data-name="Trophy" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/trophy.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/trophy.png" alt="Trophy"></button>
+          <button class="icon-btn" style="background:#FFF9E6" data-name="Compass" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/compass.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/compass.png" alt="Compass"></button>
+          <button class="icon-btn" style="background:#FFF9E6" data-name="Handbag" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/handbag.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/handbag.png" alt="Handbag"></button>
+          <button class="icon-btn" style="background:#FFF9E6" data-name="Flower" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/flower.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/flower.png" alt="Flower"></button>
+          <button class="icon-btn" style="background:#FFF9E6" data-name="Cupcake" data-src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/cupcake.png" onclick="selectIcon(this)"><img src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/cupcake.png" alt="Cupcake"></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="icon-selected-bar visible" id="selectedBar">
+      <img id="selectedImg" src="/Users/ryanlaubscher/Projects/gifta-codex-5.3/public/icons/gifts/scooter.png" alt="">
+      <span id="selectedText">Scooter selected</span>
+    </div>
+  </div>
+
+  <!-- Right: Form panel (mirrors Step 1 form-panel) -->
+  <div class="form-panel">
+    <h2 class="form-panel-title">Gift details</h2>
+    <p class="form-panel-sub">Describe the dream gift so contributors know what they're chipping in for.</p>
+
+    <div class="field">
+      <label class="field-label" for="giftName">Gift name</label>
+      <input class="field-input" type="text" id="giftName" placeholder="e.g. Red mountain bike" autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="giftDesc">Describe the dream gift</label>
+      <textarea class="field-textarea" id="giftDesc" placeholder="e.g. A red mountain bike with a basket and shiny streamers."></textarea>
+      <div class="field-tip">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <p>A clear description helps contributors feel confident about what they're giving towards.</p>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="field">
+      <label class="field-label" for="giftMessage">A message from Maya</label>
+      <textarea class="field-textarea" id="giftMessage" placeholder="e.g. Thank you for helping make this dream gift possible!"></textarea>
+      <p class="field-hint">This note may appear on the public Dreamboard page.</p>
+    </div>
+
+    <div class="form-cta">
+      <button class="back-btn" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <button class="cta-btn" type="button">
+        Continue to dates
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>&copy; 2026 Gifta. A joyful, secure way to pool gifts.</p>
+</footer>
+
+<script>
+  function selectIcon(btn) {
+    document.querySelectorAll('.icon-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    const bar = document.getElementById('selectedBar');
+    const img = document.getElementById('selectedImg');
+    const text = document.getElementById('selectedText');
+    img.src = btn.dataset.src;
+    text.textContent = btn.dataset.name + ' selected';
+    bar.classList.add('visible');
+  }
+</script>
+
+</body>
+</html>

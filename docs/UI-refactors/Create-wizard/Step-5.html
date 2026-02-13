@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gifta — Payout Setup (Step 5 of 6)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FBF8F3;
+      --card: #FFFFFF;
+      --ink: #2C2520;
+      --ink-mid: #5C544C;
+      --ink-soft: #8A827A;
+      --ink-faint: #B5AEA5;
+      --ink-ghost: #D1CBC3;
+      --border: #EDE7DE;
+      --border-soft: #F5F1EA;
+      --sage: #4A7E66;
+      --sage-deep: #3B6B55;
+      --sage-light: #E9F3ED;
+      --sage-wash: #F1F7F4;
+      --amber: #C49A5C;
+      --amber-light: #F7EFE2;
+      --amber-glow: #EBDCC8;
+      --plum: #7E6B9B;
+      --plum-wash: #F1EDF7;
+      --plum-soft: #E4DDF0;
+      --serif: 'Libre Baskerville', Georgia, serif;
+      --sans: 'DM Sans', -apple-system, sans-serif;
+      --radius-lg: 28px;
+      --radius-md: 20px;
+      --radius-sm: 14px;
+      --shadow-card: 0 1px 2px rgba(44,37,32,0.03), 0 4px 12px rgba(44,37,32,0.04), 0 12px 36px rgba(44,37,32,0.04);
+      --shadow-input: 0 1px 3px rgba(44,37,32,0.04);
+    }
+
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Nav */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--serif);
+      font-size: 20px;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .nav-logo span {
+      font-size: 17px;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-right a {
+      font-size: 13px;
+      color: var(--ink-soft);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-right a:hover {
+      color: var(--ink);
+    }
+
+    .nav-btn {
+      background: var(--sage) !important;
+      color: #fff !important;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 500;
+    }
+
+    .nav-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--sage);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Stepper */
+    .stepper-bar {
+      max-width: 940px;
+      margin: 0 auto;
+      padding: 0 48px;
+      margin-top: 32px;
+      margin-bottom: 36px;
+      animation: fadeUp 0.35s ease-out both;
+    }
+
+    .stepper-track {
+      display: flex;
+      align-items: center;
+    }
+
+    .s-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .s-dot.done {
+      background: var(--sage);
+      color: #fff;
+    }
+
+    .s-dot.active {
+      background: var(--sage);
+      color: #fff;
+      box-shadow: 0 0 0 3px var(--sage-light);
+    }
+
+    .s-dot.upcoming {
+      background: var(--border-soft);
+      color: var(--ink-ghost);
+    }
+
+    .s-line {
+      flex: 1;
+      height: 2px;
+      background: var(--border-soft);
+      margin: 0 4px;
+    }
+
+    .s-line.done {
+      background: var(--sage);
+    }
+
+    /* Split layout */
+    .split {
+      max-width: 940px;
+      margin: 0 auto;
+      padding: 0 48px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: start;
+      animation: fadeUp 0.45s ease-out 0.08s both;
+    }
+
+    /* Left panel */
+    .form-panel {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: 36px 32px 32px;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--amber);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 8px;
+    }
+
+    .panel-title {
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .panel-subtitle {
+      font-size: 13.5px;
+      color: var(--ink-soft);
+      line-height: 1.5;
+      margin-bottom: 28px;
+    }
+
+    /* Payout method tabs */
+    .method-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .method-tab {
+      flex: 1;
+      padding: 16px 20px;
+      border: none;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+      background: var(--bg);
+      color: var(--ink-soft);
+      border: 1.5px solid var(--border);
+      font-family: var(--sans);
+    }
+
+    .method-tab svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .method-tab.active {
+      background: var(--sage);
+      color: #fff;
+      border-color: var(--sage);
+    }
+
+    .method-tab:hover:not(.active) {
+      background: var(--border-soft);
+      border-color: var(--border);
+    }
+
+    /* Form fields */
+    .field {
+      margin-bottom: 24px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink-mid);
+      margin-bottom: 8px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .field-row .field {
+      margin-bottom: 0;
+    }
+
+    .field-input {
+      width: 100%;
+      padding: 14px 18px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-family: var(--sans);
+      font-size: 15px;
+      color: var(--ink);
+      outline: none;
+      transition: all 0.25s;
+      box-shadow: var(--shadow-input);
+    }
+
+    .field-input::placeholder {
+      color: var(--ink-ghost);
+      font-weight: 300;
+    }
+
+    .field-input:hover {
+      border-color: var(--ink-ghost);
+    }
+
+    .field-input:focus {
+      border-color: var(--sage);
+      box-shadow: 0 0 0 3px var(--sage-light), var(--shadow-input);
+      background: var(--card);
+    }
+
+    .field-tip {
+      background: var(--amber-light);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .field-tip svg {
+      flex-shrink: 0;
+      color: var(--amber);
+      margin-top: 1px;
+      width: 16px;
+      height: 16px;
+    }
+
+    .field-tip p {
+      font-size: 12px;
+      color: var(--ink-mid);
+      line-height: 1.5;
+    }
+
+    .form-section {
+      margin-bottom: 28px;
+    }
+
+    .form-section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-mid);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
+    }
+
+    /* CTA */
+    .form-cta {
+      margin-top: 32px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .back-btn, .cta-btn {
+      flex: 1;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+      font-family: var(--sans);
+    }
+
+    .back-btn {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--ink);
+    }
+
+    .back-btn:hover {
+      background: var(--border-soft);
+    }
+
+    .cta-btn {
+      background: var(--sage);
+      color: #fff;
+    }
+
+    .cta-btn:hover {
+      background: var(--sage-deep);
+    }
+
+    .cta-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Right panel - Preview */
+    .preview-panel {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .preview-header {
+      padding: 32px 32px 0;
+    }
+
+    .preview-header .eyebrow {
+      margin-bottom: 8px;
+    }
+
+    .preview-header .panel-title {
+      font-size: 19px;
+      margin-bottom: 0;
+    }
+
+    .preview-content {
+      flex: 1;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      margin: 32px;
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .preview-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .preview-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-ghost);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .method-card {
+      background: var(--sage-wash);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .method-card svg {
+      width: 20px;
+      height: 20px;
+      color: var(--sage);
+    }
+
+    .method-card-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .method-card-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .method-card-desc {
+      font-size: 11px;
+      color: var(--ink-soft);
+    }
+
+    .checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--ink-mid);
+    }
+
+    .checklist-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .checklist-icon.done {
+      background: var(--sage-light);
+      color: var(--sage);
+    }
+
+    .checklist-icon.pending {
+      background: var(--border-soft);
+      color: var(--ink-faint);
+    }
+
+    .checklist-icon svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .security-badge {
+      background: var(--sage-light);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .security-badge svg {
+      width: 24px;
+      height: 24px;
+      color: var(--sage);
+      flex-shrink: 0;
+    }
+
+    .security-badge-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .security-badge-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--sage-deep);
+    }
+
+    .security-badge-desc {
+      font-size: 11px;
+      color: var(--ink-soft);
+    }
+
+    /* Footer */
+    footer {
+      max-width: 940px;
+      margin: 56px auto 0;
+      padding: 0 48px 40px;
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 11.5px;
+      color: var(--ink-ghost);
+    }
+
+    /* Responsive */
+    @media (max-width: 800px) {
+      nav {
+        flex-direction: column;
+        gap: 16px;
+        padding: 16px 20px;
+      }
+
+      .nav-right {
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+      }
+
+      .nav-right a {
+        width: 100%;
+        text-align: center;
+      }
+
+      .stepper-bar {
+        padding: 0 20px;
+        margin-bottom: 24px;
+      }
+
+      .split {
+        padding: 0 20px;
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .form-cta {
+        flex-direction: column-reverse;
+      }
+
+      footer {
+        padding: 0 20px 24px;
+      }
+    }
+
+    /* Hidden state for conditional fields */
+    .form-section.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="#" class="nav-logo"><span>🎁</span> Gifta</a>
+    <div class="nav-right">
+      <a href="#">How it works</a>
+      <a href="#">Trust &amp; safety</a>
+      <a href="#" class="nav-btn">Create a Dreamboard</a>
+      <div class="nav-avatar">R</div>
+    </div>
+  </nav>
+
+  <div class="stepper-bar">
+    <div class="stepper-track">
+      <div class="s-dot done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="s-line done"></div>
+      <div class="s-dot done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="s-line done"></div>
+      <div class="s-dot done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="s-line done"></div>
+      <div class="s-dot done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="s-line done"></div>
+      <div class="s-dot active">5</div>
+      <div class="s-line"></div>
+      <div class="s-dot upcoming">6</div>
+    </div>
+  </div>
+
+  <div class="split">
+    <!-- LEFT: Payout Form -->
+    <div class="form-panel">
+      <div class="eyebrow">Step 5 of 6 — Payout setup</div>
+      <h1 class="panel-title">How should we send your payout?</h1>
+      <p class="panel-subtitle">Tell us where to send the pooled funds when the campaign closes.</p>
+
+      <!-- Payout Method Selection -->
+      <div class="form-section">
+        <div class="form-section-title">Payout method</div>
+        <div class="method-tabs">
+          <button class="method-tab active" data-method="karri">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="6" width="18" height="12" rx="2"/>
+              <path d="M3 10h18"/>
+            </svg>
+            Karri Card
+          </button>
+          <button class="method-tab" data-method="bank">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18M3 10h18M7 14h10M3 18h18"/>
+            </svg>
+            Bank Transfer
+          </button>
+        </div>
+      </div>
+
+      <!-- Karri Card Fields -->
+      <div class="form-section" id="karri-section">
+        <div class="field">
+          <label class="field-label">Card number</label>
+          <input type="text" class="field-input" placeholder="XXXX XXXX XXXX XXXX" data-field="karri-card">
+        </div>
+        <div class="field">
+          <label class="field-label">Card holder name</label>
+          <input type="text" class="field-input" placeholder="Name on card" data-field="karri-name">
+        </div>
+      </div>
+
+      <!-- Bank Transfer Fields -->
+      <div class="form-section hidden" id="bank-section">
+        <div class="field">
+          <label class="field-label">Bank name</label>
+          <input type="text" class="field-input" placeholder="e.g. FNB, Standard Bank" data-field="bank-name">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label">Account number</label>
+            <input type="text" class="field-input" placeholder="Your account number" data-field="bank-account">
+          </div>
+          <div class="field">
+            <label class="field-label">Branch code</label>
+            <input type="text" class="field-input" placeholder="6-digit code" data-field="bank-branch">
+          </div>
+        </div>
+      </div>
+
+      <!-- Always visible contact fields -->
+      <div class="form-section">
+        <div class="form-section-title">Contact details</div>
+        <div class="field">
+          <label class="field-label">Payout email</label>
+          <input type="email" class="field-input" placeholder="you@example.com" data-field="email">
+        </div>
+        <div class="field">
+          <label class="field-label">WhatsApp number</label>
+          <input type="tel" class="field-input" placeholder="e.g. +27821234567" data-field="whatsapp">
+        </div>
+      </div>
+
+      <!-- Security tip -->
+      <div class="field-tip">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        <p>Your financial details are encrypted end-to-end and stored securely.</p>
+      </div>
+
+      <!-- CTA -->
+      <div class="form-cta">
+        <button class="back-btn">Back</button>
+        <button class="cta-btn">
+          Continue to review
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Payout Summary & Trust Preview -->
+    <div class="preview-panel">
+      <div class="preview-header">
+        <div class="eyebrow">Preview</div>
+        <h2 class="panel-title">Payout summary</h2>
+      </div>
+
+      <div class="preview-content">
+        <!-- Selected Method Card -->
+        <div class="preview-section">
+          <div class="preview-section-title">Selected method</div>
+          <div class="method-card" id="preview-method-card">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="6" width="18" height="12" rx="2"/>
+              <path d="M3 10h18"/>
+            </svg>
+            <div class="method-card-content">
+              <div class="method-card-name">Karri Card</div>
+              <div class="method-card-desc">Instant payout to your card</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Checklist -->
+        <div class="preview-section">
+          <div class="preview-section-title">Setup progress</div>
+          <div class="checklist">
+            <div class="checklist-item">
+              <div class="checklist-icon done">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <span>Payout method selected</span>
+            </div>
+            <div class="checklist-item">
+              <div class="checklist-icon pending" id="card-check">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/></svg>
+              </div>
+              <span id="card-check-text">Card details entered</span>
+            </div>
+            <div class="checklist-item">
+              <div class="checklist-icon pending" id="email-check">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/></svg>
+              </div>
+              <span>Contact email provided</span>
+            </div>
+            <div class="checklist-item">
+              <div class="checklist-icon pending" id="whatsapp-check">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/></svg>
+              </div>
+              <span>WhatsApp number added (optional)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Security Badge -->
+        <div class="security-badge">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <div class="security-badge-content">
+            <div class="security-badge-title">256-bit encrypted</div>
+            <div class="security-badge-desc">Your details are protected</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 Gifta. A joyful, secure way to pool gifts.</p>
+  </footer>
+
+  <script>
+    // Method tab switching
+    const methodTabs = document.querySelectorAll('.method-tab');
+    const karriSection = document.getElementById('karri-section');
+    const bankSection = document.getElementById('bank-section');
+    const previewMethodCard = document.getElementById('preview-method-card');
+    const cardCheckText = document.getElementById('card-check-text');
+
+    methodTabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        // Update active state
+        methodTabs.forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+
+        // Show/hide relevant sections
+        const method = this.dataset.method;
+        if (method === 'karri') {
+          karriSection.classList.remove('hidden');
+          bankSection.classList.add('hidden');
+          updatePreviewMethod('karri');
+          cardCheckText.textContent = 'Card details entered';
+        } else {
+          karriSection.classList.add('hidden');
+          bankSection.classList.remove('hidden');
+          updatePreviewMethod('bank');
+          cardCheckText.textContent = 'Bank details entered';
+        }
+
+        // Reset checklist
+        updateChecklist();
+      });
+    });
+
+    function updatePreviewMethod(method) {
+      if (method === 'karri') {
+        previewMethodCard.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="6" width="18" height="12" rx="2"/>
+            <path d="M3 10h18"/>
+          </svg>
+          <div class="method-card-content">
+            <div class="method-card-name">Karri Card</div>
+            <div class="method-card-desc">Instant payout to your card</div>
+          </div>
+        `;
+      } else {
+        previewMethodCard.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M3 6h18M3 10h18M7 14h10M3 18h18"/>
+          </svg>
+          <div class="method-card-content">
+            <div class="method-card-name">Bank Transfer</div>
+            <div class="method-card-desc">Transfer to your bank account</div>
+          </div>
+        `;
+      }
+    }
+
+    // Field input tracking
+    const allInputs = document.querySelectorAll('.field-input');
+    allInputs.forEach(input => {
+      input.addEventListener('input', updateChecklist);
+      input.addEventListener('change', updateChecklist);
+    });
+
+    function updateChecklist() {
+      // Check which method is active
+      const activeMethod = document.querySelector('.method-tab.active').dataset.method;
+      const cardCheck = document.getElementById('card-check');
+      const emailCheck = document.getElementById('email-check');
+      const whatsappCheck = document.getElementById('whatsapp-check');
+
+      // Determine if method fields are filled
+      let methodFilled = false;
+      if (activeMethod === 'karri') {
+        const cardNum = document.querySelector('[data-field="karri-card"]').value.trim();
+        const cardName = document.querySelector('[data-field="karri-name"]').value.trim();
+        methodFilled = cardNum.length > 0 && cardName.length > 0;
+      } else {
+        const bankName = document.querySelector('[data-field="bank-name"]').value.trim();
+        const account = document.querySelector('[data-field="bank-account"]').value.trim();
+        const branch = document.querySelector('[data-field="bank-branch"]').value.trim();
+        methodFilled = bankName.length > 0 && account.length > 0 && branch.length > 0;
+      }
+
+      // Update card/bank check
+      updateCheckIcon(cardCheck, methodFilled);
+
+      // Check email
+      const email = document.querySelector('[data-field="email"]').value.trim();
+      updateCheckIcon(emailCheck, email.length > 0);
+
+      // Check whatsapp (optional but show state)
+      const whatsapp = document.querySelector('[data-field="whatsapp"]').value.trim();
+      updateCheckIcon(whatsappCheck, whatsapp.length > 0);
+    }
+
+    function updateCheckIcon(element, isComplete) {
+      if (isComplete) {
+        element.classList.remove('pending');
+        element.classList.add('done');
+        element.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      } else {
+        element.classList.remove('done');
+        element.classList.add('pending');
+        element.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/></svg>';
+      }
+    }
+
+    // Initialize
+    updateChecklist();
+  </script>
+</body>
+</html>

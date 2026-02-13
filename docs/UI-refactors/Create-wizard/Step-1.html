@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gifta – Create Dreamboard Step 1 (Variant B: Split Panel)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #FBF8F3;
+    --card: #FFFFFF;
+    --ink: #2C2520;
+    --ink-mid: #5C544C;
+    --ink-soft: #8A827A;
+    --ink-faint: #B5AEA5;
+    --ink-ghost: #D1CBC3;
+    --border: #EDE7DE;
+    --border-soft: #F5F1EA;
+    --sage: #4A7E66;
+    --sage-deep: #3B6B55;
+    --sage-light: #E9F3ED;
+    --sage-wash: #F1F7F4;
+    --amber: #C49A5C;
+    --amber-light: #F7EFE2;
+    --amber-glow: #EBDCC8;
+    --plum: #7E6B9B;
+    --plum-wash: #F1EDF7;
+    --plum-soft: #E4DDF0;
+    --serif: 'Libre Baskerville', Georgia, serif;
+    --sans: 'DM Sans', -apple-system, sans-serif;
+    --radius-lg: 28px;
+    --radius-md: 20px;
+    --radius-sm: 14px;
+    --shadow-card: 0 1px 2px rgba(44,37,32,0.03), 0 4px 12px rgba(44,37,32,0.04), 0 12px 36px rgba(44,37,32,0.04);
+    --shadow-input: 0 1px 3px rgba(44,37,32,0.04);
+  }
+
+  body { font-family: var(--sans); background: var(--bg); color: var(--ink); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+  /* NAV */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 48px; }
+  .nav-logo { display: flex; align-items: center; gap: 8px; font-family: var(--serif); font-size: 20px; color: var(--ink); text-decoration: none; }
+  .nav-logo span { font-size: 17px; }
+  .nav-right { display: flex; align-items: center; gap: 28px; }
+  .nav-right a { font-size: 13px; color: var(--ink-soft); text-decoration: none; transition: color 0.2s; }
+  .nav-right a:hover { color: var(--ink); }
+  .nav-btn { background: var(--sage) !important; color: #fff !important; padding: 10px 20px; border-radius: 10px; font-weight: 500; }
+  .nav-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--sage); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* STEPPER — top bar */
+  .stepper-bar {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 0 48px;
+    margin-top: 32px;
+    margin-bottom: 36px;
+    animation: fadeUp 0.35s ease-out both;
+  }
+  .stepper-track {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .s-dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; flex-shrink: 0;
+  }
+  .s-dot.active { background: var(--sage); color: #fff; box-shadow: 0 0 0 3px var(--sage-light); }
+  .s-dot.upcoming { background: var(--border-soft); color: var(--ink-ghost); }
+  .s-line { flex: 1; height: 2px; background: var(--border-soft); margin: 0 4px; }
+
+  /* SPLIT LAYOUT */
+  .split {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 0 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    align-items: start;
+    animation: fadeUp 0.45s ease-out 0.08s both;
+  }
+
+  /* LEFT — photo panel */
+  .photo-panel {
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .photo-panel-header {
+    padding: 32px 32px 0;
+  }
+  .photo-panel-eyebrow {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--amber);
+    margin-bottom: 8px;
+  }
+  .photo-panel-title {
+    font-family: var(--serif);
+    font-size: 22px; font-weight: 400;
+    color: var(--ink); line-height: 1.3;
+    margin-bottom: 4px;
+  }
+  .photo-panel-sub {
+    font-size: 13.5px; color: var(--ink-soft); font-weight: 300;
+    line-height: 1.5;
+  }
+
+  /* Drop zone */
+  .photo-drop-area {
+    margin: 28px 32px 32px;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-md);
+    background: var(--border-soft);
+    padding: 48px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    min-height: 240px;
+  }
+  .photo-drop-area:hover {
+    border-color: var(--sage);
+    background: var(--sage-wash);
+  }
+  .photo-drop-area.dragover {
+    border-color: var(--sage);
+    background: var(--sage-light);
+    border-style: solid;
+    transform: scale(1.01);
+  }
+  .photo-drop-area input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+  }
+  .drop-icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--card);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 4px rgba(44,37,32,0.06);
+    transition: all 0.3s;
+  }
+  .photo-drop-area:hover .drop-icon { background: var(--sage-light); }
+  .drop-icon svg { color: var(--ink-ghost); transition: color 0.3s; }
+  .photo-drop-area:hover .drop-icon svg { color: var(--sage); }
+  .drop-text {
+    font-size: 14px; color: var(--ink-soft); font-weight: 400;
+    text-align: center; line-height: 1.5;
+  }
+  .drop-text strong {
+    color: var(--sage); font-weight: 500;
+  }
+  .drop-hint {
+    font-size: 11.5px; color: var(--ink-ghost);
+  }
+  .preview-img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; display: none;
+    border-radius: 18px;
+  }
+  .preview-overlay {
+    position: absolute; inset: 0;
+    background: rgba(44,37,32,0.4);
+    display: none;
+    align-items: center; justify-content: center;
+    border-radius: 18px;
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .photo-drop-area:hover .preview-overlay { opacity: 1; }
+  .preview-overlay span {
+    background: var(--card);
+    padding: 8px 18px;
+    border-radius: 10px;
+    font-size: 13px; font-weight: 500;
+    color: var(--ink);
+  }
+
+  /* RIGHT — form */
+  .form-panel {
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: 36px 32px 32px;
+  }
+  .form-panel-title {
+    font-family: var(--serif);
+    font-size: 19px; font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .form-panel-sub {
+    font-size: 13px; color: var(--ink-soft); font-weight: 300;
+    margin-bottom: 28px;
+  }
+
+  .field { margin-bottom: 24px; }
+  .field-label {
+    display: block;
+    font-size: 13px; font-weight: 500;
+    color: var(--ink-mid);
+    margin-bottom: 8px;
+  }
+  .field-input {
+    width: 100%; padding: 14px 18px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-family: var(--sans); font-size: 15px;
+    color: var(--ink); outline: none;
+    transition: all 0.25s;
+    box-shadow: var(--shadow-input);
+  }
+  .field-input::placeholder { color: var(--ink-ghost); font-weight: 300; }
+  .field-input:hover { border-color: var(--ink-ghost); }
+  .field-input:focus {
+    border-color: var(--sage);
+    box-shadow: 0 0 0 3px var(--sage-light), var(--shadow-input);
+    background: var(--card);
+  }
+
+  /* Inline tip */
+  .field-tip {
+    display: flex; align-items: flex-start; gap: 8px;
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: var(--amber-light);
+    border-radius: 10px;
+  }
+  .field-tip svg { flex-shrink: 0; color: var(--amber); margin-top: 1px; }
+  .field-tip p { font-size: 12px; color: var(--ink-mid); line-height: 1.5; }
+
+  /* CTA */
+  .form-cta { margin-top: 32px; }
+  .cta-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 16px;
+    background: var(--sage); color: #fff;
+    border: none; border-radius: 14px;
+    font-family: var(--sans); font-size: 15px; font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(74,126,102,0.12), 0 4px 12px rgba(74,126,102,0.1);
+  }
+  .cta-btn:hover {
+    background: var(--sage-deep);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(74,126,102,0.15), 0 8px 20px rgba(74,126,102,0.12);
+  }
+  .cta-btn svg { flex-shrink: 0; transition: transform 0.2s; }
+  .cta-btn:hover svg { transform: translateX(2px); }
+
+  /* FOOTER */
+  footer {
+    max-width: 940px;
+    margin: 56px auto 0;
+    padding: 0 48px 40px;
+    text-align: center;
+  }
+  footer p { font-size: 11.5px; color: var(--ink-ghost); }
+
+  /* RESPONSIVE */
+  @media (max-width: 800px) {
+    nav { padding: 14px 20px; }
+    .nav-right a:not(.nav-btn):not(.nav-avatar) { display: none; }
+    .stepper-bar { padding: 0 20px; margin-top: 24px; margin-bottom: 28px; }
+    .split { grid-template-columns: 1fr; padding: 0 20px; }
+    .photo-drop-area { padding: 36px 24px; min-height: 180px; }
+    .photo-panel-header { padding: 24px 24px 0; }
+    .photo-drop-area { margin: 20px 24px 24px; }
+    .form-panel { padding: 28px 24px 24px; }
+    footer { padding: 0 20px 32px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo"><span>🎁</span> Gifta</a>
+  <div class="nav-right">
+    <a href="#">How it works</a>
+    <a href="#">Trust &amp; safety</a>
+    <a href="#" class="nav-btn">Create a Dreamboard</a>
+    <div class="nav-avatar">R</div>
+  </div>
+</nav>
+
+<!-- Stepper -->
+<div class="stepper-bar">
+  <div class="stepper-track">
+    <div class="s-dot active">1</div>
+    <div class="s-line"></div>
+    <div class="s-dot upcoming">2</div>
+    <div class="s-line"></div>
+    <div class="s-dot upcoming">3</div>
+    <div class="s-line"></div>
+    <div class="s-dot upcoming">4</div>
+    <div class="s-line"></div>
+    <div class="s-dot upcoming">5</div>
+    <div class="s-line"></div>
+    <div class="s-dot upcoming">6</div>
+  </div>
+</div>
+
+<!-- Split Layout -->
+<div class="split">
+
+  <!-- Left: Photo Panel -->
+  <div class="photo-panel">
+    <div class="photo-panel-header">
+      <p class="photo-panel-eyebrow">Step 1 of 6 — The child</p>
+      <h1 class="photo-panel-title">Who's the birthday star?</h1>
+      <p class="photo-panel-sub">This photo will be the face of the Dreamboard that friends and family see.</p>
+    </div>
+
+    <div class="photo-drop-area" id="photoDrop">
+      <div class="drop-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </div>
+      <p class="drop-text">Drag a photo here, or <strong>browse</strong></p>
+      <span class="drop-hint">JPG, PNG or WebP · Max 5 MB</span>
+      <input type="file" accept="image/jpeg,image/png,image/webp" id="photoInput">
+      <img class="preview-img" id="previewImg" alt="Preview">
+      <div class="preview-overlay" id="previewOverlay"><span>Change photo</span></div>
+    </div>
+  </div>
+
+  <!-- Right: Form -->
+  <div class="form-panel">
+    <h2 class="form-panel-title">Child details</h2>
+    <p class="form-panel-sub">Tell us a little about the birthday child.</p>
+
+    <div class="field">
+      <label class="field-label" for="childName">Child's first name</label>
+      <input class="field-input" type="text" id="childName" placeholder="e.g. Maya" autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="childAge">Age turning this birthday</label>
+      <input class="field-input" type="number" id="childAge" placeholder="e.g. 7" min="1" max="18">
+      <div class="field-tip">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <p>This will be shown on the Dreamboard as "Maya turns 7!"</p>
+      </div>
+    </div>
+
+    <div class="form-cta">
+      <button class="cta-btn" type="button">
+        Continue to gift
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>&copy; 2026 Gifta. A joyful, secure way to pool gifts.</p>
+</footer>
+
+<script>
+  const drop = document.getElementById('photoDrop');
+  const input = document.getElementById('photoInput');
+  const preview = document.getElementById('previewImg');
+  const overlay = document.getElementById('previewOverlay');
+
+  ['dragenter','dragover'].forEach(e => {
+    drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.add('dragover'); });
+  });
+  ['dragleave','drop'].forEach(e => {
+    drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.remove('dragover'); });
+  });
+  drop.addEventListener('drop', ev => {
+    const file = ev.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) showPreview(file);
+  });
+  input.addEventListener('change', () => {
+    if (input.files[0]) showPreview(input.files[0]);
+  });
+  function showPreview(file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+      overlay.style.display = 'flex';
+      drop.querySelector('.drop-icon').style.display = 'none';
+      drop.querySelector('.drop-text').style.display = 'none';
+      drop.querySelector('.drop-hint').style.display = 'none';
+      drop.style.borderStyle = 'solid';
+      drop.style.borderColor = 'var(--sage)';
+      drop.style.padding = '0';
+    };
+    reader.readAsDataURL(file);
+  }
+</script>
+
+</body>
+</html>

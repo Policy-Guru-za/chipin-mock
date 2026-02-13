@@ -477,6 +477,7 @@ export const listAdminCharities = async (
 ): Promise<AdminPage<AdminCharityDataset>> => {
   const limit = resolveLimit(filters.limit);
   const conditions: SQL[] = [];
+  const charityIdReference = sql.raw('"charities"."id"');
 
   if (filters.isActive !== undefined) {
     conditions.push(eq(charities.isActive, filters.isActive));
@@ -522,14 +523,14 @@ export const listAdminCharities = async (
         SELECT COUNT(DISTINCT db.id)::int
         FROM dream_boards db
         WHERE db.charity_enabled = true
-          AND db.charity_id = ${charities.id}
+          AND db.charity_id = ${charityIdReference}
       ), 0)`,
       totalRaisedCents: sql<number>`COALESCE((
         SELECT SUM(COALESCE(c.charity_cents, 0))::int
         FROM contributions c
         JOIN dream_boards db ON db.id = c.dream_board_id
         WHERE db.charity_enabled = true
-          AND db.charity_id = ${charities.id}
+          AND db.charity_id = ${charityIdReference}
           AND c.payment_status = 'completed'
       ), 0)`,
       totalPayoutsCents: sql<number>`COALESCE((
@@ -537,7 +538,7 @@ export const listAdminCharities = async (
         FROM payouts p
         WHERE p.type = 'charity'
           AND p.status = 'completed'
-          AND p.recipient_data ->> 'charityId' = ${charities.id}
+          AND p.recipient_data ->> 'charityId' = ${charityIdReference}
       ), 0)`,
     })
     .from(charities)

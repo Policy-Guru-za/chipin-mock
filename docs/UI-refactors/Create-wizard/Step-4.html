@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gifta – Step 4: Giving Back (Variant B: Config Left, Preview Right)</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FBF8F3;
+      --card: #FFFFFF;
+      --ink: #2C2520;
+      --ink-mid: #5C544C;
+      --ink-soft: #8A827A;
+      --ink-faint: #B5AEA5;
+      --ink-ghost: #D1CBC3;
+      --border: #EDE7DE;
+      --border-soft: #F5F1EA;
+      --sage: #4A7E66;
+      --sage-deep: #3B6B55;
+      --sage-light: #E9F3ED;
+      --sage-wash: #F1F7F4;
+      --amber: #C49A5C;
+      --amber-light: #F7EFE2;
+      --amber-glow: #EBDCC8;
+      --plum: #7E6B9B;
+      --plum-wash: #F1EDF7;
+      --plum-soft: #E4DDF0;
+      --serif: 'Libre Baskerville', Georgia, serif;
+      --sans: 'DM Sans', -apple-system, sans-serif;
+      --radius-lg: 28px;
+      --radius-md: 20px;
+      --radius-sm: 14px;
+      --shadow-card: 0 1px 2px rgba(44,37,32,0.03), 0 4px 12px rgba(44,37,32,0.04), 0 12px 36px rgba(44,37,32,0.04);
+      --shadow-input: 0 1px 3px rgba(44,37,32,0.04);
+    }
+
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Nav */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--serif);
+      font-size: 20px;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .nav-logo span {
+      font-size: 17px;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-right a {
+      font-size: 13px;
+      color: var(--ink-soft);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-right a:hover {
+      color: var(--ink);
+    }
+
+    .nav-btn {
+      background: var(--sage) !important;
+      color: #fff !important;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 500;
+    }
+
+    .nav-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--sage);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Stepper */
+    .stepper-bar {
+      max-width: 940px;
+      margin: 0 auto;
+      padding: 0 48px;
+      margin-top: 32px;
+      margin-bottom: 36px;
+      animation: fadeUp 0.35s ease-out both;
+    }
+
+    .stepper-track {
+      display: flex;
+      align-items: center;
+    }
+
+    .s-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .s-dot.done {
+      background: var(--sage);
+      color: #fff;
+    }
+
+    .s-dot.active {
+      background: var(--sage);
+      color: #fff;
+      box-shadow: 0 0 0 3px var(--sage-light);
+    }
+
+    .s-dot.upcoming {
+      background: var(--border-soft);
+      color: var(--ink-ghost);
+    }
+
+    .s-line {
+      flex: 1;
+      height: 2px;
+      background: var(--border-soft);
+      margin: 0 4px;
+    }
+
+    .s-line.done {
+      background: var(--sage);
+    }
+
+    /* Split Layout */
+    .split {
+      max-width: 940px;
+      margin: 0 auto;
+      padding: 0 48px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: start;
+      animation: fadeUp 0.45s ease-out 0.08s both;
+    }
+
+    /* Form Panel */
+    .form-panel {
+      background: var(--card);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      padding: 36px 32px 32px;
+    }
+
+    .panel-header {
+      margin-bottom: 32px;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--amber);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 8px;
+    }
+
+    .panel-title {
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .panel-subtitle {
+      font-size: 14px;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+
+    .preview-header .panel-title {
+      font-size: 19px;
+    }
+
+    /* Field */
+    .field {
+      margin-bottom: 24px;
+    }
+
+    .field-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink-mid);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .field-input {
+      width: 100%;
+      padding: 14px 18px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-family: var(--sans);
+      font-size: 15px;
+      color: var(--ink);
+      outline: none;
+      transition: all 0.25s;
+      box-shadow: var(--shadow-input);
+    }
+
+    .field-input::placeholder {
+      color: var(--ink-ghost);
+      font-weight: 300;
+    }
+
+    .field-input:hover {
+      border-color: var(--ink-ghost);
+    }
+
+    .field-input:focus {
+      border-color: var(--sage);
+      box-shadow: 0 0 0 3px var(--sage-light), var(--shadow-input);
+      background: var(--card);
+    }
+
+    /* Toggle */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      padding: 16px;
+      background: var(--border-soft);
+      border-radius: 12px;
+    }
+
+    .toggle-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink-mid);
+    }
+
+    .toggle-switch {
+      width: 44px;
+      height: 24px;
+      background: var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      position: relative;
+      border: none;
+      padding: 0;
+      transition: background 0.3s;
+    }
+
+    .toggle-switch.on {
+      background: var(--sage);
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.3s;
+    }
+
+    .toggle-switch.on::after {
+      transform: translateX(20px);
+    }
+
+    /* Charity list */
+    .charity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .charity-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .charity-item:hover {
+      border-color: var(--sage);
+      background: var(--sage-wash);
+    }
+
+    .charity-item.selected {
+      border-color: var(--sage);
+      background: var(--sage-light);
+    }
+
+    .charity-initials {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .charity-initials.plum { background: var(--plum); }
+    .charity-initials.amber { background: var(--amber); }
+    .charity-initials.sage { background: var(--sage); }
+    .charity-initials.orange { background: #D97706; }
+    .charity-initials.blue { background: #2563EB; }
+
+    .charity-info {
+      flex: 1;
+    }
+
+    .charity-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 3px;
+    }
+
+    .charity-tag {
+      font-size: 11px;
+      color: var(--ink-soft);
+    }
+
+    /* Split tabs */
+    .split-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .split-tab {
+      flex: 1;
+      padding: 12px 16px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .split-tab:hover {
+      border-color: var(--sage);
+    }
+
+    .split-tab.active {
+      background: var(--sage);
+      color: #fff;
+      border-color: var(--sage);
+    }
+
+    /* Amount input wrapper */
+    .amount-wrapper {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .amount-prefix,
+    .amount-suffix {
+      position: absolute;
+      top: 14px;
+      font-size: 15px;
+      color: var(--ink-mid);
+      font-weight: 500;
+      pointer-events: none;
+    }
+
+    .amount-prefix {
+      left: 18px;
+    }
+
+    .amount-suffix {
+      right: 18px;
+    }
+
+    .amount-input {
+      padding-left: 28px;
+      padding-right: 28px;
+      text-align: center;
+    }
+
+    /* Field tip */
+    .field-tip {
+      background: var(--amber-light);
+      border: 1px solid var(--amber-glow);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .field-tip svg {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+    }
+
+    .field-tip p {
+      font-size: 12px;
+      color: var(--ink-mid);
+      line-height: 1.5;
+    }
+
+    /* CTA */
+    .form-cta {
+      margin-top: 32px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .back-btn,
+    .cta-btn {
+      flex: 1;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+      font-family: var(--sans);
+    }
+
+    .back-btn {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--ink);
+    }
+
+    .back-btn:hover {
+      background: var(--border-soft);
+    }
+
+    .cta-btn {
+      background: var(--sage);
+      color: #fff;
+    }
+
+    .cta-btn:hover {
+      background: var(--sage-deep);
+    }
+
+    .cta-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Preview Panel */
+    .preview-panel {
+      background: var(--card);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .preview-header {
+      padding: 32px 32px 0;
+    }
+
+    .preview-content {
+      flex: 1;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      margin: 32px 32px 32px;
+      padding: 32px 28px;
+    }
+
+    /* Impact bar */
+    .impact-bar {
+      margin-bottom: 24px;
+    }
+
+    .impact-bar-track {
+      width: 100%;
+      height: 12px;
+      background: var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      margin-bottom: 12px;
+    }
+
+    .impact-bar-gift {
+      background: var(--sage);
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 8px;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .impact-bar-charity {
+      background: var(--plum);
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding-left: 8px;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    /* Summary rows */
+    .impact-summary {
+      margin-bottom: 24px;
+    }
+
+    .impact-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: var(--ink);
+    }
+
+    .impact-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .impact-dot.gift {
+      background: var(--sage);
+    }
+
+    .impact-dot.charity {
+      background: var(--plum);
+    }
+
+    /* Divider */
+    .impact-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+
+    /* Charity card */
+    .impact-charity-card {
+      background: var(--plum-wash);
+      border: 1px solid var(--plum-soft);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .impact-charity-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--plum);
+      margin-bottom: 4px;
+    }
+
+    .impact-charity-desc {
+      font-size: 12px;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+
+    /* Per 100 breakdown */
+    .impact-breakdown {
+      background: var(--sage-wash);
+      border: 1px solid var(--sage-light);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .impact-breakdown-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .impact-breakdown-items {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .impact-breakdown-item {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .impact-breakdown-arrow {
+      color: var(--ink-soft);
+      margin: 0 6px;
+    }
+
+    /* Footer */
+    footer {
+      max-width: 940px;
+      margin: 56px auto 0;
+      padding: 0 48px 40px;
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 11.5px;
+      color: var(--ink-ghost);
+    }
+
+    /* Responsive */
+    @media (max-width: 800px) {
+      nav {
+        padding: 16px 20px;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .nav-right {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .stepper-bar {
+        padding: 0 20px;
+      }
+
+
+
+      .split {
+        grid-template-columns: 1fr;
+        padding: 0 20px;
+      }
+
+      .form-cta {
+        flex-direction: column-reverse;
+      }
+
+      .form-panel,
+      .preview-panel {
+        padding: 24px 20px 20px;
+      }
+
+      .panel-header {
+        margin-bottom: 24px;
+      }
+
+      .panel-title {
+        font-size: 18px;
+      }
+
+      footer {
+        padding: 24px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <a href="#" class="nav-logo"><span>🎁</span> Gifta</a>
+  <div class="nav-right">
+    <a href="#">How it works</a>
+    <a href="#">Trust &amp; safety</a>
+    <a href="#" class="nav-btn">Create a Dreamboard</a>
+    <div class="nav-avatar">R</div>
+  </div>
+</nav>
+
+<!-- Stepper -->
+<div class="stepper-bar">
+  <div class="stepper-track">
+    <div class="s-dot done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <div class="s-line done"></div>
+    <div class="s-dot done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <div class="s-line done"></div>
+    <div class="s-dot done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <div class="s-line done"></div>
+    <div class="s-dot active">4</div>
+    <div class="s-line"></div>
+    <div class="s-dot upcoming">5</div>
+    <div class="s-line"></div>
+    <div class="s-dot upcoming">6</div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="split">
+
+    <!-- LEFT: Config Form -->
+    <div class="form-panel">
+      <div class="panel-header">
+        <div class="eyebrow">Step 4 of 6 — Giving back</div>
+        <h1 class="panel-title">Want to share the love?</h1>
+        <p class="panel-subtitle">Help a cause while celebrating Maya.</p>
+      </div>
+
+      <form id="givingForm">
+        <!-- Toggle -->
+        <div class="toggle-row">
+          <label class="toggle-label">Enable giving back</label>
+          <button type="button" class="toggle-switch on" id="givingToggle"></button>
+        </div>
+
+        <!-- Charity selector -->
+        <div class="field" id="charityField">
+          <label class="field-label">Select a charity</label>
+          <div class="charity-list" id="charityList">
+            <div class="charity-item selected" data-charity="reach-for-a-dream">
+              <div class="charity-initials plum">RF</div>
+              <div class="charity-info">
+                <div class="charity-name">Reach for a Dream</div>
+                <div class="charity-tag">Supporting children with chronic illnesses</div>
+              </div>
+            </div>
+            <div class="charity-item" data-charity="choc">
+              <div class="charity-initials amber">CH</div>
+              <div class="charity-info">
+                <div class="charity-name">CHOC Childhood Cancer</div>
+                <div class="charity-tag">Childhood cancer research &amp; support</div>
+              </div>
+            </div>
+            <div class="charity-item" data-charity="cotlands">
+              <div class="charity-initials sage">CO</div>
+              <div class="charity-info">
+                <div class="charity-name">Cotlands</div>
+                <div class="charity-tag">Early childhood development</div>
+              </div>
+            </div>
+            <div class="charity-item" data-charity="ladles-of-love">
+              <div class="charity-initials orange">LL</div>
+              <div class="charity-info">
+                <div class="charity-name">Ladles of Love</div>
+                <div class="charity-tag">Feeding the hungry daily</div>
+              </div>
+            </div>
+            <div class="charity-item" data-charity="afrika-tikkun">
+              <div class="charity-initials blue">AT</div>
+              <div class="charity-info">
+                <div class="charity-name">Afrika Tikkun</div>
+                <div class="charity-tag">Youth development &amp; education</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Split mode tabs -->
+        <div class="field" id="splitModeField">
+          <label class="field-label">How should we split?</label>
+          <div class="split-tabs">
+            <button type="button" class="split-tab active" data-mode="percentage">Percentage</button>
+            <button type="button" class="split-tab" data-mode="threshold">Threshold</button>
+          </div>
+        </div>
+
+        <!-- Amount input -->
+        <div class="field" id="amountField">
+          <label class="field-label" id="amountLabel">Percentage to share</label>
+          <div class="amount-wrapper">
+            <span class="amount-suffix" id="amountSuffix">%</span>
+            <input type="number" class="field-input amount-input" id="amountInput" value="15" min="1" max="100">
+          </div>
+        </div>
+
+        <!-- Field tip -->
+        <div class="field-tip">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--amber);">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            <text x="12" y="15" text-anchor="middle" font-size="10" font-weight="600" fill="currentColor">i</text>
+          </svg>
+          <p>Contributors will see that a portion goes to charity on the Dreamboard.</p>
+        </div>
+
+        <!-- CTA -->
+        <div class="form-cta">
+          <button type="button" class="back-btn" id="backBtn">Back</button>
+          <button type="button" class="cta-btn" id="continueBtn">
+            Continue to payout setup
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+            </svg>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- RIGHT: Impact Preview -->
+    <div class="preview-panel">
+      <div class="preview-header">
+        <div class="eyebrow">Preview</div>
+        <h2 class="panel-title">Impact breakdown</h2>
+      </div>
+
+      <div class="preview-content">
+        <!-- Impact bar -->
+        <div class="impact-bar">
+          <div class="impact-bar-track">
+            <div class="impact-bar-gift" id="giftBar" style="width: 85%;">Gift</div>
+            <div class="impact-bar-charity" id="charityBar" style="width: 15%;">Charity</div>
+          </div>
+        </div>
+
+        <!-- Summary rows -->
+        <div class="impact-summary">
+          <div class="impact-row">
+            <span class="impact-dot gift"></span>
+            <span id="giftPercent">Gift portion: 85%</span>
+          </div>
+          <div class="impact-row">
+            <span class="impact-dot charity"></span>
+            <span id="charityPercent">Charity portion: 15%</span>
+          </div>
+        </div>
+
+        <div class="impact-divider"></div>
+
+        <!-- Charity card -->
+        <div class="impact-charity-card">
+          <div class="impact-charity-name" id="selectedCharityName">Reach for a Dream</div>
+          <div class="impact-charity-desc">Supporting children with chronic illnesses to pursue their dreams.</div>
+        </div>
+
+        <!-- Per 100 breakdown -->
+        <div class="impact-breakdown">
+          <div class="impact-breakdown-label">For every R100 contributed:</div>
+          <div class="impact-breakdown-items">
+            <div class="impact-breakdown-item">
+              <span>R<span id="giftAmount">85</span></span>
+              <span class="impact-breakdown-arrow">→</span>
+              <span>Maya's dream gift</span>
+            </div>
+            <div class="impact-breakdown-item">
+              <span>R<span id="charityAmount">15</span></span>
+              <span class="impact-breakdown-arrow">→</span>
+              <span id="charityNameBreakdown">Reach for a Dream</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <p>&copy; 2026 Gifta. A joyful, secure way to pool gifts.</p>
+</footer>
+
+<script>
+  // State
+  let state = {
+    givingEnabled: true,
+    selectedCharity: 'reach-for-a-dream',
+    selectedCharityName: 'Reach for a Dream',
+    splitMode: 'percentage',
+    amount: 15,
+  };
+
+  const charityData = {
+    'reach-for-a-dream': { name: 'Reach for a Dream', desc: 'Supporting children with chronic illnesses to pursue their dreams.' },
+    'choc': { name: 'CHOC Childhood Cancer', desc: 'Leading research in childhood cancer treatment and family support.' },
+    'cotlands': { name: 'Cotlands', desc: 'Providing quality early childhood development programmes.' },
+    'ladles-of-love': { name: 'Ladles of Love', desc: 'Feeding the hungry with hot nutritious meals daily.' },
+    'afrika-tikkun': { name: 'Afrika Tikkun', desc: 'Building futures through youth development and education.' },
+  };
+
+  // DOM refs
+  const givingToggle = document.getElementById('givingToggle');
+  const charityList = document.getElementById('charityList');
+  const splitTabs = document.querySelectorAll('.split-tab');
+  const amountInput = document.getElementById('amountInput');
+  const amountLabel = document.getElementById('amountLabel');
+  const amountSuffix = document.getElementById('amountSuffix');
+  const charityField = document.getElementById('charityField');
+  const splitModeField = document.getElementById('splitModeField');
+  const amountField = document.getElementById('amountField');
+
+  const giftBar = document.getElementById('giftBar');
+  const charityBar = document.getElementById('charityBar');
+  const giftPercent = document.getElementById('giftPercent');
+  const charityPercent = document.getElementById('charityPercent');
+  const giftAmount = document.getElementById('giftAmount');
+  const charityAmount = document.getElementById('charityAmount');
+  const selectedCharityName = document.getElementById('selectedCharityName');
+  const selectedCharityDesc = document.querySelector('.impact-charity-desc');
+  const charityNameBreakdown = document.getElementById('charityNameBreakdown');
+
+  const backBtn = document.getElementById('backBtn');
+  const continueBtn = document.getElementById('continueBtn');
+
+  // Toggle giving back
+  givingToggle.addEventListener('click', () => {
+    state.givingEnabled = !state.givingEnabled;
+    givingToggle.classList.toggle('on');
+    charityField.style.opacity = state.givingEnabled ? '1' : '0.5';
+    splitModeField.style.opacity = state.givingEnabled ? '1' : '0.5';
+    amountField.style.opacity = state.givingEnabled ? '1' : '0.5';
+    charityField.style.pointerEvents = state.givingEnabled ? 'auto' : 'none';
+    splitModeField.style.pointerEvents = state.givingEnabled ? 'auto' : 'none';
+    amountField.style.pointerEvents = state.givingEnabled ? 'auto' : 'none';
+    updatePreview();
+  });
+
+  // Charity selection
+  charityList.addEventListener('click', (e) => {
+    const item = e.target.closest('.charity-item');
+    if (!item) return;
+    charityList.querySelectorAll('.charity-item').forEach(c => c.classList.remove('selected'));
+    item.classList.add('selected');
+    state.selectedCharity = item.dataset.charity;
+    state.selectedCharityName = charityData[state.selectedCharity].name;
+    updatePreview();
+  });
+
+  // Split mode tabs
+  splitTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      splitTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      state.splitMode = tab.dataset.mode;
+      if (state.splitMode === 'percentage') {
+        amountLabel.textContent = 'Percentage to share';
+        amountInput.value = 15;
+        amountInput.min = 1;
+        amountInput.max = 100;
+        amountSuffix.textContent = '%';
+      } else {
+        amountLabel.textContent = 'Amount to share';
+        amountInput.value = 15;
+        amountInput.min = 1;
+        amountInput.max = 999999;
+        amountSuffix.textContent = 'R';
+      }
+      state.amount = parseFloat(amountInput.value);
+      updatePreview();
+    });
+  });
+
+  // Amount input
+  amountInput.addEventListener('input', () => {
+    state.amount = parseFloat(amountInput.value) || 0;
+    updatePreview();
+  });
+
+  // Update preview
+  function updatePreview() {
+    if (!state.givingEnabled) {
+      giftBar.style.width = '100%';
+      charityBar.style.width = '0%';
+      giftPercent.textContent = 'Gift portion: 100%';
+      charityPercent.textContent = 'Charity portion: 0%';
+      giftAmount.textContent = '100';
+      charityAmount.textContent = '0';
+      charityNameBreakdown.textContent = state.selectedCharityName;
+      return;
+    }
+
+    let giftPercValue, charityPercValue;
+
+    if (state.splitMode === 'percentage') {
+      charityPercValue = Math.max(0, Math.min(100, state.amount));
+      giftPercValue = 100 - charityPercValue;
+    } else {
+      // Threshold mode: for every 100
+      const per100Gift = 100 - state.amount;
+      const per100Charity = state.amount;
+      giftPercValue = Math.max(0, Math.min(100, per100Gift));
+      charityPercValue = Math.max(0, Math.min(100, per100Charity));
+    }
+
+    giftBar.style.width = giftPercValue + '%';
+    charityBar.style.width = charityPercValue + '%';
+    giftBar.textContent = giftPercValue > 15 ? 'Gift' : '';
+    charityBar.textContent = charityPercValue > 15 ? 'Charity' : '';
+
+    giftPercent.textContent = `Gift portion: ${Math.round(giftPercValue)}%`;
+    charityPercent.textContent = `Charity portion: ${Math.round(charityPercValue)}%`;
+    giftAmount.textContent = Math.round(giftPercValue);
+    charityAmount.textContent = Math.round(charityPercValue);
+
+    selectedCharityName.textContent = charityData[state.selectedCharity].name;
+    selectedCharityDesc.textContent = charityData[state.selectedCharity].desc;
+    charityNameBreakdown.textContent = charityData[state.selectedCharity].name;
+  }
+
+  // Button handlers
+  backBtn.addEventListener('click', () => {
+    console.log('Back button clicked');
+  });
+
+  continueBtn.addEventListener('click', () => {
+    console.log('Continue button clicked');
+    console.log('State:', state);
+  });
+
+  // Initial preview
+  updatePreview();
+</script>
+
+</body>
+</html>
