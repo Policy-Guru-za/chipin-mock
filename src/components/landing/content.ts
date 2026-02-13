@@ -105,55 +105,99 @@ export const socialLinks = [
   },
 ];
 
-export const givingBackMetrics = [
-  {
-    emoji: '💜',
-    value: 'R240,000+',
-    label: 'shared with charities',
-  },
-  {
-    emoji: '🤝',
-    value: '5',
-    sublabel: 'partner charities',
-    label: 'vetted & verified',
-  },
-  {
-    emoji: '🇿🇦',
-    value: '100%',
-    sublabel: 'South African',
-    label: 'supporting local causes',
-  },
-];
+/* ------------------------------------------------------------------ */
+/*  Giving Back — v6 redesign data                                     */
+/* ------------------------------------------------------------------ */
 
 export const givingBackCharities = [
   {
-    initials: 'RF',
     name: 'Reach for a Dream',
     tag: 'Children with chronic illnesses',
-    color: '#7E6B9B', // plum
+    logoUrl:
+      'https://reachforadream.org.za/wp-content/uploads/2025/03/reach-for-a-dream-logo.svg',
+    logoBg: '#f3eef9',
   },
   {
-    initials: 'CH',
-    name: 'CHOC Childhood Cancer',
+    name: 'CHOC',
     tag: 'Cancer research & support',
-    color: '#C49A5C', // amber
+    logoUrl:
+      'https://choc.org.za/wp-content/uploads/2019/07/choc-logo-200px.png',
+    logoBg: '#e8f1f9',
   },
   {
-    initials: 'CO',
     name: 'Cotlands',
     tag: 'Early childhood development',
-    color: '#4A7E66', // sage
+    logoUrl:
+      'https://cdn.brandfetch.io/idsAaqKEre/w/400/h/400/theme/dark/icon.jpeg',
+    logoBg: '#fef4e8',
   },
   {
-    initials: 'LL',
     name: 'Ladles of Love',
     tag: 'Feeding the hungry daily',
-    color: '#D97706', // orange/warning
+    logoUrl:
+      'https://ladlesoflove.org.za/wp-content/uploads/2022/03/LadlesOfLove-logofullcolour.png',
+    logoBg: '#fdedef',
   },
   {
-    initials: 'AT',
     name: 'Afrika Tikkun',
     tag: 'Youth development & education',
-    color: '#2563EB', // blue
+    logoUrl:
+      'https://afrikatikkun.com/wp-content/uploads/2024/01/Mian-Logo.png',
+    logoBg: '#e8ecf9',
+  },
+  {
+    name: 'DARG',
+    tag: 'Domestic animal rescue',
+    logoUrl:
+      'https://cdn.brandfetch.io/idgm5KhPzP/w/117/h/118/theme/dark/logo.png',
+    logoBg: '#e8eff9',
+  },
+  {
+    name: 'Cape SPCA',
+    tag: 'Animal welfare & protection',
+    logoUrl:
+      'https://capespca.co.za/wp-content/uploads/2024/06/Flat-design-logo.png',
+    logoBg: '#e8f6f7',
+  },
+];
+
+export const givingBackDemo = {
+  childName: 'Mia',
+  childAge: 'Turning 6',
+  childDate: 'March 28th',
+  setupStep: 'Setting up · Step 4 of 5',
+  giftName: 'Ballet Starter Kit',
+  giftDescription: 'Shoes, tutu & dance bag',
+  giftEmoji: '🎀',
+  selectedCharity: 'Reach for a Dream',
+  selectedCharityTag: 'Children with chronic illnesses',
+  selectedCharityLogo:
+    'https://reachforadream.org.za/wp-content/uploads/2025/03/reach-for-a-dream-logo.svg',
+  percentageOptions: [5, 10, 15, 20],
+  activePercentage: 20,
+  exampleContribution: 200,
+};
+
+export const givingBackHowItWorks = [
+  {
+    emoji: '💜',
+    title: 'Host decides',
+    description:
+      'Pick a charity and choose what % of each contribution to share',
+    bgClass: 'bg-[rgba(126,107,155,0.1)]',
+  },
+  {
+    emoji: '🤝',
+    title: 'Guests see it all',
+    description:
+      'Full transparency — every rand accounted for before they chip in',
+    bgClass: 'bg-[rgba(107,158,136,0.1)]',
+  },
+  {
+    emoji: '🎉',
+    title: 'Double the joy',
+    description:
+      'A birthday gift and a good deed, all in one contribution',
+    bgClass: 'bg-[rgba(196,120,90,0.08)]',
   },
 ];

@@ -3,6 +3,8 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-13 | self | Axiom query attempt with heredoc inside nested `zsh -lc` was mangled (`no matches found`) before request execution | In this environment, prefer `printf '%s' '...json...' > /tmp/query.json` + `--data-binary @file` over heredoc for APL payloads |
+| 2026-02-13 | self | Charity URL draft autofill can fail with "page too large" while Axiom shows only `POST /admin/charities` `200`, because `generateCharityDraftFromUrlAction` catches `CharityUrlIngestError` and returns a handled error payload | For autofill triage, pair logs with code limits: check `src/lib/charities/url-ingest.ts` (`MAX_HTML_BYTES=800000`) and measure target HTML bytes directly before assuming backend crash |
 | 2026-02-13 | self | In `CharityFormModal` URL draft autofill, I guarded `result.draft` but still referenced `result.draft.*` inside `setValues` callback, and strict TypeScript flagged it as possibly undefined | After the guard, assign `const draft = result.draft` and reference `draft.*` inside callbacks to preserve narrowing |
 | 2026-02-13 | self | First `/admin/charities` fix swapped to a qualified outer id but reused UUID reference against `recipient_data ->> 'charityId'` (text), causing `42883 operator does not exist: text = uuid` | For JSON text extraction comparisons, cast outer UUID to text (`"charities"."id"::text`) and keep UUID reference only for UUID columns |
 | 2026-02-13 | self | Axiom log triage used multiple inconsistent query styles before converging, costing time | Use one canonical Axiom fast-path: payload file + `format=tabular` + field aliases + TSV extraction + request-id deep dive |

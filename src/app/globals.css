@@ -271,3 +271,42 @@ a:focus-visible {
   right: -30px;
   pointer-events: none;
 }
+
+/* ================================================================== */
+/*  Giving Back v6 – keyframe animations                               */
+/* ================================================================== */
+
+@keyframes givingBack-floatOrb1 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-20px, 30px); }
+}
+
+@keyframes givingBack-floatOrb2 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(20px, -20px); }
+}
+
+@keyframes givingBack-heartGlow {
+  0%, 100% { box-shadow: 0 3px 10px rgba(126,107,155,0.25); }
+  50% { box-shadow: 0 3px 16px rgba(126,107,155,0.4); }
+}
+
+@keyframes givingBack-nudge-x {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
+}
+
+@keyframes givingBack-nudge-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+@keyframes givingBack-barGrow80 {
+  from { width: 0%; }
+  to { width: 80%; }
+}
+
+@keyframes givingBack-barGrow20 {
+  from { width: 0%; }
+  to { width: 20%; }
+}
