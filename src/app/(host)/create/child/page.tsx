@@ -1,11 +1,21 @@
-import Image from 'next/image';
+import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
-import { CreateFlowShell } from '@/components/layout/CreateFlowShell';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { ChildPhotoDropZone } from '@/components/create-wizard/ChildPhotoDropZone';
+import {
+  WizardCTA,
+  WizardEyebrow,
+  WizardFieldTip,
+  WizardFieldWrapper,
+  WizardFormCard,
+  WizardPanelTitle,
+  WizardSkeletonLoader,
+  WizardSplitLayout,
+  WizardStepper,
+  WizardTextInput,
+  resolveWizardError,
+} from '@/components/create-wizard';
 import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
 import { isMockSentry } from '@/lib/config/feature-flags';
 import { getDreamBoardDraft, saveDreamBoardDraft } from '@/lib/dream-boards/draft';
@@ -88,14 +98,6 @@ const childErrorMessages: Record<string, string> = {
   upload_failed: 'Upload failed. Please try again.',
 };
 
-const getChildErrorMessage = (error?: string) => {
-  if (!error) return null;
-  if (error === 'photo' || error === 'empty_file') {
-    return 'Please upload a photo of your child.';
-  }
-  return childErrorMessages[error] ?? null;
-};
-
 export default async function CreateChildPage({
   searchParams,
 }: {
@@ -105,90 +107,78 @@ export default async function CreateChildPage({
   const draft = await getDreamBoardDraft(session.hostId);
   const resolvedSearchParams = await searchParams;
   const error = resolvedSearchParams?.error;
-  const errorMessage = getChildErrorMessage(error);
-  const view = buildCreateFlowViewModel({ step: 'child', draft });
+  const errorMessage = resolveWizardError(error, childErrorMessages, {
+    photo: 'Please upload a photo of your child.',
+    empty_file: 'Please upload a photo of your child.',
+  });
+
+  buildCreateFlowViewModel({ step: 'child', draft });
 
   return (
-    <CreateFlowShell
-      currentStep={1}
-      totalSteps={6}
-      stepLabel={view.stepLabel}
-      title={view.title}
-      subtitle={view.subtitle}
-    >
-      <Card>
-        <CardHeader>
-          <CardTitle>Child details</CardTitle>
-          <CardDescription>Tell us who we’re celebrating and add a photo.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {errorMessage ? (
-            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {errorMessage}
-            </div>
-          ) : null}
+    <>
+      <WizardStepper currentStep={1} totalSteps={6} stepLabel="The child" />
 
-          {draft?.childPhotoUrl ? (
-            <div className="flex items-center gap-4">
-              <Image
-                src={draft.childPhotoUrl}
-                alt="Child photo preview"
-                width={96}
-                height={96}
-                className="h-24 w-24 rounded-full object-cover"
-              />
-              <div className="text-sm text-text-muted">
-                Photo already uploaded. Uploading a new photo will replace it.
-              </div>
-            </div>
-          ) : null}
+      <Suspense fallback={<WizardSkeletonLoader variant="split" />}>
+        <form action={saveChildDetailsAction} encType="multipart/form-data">
+          <WizardSplitLayout
+            mobileOrder="right-first"
+            left={<ChildPhotoDropZone existingPhotoUrl={draft?.childPhotoUrl ?? null} />}
+            right={
+              <WizardFormCard>
+                <WizardEyebrow>Step 1 of 6 - The child</WizardEyebrow>
+                <WizardPanelTitle variant="form">Child details</WizardPanelTitle>
+                <p className="mb-7 text-[13px] font-light leading-relaxed text-ink-soft">
+                  Tell us a little about the birthday child.
+                </p>
 
-          <form action={saveChildDetailsAction} className="space-y-5" encType="multipart/form-data">
-            <div className="space-y-2">
-              <label htmlFor="childName" className="text-sm font-medium text-text">
-                Child’s first name
-              </label>
-              <Input
-                id="childName"
-                name="childName"
-                placeholder="e.g. Maya"
-                required
-                defaultValue={draft?.childName ?? ''}
-              />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="photo" className="text-sm font-medium text-text">
-                Child’s photo
-              </label>
-              <Input
-                id="photo"
-                name="photo"
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                required
-              />
-              <p className="text-xs text-text-muted">Max 5MB. JPG, PNG, or WebP.</p>
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="childAge" className="text-sm font-medium text-text">
-                Age turning this birthday
-              </label>
-              <Input
-                id="childAge"
-                name="childAge"
-                type="number"
-                min={1}
-                max={18}
-                step={1}
-                placeholder="e.g. 7"
-                required
-                defaultValue={draft?.childAge ?? ''}
-              />
-            </div>
-            <Button type="submit">Continue to gift</Button>
-          </form>
-        </CardContent>
-      </Card>
-    </CreateFlowShell>
+                <WizardFieldWrapper
+                  label="Child's first name"
+                  htmlFor="childName"
+                  error={errorMessage}
+                >
+                  <WizardTextInput
+                    id="childName"
+                    name="childName"
+                    placeholder="e.g. Maya"
+                    required
+                    defaultValue={draft?.childName ?? ''}
+                    autoCapitalize="words"
+                    enterKeyHint="next"
+                    autoComplete="given-name"
+                  />
+                </WizardFieldWrapper>
+
+                <WizardFieldWrapper
+                  label="Age turning this birthday"
+                  htmlFor="childAge"
+                  tip={
+                    <WizardFieldTip>
+                      {`This will be shown on the Dreamboard as "${draft?.childName ?? 'Child'} turns ${draft?.childAge ?? '?'}!"`}
+                    </WizardFieldTip>
+                  }
+                >
+                  <WizardTextInput
+                    id="childAge"
+                    name="childAge"
+                    type="number"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    min={1}
+                    max={18}
+                    step={1}
+                    placeholder="e.g. 7"
+                    required
+                    defaultValue={draft?.childAge?.toString() ?? ''}
+                    enterKeyHint="done"
+                  />
+                </WizardFieldWrapper>
+
+                <WizardCTA submitLabel="Continue to gift" pending={false} error={errorMessage} />
+              </WizardFormCard>
+            }
+          />
+        </form>
+      </Suspense>
+    </>
   );
 }
