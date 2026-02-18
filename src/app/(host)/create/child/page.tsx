@@ -46,24 +46,33 @@ async function saveChildDetailsAction(formData: FormData) {
     redirect('/create/child?error=invalid');
   }
 
-  if (!(photo instanceof File) || photo.size === 0) {
+  const hasNewPhoto = photo instanceof File && photo.size > 0;
+  const existingDraft = await getDreamBoardDraft(session.hostId);
+
+  if (!hasNewPhoto && !existingDraft?.childPhotoUrl) {
     redirect('/create/child?error=photo');
   }
 
-  let uploadSuccess = false;
+  let saveSuccess = false;
   try {
-    const upload = await uploadChildPhoto(photo, session.hostId);
-    const existingDraft = await getDreamBoardDraft(session.hostId);
-    if (existingDraft?.childPhotoUrl) {
-      await deleteChildPhoto(existingDraft.childPhotoUrl);
+    if (hasNewPhoto) {
+      const upload = await uploadChildPhoto(photo as File, session.hostId);
+      if (existingDraft?.childPhotoUrl) {
+        await deleteChildPhoto(existingDraft.childPhotoUrl);
+      }
+      await saveDreamBoardDraft(session.hostId, {
+        childName: result.data.childName,
+        childAge: result.data.childAge,
+        childPhotoUrl: upload.url,
+        photoFilename: upload.filename,
+      });
+    } else {
+      await saveDreamBoardDraft(session.hostId, {
+        childName: result.data.childName,
+        childAge: result.data.childAge,
+      });
     }
-    await saveDreamBoardDraft(session.hostId, {
-      childName: result.data.childName,
-      childAge: result.data.childAge,
-      childPhotoUrl: upload.url,
-      photoFilename: upload.filename,
-    });
-    uploadSuccess = true;
+    saveSuccess = true;
   } catch (error) {
     log('error', 'child_photo_upload_failed', {
       hostId: session.hostId,
@@ -82,7 +91,7 @@ async function saveChildDetailsAction(formData: FormData) {
     redirect('/create/child?error=upload_failed');
   }
 
-  if (uploadSuccess) {
+  if (saveSuccess) {
     redirect('/create/gift');
   }
 }
@@ -134,7 +143,6 @@ export default async function CreateChildPage({
                 <WizardFieldWrapper
                   label="Child's first name"
                   htmlFor="childName"
-                  error={errorMessage}
                 >
                   <WizardTextInput
                     id="childName"
