@@ -48,6 +48,7 @@ pnpm drizzle:push
 ## Repo conventions
 
 - Do this first: *Always* read /docs/napkin/SKILL.md before you start any new session. Follow the instructions in this document.
+- Before any codebase refactor, new feature creation, or other meaningful codebase alteration, always read and follow `/Users/ryanlaubscher/Projects/gifta-codex-5.3/workflow-orchestration.md`.
 - This application only uses the single-word term 'Dreamboard'. Ensure user-facing copy never uses alternate spacing for this term.
 - Keep changes small and reviewable.
 - Prefer updating docs that make product guarantees (CANONICAL/SPEC/UX/JOURNEYS/PAYMENTS/DATA/SECURITY/ARCHITECTURE) over duplicating truth elsewhere.

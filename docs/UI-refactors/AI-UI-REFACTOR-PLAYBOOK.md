@@ -58,7 +58,23 @@ If any input is missing, inform the user and ask whether to proceed with availab
 - Typography parity (0-5): family, size, weight, line-height intent.
 - Interaction parity (0-5): CTA behavior, copy actions, links, hover/focus.
 - Responsive parity (0-5): desktop/mobile transitions and tap ergonomics.
+- Mobile interaction parity (0-5): sticky CTAs, touch targets, keyboard types, draft persistence, loading states, error recovery.
 - Accessibility parity (0-5): semantics, focus states, labels, contrast intent.
+
+### Mobile-Specific Scoring Criteria (Responsive + Mobile Interaction)
+
+These must each score ≥ 4 to ship:
+
+| Check | 5 (Gold) | 4 (Ship) | 3 (Risk) | 2 (Broken) |
+|-------|----------|----------|----------|------------|
+| **Sticky CTA** | Sticky footer on mobile, safe-area support, column-reverse buttons | Sticky footer visible, correct button order | CTA visible but not sticky | CTA buried below fold |
+| **Touch targets** | All ≥ 48px, `touch-action: manipulation` everywhere | All ≥ 44px, manipulation on key elements | Some elements below 44px | Multiple elements below 40px |
+| **Keyboard types** | All fields have `inputMode`, `autoCapitalize`, `enterKeyHint`, `autoComplete` | All fields have `inputMode` and `autoCapitalize` | Some fields missing keyboard attributes | No keyboard optimisation |
+| **Loading state** | Spinner, pending label, disabled state, double-submit prevention | Disabled state + pending label | Disabled on submit only | No loading feedback |
+| **Draft persistence** | sessionStorage save/restore + visibilitychange + beforeunload | sessionStorage save/restore on key fields | Partial persistence (some fields) | No draft persistence |
+| **Error recovery** | Error in sticky footer + retry button + progressive backoff | Error banner + retry button | Error banner only (no retry) | No error display on mobile |
+| **Preview panels** | Collapsed by default, smooth expand, desktop always visible | Collapsed by default on mobile | Visible but causes scroll bloat | Nested scroll trap |
+| **Stepper** | Progress bar on mobile, dots on desktop, `role="progressbar"` | Progress bar on mobile with label | Squeezed dots on mobile | Dots overflow or are unreadable |
 
 Release target: no category below `4`, overall average `>= 4.5`.
 
@@ -163,12 +179,18 @@ Track mistakes and fixes in this table after each refactor:
 | 2026-02-11 | /create/review | Applied `first:` and `last:` spacing utilities to rows that were each wrapped in their own border container | Pseudo-class logic collapsed row padding and created inconsistent vertical rhythm | Keep rows as direct siblings and apply separators on row root with non-last-child utility selectors |
 | 2026-02-11 | /dashboard | Built timeline card tests with `getByText` for status labels that appear in multiple locations inside one node | False-negative unit failures during gate runs | Use role-based assertions first (`link` with aria-label/href), and use `getAllByText` only when duplicate labels are intentional |
 | 2026-02-11 | /dashboard | Timeline refactor risked hiding boards when introducing hero treatment | Missing board visibility and behavior drift risk | Partition boards into explicit live/archived buckets and render all boards (hero = first live only, never a filter) |
+| 2026-02-18 | /create/* (wizard) | Treated mobile as CSS afterthought — single `@media` breakpoint that stacks desktop panels vertically without rethinking scroll depth, tap targets, input ergonomics, CTA visibility, draft persistence, or loading states | Wizard was rated "not mobile-ready" in adversarial assessment. CTA buried below fold, no loading feedback, no draft persistence, icon grid scroll trap, stepper unreadable | **Never treat mobile as "just collapse to 1 column."** Every responsive breakpoint requires a separate UX audit: (1) Where is the CTA? (2) What is the scroll depth? (3) Are touch targets ≥ 44px? (4) Do inputs trigger correct virtual keyboards? (5) Is there a loading/pending state? (6) Can the user recover from interruption? Add these as mandatory questions in the responsive parity check. |
 
 Anti-patterns to avoid:
 - Copying guide HTML wholesale into production route file.
 - Editing shell files to fake parity.
 - Changing data contracts to match guide demo content.
 - Omitting tests because "UI only."
+- Treating mobile as "just collapse the grid." Every mobile view needs its own UX pass.
+- Assuming desktop CTA placement works on mobile (sticky footer is almost always needed).
+- Ignoring `inputMode` / `autoCapitalize` / `enterKeyHint` on form fields.
+- Creating nested scroll containers (inner `overflow-y: auto` inside a scrollable page).
+- Skipping loading/pending states on form submissions (especially on slow mobile data).
 
 ## 12. Change Log (Continuous Learning)
 | Date | Refactor Target | What Improved in This Playbook | Author |
@@ -178,6 +200,7 @@ Anti-patterns to avoid:
 | 2026-02-11 | /create/review | Added spacing-rhythm safeguard: avoid wrapper containers that break `first`/`last` row utility behavior | Codex |
 | 2026-02-11 | /dashboard | Added timeline-mode guidance: preserve board completeness via live/archived bucketing and first-live hero treatment only | Codex |
 | 2026-02-11 | /dashboard | Added testing guardrail for duplicated status copy in timeline nodes (`getAllByText` + role/href checks) | Codex |
+| 2026-02-18 | /create/* (wizard) | Added mobile interaction parity as a new fidelity scoring category (§5). Added mobile-specific scoring criteria table. Added pitfall for "mobile as CSS afterthought." Added 5 new anti-patterns. Cross-referenced MOBILE-UX-ASSESSMENT.md and MOBILE-INTERACTION-SPEC.md. | Codex |
 
 ## Mandatory Post-Refactor Update Rule
 After each successful UI refactor, you must update this playbook with new constraints, pitfalls, fidelity lessons, and verification improvements before closing the task.
