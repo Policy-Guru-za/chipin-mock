@@ -1,5 +1,5 @@
 import './globals.css';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import {
   DM_Sans,
   DM_Serif_Display,
@@ -81,6 +81,12 @@ export const metadata: Metadata = {
       'Create a Dreamboard for your child\'s birthday. Friends and family chip in toward one meaningful gift — no more gift piles, no more guesswork.',
     images: ['/og-image.png'],
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

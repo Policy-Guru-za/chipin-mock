@@ -80,12 +80,16 @@ const config: Config = {
       borderRadius: {
         '2xl': '1rem',
         '3xl': '1.5rem',
+        'radius-lg': '28px',
+        'radius-md': '20px',
+        'radius-sm': '14px',
       },
       boxShadow: {
         soft: '0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04)',
         lifted: '0 4px 8px rgba(0,0,0,0.04), 0 12px 24px rgba(0,0,0,0.06)',
         hero: '0 8px 24px rgba(0,0,0,0.08), 0 2px 8px rgba(13,148,136,0.15)',
         card: '0 1px 2px rgba(44,37,32,0.03), 0 4px 12px rgba(44,37,32,0.04), 0 12px 36px rgba(44,37,32,0.04)',
+        input: '0 1px 3px rgba(44,37,32,0.04)',
       },
       animation: {
         shimmer: 'shimmer 2s infinite',
@@ -95,6 +99,9 @@ const config: Config = {
         'fade-up-delay-1': 'fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both',
         'fade-up-delay-2': 'fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both',
         'fade-up-delay-3': 'fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both',
+        'wizard-fade-up': 'wizardFadeUp 0.35s ease-out both',
+        'wizard-fade-up-content': 'wizardFadeUp 0.45s ease-out 0.08s both',
+        'wizard-spin': 'spin 0.6s linear infinite',
       },
       keyframes: {
         shimmer: {
@@ -108,6 +115,14 @@ const config: Config = {
         fadeUp: {
           '0%': { opacity: '0', transform: 'translateY(24px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        wizardFadeUp: {
+          '0%': { opacity: '0', transform: 'translateY(14px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        spin: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
         },
       },
     },
