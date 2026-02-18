@@ -78,6 +78,7 @@
 | 2026-02-09 | self | C7 prompt still had global root-main strategy while latest locked clarification switched to per-group main targets | Treat latest user clarification as override, and explicitly call out stale prompt lines in execution evidence before editing |
 | 2026-02-09 | self | Updated contrast-related utility classes without immediately updating coupled unit assertions (`button.test`, `progress-bar.test`) | After design-token/class changes, run and patch directly coupled component tests before the full-suite run to avoid avoidable red gate loops |
 | 2026-02-09 | self | Added global skip link but left root `error.tsx`/`not-found.tsx` without `id="main-content"` target and used low-contrast focus background | When adding skip-link patterns, validate target presence across fallback routes and use AA-compliant focus tokens (`primary-700`+) |
+| 2026-02-18 | self | Added debounced wizard draft persistence but unmount cleanup only cleared timeout, so recent edits could be dropped on quick navigation | For debounced storage hooks, flush pending value in cleanup before/with timer clear so last user input persists |
 
 ## User Preferences
 - Start with required doc read order before implementation.
