@@ -6,9 +6,14 @@ import { useActionState, useEffect, useMemo, useState } from 'react';
 import { CelebrationHeader } from '@/components/create-review/CelebrationHeader';
 import { ReviewPreviewCard } from '@/components/create-review/ReviewPreviewCard';
 import { ShareActionsPanel } from '@/components/create-review/ShareActionsPanel';
+import {
+  WizardCTA,
+  WizardCenteredLayout,
+  WizardEyebrow,
+  WizardPanelTitle,
+  WizardStepper,
+} from '@/components/create-wizard';
 import { ConfettiTrigger } from '@/components/effects/ConfettiTrigger';
-import { CreateFlowShell } from '@/components/layout/CreateFlowShell';
-import { Button } from '@/components/ui/button';
 import { formatPartyDateTime } from '@/lib/dream-boards/party-date-time';
 import { parseDateOnly } from '@/lib/utils/date';
 
@@ -152,65 +157,76 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
   }
 
   return (
-    <CreateFlowShell
-      currentStep={6}
-      totalSteps={6}
-      stepLabel="Step 6 of 6 — Review"
-      title="Review your Dreamboard"
-      subtitle="Everything looks good? Create and start sharing."
-    >
-      <div className="space-y-5">
-        {state.error ? (
-          <div
-            role="status"
-            aria-live="polite"
-            className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-          >
-            {state.error}
+    <>
+      <WizardStepper currentStep={6} totalSteps={6} stepLabel="Review" />
+      <form action={formAction}>
+        <WizardCenteredLayout>
+          <WizardEyebrow>Step 6</WizardEyebrow>
+          <WizardPanelTitle variant="form">Review your Dreamboard</WizardPanelTitle>
+          <p className="mb-7 text-[13px] font-light leading-relaxed text-ink-soft">
+            Everything looks good? Create and start sharing.
+          </p>
+
+          <div className="mb-7">
+            <ReviewPreviewCard
+              childName={draft.childName}
+              childAge={draft.childAge}
+              childPhotoUrl={draft.childPhotoUrl}
+              birthdayLabel={birthdayLabel}
+              giftName={draft.giftName}
+              giftImageUrl={draft.giftImageUrl}
+              partyDateTimeLabel={partyDateTimeSummary}
+              campaignCloseLabel={campaignCloseLabel}
+              payoutSummary={payoutSummary}
+              charitySummary={charitySummary}
+            />
           </div>
-        ) : null}
 
-        <div className="mx-auto w-full max-w-[580px]">
-          <ReviewPreviewCard
-            childName={draft.childName}
-            childAge={draft.childAge}
-            childPhotoUrl={draft.childPhotoUrl}
-            birthdayLabel={birthdayLabel}
-            giftName={draft.giftName}
-            giftImageUrl={draft.giftImageUrl}
-            partyDateTimeLabel={partyDateTimeSummary}
-            campaignCloseLabel={campaignCloseLabel}
-            payoutSummary={payoutSummary}
-            charitySummary={charitySummary}
-          />
-        </div>
-
-        <div className="mt-6 grid gap-2 text-sm">
-          <Link href="/create/child" className="text-primary-700 underline underline-offset-2">
-            Edit child details
-          </Link>
-          <Link href="/create/gift" className="text-primary-700 underline underline-offset-2">
-            Edit gift details
-          </Link>
-          <Link href="/create/dates" className="text-primary-700 underline underline-offset-2">
-            Edit dates
-          </Link>
-          {draft.charityEnabled ? (
-            <Link href="/create/giving-back" className="text-primary-700 underline underline-offset-2">
-              Edit charity settings
+          <div className="mb-7 space-y-1 border-b border-border-soft pb-5">
+            <Link
+              href="/create/child"
+              className="wizard-interactive block py-1.5 text-[13px] font-medium text-primary transition-colors hover:text-sage-deep"
+            >
+              Edit child details
             </Link>
-          ) : null}
-          <Link href="/create/payout" className="text-primary-700 underline underline-offset-2">
-            Edit payout details
-          </Link>
-        </div>
+            <Link
+              href="/create/gift"
+              className="wizard-interactive block py-1.5 text-[13px] font-medium text-primary transition-colors hover:text-sage-deep"
+            >
+              Edit gift details
+            </Link>
+            <Link
+              href="/create/dates"
+              className="wizard-interactive block py-1.5 text-[13px] font-medium text-primary transition-colors hover:text-sage-deep"
+            >
+              Edit dates
+            </Link>
+            {draft.charityEnabled ? (
+              <Link
+                href="/create/giving-back"
+                className="wizard-interactive block py-1.5 text-[13px] font-medium text-primary transition-colors hover:text-sage-deep"
+              >
+                Edit charity settings
+              </Link>
+            ) : null}
+            <Link
+              href="/create/payout"
+              className="wizard-interactive block py-1.5 text-[13px] font-medium text-primary transition-colors hover:text-sage-deep"
+            >
+              Edit payout details
+            </Link>
+          </div>
 
-        <form action={formAction}>
-          <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? 'Creating...' : 'Create Dreamboard'}
-          </Button>
-        </form>
-      </div>
-    </CreateFlowShell>
+          <WizardCTA
+            backHref="/create/payout"
+            submitLabel="Create Dreamboard"
+            pendingLabel="Creating..."
+            submitIcon="star"
+            pending={pending}
+            error={state.error ?? null}
+          />
+        </WizardCenteredLayout>
+      </form>
+    </>
   );
 }

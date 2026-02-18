@@ -3,6 +3,8 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-18 | self | Moved review stepper to server page shell, so it stayed visible after publish success where review client intentionally switches to celebration/share state | For create review flow, keep wizard chrome render tied to preview-state branch in client component (or equivalently condition on published state) |
+| 2026-02-18 | self | Review step switched to `WizardCTA`, but a legacy test still used `getByRole('button', { name: ... })` and failed because CTA renders desktop + mobile submit buttons in DOM | For wizard CTA assertions, use `getAllByRole`/`getAllByText` and assert at least one match (or check any matching element by attribute) |
 | 2026-02-18 | self | Date preview formatting used `new Date(\`${date}T00:00:00Z\`)`, which shifts displayed day for negative UTC offsets | For date-only UI values, parse `YYYY-MM-DD` parts and format with `timeZone: 'UTC'` (or equivalent day-stable logic) |
 | 2026-02-18 | self | Vercel build failed because server page imported `@/components/create-wizard` barrel that re-exported `useDraftPersistence` (uses `useEffect`/`useRef`), pulling a client hook into the server module graph | Keep shared barrels server-safe; do not re-export client hooks from a barrel imported by RSC pages. Export client hooks from direct path or client-only barrel |
 | 2026-02-13 | self | Axiom query attempt with heredoc inside nested `zsh -lc` was mangled (`no matches found`) before request execution | In this environment, prefer `printf '%s' '...json...' > /tmp/query.json` + `--data-binary @file` over heredoc for APL payloads |

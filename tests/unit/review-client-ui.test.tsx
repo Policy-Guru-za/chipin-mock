@@ -69,7 +69,7 @@ describe('ReviewClient', () => {
     render(<ReviewClient draft={draft} publishAction={publishAction} />);
 
     expect(screen.getByRole('heading', { name: 'Review your Dreamboard' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Create Dreamboard' })).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: 'Create Dreamboard' }).length).toBeGreaterThan(0);
     expect(screen.getByRole('link', { name: 'Edit child details' })).toHaveAttribute(
       'href',
       '/create/child'
