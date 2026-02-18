@@ -30,7 +30,7 @@ describe('DatesPreview', () => {
 
   it('displays formatted birthday date', () => {
     render(<DatesPreview {...defaultProps()} />);
-    expect(screen.getByText('June 15, 2026')).toBeInTheDocument();
+    expect(screen.getByText('15 June 2026')).toBeInTheDocument();
   });
 
   it('shows countdown badge with plural days', () => {

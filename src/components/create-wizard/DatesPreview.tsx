@@ -41,7 +41,7 @@ const formatDate = (dateString: string) => {
     return 'Date to be confirmed';
   }
 
-  return parsed.toLocaleDateString('en-US', {
+  return parsed.toLocaleDateString('en-ZA', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',

@@ -58,7 +58,12 @@ describe('GivingBackPreview', () => {
   it('shows threshold amount in threshold mode', () => {
     render(<GivingBackPreview {...defaultProps()} splitType="threshold" thresholdAmount={200} />);
 
+    expect(
+      screen.getByText('Threshold mode active. Percentages depend on total contributions.'),
+    ).toBeInTheDocument();
     expect(screen.getByText('First R200 goes to charity.')).toBeInTheDocument();
+    expect(screen.queryByText(/Gift portion:/)).toBeNull();
+    expect(screen.queryByText(/Charity portion:/)).toBeNull();
   });
 
   it('uses child name in breakdown', () => {

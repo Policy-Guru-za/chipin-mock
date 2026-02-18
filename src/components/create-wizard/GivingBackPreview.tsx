@@ -33,6 +33,8 @@ function GivingBackPreviewComponent({
   thresholdAmount,
   childName,
 }: GivingBackPreviewProps) {
+  const thresholdModeActive = charityEnabled && splitType === 'threshold';
+
   const charityPortion = charityEnabled
     ? splitType === 'percentage'
       ? clamp(Math.round(percentage), 0, 100)
@@ -49,33 +51,41 @@ function GivingBackPreviewComponent({
   return (
     <div className="flex w-full flex-col items-center gap-4 rounded-[20px] border border-[var(--border)] bg-[var(--bg)] p-7 text-center">
       <div className="w-full">
-        <div className="mb-3 h-3 w-full overflow-hidden rounded-md bg-border">
-          <div className="flex h-full w-full">
-            <div
-              className="flex h-full items-center justify-end bg-sage pr-2 text-[10px] font-semibold text-white"
-              style={{ width: `${giftPortion}%` }}
-            >
-              {giftPortion > 15 ? 'Gift' : null}
-            </div>
-            <div
-              className="flex h-full items-center justify-start bg-plum pl-2 text-[10px] font-semibold text-white"
-              style={{ width: `${charityPortion}%` }}
-            >
-              {charityPortion > 15 ? 'Charity' : null}
+        {thresholdModeActive ? (
+          <p className="rounded-xl border border-plum-soft bg-plum-wash p-3 text-left text-xs text-ink-soft">
+            Threshold mode active. Percentages depend on total contributions.
+          </p>
+        ) : (
+          <div className="mb-3 h-3 w-full overflow-hidden rounded-md bg-border">
+            <div className="flex h-full w-full">
+              <div
+                className="flex h-full items-center justify-end bg-sage pr-2 text-[10px] font-semibold text-white"
+                style={{ width: `${giftPortion}%` }}
+              >
+                {giftPortion > 15 ? 'Gift' : null}
+              </div>
+              <div
+                className="flex h-full items-center justify-start bg-plum pl-2 text-[10px] font-semibold text-white"
+                style={{ width: `${charityPortion}%` }}
+              >
+                {charityPortion > 15 ? 'Charity' : null}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        <div className="space-y-2 text-left">
-          <div className="flex items-center gap-3 text-[13px] text-ink">
-            <span className="h-2 w-2 shrink-0 rounded-full bg-sage" />
-            <span>Gift portion: {giftPortion}%</span>
+        {!thresholdModeActive ? (
+          <div className="space-y-2 text-left">
+            <div className="flex items-center gap-3 text-[13px] text-ink">
+              <span className="h-2 w-2 shrink-0 rounded-full bg-sage" />
+              <span>Gift portion: {giftPortion}%</span>
+            </div>
+            <div className="flex items-center gap-3 text-[13px] text-ink">
+              <span className="h-2 w-2 shrink-0 rounded-full bg-plum" />
+              <span>Charity portion: {charityPortion}%</span>
+            </div>
           </div>
-          <div className="flex items-center gap-3 text-[13px] text-ink">
-            <span className="h-2 w-2 shrink-0 rounded-full bg-plum" />
-            <span>Charity portion: {charityPortion}%</span>
-          </div>
-        </div>
+        ) : null}
       </div>
 
       <div className="h-px w-full bg-border" />
