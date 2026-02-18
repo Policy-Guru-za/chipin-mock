@@ -1,9 +1,13 @@
+import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 
 import { saveDatesAction } from '@/app/(host)/create/dates/actions';
 import { DatesForm } from '@/app/(host)/create/dates/DatesForm';
-import { CreateFlowShell } from '@/components/layout/CreateFlowShell';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  WizardSkeletonLoader,
+  WizardStepper,
+  resolveWizardError,
+} from '@/components/create-wizard';
 import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
 import { getDreamBoardDraft } from '@/lib/dream-boards/draft';
 import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
@@ -17,8 +21,6 @@ const datesErrorMessages: Record<string, string> = {
   party_datetime_invalid: 'Enter a valid birthday party date and time.',
   party_datetime_range: 'Birthday party date and time must be in the future and within 6 months.',
 };
-
-const getDatesErrorMessage = (error?: string) => (error ? (datesErrorMessages[error] ?? null) : null);
 
 const getDateAfterDays = (days: number) => {
   const date = new Date();
@@ -66,7 +68,7 @@ export default async function CreateDatesPage({
   }
 
   const resolvedSearchParams = await searchParams;
-  const errorMessage = getDatesErrorMessage(resolvedSearchParams?.error);
+  const errorMessage = resolveWizardError(resolvedSearchParams?.error, datesErrorMessages);
   const defaultBirthdayDate = getDefaultBirthdayDate(draft.birthdayDate);
   const defaultPartyDate = draft.partyDate ?? defaultBirthdayDate;
   const defaultCampaignEndDate = draft.campaignEndDate ?? defaultPartyDate;
@@ -79,35 +81,23 @@ export default async function CreateDatesPage({
   );
 
   return (
-    <CreateFlowShell
-      currentStep={3}
-      totalSteps={6}
-      stepLabel={view.stepLabel}
-      title={view.title}
-      subtitle="Set the celebration dates."
-    >
-      <Card>
-        <CardHeader>
-          <CardTitle>The dates</CardTitle>
-          <CardDescription>Set the birthday, party, and campaign timeline.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {errorMessage ? (
-            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {errorMessage}
-            </div>
-          ) : null}
-          <DatesForm
-            action={saveDatesAction}
-            defaultBirthdayDate={defaultBirthdayDate}
-            defaultPartyDate={defaultPartyDate}
-            defaultCampaignEndDate={defaultCampaignEndDate}
-            defaultPartyDateTimeDate={partyDateTimeDefaults.date}
-            defaultPartyDateTimeTime={partyDateTimeDefaults.time}
-            defaultPartyDateEnabled={defaultPartyDateEnabled}
-          />
-        </CardContent>
-      </Card>
-    </CreateFlowShell>
+    <>
+      <WizardStepper currentStep={3} totalSteps={6} stepLabel="The dates" />
+
+      <Suspense fallback={<WizardSkeletonLoader variant="split" />}>
+        <DatesForm
+          action={saveDatesAction}
+          defaultBirthdayDate={defaultBirthdayDate}
+          defaultPartyDate={defaultPartyDate}
+          defaultCampaignEndDate={defaultCampaignEndDate}
+          defaultPartyDateTimeDate={partyDateTimeDefaults.date}
+          defaultPartyDateTimeTime={partyDateTimeDefaults.time}
+          defaultPartyDateEnabled={defaultPartyDateEnabled}
+          childName={draft.childName ?? ''}
+          childAge={draft.childAge ?? 0}
+          error={errorMessage}
+        />
+      </Suspense>
+    </>
   );
 }
