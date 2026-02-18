@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useEffect, useRef } from 'react';
 
 const DRAFT_PERSIST_DEBOUNCE_MS = 500;

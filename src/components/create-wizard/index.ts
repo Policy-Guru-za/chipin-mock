@@ -28,7 +28,5 @@ export { WizardSkeletonLoader } from './WizardSkeletonLoader';
 
 // Utilities
 export { resolveWizardError } from './resolveWizardError';
-export { useDraftPersistence } from './useDraftPersistence';
 export { trackWizardEvent } from './trackWizardEvent';
 export type { WizardEvent } from './trackWizardEvent';
-

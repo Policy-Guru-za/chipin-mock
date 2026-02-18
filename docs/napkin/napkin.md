@@ -3,6 +3,7 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-18 | self | Vercel build failed because server page imported `@/components/create-wizard` barrel that re-exported `useDraftPersistence` (uses `useEffect`/`useRef`), pulling a client hook into the server module graph | Keep shared barrels server-safe; do not re-export client hooks from a barrel imported by RSC pages. Export client hooks from direct path or client-only barrel |
 | 2026-02-13 | self | Axiom query attempt with heredoc inside nested `zsh -lc` was mangled (`no matches found`) before request execution | In this environment, prefer `printf '%s' '...json...' > /tmp/query.json` + `--data-binary @file` over heredoc for APL payloads |
 | 2026-02-13 | self | Charity URL draft autofill can fail with "page too large" while Axiom shows only `POST /admin/charities` `200`, because `generateCharityDraftFromUrlAction` catches `CharityUrlIngestError` and returns a handled error payload | For autofill triage, pair logs with code limits: check `src/lib/charities/url-ingest.ts` (`MAX_HTML_BYTES=800000`) and measure target HTML bytes directly before assuming backend crash |
 | 2026-02-13 | self | In `CharityFormModal` URL draft autofill, I guarded `result.draft` but still referenced `result.draft.*` inside `setValues` callback, and strict TypeScript flagged it as possibly undefined | After the guard, assign `const draft = result.draft` and reference `draft.*` inside callbacks to preserve narrowing |
