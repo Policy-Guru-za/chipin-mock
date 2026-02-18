@@ -1,18 +1,27 @@
+import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 
 import { saveManualGiftAction } from '@/app/(host)/create/gift/actions';
+import { GiftIconPreview } from '@/components/create-wizard/GiftIconPreview';
+import {
+  WizardCTA,
+  WizardEyebrow,
+  WizardFieldTip,
+  WizardFieldWrapper,
+  WizardFormCard,
+  WizardPanelTitle,
+  WizardPreviewPanel,
+  WizardSkeletonLoader,
+  WizardSplitLayout,
+  WizardStepper,
+  WizardTextInput,
+  WizardTextarea,
+  resolveWizardError,
+} from '@/components/create-wizard';
 import { GiftIconPicker } from '@/components/gift/GiftIconPicker';
-import { CreateFlowShell } from '@/components/layout/CreateFlowShell';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
 import { getDreamBoardDraft } from '@/lib/dream-boards/draft';
-import {
-  extractIconIdFromPath,
-  isValidGiftIconId,
-} from '@/lib/icons/gift-icons';
+import { extractIconIdFromPath, isValidGiftIconId } from '@/lib/icons/gift-icons';
 import { suggestGiftIcon } from '@/lib/icons/suggest-icon';
 import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
 
@@ -20,12 +29,9 @@ type GiftSearchParams = {
   error?: string;
 };
 
-const getErrorMessage = (error?: string) =>
-  (
-    {
-      invalid: 'Please complete all required fields.',
-    }[error ?? ''] ?? null
-  );
+const giftErrorMessages: Record<string, string> = {
+  invalid: 'Please complete all required fields.',
+};
 
 const resolveDefaultGiftName = (draft?: Awaited<ReturnType<typeof getDreamBoardDraft>>) =>
   draft?.giftName ?? '';
@@ -70,7 +76,7 @@ export default async function CreateGiftPage({
   }
 
   const resolvedSearchParams = await searchParams;
-  const errorMessage = getErrorMessage(resolvedSearchParams?.error);
+  const errorMessage = resolveWizardError(resolvedSearchParams?.error, giftErrorMessages);
   const defaultGiftName = resolveDefaultGiftName(draft);
   const defaultGiftDescription = resolveDefaultGiftDescription(draft);
   const defaultMessage = resolveDefaultMessage(draft);
@@ -78,83 +84,100 @@ export default async function CreateGiftPage({
   const messageAuthor = draft.childName?.trim() ? draft.childName.trim() : 'your child';
 
   return (
-    <CreateFlowShell
-      currentStep={2}
-      totalSteps={6}
-      stepLabel={view.stepLabel}
-      title={view.title}
-      subtitle={view.subtitle}
-    >
-      <Card>
-        <CardHeader>
-          <CardTitle>The dream gift</CardTitle>
-          <CardDescription>Describe the dream gift.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {errorMessage ? (
-            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {errorMessage}
-            </div>
-          ) : null}
+    <>
+      <WizardStepper currentStep={2} totalSteps={6} stepLabel="The gift" />
 
-          <form action={saveManualGiftAction} className="space-y-5">
-            <div className="space-y-2">
-              <label htmlFor="giftName" className="text-sm font-medium text-text">
-                Gift name
-              </label>
-              <Input
-                id="giftName"
-                name="giftName"
-                placeholder="E.g., red mountain bike"
-                defaultValue={defaultGiftName}
-                required
-              />
-            </div>
+      <Suspense fallback={<WizardSkeletonLoader variant="split" />}>
+        <form action={saveManualGiftAction}>
+          <WizardSplitLayout
+            mobileOrder="right-first"
+            left={
+              <WizardPreviewPanel
+                eyebrow="Step 2 of 6 - The gift"
+                title="Gift icon preview"
+                summaryLabel="Preview icon -"
+              >
+                <GiftIconPreview selectedIcon={defaultIconId} />
+              </WizardPreviewPanel>
+            }
+            right={
+              <WizardFormCard>
+                <WizardEyebrow>Step 2 of 6 - The gift</WizardEyebrow>
+                <WizardPanelTitle variant="form">The dream gift</WizardPanelTitle>
+                <p className="mb-7 text-[13px] font-light leading-relaxed text-ink-soft">
+                  Describe the dream gift so contributors know what they&apos;re chipping in for.
+                </p>
 
-            <div className="space-y-2">
-              <label htmlFor="giftDescription" className="text-sm font-medium text-text">
-                Describe the dream gift
-              </label>
-              <Textarea
-                id="giftDescription"
-                name="giftDescription"
-                placeholder="E.g., a red mountain bike with a basket and shiny streamers."
-                defaultValue={defaultGiftDescription}
-              />
-              <p className="text-xs text-text-muted">
-                Describe the gift so contributors know what they&apos;re chipping in for.
-              </p>
-            </div>
+                <WizardFieldWrapper label="Gift name" htmlFor="giftName">
+                  <WizardTextInput
+                    id="giftName"
+                    name="giftName"
+                    placeholder="e.g. LEGO Millennium Falcon"
+                    defaultValue={defaultGiftName}
+                    inputMode="text"
+                    autoComplete="off"
+                    enterKeyHint="next"
+                    required
+                  />
+                </WizardFieldWrapper>
 
-            <GiftIconPicker
-              selectedIconId={defaultIconId}
-              giftNameInputId="giftName"
-              giftDescriptionInputId="giftDescription"
-              defaultGiftName={defaultGiftName}
-              defaultGiftDescription={defaultGiftDescription}
-              childAge={draft?.childAge}
-            />
+                <WizardFieldWrapper
+                  label="Describe the dream gift"
+                  htmlFor="giftDescription"
+                  tip={
+                    <WizardFieldTip>
+                      A clear description helps contributors feel confident about what they&apos;re
+                      giving towards.
+                    </WizardFieldTip>
+                  }
+                >
+                  <WizardTextarea
+                    id="giftDescription"
+                    name="giftDescription"
+                    placeholder="Tell guests why this gift is special..."
+                    defaultValue={defaultGiftDescription}
+                    rows={3}
+                  />
+                </WizardFieldWrapper>
 
-            <div className="space-y-2">
-              <label htmlFor="message" className="text-sm font-medium text-text">
-                {`A message from ${messageAuthor}`}
-              </label>
-              <Textarea
-                id="message"
-                name="message"
-                maxLength={280}
-                placeholder="E.g., Thank you for helping make this dream gift possible."
-                defaultValue={defaultMessage}
-              />
-              <p className="text-xs text-text-muted">
-                This note is saved with this Dreamboard and may appear on the public Dreamboard.
-              </p>
-            </div>
+                <WizardFieldWrapper label="Gift icon" htmlFor="giftIconId">
+                  <GiftIconPicker
+                    selectedIconId={defaultIconId}
+                    giftNameInputId="giftName"
+                    giftDescriptionInputId="giftDescription"
+                    defaultGiftName={defaultGiftName}
+                    defaultGiftDescription={defaultGiftDescription}
+                    childAge={draft?.childAge}
+                  />
+                </WizardFieldWrapper>
 
-            <Button type="submit">Continue to dates</Button>
-          </form>
-        </CardContent>
-      </Card>
-    </CreateFlowShell>
+                <div className="my-6 h-px bg-border-soft" />
+
+                <WizardFieldWrapper label={`A message from ${messageAuthor}`} htmlFor="message">
+                  <WizardTextarea
+                    id="message"
+                    name="message"
+                    maxLength={280}
+                    placeholder="E.g., Thank you for helping make this dream gift possible."
+                    defaultValue={defaultMessage}
+                    rows={3}
+                  />
+                  <p className="mt-1.5 text-xs text-ink-ghost">
+                    This note is saved with this Dreamboard and may appear on the public Dreamboard.
+                  </p>
+                </WizardFieldWrapper>
+
+                <WizardCTA
+                  backHref="/create/child"
+                  submitLabel="Continue to dates"
+                  pending={false}
+                  error={errorMessage}
+                />
+              </WizardFormCard>
+            }
+          />
+        </form>
+      </Suspense>
+    </>
   );
 }
