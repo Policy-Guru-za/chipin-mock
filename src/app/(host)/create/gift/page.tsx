@@ -137,6 +137,7 @@ export default async function CreateGiftPage({
                     placeholder="Tell guests why this gift is special..."
                     defaultValue={defaultGiftDescription}
                     rows={3}
+                    enterKeyHint="next"
                   />
                 </WizardFieldWrapper>
 
@@ -161,6 +162,7 @@ export default async function CreateGiftPage({
                     placeholder="E.g., Thank you for helping make this dream gift possible."
                     defaultValue={defaultMessage}
                     rows={3}
+                    enterKeyHint="done"
                   />
                   <p className="mt-1.5 text-xs text-ink-ghost">
                     This note is saved with this Dreamboard and may appear on the public Dreamboard.

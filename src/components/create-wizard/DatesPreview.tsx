@@ -1,5 +1,7 @@
 'use client';
 
+import { memo } from 'react';
+
 export interface DatesPreviewProps {
   childName: string;
   childAge: number;
@@ -82,7 +84,7 @@ const getCountdownLabel = (campaignDays: number) => {
   return `Campaign closes in ${safeDays} days`;
 };
 
-export function DatesPreview({
+function DatesPreviewComponent({
   childName,
   childAge,
   birthdayDate,
@@ -158,3 +160,6 @@ export function DatesPreview({
     </div>
   );
 }
+
+export const DatesPreview = memo(DatesPreviewComponent);
+DatesPreview.displayName = 'DatesPreview';

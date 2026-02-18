@@ -185,6 +185,7 @@ export function PayoutForm({
                     placeholder="XXXX XXXX XXXX XXXX"
                     autoComplete="off"
                     inputMode="numeric"
+                    enterKeyHint="next"
                     onChange={(event) =>
                       setHasKarriCardNumber(event.currentTarget.value.trim().length > 0)
                     }
@@ -197,6 +198,8 @@ export function PayoutForm({
                     name="karriCardHolderName"
                     placeholder="Name on card"
                     autoCapitalize="words"
+                    autoComplete="name"
+                    enterKeyHint="next"
                     value={karriCardHolderName}
                     onChange={(event) => setKarriCardHolderName(event.currentTarget.value)}
                   />
@@ -228,6 +231,7 @@ export function PayoutForm({
                       placeholder="Account number"
                       autoComplete="off"
                       inputMode="numeric"
+                      enterKeyHint="next"
                       onChange={(event) =>
                         setHasBankAccountNumber(
                           event.currentTarget.value.trim().length > 0 ||
@@ -248,6 +252,7 @@ export function PayoutForm({
                       name="bankBranchCode"
                       placeholder="6-digit branch code"
                       inputMode="numeric"
+                      enterKeyHint="next"
                       value={bankBranchCode}
                       onChange={(event) => setBankBranchCode(event.currentTarget.value)}
                     />
@@ -260,6 +265,8 @@ export function PayoutForm({
                     name="bankAccountHolder"
                     placeholder="Account holder name"
                     autoCapitalize="words"
+                    autoComplete="name"
+                    enterKeyHint="next"
                     value={bankAccountHolder}
                     onChange={(event) => setBankAccountHolder(event.currentTarget.value)}
                   />
@@ -294,6 +301,7 @@ export function PayoutForm({
                 required
                 inputMode="email"
                 autoComplete="email"
+                enterKeyHint="next"
                 value={email}
                 onChange={(event) => setEmail(event.currentTarget.value)}
               />

@@ -252,6 +252,8 @@ export function GivingBackForm({
                         min={50}
                         max={500}
                         step={1}
+                        inputMode="numeric"
+                        enterKeyHint="done"
                         value={thresholdAmount}
                         onChange={(event) => setThresholdAmount(Number(event.currentTarget.value))}
                         className={`${numberInputClassName} pl-8 text-center`}

@@ -1,5 +1,7 @@
 'use client';
 
+import { memo } from 'react';
+
 type PayoutPreviewProps = {
   payoutMethod: 'karri_card' | 'bank';
   hasMethodDetails: boolean;
@@ -38,7 +40,7 @@ function ChecklistItem({ label, done }: { label: string; done: boolean }) {
   );
 }
 
-export function PayoutPreview({
+function PayoutPreviewComponent({
   payoutMethod,
   hasMethodDetails,
   hasEmail,
@@ -137,3 +139,6 @@ export function PayoutPreview({
     </div>
   );
 }
+
+export const PayoutPreview = memo(PayoutPreviewComponent);
+PayoutPreview.displayName = 'PayoutPreview';

@@ -1,5 +1,7 @@
 'use client';
 
+import { memo } from 'react';
+
 type SplitType = 'percentage' | 'threshold';
 
 type PreviewCharity = {
@@ -23,7 +25,7 @@ const clamp = (value: number, min: number, max: number) => Math.min(max, Math.ma
 
 const formatRands = (amount: number) => `R${Math.round(amount).toLocaleString('en-ZA')}`;
 
-export function GivingBackPreview({
+function GivingBackPreviewComponent({
   charityEnabled,
   selectedCharity,
   splitType,
@@ -120,3 +122,6 @@ export function GivingBackPreview({
     </div>
   );
 }
+
+export const GivingBackPreview = memo(GivingBackPreviewComponent);
+GivingBackPreview.displayName = 'GivingBackPreview';

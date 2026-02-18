@@ -80,6 +80,7 @@ export function DatesForm({
                 name="birthdayDate"
                 type="date"
                 required
+                enterKeyHint="next"
                 value={birthdayDate}
                 onChange={(event) => {
                   const nextBirthday = event.currentTarget.value;
@@ -142,6 +143,7 @@ export function DatesForm({
                     name="partyDate"
                     type="date"
                     required
+                    enterKeyHint="next"
                     value={partyDate}
                     onChange={(event) => {
                       const nextPartyDate = event.currentTarget.value;
@@ -160,6 +162,7 @@ export function DatesForm({
                     name="campaignEndDate"
                     type="date"
                     required
+                    enterKeyHint="next"
                     value={campaignEndDate}
                     onChange={(event) => setCampaignEndDate(event.currentTarget.value)}
                     className={dateInputClassName}
@@ -181,6 +184,7 @@ export function DatesForm({
                     id="partyDateTimeDate"
                     name="partyDateTimeDate"
                     type="date"
+                    enterKeyHint="next"
                     value={partyDateTimeDate}
                     onChange={(event) => {
                       const value = event.currentTarget.value;
@@ -198,6 +202,7 @@ export function DatesForm({
                     id="partyDateTimeTime"
                     name="partyDateTimeTime"
                     type="time"
+                    enterKeyHint="done"
                     value={partyDateTimeTime}
                     disabled={!partyDateTimeDate}
                     onChange={(event) => setPartyDateTimeTime(event.currentTarget.value)}
