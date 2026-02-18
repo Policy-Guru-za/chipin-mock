@@ -1,10 +1,18 @@
+import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 
 import { saveGivingBackAction } from '@/app/(host)/create/giving-back/actions';
 import { GivingBackForm } from '@/app/(host)/create/giving-back/GivingBackForm';
-import { CreateFlowShell } from '@/components/layout/CreateFlowShell';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  WizardAlertBanner,
+  WizardCTA,
+  WizardEyebrow,
+  WizardFormCard,
+  WizardPanelTitle,
+  WizardSkeletonLoader,
+  WizardStepper,
+  resolveWizardError,
+} from '@/components/create-wizard';
 import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
 import { listActiveCharities } from '@/lib/charities';
 import { getDreamBoardDraft } from '@/lib/dream-boards/draft';
@@ -17,9 +25,6 @@ const givingBackErrorMessages: Record<string, string> = {
   percentage_range: 'Set a percentage between 5% and 50%.',
   threshold_range: 'Set a fixed amount between R50 and R500.',
 };
-
-const getGivingBackErrorMessage = (error?: string) =>
-  error ? (givingBackErrorMessages[error] ?? null) : null;
 
 type GivingBackSearchParams = {
   error?: string;
@@ -56,56 +61,50 @@ export default async function CreateGivingBackPage({
       : 'percentage';
 
   const resolvedSearchParams = await searchParams;
-  const errorMessage = getGivingBackErrorMessage(resolvedSearchParams?.error);
+  const errorMessage = resolveWizardError(resolvedSearchParams?.error, givingBackErrorMessages);
 
   return (
-    <CreateFlowShell
-      currentStep={4}
-      totalSteps={6}
-      stepLabel={view.stepLabel}
-      title={view.title}
-      subtitle={view.subtitle}
-    >
-      <Card>
-        <CardHeader>
-          <CardTitle>Giving back</CardTitle>
-          <CardDescription>Choose whether to share a portion of contributions with charity.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {errorMessage ? (
-            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {errorMessage}
-            </div>
-          ) : null}
-          {!hasActiveCharities ? (
-            <div className="space-y-4">
-              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+    <>
+      <WizardStepper currentStep={4} totalSteps={6} stepLabel="Giving back" />
+
+      <Suspense fallback={<WizardSkeletonLoader variant="split" />}>
+        {!hasActiveCharities ? (
+          <form action={saveGivingBackAction} className="mx-auto max-w-[940px] px-5 min-[801px]:px-12">
+            <WizardFormCard>
+              <WizardEyebrow>Step 4</WizardEyebrow>
+              <WizardPanelTitle variant="form">Giving back</WizardPanelTitle>
+              <p className="mb-4 text-[13px] font-light leading-relaxed text-ink-soft">
+                Choose whether to share a portion of contributions with charity.
+              </p>
+              <WizardAlertBanner variant="warning">
                 No active charities are configured. You can continue without giving back for now.
-              </div>
-              <form action={saveGivingBackAction}>
-                <Button type="submit">
-                  Continue to payout setup
-                </Button>
-              </form>
-            </div>
-          ) : (
-            <GivingBackForm
-              action={saveGivingBackAction}
-              charities={activeCharities}
-              defaultCharityEnabled={draft.charityEnabled}
-              defaultCharityId={draft.charityId}
-              defaultSplitType={defaultSplitType}
-              defaultPercentage={
-                draft.charityPercentageBps ? Math.round(draft.charityPercentageBps / 100) : 25
-              }
-              defaultThresholdAmount={
-                draft.charityThresholdCents ? Math.round(draft.charityThresholdCents / 100) : 100
-              }
-              childName={draft.childName}
-            />
-          )}
-        </CardContent>
-      </Card>
-    </CreateFlowShell>
+              </WizardAlertBanner>
+              <WizardCTA
+                backHref="/create/dates"
+                submitLabel="Continue to payout setup"
+                pending={false}
+                error={errorMessage}
+              />
+            </WizardFormCard>
+          </form>
+        ) : (
+          <GivingBackForm
+            action={saveGivingBackAction}
+            charities={activeCharities}
+            defaultCharityEnabled={draft.charityEnabled}
+            defaultCharityId={draft.charityId}
+            defaultSplitType={defaultSplitType}
+            defaultPercentage={
+              draft.charityPercentageBps ? Math.round(draft.charityPercentageBps / 100) : 25
+            }
+            defaultThresholdAmount={
+              draft.charityThresholdCents ? Math.round(draft.charityThresholdCents / 100) : 100
+            }
+            childName={draft.childName}
+            error={errorMessage}
+          />
+        )}
+      </Suspense>
+    </>
   );
 }
