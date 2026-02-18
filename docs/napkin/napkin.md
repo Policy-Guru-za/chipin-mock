@@ -79,6 +79,7 @@
 | 2026-02-09 | self | Updated contrast-related utility classes without immediately updating coupled unit assertions (`button.test`, `progress-bar.test`) | After design-token/class changes, run and patch directly coupled component tests before the full-suite run to avoid avoidable red gate loops |
 | 2026-02-09 | self | Added global skip link but left root `error.tsx`/`not-found.tsx` without `id="main-content"` target and used low-contrast focus background | When adding skip-link patterns, validate target presence across fallback routes and use AA-compliant focus tokens (`primary-700`+) |
 | 2026-02-18 | self | Added debounced wizard draft persistence but unmount cleanup only cleared timeout, so recent edits could be dropped on quick navigation | For debounced storage hooks, flush pending value in cleanup before/with timer clear so last user input persists |
+| 2026-02-18 | self | Typed a client timer ref as `ReturnType<typeof window.setTimeout>` then used `window.setTimeout`, causing TS mismatch (`number` vs `Timeout`) under mixed DOM/Node libs | In this repo, prefer `ReturnType<typeof setTimeout>` with global `setTimeout/clearTimeout` for timer refs |
 
 ## User Preferences
 - Start with required doc read order before implementation.
