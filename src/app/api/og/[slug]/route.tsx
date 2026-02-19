@@ -2,6 +2,7 @@ import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 
 import { getCachedDreamBoardBySlug } from '@/lib/dream-boards/cache';
+import { resolveRuntimeBaseUrl } from '@/lib/utils/request';
 
 export const runtime = 'nodejs';
 
@@ -27,7 +28,10 @@ export async function GET(
     return new Response('Not found', { status: 404 });
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? request.nextUrl.origin;
+  const baseUrl = resolveRuntimeBaseUrl({
+    headers: request.headers,
+    requestOrigin: request.nextUrl.origin,
+  });
   const iconUrl = toAbsoluteUrl('/Logos/Original.png', baseUrl);
   const childPhotoUrl = toAbsoluteUrl(board.childPhotoUrl, baseUrl);
 

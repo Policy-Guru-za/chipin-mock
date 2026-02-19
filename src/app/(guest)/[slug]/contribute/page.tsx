@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { cache } from 'react';
 
@@ -10,6 +11,7 @@ import { buildDreamBoardMetadata } from '@/lib/dream-boards/metadata';
 import { buildContributionViewModel } from '@/lib/dream-boards/view-model';
 import { getAvailablePaymentProviders } from '@/lib/payments';
 import { uiCopy } from '@/lib/ui/copy';
+import { resolveRuntimeBaseUrl } from '@/lib/utils/request';
 
 const getBoard = cache(async (slug: string) => getCachedDreamBoardBySlug(slug));
 
@@ -20,7 +22,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const board = await getBoard(slug);
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const baseUrl = resolveRuntimeBaseUrl({ headers: await headers() });
 
   if (!board) {
     return {
