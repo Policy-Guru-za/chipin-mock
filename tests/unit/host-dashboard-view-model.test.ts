@@ -14,9 +14,11 @@ describe('host dashboard view model', () => {
       slug: 'maya-birthday-123',
       childName: 'Maya',
       childPhotoUrl: 'https://example.com/child.jpg',
+      birthdayDate: '2099-06-12',
       giftName: 'Scooter',
       giftImageUrl: 'https://example.com/scooter.jpg',
       partyDate: '2099-06-12',
+      partyDateTime: null,
       campaignEndDate: '2099-06-10',
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
       status: 'paid_out',
@@ -37,9 +39,11 @@ describe('host dashboard view model', () => {
       slug: 'ended-board',
       childName: 'Ava',
       childPhotoUrl: '',
+      birthdayDate: '2025-01-05',
       giftName: 'Bike',
       giftImageUrl: '',
       partyDate: '2025-01-05',
+      partyDateTime: null,
       campaignEndDate: '2025-01-04',
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
       status: 'closed',
@@ -55,9 +59,11 @@ describe('host dashboard view model', () => {
       slug: 'no-deadline-board',
       childName: 'Kai',
       childPhotoUrl: '',
+      birthdayDate: null,
       giftName: 'Blocks',
       giftImageUrl: '',
       partyDate: '',
+      partyDateTime: null,
       campaignEndDate: null,
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
       status: 'active',
@@ -72,6 +78,48 @@ describe('host dashboard view model', () => {
   it('computes B6 financial breakdown as raised - fee - charity', () => {
     const breakdown = buildFinancialBreakdown(100000, 3000, 15000);
     expect(breakdown.netPayoutCents).toBe(82000);
+  });
+
+  it('derives hasBirthdayParty using birthday/party date and partyDateTime', () => {
+    const noPartyCard = buildDashboardCardViewModel({
+      id: 'board-no-party',
+      slug: 'no-party',
+      childName: 'Maya',
+      childPhotoUrl: '',
+      birthdayDate: '2099-06-12',
+      giftName: 'Scooter',
+      giftImageUrl: '',
+      partyDate: '2099-06-12',
+      partyDateTime: null,
+      campaignEndDate: '2099-06-12',
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      status: 'active',
+      goalCents: 10000,
+      charityEnabled: false,
+      raisedCents: 0,
+      contributionCount: 0,
+    });
+    expect(noPartyCard.hasBirthdayParty).toBe(false);
+
+    const plannedPartyCard = buildDashboardCardViewModel({
+      id: 'board-party',
+      slug: 'party',
+      childName: 'Maya',
+      childPhotoUrl: '',
+      birthdayDate: '2099-06-12',
+      giftName: 'Scooter',
+      giftImageUrl: '',
+      partyDate: '2099-06-14',
+      partyDateTime: null,
+      campaignEndDate: '2099-06-14',
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      status: 'active',
+      goalCents: 10000,
+      charityEnabled: false,
+      raisedCents: 0,
+      contributionCount: 0,
+    });
+    expect(plannedPartyCard.hasBirthdayParty).toBe(true);
   });
 
   it('keeps funded boards editable/non-complete on detail model', () => {
@@ -119,9 +167,11 @@ describe('host dashboard view model', () => {
         slug: 'maya-birthday-123',
         childName: 'Maya',
         childPhotoUrl: 'https://example.com/child.jpg',
+        birthdayDate: '2099-06-12',
         giftName: 'Scooter',
         giftImageUrl: 'https://example.com/scooter.jpg',
         partyDate: '2099-06-12',
+        partyDateTime: null,
         campaignEndDate: '2099-06-10',
         createdAt: new Date('2026-01-01T00:00:00.000Z'),
         status: 'active',

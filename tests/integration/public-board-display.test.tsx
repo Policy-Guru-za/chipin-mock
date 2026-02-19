@@ -99,7 +99,7 @@ function PublicBoardHarness({
         disabled={view.isExpired || view.isClosed}
       />
       <ContributorDisplay contributors={contributors} totalCount={view.contributionCount} />
-      <DreamboardDetailsCard partyDateTimeLine={null} />
+      <DreamboardDetailsCard partyDateTimeLine={null} hasBirthdayParty={false} />
       {view.charityEnabled && view.charityName && view.charityAllocationLabel ? (
         <CharitableGivingCard
           charityName={view.charityName}

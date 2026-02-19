@@ -13,7 +13,7 @@ import {
   WizardStepper,
 } from '@/components/create-wizard';
 import { ConfettiTrigger } from '@/components/effects/ConfettiTrigger';
-import { formatPartyDateTime } from '@/lib/dream-boards/party-date-time';
+import { formatBirthdayPartyLine } from '@/lib/dream-boards/party-visibility';
 import { parseDateOnly } from '@/lib/utils/date';
 
 type ReviewDraftData = {
@@ -86,7 +86,11 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
     draft.payoutMethod === 'bank'
       ? `Bank transfer${draft.bankName ? ` (${draft.bankName})` : ''}${draft.bankAccountLast4 ? ` •••• ${draft.bankAccountLast4}` : ''}`
       : `Karri Card${draft.karriCardHolderName ? ` (${draft.karriCardHolderName})` : ''}`;
-  const partyDateTimeSummary = formatPartyDateTime(draft.partyDateTime ?? null);
+  const partyDateTimeSummary = formatBirthdayPartyLine({
+    birthdayDate: draft.birthdayDate,
+    partyDate: draft.partyDate,
+    partyDateTime: draft.partyDateTime ?? null,
+  });
   const birthdayLabel = formatDate(draft.birthdayDate);
   const campaignCloseLabel = formatDate(draft.campaignEndDate);
 

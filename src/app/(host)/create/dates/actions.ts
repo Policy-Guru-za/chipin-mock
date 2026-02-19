@@ -48,14 +48,14 @@ const isPartyDateTimeWithinRange = (isoDateTime: string) => {
 const datesSchema = z
   .object({
     birthdayDate: z.string().min(1, 'Birthday date is required'),
-    partyDateEnabled: z.boolean().optional().default(false),
+    noPartyPlanned: z.boolean().optional().default(false),
     partyDate: z.string().optional(),
     campaignEndDate: z.string().optional(),
     partyDateTimeDate: z.string().optional(),
     partyDateTimeTime: z.string().optional(),
   })
   .superRefine((value, ctx) => {
-    if (!value.partyDateEnabled) {
+    if (value.noPartyPlanned) {
       return;
     }
 
@@ -96,7 +96,7 @@ export async function saveDatesAction(formData: FormData) {
 
   const payload = {
     birthdayDate: formData.get('birthdayDate'),
-    partyDateEnabled: formData.get('partyDateEnabled') === 'on',
+    noPartyPlanned: formData.get('noPartyPlanned') === 'on',
     partyDate: typeof formData.get('partyDate') === 'string' ? formData.get('partyDate') : undefined,
     campaignEndDate:
       typeof formData.get('campaignEndDate') === 'string'
@@ -118,10 +118,8 @@ export async function saveDatesAction(formData: FormData) {
   }
 
   const birthdayDate = parsed.data.birthdayDate;
-  const partyDate = parsed.data.partyDateEnabled ? parsed.data.partyDate ?? '' : birthdayDate;
-  const campaignEndDate = parsed.data.partyDateEnabled
-    ? parsed.data.campaignEndDate ?? ''
-    : birthdayDate;
+  const partyDate = parsed.data.noPartyPlanned ? birthdayDate : parsed.data.partyDate ?? '';
+  const campaignEndDate = parsed.data.noPartyPlanned ? birthdayDate : parsed.data.campaignEndDate ?? '';
 
   if (!isBirthdayDateValid(birthdayDate)) {
     redirect('/create/dates?error=birthday_date');
@@ -140,7 +138,7 @@ export async function saveDatesAction(formData: FormData) {
   }
 
   let partyDateTime: string | null = null;
-  if (parsed.data.partyDateTimeDate) {
+  if (!parsed.data.noPartyPlanned && parsed.data.partyDateTimeDate) {
     const parsedPartyDateTime = toPartyDateTimeIso(
       parsed.data.partyDateTimeDate,
       parsed.data.partyDateTimeTime

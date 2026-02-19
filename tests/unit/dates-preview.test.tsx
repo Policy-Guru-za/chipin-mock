@@ -62,7 +62,21 @@ describe('DatesPreview', () => {
       />,
     );
     expect(screen.getByText(/Party day/i)).toBeInTheDocument();
-    expect(screen.getByText(/2:00 PM/)).toBeInTheDocument();
+    expect(screen.getByText(/14:00/)).toBeInTheDocument();
+  });
+
+  it('shows party line when party date differs even without party time', () => {
+    render(
+      <DatesPreview
+        {...defaultProps()}
+        partyDate="2026-06-16"
+        partyDateTimeDate=""
+        partyDateTimeTime=""
+      />
+    );
+
+    expect(screen.getByText(/Party day/i)).toBeInTheDocument();
+    expect(screen.getByText(/16 June 2026/)).toBeInTheDocument();
   });
 
   it('renders timeline markers for Today, Birthday, and Closes', () => {

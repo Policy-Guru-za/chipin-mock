@@ -49,7 +49,6 @@ describe('saveDatesAction', () => {
     const { saveDatesAction } = await loadModule();
     const formData = new FormData();
     formData.set('birthdayDate', addDays(20));
-    formData.set('partyDateEnabled', 'on');
     formData.set('partyDate', addDays(22));
     formData.set('campaignEndDate', addDays(22));
 
@@ -77,7 +76,6 @@ describe('saveDatesAction', () => {
     const { saveDatesAction } = await loadModule();
     const formData = new FormData();
     formData.set('birthdayDate', addDays(-1));
-    formData.set('partyDateEnabled', 'on');
     formData.set('partyDate', addDays(2));
     formData.set('campaignEndDate', addDays(2));
 
@@ -99,7 +97,6 @@ describe('saveDatesAction', () => {
     const { saveDatesAction } = await loadModule();
     const formData = new FormData();
     formData.set('birthdayDate', addDays(20));
-    formData.set('partyDateEnabled', 'on');
     formData.set('partyDate', addDays(220));
     formData.set('campaignEndDate', addDays(220));
 
@@ -121,7 +118,6 @@ describe('saveDatesAction', () => {
     const { saveDatesAction } = await loadModule();
     const formData = new FormData();
     formData.set('birthdayDate', addDays(20));
-    formData.set('partyDateEnabled', 'on');
     formData.set('partyDate', addDays(25));
     formData.set('campaignEndDate', addDays(26));
 
@@ -143,14 +139,13 @@ describe('saveDatesAction', () => {
     const { saveDatesAction } = await loadModule();
     const formData = new FormData();
     formData.set('birthdayDate', addDays(20));
-    formData.set('partyDateEnabled', 'on');
     formData.set('partyDate', addDays(19));
     formData.set('campaignEndDate', addDays(19));
 
     await expect(saveDatesAction(formData)).rejects.toThrow('REDIRECT:/create/dates?error=birthday_order');
   });
 
-  it('defaults party and campaign dates to birthday when partyDateEnabled is false', async () => {
+  it('defaults party and campaign dates to birthday when noPartyPlanned is true', async () => {
     const redirectMock = vi.fn((url: string) => {
       throw new Error(`REDIRECT:${url}`);
     });
@@ -166,6 +161,7 @@ describe('saveDatesAction', () => {
     const { saveDatesAction } = await loadModule();
     const formData = new FormData();
     formData.set('birthdayDate', addDays(20));
+    formData.set('noPartyPlanned', 'on');
 
     await expect(saveDatesAction(formData)).rejects.toThrow('REDIRECT:/create/giving-back');
     expect(updateDreamBoardDraft).toHaveBeenCalledWith('host-1', {
@@ -193,7 +189,6 @@ describe('saveDatesAction', () => {
     const { saveDatesAction } = await loadModule();
     const formData = new FormData();
     formData.set('birthdayDate', addDays(20));
-    formData.set('partyDateEnabled', 'on');
     formData.set('partyDate', addDays(22));
     formData.set('campaignEndDate', addDays(22));
     formData.set('partyDateTimeDate', partyDateTimeDate);
@@ -222,7 +217,6 @@ describe('saveDatesAction', () => {
     const { saveDatesAction } = await loadModule();
     const formData = new FormData();
     formData.set('birthdayDate', addDays(20));
-    formData.set('partyDateEnabled', 'on');
     formData.set('partyDate', addDays(22));
     formData.set('campaignEndDate', addDays(22));
     formData.set('partyDateTimeDate', addDays(220));
@@ -247,7 +241,6 @@ describe('saveDatesAction', () => {
 
     const { saveDatesAction } = await loadModule();
     const formData = new FormData();
-    formData.set('partyDateEnabled', 'on');
     formData.set('partyDate', addDays(2));
     formData.set('campaignEndDate', addDays(2));
 

@@ -51,7 +51,7 @@ vi.mock('@/app/(host)/create/dates/DatesForm', () => ({
       data-campaign-end={String(props.defaultCampaignEndDate ?? '')}
       data-party-dt-date={String(props.defaultPartyDateTimeDate ?? '')}
       data-party-dt-time={String(props.defaultPartyDateTimeTime ?? '')}
-      data-party-enabled={String(props.defaultPartyDateEnabled)}
+      data-no-party-planned={String(props.defaultNoPartyPlanned)}
       data-child-name={String(props.childName ?? '')}
       data-child-age={String(props.childAge ?? '')}
       data-error={String(props.error ?? '')}
@@ -133,7 +133,7 @@ describe('Create Dates Page', () => {
     expect(html).toContain('data-error=""');
   });
 
-  it('computes defaultPartyDateEnabled correctly when dates differ', async () => {
+  it('computes defaultNoPartyPlanned as false when party is configured', async () => {
     mocks.getDreamBoardDraft.mockResolvedValue({
       childName: 'Maya',
       childAge: 7,
@@ -144,10 +144,10 @@ describe('Create Dates Page', () => {
     });
 
     const html = await renderPage();
-    expect(html).toContain('data-party-enabled="true"');
+    expect(html).toContain('data-no-party-planned="false"');
   });
 
-  it('computes defaultPartyDateEnabled as false when all dates match', async () => {
+  it('computes defaultNoPartyPlanned as true when all dates match and no party time is set', async () => {
     mocks.getDreamBoardDraft.mockResolvedValue({
       childName: 'Maya',
       childAge: 7,
@@ -158,6 +158,20 @@ describe('Create Dates Page', () => {
     });
 
     const html = await renderPage();
-    expect(html).toContain('data-party-enabled="false"');
+    expect(html).toContain('data-no-party-planned="true"');
+  });
+
+  it('keeps defaultNoPartyPlanned false when campaign close differs from birthday', async () => {
+    mocks.getDreamBoardDraft.mockResolvedValue({
+      childName: 'Maya',
+      childAge: 7,
+      birthdayDate: '2026-06-15',
+      partyDate: '2026-06-15',
+      campaignEndDate: '2026-06-14',
+      partyDateTime: null,
+    });
+
+    const html = await renderPage();
+    expect(html).toContain('data-no-party-planned="false"');
   });
 });

@@ -16,7 +16,7 @@ import { getHostAuth } from '@/lib/auth/clerk-wrappers';
 import { listRecentContributors } from '@/lib/db/queries';
 import { getCachedDreamBoardBySlug } from '@/lib/dream-boards/cache';
 import { buildDreamBoardMetadata } from '@/lib/dream-boards/metadata';
-import { formatPartyDateTime } from '@/lib/dream-boards/party-date-time';
+import { formatBirthdayPartyLine, hasBirthdayParty } from '@/lib/dream-boards/party-visibility';
 import { buildGuestViewModel } from '@/lib/dream-boards/view-model';
 import { parseDateOnly } from '@/lib/utils/date';
 
@@ -85,10 +85,17 @@ export default async function DreamBoardPage({
   const hostAuth = await getHostAuth();
   const isHostViewingOwnBoard = hostAuth?.hostId === view.hostId;
   const birthdayLabel = formatBoardDate(board.birthdayDate ?? board.partyDate);
-  const formattedPartyDateTime = formatPartyDateTime(view.partyDateTime);
-  const partyDateTimeLine = formattedPartyDateTime
-    ? `Birthday Party · ${formattedPartyDateTime}`
-    : null;
+  const hasPartyOutput = hasBirthdayParty({
+    birthdayDate: board.birthdayDate,
+    partyDate: board.partyDate,
+    partyDateTime: view.partyDateTime,
+  });
+  const partySummary = formatBirthdayPartyLine({
+    birthdayDate: board.birthdayDate,
+    partyDate: board.partyDate,
+    partyDateTime: view.partyDateTime,
+  });
+  const partyDateTimeLine = partySummary ? `Birthday Party · ${partySummary}` : null;
   const ageLine = board.childAge
     ? `Turning ${board.childAge}${birthdayLabel ? ` on ${birthdayLabel}` : ''}`
     : birthdayLabel
@@ -134,7 +141,10 @@ export default async function DreamBoardPage({
             />
           )}
           <ContributorDisplay contributors={contributors} totalCount={view.contributionCount} />
-          <DreamboardDetailsCard partyDateTimeLine={partyDateTimeLine} />
+          <DreamboardDetailsCard
+            partyDateTimeLine={partyDateTimeLine}
+            hasBirthdayParty={hasPartyOutput}
+          />
         </div>
       </div>
     </section>

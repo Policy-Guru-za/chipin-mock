@@ -216,4 +216,20 @@ describe('ReviewClient', () => {
 
     expect(screen.queryByRole('link', { name: 'Edit charity settings' })).toBeNull();
   });
+
+  it('hides birthday party summary when no party is planned', () => {
+    const publishAction = async (
+      _state: PublishState,
+      _formData: FormData
+    ): Promise<PublishState> => ({ status: 'preview' });
+    const noPartyDraft = {
+      ...draft,
+      partyDate: draft.birthdayDate,
+      partyDateTime: null,
+    };
+
+    render(<ReviewClient draft={noPartyDraft} publishAction={publishAction} />);
+
+    expect(screen.queryByText(/Birthday Party/i)).toBeNull();
+  });
 });

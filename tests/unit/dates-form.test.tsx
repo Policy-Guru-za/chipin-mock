@@ -46,7 +46,7 @@ const defaultProps = () => ({
   defaultCampaignEndDate: '2026-06-15',
   defaultPartyDateTimeDate: '',
   defaultPartyDateTimeTime: '',
-  defaultPartyDateEnabled: false,
+  defaultNoPartyPlanned: true,
   childName: 'Maya',
   childAge: 7,
   error: null as string | null,
@@ -60,24 +60,33 @@ describe('DatesForm', () => {
     expect(birthdayInput?.value).toBe('2026-06-15');
   });
 
-  it('hides party/campaign fields when partyDateEnabled is false', () => {
-    const { container } = render(<DatesForm {...defaultProps()} defaultPartyDateEnabled={false} />);
+  it('hides party scheduling fields when noPartyPlanned is true', () => {
+    const { container } = render(<DatesForm {...defaultProps()} defaultNoPartyPlanned />);
     expect(container.querySelector('input#partyDate[type="date"]')).toBeNull();
     expect(container.querySelector('input#campaignEndDate[type="date"]')).toBeNull();
+    expect(container.querySelector('input#partyDateTimeTime[type="time"]')).toBeNull();
 
     const hiddenPartyDate = container.querySelector<HTMLInputElement>('input[name="partyDate"][type="hidden"]');
     const hiddenCampaignEndDate = container.querySelector<HTMLInputElement>(
       'input[name="campaignEndDate"][type="hidden"]',
     );
+    const hiddenPartyDateTimeDate = container.querySelector<HTMLInputElement>(
+      'input[name="partyDateTimeDate"][type="hidden"]',
+    );
+    const hiddenPartyDateTimeTime = container.querySelector<HTMLInputElement>(
+      'input[name="partyDateTimeTime"][type="hidden"]',
+    );
     expect(hiddenPartyDate?.value).toBe('2026-06-15');
     expect(hiddenCampaignEndDate?.value).toBe('2026-06-15');
+    expect(hiddenPartyDateTimeDate?.value).toBe('');
+    expect(hiddenPartyDateTimeTime?.value).toBe('');
   });
 
-  it('shows party/campaign fields when partyDateEnabled is true', () => {
+  it('shows party scheduling fields when noPartyPlanned is false', () => {
     const { container } = render(
       <DatesForm
         {...defaultProps()}
-        defaultPartyDateEnabled
+        defaultNoPartyPlanned={false}
         defaultPartyDate="2026-06-16"
         defaultCampaignEndDate="2026-06-16"
       />,
@@ -85,11 +94,12 @@ describe('DatesForm', () => {
 
     expect(container.querySelector('input#partyDate[type="date"]')).toBeInTheDocument();
     expect(container.querySelector('input#campaignEndDate[type="date"]')).toBeInTheDocument();
+    expect(container.querySelector('input#partyDateTimeTime[type="time"]')).toBeInTheDocument();
   });
 
   it('toggling checkbox shows/hides party fields', () => {
-    const { container } = render(<DatesForm {...defaultProps()} defaultPartyDateEnabled={false} />);
-    const checkbox = container.querySelector<HTMLInputElement>('#partyDateEnabled');
+    const { container } = render(<DatesForm {...defaultProps()} defaultNoPartyPlanned />);
+    const checkbox = container.querySelector<HTMLInputElement>('#noPartyPlanned');
     expect(checkbox).not.toBeNull();
     expect(container.querySelector('input#partyDate[type="date"]')).toBeNull();
 
@@ -97,10 +107,11 @@ describe('DatesForm', () => {
 
     expect(container.querySelector('input#partyDate[type="date"]')).toBeInTheDocument();
     expect(container.querySelector('input#campaignEndDate[type="date"]')).toBeInTheDocument();
+    expect(container.querySelector('input#partyDateTimeTime[type="time"]')).toBeInTheDocument();
   });
 
-  it('changing birthday cascades to party/campaign when checkbox is off', () => {
-    const { container } = render(<DatesForm {...defaultProps()} defaultPartyDateEnabled={false} />);
+  it('changing birthday cascades to party/campaign when no-party is selected', () => {
+    const { container } = render(<DatesForm {...defaultProps()} defaultNoPartyPlanned />);
     const birthdayInput = container.querySelector<HTMLInputElement>('#birthdayDate');
     expect(birthdayInput).not.toBeNull();
 
@@ -133,9 +144,21 @@ describe('DatesForm', () => {
     expect(container.querySelectorAll('[data-error-id]').length).toBe(0);
   });
 
-  it('party time input is disabled when partyDateTimeDate is empty', () => {
-    const { container } = render(<DatesForm {...defaultProps()} defaultPartyDateTimeDate="" />);
+  it('party time input is enabled when party scheduling is visible', () => {
+    const { container } = render(
+      <DatesForm {...defaultProps()} defaultNoPartyPlanned={false} defaultPartyDateTimeDate="" />,
+    );
     const partyTimeInput = container.querySelector<HTMLInputElement>('#partyDateTimeTime');
-    expect(partyTimeInput).toBeDisabled();
+    expect(partyTimeInput).toBeEnabled();
+  });
+
+  it('applies normalized date/time input styling classes', () => {
+    const { container } = render(
+      <DatesForm {...defaultProps()} defaultNoPartyPlanned={false} defaultPartyDateTimeDate="" />,
+    );
+    const birthdayInput = container.querySelector<HTMLInputElement>('#birthdayDate');
+    expect(birthdayInput?.className).toContain('border-border');
+    expect(birthdayInput?.className).toContain('[appearance:none]');
+    expect(birthdayInput?.className).toContain('[color-scheme:light]');
   });
 });

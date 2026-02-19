@@ -52,6 +52,7 @@ export function DashboardTimelineHeroCard({ card }: DashboardTimelineHeroCardPro
     card.contributionCount === 1 ? 'contributor' : 'contributors'
   }`;
   const shareHint = card.contributionCount === 0 ? 'Share to start collecting' : 'Keep sharing your Dreamboard';
+  const headlineDate = card.hasBirthdayParty ? card.partyDate : card.birthdayDate;
 
   return (
     <Link
@@ -76,7 +77,9 @@ export function DashboardTimelineHeroCard({ card }: DashboardTimelineHeroCardPro
 
         <div className="min-w-0">
           <h3 className="font-warmth-serif text-[21px] text-ink">{card.boardTitle}</h3>
-          <p className="text-sm text-ink-soft">Party: {formatLongDate(card.partyDate)}</p>
+          {card.hasBirthdayParty ? (
+            <p className="text-sm text-ink-soft">Party: {formatLongDate(card.partyDate)}</p>
+          ) : null}
         </div>
 
         <span className="inline-flex items-center rounded-full bg-plum-wash px-3 py-1 text-xs font-medium text-plum sm:ml-auto">
@@ -104,8 +107,10 @@ export function DashboardTimelineHeroCard({ card }: DashboardTimelineHeroCardPro
 
         <div className="grid grid-cols-1 overflow-hidden rounded-xl border border-border-soft bg-bg-warmth sm:grid-cols-3">
           <div className="border-b border-border-soft px-4 py-3 text-center sm:border-b-0 sm:border-r sm:border-border-soft">
-            <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-faint">Party</p>
-            <p className="text-sm font-medium text-ink">{formatShortDate(card.partyDate)}</p>
+            <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-faint">
+              {card.hasBirthdayParty ? 'Party' : 'Birthday'}
+            </p>
+            <p className="text-sm font-medium text-ink">{formatShortDate(headlineDate)}</p>
           </div>
           <div className="border-b border-border-soft px-4 py-3 text-center sm:border-b-0 sm:border-r sm:border-border-soft">
             <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-faint">Closes</p>

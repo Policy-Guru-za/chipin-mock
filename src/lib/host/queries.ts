@@ -9,9 +9,11 @@ export type HostDashboardListRow = {
   slug: string;
   childName: string;
   childPhotoUrl: string;
+  birthdayDate: string | null;
   giftName: string;
   giftImageUrl: string;
   partyDate: string;
+  partyDateTime: Date | null;
   campaignEndDate: string | null;
   createdAt: Date;
   status: string;
@@ -99,9 +101,11 @@ export async function listDreamBoardsForHostExpanded(hostId: string): Promise<Ho
       slug: dreamBoards.slug,
       childName: dreamBoards.childName,
       childPhotoUrl: dreamBoards.childPhotoUrl,
+      birthdayDate: dreamBoards.birthdayDate,
       giftName: dreamBoards.giftName,
       giftImageUrl: dreamBoards.giftImageUrl,
       partyDate: dreamBoards.partyDate,
+      partyDateTime: dreamBoards.partyDateTime,
       campaignEndDate: dreamBoards.campaignEndDate,
       createdAt: dreamBoards.createdAt,
       status: dreamBoards.status,

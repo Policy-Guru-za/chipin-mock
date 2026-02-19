@@ -1,4 +1,5 @@
 import { getGiftInfo } from '@/lib/dream-boards/gift-info';
+import { hasBirthdayParty } from '@/lib/dream-boards/party-visibility';
 import type {
   HostDashboardDetailRow,
   HostDashboardListRow,
@@ -32,7 +33,9 @@ export interface DashboardCardViewModel {
   displayImage: string | null;
   slug: string;
   childPhotoUrl: string | null;
+  birthdayDate: Date | null;
   partyDate: Date | null;
+  hasBirthdayParty: boolean;
   campaignEndDate: Date | null;
   daysRemaining: number | null;
   timeLabel: string;
@@ -226,6 +229,8 @@ export const buildDashboardCardViewModel = (
   const deadline = board.campaignEndDate ?? board.partyDate;
   const { daysRemaining, timeLabel } = resolveTime(deadline);
   const isComplete = board.status === 'closed' || board.status === 'paid_out';
+  const birthdayDate = toDate(board.birthdayDate) ?? toDate(board.partyDate);
+  const partyDate = toDate(board.partyDate);
 
   return {
     boardId: board.id,
@@ -241,7 +246,13 @@ export const buildDashboardCardViewModel = (
     displaySubtitle: gift.giftSubtitle,
     displayImage: gift.giftImage || board.childPhotoUrl,
     childPhotoUrl: board.childPhotoUrl,
-    partyDate: toDate(board.partyDate),
+    birthdayDate,
+    partyDate,
+    hasBirthdayParty: hasBirthdayParty({
+      birthdayDate,
+      partyDate,
+      partyDateTime: board.partyDateTime,
+    }),
     campaignEndDate: toDate(board.campaignEndDate),
     daysRemaining,
     timeLabel,

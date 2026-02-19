@@ -28,7 +28,9 @@ const makeCard = (overrides: Partial<DashboardCardViewModel> = {}): DashboardCar
   displayImage: null,
   slug: 'maya-birthday',
   childPhotoUrl: null,
+  birthdayDate: new Date('2026-02-27T00:00:00.000Z'),
   partyDate: new Date('2026-02-28T00:00:00.000Z'),
+  hasBirthdayParty: true,
   campaignEndDate: new Date('2026-02-26T00:00:00.000Z'),
   daysRemaining: 17,
   timeLabel: '17 days left',
@@ -151,5 +153,24 @@ describe('DashboardTimeline', () => {
       .getAllByRole('link')
       .filter((link) => (link.getAttribute('href') ?? '').startsWith('/dashboard/'));
     expect(boardLinks).toHaveLength(2);
+  });
+
+  it('uses birthday output when no party is planned', () => {
+    render(
+      <DashboardTimeline
+        cards={[
+          makeCard({
+            boardId: 'board-no-party',
+            boardTitle: "Mia's Dreamboard",
+            birthdayDate: new Date('2026-02-28T00:00:00.000Z'),
+            partyDate: new Date('2026-02-28T00:00:00.000Z'),
+            hasBirthdayParty: false,
+          }),
+        ]}
+      />
+    );
+
+    expect(screen.getByText('Birthday')).toBeInTheDocument();
+    expect(screen.queryByText(/^Party:/)).not.toBeInTheDocument();
   });
 });

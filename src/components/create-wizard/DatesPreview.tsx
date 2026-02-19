@@ -2,6 +2,8 @@
 
 import { memo } from 'react';
 
+import { formatBirthdayPartyLine } from '@/lib/dream-boards/party-visibility';
+
 export interface DatesPreviewProps {
   childName: string;
   childAge: number;
@@ -49,25 +51,18 @@ const formatDate = (dateString: string) => {
   });
 };
 
-const formatTime = (timeValue: string) => {
-  const [hoursString, minutesString] = timeValue.split(':');
-  const hours = Number(hoursString);
-  const minutes = Number(minutesString);
-
-  if (
-    Number.isNaN(hours) ||
-    Number.isNaN(minutes) ||
-    hours < 0 ||
-    hours > 23 ||
-    minutes < 0 ||
-    minutes > 59
-  ) {
-    return '12:00 PM';
+const toPartyDateTimeIso = (dateValue: string, timeValue: string) => {
+  if (!dateValue) {
+    return null;
   }
 
-  const meridiem = hours >= 12 ? 'PM' : 'AM';
-  const displayHours = hours % 12 || 12;
-  return `${displayHours}:${minutesString.padStart(2, '0')} ${meridiem}`;
+  const resolvedTime = timeValue || '12:00';
+  const parsed = new Date(`${dateValue}T${resolvedTime}:00+02:00`);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+
+  return parsed.toISOString();
 };
 
 const getCountdownLabel = (campaignDays: number) => {
@@ -97,11 +92,14 @@ function DatesPreviewComponent({
   const displayName = childName.trim() || 'Your child';
   const ageText = childAge > 0 ? `${childAge}` : '?';
   const birthdayLabel = formatDate(birthdayDate);
-  const partyDateLabel = formatDate(partyDateTimeDate || partyDate);
-  const partyTimeLabel = formatTime(partyDateTimeTime || '12:00');
+  const partyDateTime = toPartyDateTimeIso(partyDateTimeDate, partyDateTimeTime);
+  const partyLine = formatBirthdayPartyLine({
+    birthdayDate,
+    partyDate,
+    partyDateTime,
+  });
   const campaignEndDateLabel = formatDate(campaignEndDate);
   const countdownLabel = getCountdownLabel(campaignDays);
-  const showPartyLine = Boolean(partyDateTimeDate);
 
   return (
     <div className="flex flex-col items-center gap-4 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] p-7 text-center">
@@ -116,8 +114,8 @@ function DatesPreviewComponent({
       <p className="text-sm text-ink-soft">{birthdayLabel}</p>
       <div className="h-px w-full bg-border" />
 
-      {showPartyLine ? (
-        <p className="text-[13px] font-medium text-ink-mid">{`🎈 Party day · ${partyDateLabel} at ${partyTimeLabel}`}</p>
+      {partyLine ? (
+        <p className="text-[13px] font-medium text-ink-mid">{`🎈 Party day · ${partyLine}`}</p>
       ) : null}
 
       <div className="mt-1 inline-flex items-center gap-1.5 rounded-[20px] bg-sage-wash px-3 py-2 text-xs font-medium text-sage-deep">

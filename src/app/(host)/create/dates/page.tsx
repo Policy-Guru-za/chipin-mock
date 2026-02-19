@@ -73,11 +73,13 @@ export default async function CreateDatesPage({
   const defaultPartyDate = draft.partyDate ?? defaultBirthdayDate;
   const defaultCampaignEndDate = draft.campaignEndDate ?? defaultPartyDate;
   const partyDateTimeDefaults = getPartyDateTimeDefaults(draft.partyDateTime);
-  const defaultPartyDateEnabled = Boolean(
+  const defaultNoPartyPlanned = Boolean(
     draft.birthdayDate &&
       draft.partyDate &&
       draft.campaignEndDate &&
-      (draft.partyDate !== draft.birthdayDate || draft.campaignEndDate !== draft.birthdayDate)
+      draft.partyDate === draft.birthdayDate &&
+      draft.campaignEndDate === draft.birthdayDate &&
+      !draft.partyDateTime
   );
 
   return (
@@ -92,7 +94,7 @@ export default async function CreateDatesPage({
           defaultCampaignEndDate={defaultCampaignEndDate}
           defaultPartyDateTimeDate={partyDateTimeDefaults.date}
           defaultPartyDateTimeTime={partyDateTimeDefaults.time}
-          defaultPartyDateEnabled={defaultPartyDateEnabled}
+          defaultNoPartyPlanned={defaultNoPartyPlanned}
           childName={draft.childName ?? ''}
           childAge={draft.childAge ?? 0}
           error={errorMessage}

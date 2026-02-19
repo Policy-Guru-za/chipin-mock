@@ -20,14 +20,17 @@ type DatesFormProps = {
   defaultCampaignEndDate: string;
   defaultPartyDateTimeDate: string;
   defaultPartyDateTimeTime: string;
-  defaultPartyDateEnabled: boolean;
+  defaultNoPartyPlanned: boolean;
   childName: string;
   childAge: number;
   error: string | null;
 };
 
 const dateInputClassName =
-  'w-full rounded-xl border border-[var(--sage-200)] bg-white px-4 py-3 text-base text-[var(--ink-900)] placeholder:text-[var(--ink-400)] focus:border-[var(--sage-400)] focus:outline-none focus:ring-2 focus:ring-[var(--sage-200)] wizard-interactive';
+  'wizard-interactive w-full rounded-xl border border-border bg-white px-4 py-3 text-base text-text shadow-input transition-colors duration-200 placeholder:text-ink-faint focus:border-primary focus:outline-none focus:ring-2 focus:ring-sage-light [appearance:none] [-webkit-appearance:none] [color-scheme:light]';
+
+const dateTimePickerClassName =
+  '[&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-70 [&::-webkit-date-and-time-value]:min-h-[1.2rem]';
 
 const getDaysUntil = (dateString: string) => {
   const today = new Date();
@@ -45,20 +48,24 @@ export function DatesForm({
   defaultCampaignEndDate,
   defaultPartyDateTimeDate,
   defaultPartyDateTimeTime,
-  defaultPartyDateEnabled,
+  defaultNoPartyPlanned,
   childName,
   childAge,
   error,
 }: DatesFormProps) {
-  const [partyDateEnabled, setPartyDateEnabled] = useState(defaultPartyDateEnabled);
+  const [noPartyPlanned, setNoPartyPlanned] = useState(defaultNoPartyPlanned);
   const [birthdayDate, setBirthdayDate] = useState(defaultBirthdayDate);
   const [partyDate, setPartyDate] = useState(defaultPartyDate || defaultBirthdayDate);
-  const [campaignEndDate, setCampaignEndDate] = useState(defaultCampaignEndDate || defaultPartyDate);
-  const [partyDateTimeDate, setPartyDateTimeDate] = useState(defaultPartyDateTimeDate);
-  const [partyDateTimeTime, setPartyDateTimeTime] = useState(defaultPartyDateTimeTime);
+  const [campaignEndDate, setCampaignEndDate] = useState(
+    defaultCampaignEndDate || defaultPartyDate || defaultBirthdayDate
+  );
+  const [partyDateTimeTime, setPartyDateTimeTime] = useState(
+    defaultNoPartyPlanned || !defaultPartyDateTimeDate ? '' : defaultPartyDateTimeTime
+  );
 
-  const effectivePartyDate = partyDateEnabled ? partyDate : birthdayDate;
-  const effectiveCampaignEndDate = partyDateEnabled ? campaignEndDate : birthdayDate;
+  const effectivePartyDate = noPartyPlanned ? birthdayDate : partyDate;
+  const effectiveCampaignEndDate = noPartyPlanned ? birthdayDate : campaignEndDate;
+  const previewPartyDateTimeDate = !noPartyPlanned && partyDateTimeTime ? effectivePartyDate : '';
   const campaignDays = useMemo(() => getDaysUntil(effectiveCampaignEndDate), [effectiveCampaignEndDate]);
 
   return (
@@ -83,31 +90,32 @@ export function DatesForm({
                 onChange={(event) => {
                   const nextBirthday = event.currentTarget.value;
                   setBirthdayDate(nextBirthday);
-                  if (!partyDateEnabled) {
+                  if (noPartyPlanned) {
                     setPartyDate(nextBirthday);
                     setCampaignEndDate(nextBirthday);
                   }
                 }}
-                className={dateInputClassName}
+                className={`${dateInputClassName} ${dateTimePickerClassName}`}
               />
             </WizardFieldWrapper>
 
             <div className="mb-6">
               <label
-                htmlFor="partyDateEnabled"
-                className="wizard-interactive flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-background px-4 py-3"
+                htmlFor="noPartyPlanned"
+                className="wizard-interactive flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-background px-5 py-4"
               >
                 <input
-                  id="partyDateEnabled"
-                  name="partyDateEnabled"
+                  id="noPartyPlanned"
+                  name="noPartyPlanned"
                   type="checkbox"
-                  checked={partyDateEnabled}
+                  checked={noPartyPlanned}
                   onChange={(event) => {
-                    const enabled = event.currentTarget.checked;
-                    setPartyDateEnabled(enabled);
-                    if (!enabled) {
+                    const checked = event.currentTarget.checked;
+                    setNoPartyPlanned(checked);
+                    if (checked) {
                       setPartyDate(birthdayDate);
                       setCampaignEndDate(birthdayDate);
+                      setPartyDateTimeTime('');
                     } else if (!partyDate) {
                       setPartyDate(birthdayDate);
                       setCampaignEndDate(birthdayDate);
@@ -129,89 +137,74 @@ export function DatesForm({
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                 </span>
-                <span className="text-[13px] font-medium text-ink-mid">Party is on a different day</span>
+                <span className="text-[13px] font-medium text-ink-mid">
+                  We are not planning a birthday party
+                </span>
               </label>
             </div>
 
-            {partyDateEnabled ? (
-              <div className="grid gap-3 md:grid-cols-2">
-                <WizardFieldWrapper label="Party date" htmlFor="partyDate">
-                  <input
-                    id="partyDate"
-                    name="partyDate"
-                    type="date"
-                    required
-                    enterKeyHint="next"
-                    value={partyDate}
-                    onChange={(event) => {
-                      const nextPartyDate = event.currentTarget.value;
-                      setPartyDate(nextPartyDate);
-                      if (!campaignEndDate || campaignEndDate < nextPartyDate) {
-                        setCampaignEndDate(nextPartyDate);
-                      }
-                    }}
-                    className={dateInputClassName}
-                  />
-                </WizardFieldWrapper>
-
-                <WizardFieldWrapper label="Campaign close date" htmlFor="campaignEndDate">
-                  <input
-                    id="campaignEndDate"
-                    name="campaignEndDate"
-                    type="date"
-                    required
-                    enterKeyHint="next"
-                    value={campaignEndDate}
-                    onChange={(event) => setCampaignEndDate(event.currentTarget.value)}
-                    className={dateInputClassName}
-                  />
-                </WizardFieldWrapper>
-              </div>
-            ) : (
+            {noPartyPlanned ? (
               <>
                 <input type="hidden" name="partyDate" value={birthdayDate} />
                 <input type="hidden" name="campaignEndDate" value={birthdayDate} />
+                <input type="hidden" name="partyDateTimeDate" value="" />
+                <input type="hidden" name="partyDateTimeTime" value="" />
               </>
-            )}
+            ) : (
+              <div className="mb-6 rounded-[20px] border border-border bg-background p-5">
+                <p className="mb-3 text-sm font-medium text-text">Birthday party schedule</p>
 
-            <div className="mb-6 rounded-[20px] border border-border bg-background p-4">
-              <p className="mb-3 text-sm font-medium text-text">Birthday party date &amp; time (optional)</p>
-              <div className="grid gap-3 md:grid-cols-2">
-                <WizardFieldWrapper label="Party date" htmlFor="partyDateTimeDate">
-                  <input
-                    id="partyDateTimeDate"
-                    name="partyDateTimeDate"
-                    type="date"
-                    enterKeyHint="next"
-                    value={partyDateTimeDate}
-                    onChange={(event) => {
-                      const value = event.currentTarget.value;
-                      setPartyDateTimeDate(value);
-                      if (!value) {
-                        setPartyDateTimeTime('');
-                      }
-                    }}
-                    className={dateInputClassName}
-                  />
-                </WizardFieldWrapper>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <WizardFieldWrapper label="Party date" htmlFor="partyDate">
+                    <input
+                      id="partyDate"
+                      name="partyDate"
+                      type="date"
+                      required
+                      enterKeyHint="next"
+                      value={partyDate}
+                      onChange={(event) => {
+                        const nextPartyDate = event.currentTarget.value;
+                        setPartyDate(nextPartyDate);
+                        if (!campaignEndDate || campaignEndDate < nextPartyDate) {
+                          setCampaignEndDate(nextPartyDate);
+                        }
+                      }}
+                      className={`${dateInputClassName} ${dateTimePickerClassName}`}
+                    />
+                  </WizardFieldWrapper>
 
-                <WizardFieldWrapper label="Party time" htmlFor="partyDateTimeTime">
+                  <WizardFieldWrapper label="Campaign close date" htmlFor="campaignEndDate">
+                    <input
+                      id="campaignEndDate"
+                      name="campaignEndDate"
+                      type="date"
+                      required
+                      enterKeyHint="next"
+                      value={campaignEndDate}
+                      onChange={(event) => setCampaignEndDate(event.currentTarget.value)}
+                      className={`${dateInputClassName} ${dateTimePickerClassName}`}
+                    />
+                  </WizardFieldWrapper>
+                </div>
+
+                <WizardFieldWrapper label="Party time (optional)" htmlFor="partyDateTimeTime">
                   <input
                     id="partyDateTimeTime"
                     name="partyDateTimeTime"
                     type="time"
                     enterKeyHint="done"
                     value={partyDateTimeTime}
-                    disabled={!partyDateTimeDate}
                     onChange={(event) => setPartyDateTimeTime(event.currentTarget.value)}
-                    className={`${dateInputClassName} disabled:cursor-not-allowed disabled:opacity-60`}
+                    className={`${dateInputClassName} ${dateTimePickerClassName}`}
                   />
                 </WizardFieldWrapper>
+                <input type="hidden" name="partyDateTimeDate" value={partyDateTimeTime ? partyDate : ''} />
               </div>
-            </div>
+            )}
 
             <WizardFieldTip>
-              The campaign closes on the birthday. Contributors can chip in until then.
+              If you&apos;re not planning a birthday party, the campaign closes on the birthday.
             </WizardFieldTip>
 
             <WizardCTA
@@ -233,8 +226,8 @@ export function DatesForm({
               childAge={childAge}
               birthdayDate={birthdayDate}
               partyDate={effectivePartyDate}
-              partyDateTimeDate={partyDateTimeDate}
-              partyDateTimeTime={partyDateTimeTime}
+              partyDateTimeDate={previewPartyDateTimeDate}
+              partyDateTimeTime={!noPartyPlanned ? partyDateTimeTime : ''}
               campaignEndDate={effectiveCampaignEndDate}
               campaignDays={campaignDays}
             />

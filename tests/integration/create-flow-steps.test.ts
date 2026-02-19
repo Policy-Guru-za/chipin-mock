@@ -104,6 +104,7 @@ describe('create flow step transitions', () => {
 
     const datesForm = new FormData();
     datesForm.set('birthdayDate', addDays(20));
+    datesForm.set('noPartyPlanned', 'on');
     await expectRedirect(saveDatesAction(datesForm), '/create/giving-back');
 
     expect(store[hostId].birthdayDate).toBe(addDays(20));
@@ -140,6 +141,7 @@ describe('create flow step transitions', () => {
 
     const datesForm = new FormData();
     datesForm.set('birthdayDate', addDays(25));
+    datesForm.set('noPartyPlanned', 'on');
     await expectRedirect(saveDatesAction(datesForm), '/create/giving-back');
 
     const givingBackForm = new FormData();
@@ -172,6 +174,7 @@ describe('create flow step transitions', () => {
 
     const datesForm = new FormData();
     datesForm.set('birthdayDate', addDays(25));
+    datesForm.set('noPartyPlanned', 'on');
     await expectRedirect(saveDatesAction(datesForm), '/create/giving-back');
 
     const givingBackForm = new FormData();
@@ -230,7 +233,6 @@ describe('create flow step transitions', () => {
 
     const datesForm = new FormData();
     datesForm.set('birthdayDate', addDays(21));
-    datesForm.set('partyDateEnabled', 'on');
     datesForm.set('partyDate', addDays(23));
     datesForm.set('campaignEndDate', addDays(23));
 
@@ -294,7 +296,6 @@ describe('create flow step transitions', () => {
 
     const datesForm = new FormData();
     datesForm.set('birthdayDate', addDays(20));
-    datesForm.set('partyDateEnabled', 'on');
     datesForm.set('partyDate', addDays(22));
     datesForm.set('campaignEndDate', addDays(22));
     await expectRedirect(saveDatesAction(datesForm), '/create/giving-back');
