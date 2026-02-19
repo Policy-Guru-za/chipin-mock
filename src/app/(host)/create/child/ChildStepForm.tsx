@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+
 import {
   WizardCTA,
   WizardEyebrow,
@@ -39,6 +41,25 @@ export function ChildStepForm({
     handleDrop,
     openFilePicker,
   } = useChildPhoto(existingPhotoUrl);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    if (typeof window.matchMedia !== 'function') {
+      return;
+    }
+
+    const isMobile = window.matchMedia('(max-width: 800px)').matches;
+    if (!isMobile || window.scrollY <= 0) {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    });
+  }, []);
 
   return (
     <form action={action} encType="multipart/form-data">
