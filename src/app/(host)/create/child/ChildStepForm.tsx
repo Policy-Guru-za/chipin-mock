@@ -1,0 +1,136 @@
+'use client';
+
+import {
+  WizardCTA,
+  WizardEyebrow,
+  WizardFieldTip,
+  WizardFieldWrapper,
+  WizardFormCard,
+  WizardPanelTitle,
+  WizardSplitLayout,
+  WizardTextInput,
+} from '@/components/create-wizard';
+import { ChildPhotoCompactRow } from '@/components/create-wizard/ChildPhotoCompactRow';
+import { ChildPhotoDropZone } from '@/components/create-wizard/ChildPhotoDropZone';
+import { useChildPhoto } from '@/components/create-wizard/useChildPhoto';
+
+type ChildStepFormProps = {
+  action: (formData: FormData) => void | Promise<void>;
+  existingPhotoUrl: string | null;
+  defaultChildName: string;
+  defaultChildAge: string;
+  error: string | null;
+};
+
+export function ChildStepForm({
+  action,
+  existingPhotoUrl,
+  defaultChildName,
+  defaultChildAge,
+  error,
+}: ChildStepFormProps) {
+  const {
+    inputRef,
+    previewObjectUrl,
+    errorMessage,
+    hasPreview,
+    displayExistingPhoto,
+    handleInputChange,
+    handleDrop,
+    openFilePicker,
+  } = useChildPhoto(existingPhotoUrl);
+
+  return (
+    <form action={action} encType="multipart/form-data">
+      <input
+        ref={inputRef}
+        type="file"
+        id="photo"
+        name="photo"
+        accept="image/png,image/jpeg,image/webp"
+        required={!hasPreview}
+        tabIndex={-1}
+        className="sr-only"
+        onChange={handleInputChange}
+        aria-label="Upload child photo"
+      />
+
+      <WizardSplitLayout
+        mobileOrder="right-first"
+        left={
+          <div className="hidden min-[801px]:block">
+            <ChildPhotoDropZone
+              existingPhotoUrl={existingPhotoUrl}
+              previewObjectUrl={previewObjectUrl}
+              hasPreview={hasPreview}
+              displayExistingPhoto={displayExistingPhoto}
+              errorMessage={errorMessage}
+              handleDrop={handleDrop}
+              openFilePicker={openFilePicker}
+            />
+          </div>
+        }
+        right={
+          <WizardFormCard>
+            <WizardEyebrow>Step 1 of 6 - The child</WizardEyebrow>
+            <WizardPanelTitle variant="form">Child details</WizardPanelTitle>
+            <p className="mb-7 text-[13px] font-light leading-relaxed text-ink-soft">
+              Tell us a little about the birthday child.
+            </p>
+
+            <WizardFieldWrapper label="Child's first name" htmlFor="childName">
+              <WizardTextInput
+                id="childName"
+                name="childName"
+                placeholder="e.g. Maya"
+                required
+                defaultValue={defaultChildName}
+                autoCapitalize="words"
+                enterKeyHint="next"
+                autoComplete="given-name"
+              />
+            </WizardFieldWrapper>
+
+            <WizardFieldWrapper
+              label="Age turning this birthday"
+              htmlFor="childAge"
+              tip={
+                <WizardFieldTip>
+                  {`This will be shown on the Dreamboard as "${defaultChildName || 'Child'} turns ${defaultChildAge || '?'}!"`}
+                </WizardFieldTip>
+              }
+            >
+              <WizardTextInput
+                id="childAge"
+                name="childAge"
+                type="number"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                min={1}
+                max={18}
+                step={1}
+                placeholder="e.g. 7"
+                required
+                defaultValue={defaultChildAge}
+                enterKeyHint="done"
+              />
+            </WizardFieldWrapper>
+
+            <div className="mb-6 min-[801px]:hidden">
+              <ChildPhotoCompactRow
+                existingPhotoUrl={existingPhotoUrl}
+                previewObjectUrl={previewObjectUrl}
+                hasPreview={hasPreview}
+                displayExistingPhoto={displayExistingPhoto}
+                errorMessage={errorMessage}
+                openFilePicker={openFilePicker}
+              />
+            </div>
+
+            <WizardCTA submitLabel="Continue to gift" pending={false} error={error} />
+          </WizardFormCard>
+        }
+      />
+    </form>
+  );
+}

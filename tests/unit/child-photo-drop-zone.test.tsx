@@ -1,9 +1,10 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
+import type { ComponentProps } from 'react';
 
 import { ChildPhotoDropZone } from '@/components/create-wizard/ChildPhotoDropZone';
 
@@ -15,30 +16,7 @@ vi.mock('next/image', () => ({
   },
 }));
 
-const createObjectURLMock = vi.fn(() => 'blob:mock-url');
-const revokeObjectURLMock = vi.fn();
-
-beforeEach(() => {
-  vi.clearAllMocks();
-  vi.stubGlobal('URL', {
-    ...globalThis.URL,
-    createObjectURL: createObjectURLMock,
-    revokeObjectURL: revokeObjectURLMock,
-  });
-});
-
-afterEach(() => {
-  cleanup();
-  vi.unstubAllGlobals();
-});
-
-function getPhotoInput(container: HTMLElement): HTMLInputElement {
-  const input = container.querySelector('input[name="photo"]');
-  if (!(input instanceof HTMLInputElement)) {
-    throw new Error('Expected photo input to exist');
-  }
-  return input;
-}
+afterEach(() => cleanup());
 
 function getDropZone(container: HTMLElement): HTMLLabelElement {
   const dropZone = container.querySelector('label[for="photo"]');
@@ -48,83 +26,58 @@ function getDropZone(container: HTMLElement): HTMLLabelElement {
   return dropZone;
 }
 
+function renderDropZone(overrides: Partial<ComponentProps<typeof ChildPhotoDropZone>> = {}) {
+  return render(
+    <ChildPhotoDropZone
+      existingPhotoUrl={null}
+      previewObjectUrl={null}
+      hasPreview={false}
+      displayExistingPhoto={false}
+      errorMessage={null}
+      handleDrop={vi.fn()}
+      openFilePicker={vi.fn()}
+      {...overrides}
+    />
+  );
+}
+
 describe('ChildPhotoDropZone', () => {
-  it('renders file input with correct accept types', () => {
-    const { container } = render(<ChildPhotoDropZone existingPhotoUrl={null} />);
-    const input = getPhotoInput(container);
+  it('shows existing photo preview when displayExistingPhoto is true', () => {
+    renderDropZone({
+      existingPhotoUrl: 'https://example.com/photo.jpg',
+      hasPreview: true,
+      displayExistingPhoto: true,
+    });
 
-    expect(input).toHaveAttribute('accept');
-    expect(input.getAttribute('accept')).toContain('image/png');
-    expect(input.getAttribute('accept')).toContain('image/jpeg');
-    expect(input.getAttribute('accept')).toContain('image/webp');
-  });
-
-  it('file input is required when no existing photo', () => {
-    const { container } = render(<ChildPhotoDropZone existingPhotoUrl={null} />);
-    const input = getPhotoInput(container);
-    expect(input).toBeRequired();
-  });
-
-  it('file input is NOT required when existing photo provided', () => {
-    const { container } = render(
-      <ChildPhotoDropZone existingPhotoUrl="https://example.com/photo.jpg" />
-    );
-    const input = getPhotoInput(container);
-    expect(input).not.toBeRequired();
-  });
-
-  it('shows existing photo preview when existingPhotoUrl provided', () => {
-    render(<ChildPhotoDropZone existingPhotoUrl="https://example.com/photo.jpg" />);
     const img = screen.getByAltText('Current child photo');
     expect(img).toBeInTheDocument();
     expect(img).toHaveAttribute('src', 'https://example.com/photo.jpg');
   });
 
-  it('shows upload prompt when no existing photo', () => {
-    render(<ChildPhotoDropZone existingPhotoUrl={null} />);
-    expect(screen.getByText(/drag a photo here/i)).toBeInTheDocument();
-  });
+  it('shows selected preview image when previewObjectUrl is provided', () => {
+    renderDropZone({
+      previewObjectUrl: 'blob:mock-url',
+      hasPreview: true,
+      displayExistingPhoto: false,
+    });
 
-  it('shows preview after valid file selection', () => {
-    const { container } = render(<ChildPhotoDropZone existingPhotoUrl={null} />);
-    const input = getPhotoInput(container);
-    const file = new File(['x'], 'test.png', { type: 'image/png' });
-
-    fireEvent.change(input, { target: { files: [file] } });
-
-    expect(createObjectURLMock).toHaveBeenCalledTimes(1);
-    expect(createObjectURLMock).toHaveBeenCalledWith(file);
     const previewImage = screen.getByAltText('Selected child photo preview');
     expect(previewImage).toBeInTheDocument();
     expect(previewImage).toHaveAttribute('src', 'blob:mock-url');
   });
 
-  it('rejects file over 5MB', () => {
-    const { container } = render(<ChildPhotoDropZone existingPhotoUrl={null} />);
-    const input = getPhotoInput(container);
-    const oversizedFile = new File([new Uint8Array(6 * 1024 * 1024)], 'big.png', {
-      type: 'image/png',
-    });
-
-    fireEvent.change(input, { target: { files: [oversizedFile] } });
-
-    expect(screen.getByText(/under 5mb/i)).toBeInTheDocument();
-    expect(screen.queryByAltText('Selected child photo preview')).not.toBeInTheDocument();
+  it('shows upload prompt when no preview is present', () => {
+    renderDropZone();
+    expect(screen.getByText(/drag a photo here/i)).toBeInTheDocument();
   });
 
-  it('rejects invalid file type', () => {
-    const { container } = render(<ChildPhotoDropZone existingPhotoUrl={null} />);
-    const input = getPhotoInput(container);
-    const invalidFile = new File(['x'], 'doc.pdf', { type: 'application/pdf' });
-
-    fireEvent.change(input, { target: { files: [invalidFile] } });
-
-    expect(screen.getByText(/jpg, png, or webp/i)).toBeInTheDocument();
-    expect(screen.queryByAltText('Selected child photo preview')).not.toBeInTheDocument();
+  it('renders inline error when errorMessage is provided', () => {
+    renderDropZone({ errorMessage: 'Photo must be under 5MB' });
+    expect(screen.getByText('Photo must be under 5MB')).toBeInTheDocument();
   });
 
   it('applies drag-over styling on dragenter and removes on dragleave', () => {
-    const { container } = render(<ChildPhotoDropZone existingPhotoUrl={null} />);
+    const { container } = renderDropZone();
     const dropZone = getDropZone(container);
 
     fireEvent.dragEnter(dropZone, { dataTransfer: { types: ['Files'], files: [] } });
@@ -134,14 +87,41 @@ describe('ChildPhotoDropZone', () => {
     expect(dropZone.className).not.toContain('bg-sage-light');
   });
 
-  it('cleans up object URL on unmount', () => {
-    const { container, unmount } = render(<ChildPhotoDropZone existingPhotoUrl={null} />);
-    const input = getPhotoInput(container);
-    const file = new File(['x'], 'test.png', { type: 'image/png' });
+  it('does not forward drop events without files', () => {
+    const handleDrop = vi.fn();
+    const { container } = renderDropZone({ handleDrop });
+    const dropZone = getDropZone(container);
 
-    fireEvent.change(input, { target: { files: [file] } });
-    unmount();
+    fireEvent.drop(dropZone, { dataTransfer: { types: ['text/plain'], files: [] } });
+    expect(handleDrop).not.toHaveBeenCalled();
+  });
 
-    expect(revokeObjectURLMock).toHaveBeenCalledWith('blob:mock-url');
+  it('forwards drop events with files', () => {
+    const handleDrop = vi.fn();
+    const { container } = renderDropZone({ handleDrop });
+    const dropZone = getDropZone(container);
+
+    fireEvent.drop(dropZone, { dataTransfer: { types: ['Files'], files: [new File(['x'], 'a.png')] } });
+    expect(handleDrop).toHaveBeenCalledTimes(1);
+  });
+
+  it('opens picker on Enter and Space keyboard interactions', () => {
+    const openFilePicker = vi.fn();
+    const { container } = renderDropZone({ openFilePicker });
+    const dropZone = getDropZone(container);
+
+    fireEvent.keyDown(dropZone, { key: 'Enter' });
+    fireEvent.keyDown(dropZone, { key: ' ' });
+
+    expect(openFilePicker).toHaveBeenCalledTimes(2);
+  });
+
+  it('is keyboard-focusable and includes focus-visible ring styles', () => {
+    const { container } = renderDropZone();
+    const dropZone = getDropZone(container);
+
+    expect(dropZone).toHaveAttribute('tabIndex', '0');
+    expect(dropZone.className).toContain('focus-visible:ring-2');
+    expect(dropZone.className).toContain('focus-visible:ring-primary');
   });
 });
