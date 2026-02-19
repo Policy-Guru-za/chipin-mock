@@ -91,7 +91,9 @@ export function ChildStepForm({
         }
         right={
           <WizardFormCard>
-            <WizardPanelTitle variant="form">About the birthday star</WizardPanelTitle>
+            <div className="min-[801px]:-translate-y-px">
+              <WizardPanelTitle variant="form">About the birthday star</WizardPanelTitle>
+            </div>
             <p className="mb-7 text-[13px] font-light leading-relaxed text-ink-soft">
               A few details to personalise their Dreamboard
             </p>

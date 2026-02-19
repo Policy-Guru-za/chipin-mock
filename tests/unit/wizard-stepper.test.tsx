@@ -25,6 +25,24 @@ function getConnectorLines(container: HTMLElement): HTMLSpanElement[] {
   );
 }
 
+function getDesktopContainer(container: HTMLElement): HTMLDivElement {
+  const desktopContainer = container.querySelector('div.max-w-\\[940px\\]');
+  if (!(desktopContainer instanceof HTMLDivElement)) {
+    throw new Error('Expected desktop stepper container to exist');
+  }
+
+  return desktopContainer;
+}
+
+function getDesktopTrack(container: HTMLElement): HTMLDivElement {
+  const desktopTrack = container.querySelector('div.flex.w-full.items-center');
+  if (!(desktopTrack instanceof HTMLDivElement)) {
+    throw new Error('Expected desktop stepper track to exist');
+  }
+
+  return desktopTrack;
+}
+
 describe('WizardStepper', () => {
   it('renders the correct number of dots for desktop mode', () => {
     const { container } = render(
@@ -90,6 +108,41 @@ describe('WizardStepper', () => {
     expect(lines).toHaveLength(5);
     expect(lines.filter((line) => line.className.includes('bg-primary'))).toHaveLength(2);
     expect(lines.filter((line) => line.className.includes('bg-border-soft'))).toHaveLength(3);
+  });
+
+  it('uses design-spec desktop container width and horizontal padding', () => {
+    const { container } = render(
+      <WizardStepper currentStep={3} totalSteps={6} stepLabel="The dates" />,
+    );
+
+    const desktopContainer = getDesktopContainer(container);
+    expect(desktopContainer.className).toContain('max-w-[940px]');
+    expect(desktopContainer.className).toContain('px-12');
+  });
+
+  it('renders a flat dot-line sequence in the desktop track', () => {
+    const { container } = render(
+      <WizardStepper currentStep={3} totalSteps={6} stepLabel="The dates" />,
+    );
+
+    const desktopTrack = getDesktopTrack(container);
+    expect(Array.from(desktopTrack.children)).toHaveLength(11);
+  });
+
+  it('ends desktop track with a dot and has no trailing flex segment', () => {
+    const { container } = render(
+      <WizardStepper currentStep={3} totalSteps={6} stepLabel="The dates" />,
+    );
+
+    const desktopTrack = getDesktopTrack(container);
+    const children = Array.from(desktopTrack.children);
+    const lastChild = children.at(-1);
+
+    expect(lastChild).toBeTruthy();
+    expect(lastChild?.className).toContain('h-8');
+    expect(lastChild?.className).toContain('w-8');
+    expect(lastChild?.className).toContain('rounded-full');
+    expect(lastChild?.className).not.toContain('h-[2px]');
   });
 
   it('sets progressbar accessibility attributes', () => {
@@ -186,4 +239,3 @@ describe('WizardStepper', () => {
     );
   });
 });
-

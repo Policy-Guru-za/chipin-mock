@@ -47,34 +47,42 @@ export function WizardStepper({ currentStep, totalSteps, stepLabel }: WizardStep
       aria-valuemax={safeTotalSteps}
       aria-label={`Step ${safeCurrentStep} of ${safeTotalSteps}: ${stepLabel}`}
     >
-      <div className="mx-auto mt-8 mb-9 hidden max-w-[520px] items-center px-5 animate-wizard-fade-up min-[801px]:flex">
-        {Array.from({ length: safeTotalSteps }).map((_, index) => {
-          const stepNumber = index + 1;
-          const isDone = stepNumber < safeCurrentStep;
-          const isActive = stepNumber === safeCurrentStep;
+      <div className="mx-auto mt-8 mb-9 hidden max-w-[940px] px-12 animate-wizard-fade-up min-[801px]:flex">
+        <div className="flex w-full items-center">
+          {Array.from({ length: safeTotalSteps }).flatMap((_, index) => {
+            const stepNumber = index + 1;
+            const isDone = stepNumber < safeCurrentStep;
+            const isActive = stepNumber === safeCurrentStep;
+            const dot = isDone ? (
+              <StepDot key={`dot-${stepNumber}`} className="bg-primary text-white">
+                <CheckIcon />
+              </StepDot>
+            ) : isActive ? (
+              <StepDot
+                key={`dot-${stepNumber}`}
+                className="bg-primary text-white shadow-[0_0_0_3px_var(--sage-light)]"
+              >
+                {stepNumber}
+              </StepDot>
+            ) : (
+              <StepDot key={`dot-${stepNumber}`} className="bg-border-soft text-ink-ghost">
+                {stepNumber}
+              </StepDot>
+            );
 
-          return (
-            <div key={stepNumber} className="flex flex-1 items-center">
-              {isDone ? (
-                <StepDot className="bg-primary text-white">
-                  <CheckIcon />
-                </StepDot>
-              ) : isActive ? (
-                <StepDot className="bg-primary text-white shadow-[0_0_0_3px_var(--sage-light)]">
-                  {stepNumber}
-                </StepDot>
-              ) : (
-                <StepDot className="bg-border-soft text-ink-ghost">{stepNumber}</StepDot>
-              )}
-
-              {stepNumber < safeTotalSteps ? (
+            if (stepNumber < safeTotalSteps) {
+              return [
+                dot,
                 <span
+                  key={`line-${stepNumber}`}
                   className={`mx-1 h-[2px] flex-1 ${stepNumber < safeCurrentStep ? 'bg-primary' : 'bg-border-soft'}`}
-                />
-              ) : null}
-            </div>
-          );
-        })}
+                />,
+              ];
+            }
+
+            return [dot];
+          })}
+        </div>
       </div>
 
       <div className="mt-5 mb-5 flex flex-col gap-2 px-5 min-[801px]:hidden">
@@ -91,4 +99,3 @@ export function WizardStepper({ currentStep, totalSteps, stepLabel }: WizardStep
     </div>
   );
 }
-
