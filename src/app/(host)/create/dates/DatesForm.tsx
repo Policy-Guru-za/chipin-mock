@@ -5,7 +5,6 @@ import { useMemo, useState } from 'react';
 import { DatesPreview } from '@/components/create-wizard/DatesPreview';
 import {
   WizardCTA,
-  WizardEyebrow,
   WizardFieldTip,
   WizardFieldWrapper,
   WizardFormCard,
@@ -68,7 +67,6 @@ export function DatesForm({
         mobileOrder="right-first"
         left={
           <WizardFormCard>
-            <WizardEyebrow>Step 3</WizardEyebrow>
             <WizardPanelTitle variant="form">When&apos;s the big day?</WizardPanelTitle>
             <p className="mb-7 text-[13px] font-light leading-relaxed text-ink-soft">
               Set the dates that shape the campaign timeline.

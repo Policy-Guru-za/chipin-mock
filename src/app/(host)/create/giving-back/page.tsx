@@ -6,7 +6,6 @@ import { GivingBackForm } from '@/app/(host)/create/giving-back/GivingBackForm';
 import {
   WizardAlertBanner,
   WizardCTA,
-  WizardEyebrow,
   WizardFormCard,
   WizardPanelTitle,
   WizardSkeletonLoader,
@@ -71,7 +70,6 @@ export default async function CreateGivingBackPage({
         {!hasActiveCharities ? (
           <form action={saveGivingBackAction} className="mx-auto max-w-[940px] px-5 min-[801px]:px-12">
             <WizardFormCard>
-              <WizardEyebrow>Step 4</WizardEyebrow>
               <WizardPanelTitle variant="form">Giving back</WizardPanelTitle>
               <p className="mb-4 text-[13px] font-light leading-relaxed text-ink-soft">
                 Choose whether to share a portion of contributions with charity.

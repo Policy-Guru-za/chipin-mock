@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 import { CameraIcon } from './CameraIcon';
-import { WizardEyebrow } from './WizardEyebrow';
 import { WizardInlineError } from './WizardInlineError';
 
 export interface ChildPhotoDropZoneProps {
@@ -37,12 +36,11 @@ export function ChildPhotoDropZone({
   return (
     <div className="flex flex-col overflow-hidden rounded-[28px] bg-white shadow-card">
       <div className="px-6 pt-6 pb-0 min-[801px]:px-8 min-[801px]:pt-8">
-        <WizardEyebrow>Step 1 of 6 - The child</WizardEyebrow>
         <h1 className="font-display text-[22px] font-normal leading-[1.3] text-text">
           Who&apos;s the birthday star?
         </h1>
         <p className="mt-1 text-[13.5px] font-light leading-relaxed text-ink-soft">
-          This photo will be the face of the Dreamboard.
+          The photo you choose will be used on the Dreamboard
         </p>
       </div>
 

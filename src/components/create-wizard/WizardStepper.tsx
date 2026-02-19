@@ -47,7 +47,7 @@ export function WizardStepper({ currentStep, totalSteps, stepLabel }: WizardStep
       aria-valuemax={safeTotalSteps}
       aria-label={`Step ${safeCurrentStep} of ${safeTotalSteps}: ${stepLabel}`}
     >
-      <div className="mx-auto mt-8 mb-9 hidden max-w-[940px] items-center px-12 animate-wizard-fade-up min-[801px]:flex">
+      <div className="mx-auto mt-8 mb-9 hidden max-w-[520px] items-center px-5 animate-wizard-fade-up min-[801px]:flex">
         {Array.from({ length: safeTotalSteps }).map((_, index) => {
           const stepNumber = index + 1;
           const isDone = stepNumber < safeCurrentStep;

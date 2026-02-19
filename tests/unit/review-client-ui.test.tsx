@@ -85,7 +85,7 @@ describe('ReviewClient', () => {
     );
   });
 
-  it('renders step 6 eyebrow text', () => {
+  it('renders stepper progress for review step', () => {
     const publishAction = async (
       _state: PublishState,
       _formData: FormData
@@ -93,7 +93,7 @@ describe('ReviewClient', () => {
 
     render(<ReviewClient draft={draft} publishAction={publishAction} />);
 
-    expect(screen.getByText('Step 6')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar', { name: 'Step 6 of 6: Review' })).toBeInTheDocument();
   });
 
   it('renders the review heading', () => {

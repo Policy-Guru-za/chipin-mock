@@ -9,7 +9,6 @@ import { ShareActionsPanel } from '@/components/create-review/ShareActionsPanel'
 import {
   WizardCTA,
   WizardCenteredLayout,
-  WizardEyebrow,
   WizardPanelTitle,
   WizardStepper,
 } from '@/components/create-wizard';
@@ -161,7 +160,6 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
       <WizardStepper currentStep={6} totalSteps={6} stepLabel="Review" />
       <form action={formAction}>
         <WizardCenteredLayout>
-          <WizardEyebrow>Step 6</WizardEyebrow>
           <WizardPanelTitle variant="form">Review your Dreamboard</WizardPanelTitle>
           <p className="mb-7 text-[13px] font-light leading-relaxed text-ink-soft">
             Everything looks good? Create and start sharing.

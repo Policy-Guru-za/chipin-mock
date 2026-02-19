@@ -35,7 +35,6 @@ vi.mock('@/lib/analytics/metrics', () => ({
 
 describe('PaymentClient', () => {
   beforeEach(() => {
-    cleanup();
     replaceMock.mockReset();
     clearFlowDataMock.mockReset();
     savePaymentAttemptDataMock.mockReset();
@@ -60,6 +59,7 @@ describe('PaymentClient', () => {
   });
 
   afterEach(() => {
+    cleanup();
     vi.unstubAllGlobals();
   });
 

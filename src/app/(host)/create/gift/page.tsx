@@ -5,7 +5,6 @@ import { saveManualGiftAction } from '@/app/(host)/create/gift/actions';
 import { GiftIconPreview } from '@/components/create-wizard/GiftIconPreview';
 import {
   WizardCTA,
-  WizardEyebrow,
   WizardFieldTip,
   WizardFieldWrapper,
   WizardFormCard,
@@ -93,7 +92,6 @@ export default async function CreateGiftPage({
             mobileOrder="right-first"
             left={
               <WizardPreviewPanel
-                eyebrow="Step 2 of 6 - The gift"
                 title="Gift icon preview"
                 summaryLabel="Preview icon -"
               >
@@ -102,7 +100,6 @@ export default async function CreateGiftPage({
             }
             right={
               <WizardFormCard>
-                <WizardEyebrow>Step 2 of 6 - The gift</WizardEyebrow>
                 <WizardPanelTitle variant="form">The dream gift</WizardPanelTitle>
                 <p className="mb-7 text-[13px] font-light leading-relaxed text-ink-soft">
                   Describe the dream gift so contributors know what they&apos;re chipping in for.

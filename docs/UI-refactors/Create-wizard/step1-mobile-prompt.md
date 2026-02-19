@@ -22,7 +22,7 @@ One `WizardSplitLayout` wrapping one form. The left slot (desktop drop zone) is 
   │  │         keeps <label htmlFor="photo"> semantics      │
   │  │                                                      │
   │  └─ right: WizardFormCard                               │
-  │       ├─ eyebrow, title, subtitle                       │
+  │       ├─ title, subtitle                                 │
   │       ├─ childName input                                │
   │       ├─ childAge input + tip                           │
   │       ├─ ChildPhotoCompactRow (mobile-only visual)      │
@@ -202,13 +202,12 @@ No `useState` for text fields — inputs are uncontrolled with `defaultValue`.
     }
     right={
       <WizardFormCard>
-        <WizardEyebrow>Step 1 of 6 - The child</WizardEyebrow>
-        <WizardPanelTitle variant="form">Child details</WizardPanelTitle>
+        <WizardPanelTitle variant="form">About the birthday star</WizardPanelTitle>
         <p className="mb-7 text-[13px] font-light leading-relaxed text-ink-soft">
-          Tell us a little about the birthday child.
+          A few details to personalise their Dreamboard
         </p>
 
-        <WizardFieldWrapper label="Child's first name" htmlFor="childName">
+        <WizardFieldWrapper label="First name" htmlFor="childName">
           <WizardTextInput
             id="childName"
             name="childName"
@@ -222,11 +221,11 @@ No `useState` for text fields — inputs are uncontrolled with `defaultValue`.
         </WizardFieldWrapper>
 
         <WizardFieldWrapper
-          label="Age turning this birthday"
+          label="Age they're turning"
           htmlFor="childAge"
           tip={
             <WizardFieldTip>
-              {`This will be shown on the Dreamboard as "${defaultChildName || 'Child'} turns ${defaultChildAge || '?'}!"`}
+              {`Displayed as "${defaultChildName || 'Child'} turns ${defaultChildAge || '?'}!" on the Dreamboard.`}
             </WizardFieldTip>
           }
         >
@@ -304,7 +303,7 @@ export interface ChildPhotoDropZoneProps {
 - `isDragOver` local state and `hasDraggedFiles` helper (desktop-only visual concern)
 - **`CameraIcon` component** — move to a shared file `src/components/create-wizard/CameraIcon.tsx` (see §4 above). Import it from there instead of defining it inline
 - The `<label htmlFor="photo">` wrapper — this is the accessible click target that triggers the hidden file input via native label association. **Do not change this to a div.** Because the hidden file input is now `sr-only` with `tabIndex={-1}` (removed from tab order), the label must become the keyboard target: add `tabIndex={0}` and `onKeyDown` that calls `openFilePicker()` on Enter or Space (with `e.preventDefault()` to suppress scroll). Also add a focus-visible ring: `focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2`. This is why `openFilePicker` exists in the props — it provides the keyboard activation path.
-- `WizardEyebrow` header section: eyebrow, title, subtitle — all text unchanged
+- Title and subtitle header section (no step-indicator eyebrow — these have been removed from all wizard steps)
 - `WizardInlineError` for desktop error display (now reads `errorMessage` from props)
 - All CSS class names and visual styling, except for the required desktop and mobile `focus-visible` accessibility ring additions described above
 

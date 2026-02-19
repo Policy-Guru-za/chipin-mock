@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 
 import {
   WizardCTA,
-  WizardEyebrow,
   WizardFieldTip,
   WizardFieldWrapper,
   WizardFormCard,
@@ -93,13 +92,12 @@ export function ChildStepForm({
         }
         right={
           <WizardFormCard>
-            <WizardEyebrow>Step 1 of 6 - The child</WizardEyebrow>
-            <WizardPanelTitle variant="form">Child details</WizardPanelTitle>
+            <WizardPanelTitle variant="form">About the birthday star</WizardPanelTitle>
             <p className="mb-7 text-[13px] font-light leading-relaxed text-ink-soft">
-              Tell us a little about the birthday child.
+              A few details to personalise their Dreamboard
             </p>
 
-            <WizardFieldWrapper label="Child's first name" htmlFor="childName">
+            <WizardFieldWrapper label="First name" htmlFor="childName">
               <WizardTextInput
                 id="childName"
                 name="childName"
@@ -113,11 +111,11 @@ export function ChildStepForm({
             </WizardFieldWrapper>
 
             <WizardFieldWrapper
-              label="Age turning this birthday"
+              label="Age they're turning"
               htmlFor="childAge"
               tip={
                 <WizardFieldTip>
-                  {`This will be shown on the Dreamboard as "${defaultChildName || 'Child'} turns ${defaultChildAge || '?'}!"`}
+                  {`Displayed as "${defaultChildName || 'Child'} turns ${defaultChildAge || '?'}!" on the Dreamboard.`}
                 </WizardFieldTip>
               }
             >

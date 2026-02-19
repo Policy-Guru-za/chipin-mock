@@ -4,7 +4,6 @@ import { useState } from 'react';
 
 import {
   WizardCTA,
-  WizardEyebrow,
   WizardFieldTip,
   WizardFieldWrapper,
   WizardFormCard,
@@ -86,7 +85,6 @@ export function PayoutForm({
         mobileOrder="right-first"
         left={
           <WizardFormCard>
-            <WizardEyebrow>Step 5</WizardEyebrow>
             <WizardPanelTitle variant="form">How should we send your payout?</WizardPanelTitle>
             <p className="mb-7 text-[13px] font-light leading-relaxed text-ink-soft">
               Tell us where to send the pooled funds when the campaign closes.

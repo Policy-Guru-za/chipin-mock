@@ -5,7 +5,6 @@ import { useMemo, useState } from 'react';
 import { GivingBackPreview } from '@/components/create-wizard/GivingBackPreview';
 import {
   WizardCTA,
-  WizardEyebrow,
   WizardFieldTip,
   WizardFieldWrapper,
   WizardFormCard,
@@ -101,7 +100,6 @@ export function GivingBackForm({
         mobileOrder="right-first"
         left={
           <WizardFormCard>
-            <WizardEyebrow>Step 4</WizardEyebrow>
             <WizardPanelTitle variant="form">Want to share the love?</WizardPanelTitle>
             <p className="mb-7 text-[13px] font-light leading-relaxed text-ink-soft">
               Help a cause while celebrating {trimmedChildName || 'your child'}.
