@@ -35,7 +35,7 @@ export function ChildPhotoDropZone({
 
   return (
     <div className="flex flex-col overflow-hidden rounded-[28px] bg-white shadow-card">
-      <div className="px-6 pt-6 pb-0 min-[801px]:px-8 min-[801px]:pt-8">
+      <div className="px-6 pt-6 pb-0 min-[801px]:px-8 min-[801px]:pt-9">
         <h1 className="font-display text-[22px] font-normal leading-[1.3] text-text">
           Who&apos;s the birthday star?
         </h1>

@@ -124,4 +124,14 @@ describe('ChildPhotoDropZone', () => {
     expect(dropZone.className).toContain('focus-visible:ring-2');
     expect(dropZone.className).toContain('focus-visible:ring-primary');
   });
+
+  it('uses desktop top padding class that aligns heading baseline with the form card', () => {
+    const { container } = renderDropZone();
+    const heading = screen.getByRole('heading', { name: "Who's the birthday star?" });
+    const headingContainer = heading.closest('div');
+
+    expect(headingContainer).not.toBeNull();
+    expect(headingContainer).toHaveClass('min-[801px]:pt-9');
+    expect(container).toContainElement(headingContainer);
+  });
 });

@@ -37,7 +37,9 @@ vi.mock('@/components/create-wizard', () => ({
   WizardFieldWrapper: (props: Record<string, unknown>) => <div>{props.children as ReactNode}</div>,
   WizardFieldTip: (props: Record<string, unknown>) => <div>{props.children as ReactNode}</div>,
   WizardTextInput: (props: Record<string, unknown>) => <input {...props} />,
-  WizardCTA: () => <div data-testid="wizard-cta" />,
+  WizardCTA: (props: Record<string, unknown>) => (
+    <div data-testid="wizard-cta" data-submit-label={String(props.submitLabel ?? '')} />
+  ),
 }));
 
 function mockPhotoState(hasPreview: boolean) {
@@ -92,5 +94,19 @@ describe('ChildStepForm', () => {
 
     const photoInput = container.querySelector('input[name="photo"]');
     expect(photoInput).not.toBeRequired();
+  });
+
+  it('uses "Next" as the submit CTA label', () => {
+    const { getByTestId } = render(
+      <ChildStepForm
+        action={vi.fn()}
+        existingPhotoUrl={null}
+        defaultChildName=""
+        defaultChildAge=""
+        error={null}
+      />,
+    );
+
+    expect(getByTestId('wizard-cta')).toHaveAttribute('data-submit-label', 'Next');
   });
 });
