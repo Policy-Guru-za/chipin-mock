@@ -33,6 +33,27 @@ describe('GET /api/og/[slug]', () => {
     expect(response.headers.get('content-type')).toContain('image/png');
   });
 
+  it('returns a png image when board uses gifta-logo system icon', async () => {
+    vi.doMock('@/lib/dream-boards/cache', () => ({
+      getCachedDreamBoardBySlug: vi.fn(async () => ({
+        id: 'board-1',
+        slug: 'maya-birthday',
+        childName: 'Maya',
+        childPhotoUrl: 'https://images.example/child.jpg',
+        giftName: 'Train set',
+        giftImageUrl: '/icons/gifts/gifta-logo.png',
+      })),
+    }));
+
+    const { GET } = await loadHandler();
+    const response = await GET(new NextRequest('http://localhost/api/og/maya-birthday'), {
+      params: Promise.resolve({ slug: 'maya-birthday' }),
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toContain('image/png');
+  });
+
   it('returns 404 when board is missing', async () => {
     vi.doMock('@/lib/dream-boards/cache', () => ({
       getCachedDreamBoardBySlug: vi.fn(async () => null),

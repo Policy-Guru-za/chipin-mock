@@ -1085,7 +1085,8 @@ export const openApiSpec = {
           gift_icon_id: {
             type: 'string',
             nullable: true,
-            description: 'Gift icon identifier when gift imagery is sourced from the curated icon library.',
+            description:
+              'Gift icon identifier for supported icon identities, including curated and system icons (for example gifta-logo).',
           },
           gift_image_url: {
             type: 'string',
@@ -1304,7 +1305,7 @@ export const openApiSpec = {
           gift_icon_id: {
             type: 'string',
             description:
-              'Curated icon id. Required when gift_image_url is omitted. Preferred for new clients.',
+              'Supported icon identity (curated or system). Required when gift_image_url is omitted.',
           },
           gift_image_url: {
             type: 'string',

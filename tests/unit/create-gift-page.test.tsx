@@ -12,9 +12,6 @@ const mocks = vi.hoisted(() => ({
   getDreamBoardDraft: vi.fn(),
   saveManualGiftAction: vi.fn(),
   buildCreateFlowViewModel: vi.fn(),
-  extractIconIdFromPath: vi.fn(),
-  isValidGiftIconId: vi.fn(),
-  suggestGiftIcon: vi.fn(),
 }));
 
 vi.mock('@/lib/auth/clerk-wrappers', () => ({
@@ -33,36 +30,25 @@ vi.mock('@/lib/host/create-view-model', () => ({
   buildCreateFlowViewModel: mocks.buildCreateFlowViewModel,
 }));
 
-vi.mock('@/lib/icons/gift-icons', () => ({
-  extractIconIdFromPath: mocks.extractIconIdFromPath,
-  isValidGiftIconId: mocks.isValidGiftIconId,
-}));
-
-vi.mock('@/lib/icons/suggest-icon', () => ({
-  suggestGiftIcon: mocks.suggestGiftIcon,
-}));
-
 vi.mock('next/navigation', () => ({
   redirect: vi.fn(),
+}));
+
+vi.mock('next/image', () => ({
+  __esModule: true,
+  default: ({ priority: _priority, src, ...props }: Record<string, unknown>) => (
+    <span data-mock-image-src={String(src ?? '')} {...props} />
+  ),
 }));
 
 vi.mock('@/components/create-wizard', () => ({
   WizardStepper: (props: Record<string, unknown>) => (
     <div data-testid="wizard-stepper" data-step={props.currentStep} />
   ),
-  WizardSplitLayout: (props: Record<string, unknown>) => (
-    <div data-testid="split-layout">
-      {props.left as ReactNode}
-      {props.right as ReactNode}
-    </div>
+  WizardCenteredLayout: (props: Record<string, unknown>) => (
+    <div data-testid="centered-layout">{props.children as ReactNode}</div>
   ),
-  WizardPreviewPanel: (props: Record<string, unknown>) => (
-    <section data-testid="preview-panel">{props.children as ReactNode}</section>
-  ),
-  WizardFormCard: (props: Record<string, unknown>) => <div>{props.children as ReactNode}</div>,
-  WizardEyebrow: (props: Record<string, unknown>) => <span>{props.children as ReactNode}</span>,
   WizardPanelTitle: (props: Record<string, unknown>) => <h2>{props.children as ReactNode}</h2>,
-  WizardFieldTip: (props: Record<string, unknown>) => <div>{props.children as ReactNode}</div>,
   WizardFieldWrapper: (props: Record<string, unknown>) => (
     <div data-testid={`field-${props.htmlFor}`} data-error={(props.error as string | null) ?? ''}>
       {props.children as ReactNode}
@@ -87,19 +73,6 @@ vi.mock('@/components/create-wizard', () => ({
   resolveWizardError: (code: string | undefined) => (code ? `Error: ${code}` : null),
 }));
 
-vi.mock('@/components/gift/GiftIconPicker', () => ({
-  GiftIconPicker: () => <div data-testid="gift-icon-picker" />,
-}));
-
-vi.mock('@/components/create-wizard/GiftIconPreview', () => ({
-  GiftIconPreview: (props: Record<string, unknown>) => (
-    <div
-      data-testid="gift-icon-preview"
-      data-selected-icon={(props.selectedIcon as string | null) ?? ''}
-    />
-  ),
-}));
-
 afterEach(() => {
   cleanup();
 });
@@ -112,15 +85,9 @@ beforeEach(() => {
     childName: 'Maya',
     childAge: 7,
     giftName: '',
-    giftDescription: '',
-    giftIconId: 'scooter',
-    giftImageUrl: null,
     message: '',
   });
   mocks.buildCreateFlowViewModel.mockReturnValue({ redirectTo: null });
-  mocks.extractIconIdFromPath.mockReturnValue(null);
-  mocks.isValidGiftIconId.mockImplementation((id: string) => id === 'scooter' || id === 'rocket');
-  mocks.suggestGiftIcon.mockReturnValue({ id: 'scooter' });
 });
 
 async function renderPage(sp: Record<string, string> = {}) {
@@ -136,12 +103,15 @@ describe('Create Gift Page', () => {
     expect(html).toContain('data-step="2"');
   });
 
-  it('renders split layout with preview panel and form card', async () => {
+  it('renders centered layout with gift name and message fields', async () => {
     const html = await renderPage();
-    expect(html).toContain('data-testid="split-layout"');
-    expect(html).toContain('data-testid="gift-icon-preview"');
+    expect(html).toContain('data-testid="centered-layout"');
     expect(html).toContain('data-testid="field-giftName"');
-    expect(html).toContain('data-testid="field-giftDescription"');
+    expect(html).toContain('data-testid="field-message"');
+    expect(html).not.toContain('data-testid="split-layout"');
+    expect(html).not.toContain('data-testid="gift-icon-preview"');
+    expect(html).not.toContain('data-testid="field-giftDescription"');
+    expect(html).not.toContain('data-testid="field-giftIconId"');
   });
 
   it('prefills gift name from draft', async () => {
@@ -149,9 +119,6 @@ describe('Create Gift Page', () => {
       childName: 'Maya',
       childAge: 7,
       giftName: 'LEGO Millennium Falcon',
-      giftDescription: '',
-      giftIconId: 'scooter',
-      giftImageUrl: null,
       message: '',
     });
 
@@ -160,36 +127,18 @@ describe('Create Gift Page', () => {
     expect(html).toContain('value="LEGO Millennium Falcon"');
   });
 
-  it('prefills gift description from draft', async () => {
+  it('prefills message from draft', async () => {
     mocks.getDreamBoardDraft.mockResolvedValue({
       childName: 'Maya',
       childAge: 7,
       giftName: '',
-      giftDescription: 'Collector edition with display stand',
-      giftIconId: 'scooter',
-      giftImageUrl: null,
-      message: '',
+      message: 'Thanks everyone!',
     });
 
     const html = await renderPage();
-    expect(html).toContain('data-testid="giftDescription"');
-    expect(html).toContain('data-default-value="Collector edition with display stand"');
-  });
-
-  it('passes selected icon to GiftIconPreview from draft', async () => {
-    mocks.getDreamBoardDraft.mockResolvedValue({
-      childName: 'Maya',
-      childAge: 7,
-      giftName: '',
-      giftDescription: '',
-      giftIconId: 'rocket',
-      giftImageUrl: null,
-      message: '',
-    });
-
-    const html = await renderPage();
-    expect(html).toContain('data-testid="gift-icon-preview"');
-    expect(html).toContain('data-selected-icon="rocket"');
+    expect(html).toContain('data-testid="message"');
+    expect(html).toContain('data-default-value="Thanks everyone!"');
+    expect(html).toContain('What&#x27;s the one gift Maya is dreaming of?');
   });
 
   it('shows error message via WizardCTA when error searchParam is present', async () => {
@@ -200,8 +149,14 @@ describe('Create Gift Page', () => {
 
   it('does NOT pass error to individual field wrappers', async () => {
     const html = await renderPage({ error: 'invalid' });
-    for (const fieldId of ['giftName', 'giftDescription', 'giftIconId', 'message']) {
+    for (const fieldId of ['giftName', 'message']) {
       expect(html).toMatch(new RegExp(`data-testid="field-${fieldId}"[^>]*data-error=""`));
     }
+  });
+
+  it('renders decorative Gifta logo', async () => {
+    const html = await renderPage();
+    expect(html).toContain('data-mock-image-src="/icons/gifts/gifta-logo.png"');
+    expect(html).toContain('aria-hidden="true"');
   });
 });

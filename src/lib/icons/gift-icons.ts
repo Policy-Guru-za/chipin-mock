@@ -10,7 +10,8 @@ export type GiftIconCategory =
   | 'learning-discovery'
   | 'imaginative-play'
   | 'tech-gaming'
-  | 'experiences';
+  | 'experiences'
+  | 'system';
 
 export type GiftIcon = {
   id: string;
@@ -489,7 +490,19 @@ export const GIFT_ICONS = [
   }),
 ] as const satisfies readonly GiftIcon[];
 
-const GIFT_ICON_BY_ID = new Map<string, GiftIcon>(GIFT_ICONS.map((icon) => [icon.id, icon]));
+const SYSTEM_GIFT_ICONS = [
+  createIcon({
+    id: 'gifta-logo',
+    label: 'Gifta logo',
+    category: 'system',
+    keywords: ['gifta', 'brand', 'logo', 'universal', 'dreamboard', 'gift', 'system', 'default'],
+    ageRange: [1, 18],
+  }),
+] as const satisfies readonly GiftIcon[];
+
+const GIFT_ICON_BY_ID = new Map<string, GiftIcon>(
+  [...GIFT_ICONS, ...SYSTEM_GIFT_ICONS].map((icon) => [icon.id, icon])
+);
 
 const ICON_PATH_PATTERN = /^\/icons\/gifts\/([a-z0-9-]+)\.png$/;
 const ABSOLUTE_HTTP_PATTERN = /^https?:\/\//i;

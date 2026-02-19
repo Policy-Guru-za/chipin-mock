@@ -35,10 +35,20 @@ describe('gift icon registry', () => {
 
   it('resolves icon id helpers', () => {
     expect(getGiftIconById('ballet')?.label).toBe('Ballet');
+    expect(getGiftIconById('gifta-logo')?.label).toBe('Gifta logo');
     expect(getGiftIconById('missing-id')).toBeUndefined();
 
     expect(isValidGiftIconId('teddy-bear')).toBe(true);
+    expect(isValidGiftIconId('gifta-logo')).toBe(true);
     expect(isValidGiftIconId('not-real')).toBe(false);
+  });
+
+  it('keeps system icon identities out of curated category listings', () => {
+    const curatedCategoryIds = new Set(
+      GIFT_ICON_CATEGORIES.flatMap((category) => getIconsByCategory(category.id).map((icon) => icon.id))
+    );
+
+    expect(curatedCategoryIds.has('gifta-logo')).toBe(false);
   });
 
   it('extracts icon ids from relative and absolute paths', () => {

@@ -1,4 +1,3 @@
-import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -19,7 +18,6 @@ afterEach(() => {
   vi.unmock('next/navigation');
   vi.unmock('@/lib/auth/clerk-wrappers');
   vi.unmock('@/lib/dream-boards/draft');
-  vi.unmock('@/components/gift/GiftIconPicker');
   vi.clearAllMocks();
   vi.resetModules();
 });
@@ -43,16 +41,14 @@ describe('saveManualGiftAction', () => {
     const { saveManualGiftAction } = await loadActionsModule();
     const formData = new FormData();
     formData.set('giftName', '  PlayStation II  ');
-    formData.set('giftDescription', '  Console bundle with two controllers.  ');
-    formData.set('giftIconId', 'scooter');
     formData.set('message', '  Thanks for helping make this happen.  ');
 
     await expect(saveManualGiftAction(formData)).rejects.toThrow('REDIRECT:/create/dates');
     expect(updateDreamBoardDraft).toHaveBeenCalledWith('host-1', {
       giftName: 'PlayStation II',
-      giftDescription: 'Console bundle with two controllers.',
-      giftIconId: 'scooter',
-      giftImageUrl: '/icons/gifts/scooter.png',
+      giftDescription: undefined,
+      giftIconId: undefined,
+      giftImageUrl: '/icons/gifts/gifta-logo.png',
       giftImagePrompt: undefined,
       goalCents: 0,
       message: 'Thanks for helping make this happen.',
@@ -77,8 +73,6 @@ describe('saveManualGiftAction', () => {
     const { saveManualGiftAction } = await loadActionsModule();
     const formData = new FormData();
     formData.set('giftName', 'PlayStation II');
-    formData.set('giftDescription', 'Console bundle with two controllers.');
-    formData.set('giftIconId', 'scooter');
     formData.set('message', 'a'.repeat(281));
 
     await expect(saveManualGiftAction(formData)).rejects.toThrow('REDIRECT:/create/gift?error=invalid');
@@ -103,16 +97,14 @@ describe('saveManualGiftAction', () => {
     const { saveManualGiftAction } = await loadActionsModule();
     const formData = new FormData();
     formData.set('giftName', 'PlayStation II');
-    formData.set('giftDescription', '   ');
-    formData.set('giftIconId', 'scooter');
     formData.set('message', '    ');
 
     await expect(saveManualGiftAction(formData)).rejects.toThrow('REDIRECT:/create/dates');
     expect(updateDreamBoardDraft).toHaveBeenCalledWith('host-1', {
       giftName: 'PlayStation II',
       giftDescription: undefined,
-      giftIconId: 'scooter',
-      giftImageUrl: '/icons/gifts/scooter.png',
+      giftIconId: undefined,
+      giftImageUrl: '/icons/gifts/gifta-logo.png',
       giftImagePrompt: undefined,
       goalCents: 0,
       message: undefined,
@@ -137,7 +129,6 @@ describe('saveManualGiftAction', () => {
     const { saveManualGiftAction } = await loadActionsModule();
     const formData = new FormData();
     formData.set('giftName', 'PlayStation II');
-    formData.set('giftIconId', 'scooter');
 
     await expect(saveManualGiftAction(formData)).rejects.toThrow('REDIRECT:/create/child');
     expect(updateDreamBoardDraft).not.toHaveBeenCalled();
@@ -158,15 +149,9 @@ describe('CreateGiftPage', () => {
       getDreamBoardDraft: vi.fn(async () =>
         baseDraft({
           giftName: 'Scooter',
-          giftDescription: 'Mint green scooter.',
-          giftIconId: 'scooter',
-          giftImageUrl: '/icons/gifts/scooter.png',
           message: 'Thanks everyone!',
         })
       ),
-    }));
-    vi.doMock('@/components/gift/GiftIconPicker', () => ({
-      GiftIconPicker: () => createElement('input', { type: 'hidden', name: 'giftIconId', value: 'scooter' }),
     }));
 
     const giftPageModule = await import('@/app/(host)/create/gift/page');

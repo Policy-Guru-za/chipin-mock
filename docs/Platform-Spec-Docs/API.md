@@ -187,7 +187,8 @@ POST /v1/dream-boards
 ```
 
 **Notes:**
-- Provide `gift_icon_id` (preferred) or `gift_image_url` that maps to a supported icon.
+- Provide `gift_icon_id` (preferred) or `gift_image_url` that maps to a supported icon identity (curated or system).
+- Host-created Dreamboards may use the system identity `gifta-logo` for `gift_icon_id`.
 - `gift_image_prompt` is deprecated legacy data and is null for icon-based boards.
 - `payout_method` is always `karri_card`.
 - `party_date` must be within the next 6 months.

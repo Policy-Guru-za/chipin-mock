@@ -3,13 +3,10 @@ import { z } from 'zod';
 
 import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
 import { getDreamBoardDraft, updateDreamBoardDraft } from '@/lib/dream-boards/draft';
-import { getGiftIconById } from '@/lib/icons/gift-icons';
 import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
 
 const manualGiftSchema = z.object({
   giftName: z.string().min(2).max(200),
-  giftDescription: z.string().max(500).optional(),
-  giftIconId: z.string().min(1),
   message: z.string().max(280).optional(),
 });
 
@@ -36,8 +33,6 @@ export async function saveManualGiftAction(formData: FormData) {
 
   const payload = {
     giftName: formData.get('giftName'),
-    giftDescription: toOptionalString(formData.get('giftDescription')),
-    giftIconId: formData.get('giftIconId'),
     message: toOptionalString(formData.get('message')),
   };
 
@@ -46,16 +41,11 @@ export async function saveManualGiftAction(formData: FormData) {
     redirect('/create/gift?error=invalid');
   }
 
-  const icon = getGiftIconById(result.data.giftIconId);
-  if (!icon) {
-    redirect('/create/gift?error=invalid');
-  }
-
   await updateDreamBoardDraft(session.hostId, {
     giftName: result.data.giftName.trim(),
-    giftDescription: result.data.giftDescription,
-    giftIconId: icon.id,
-    giftImageUrl: icon.src,
+    giftDescription: undefined,
+    giftIconId: undefined,
+    giftImageUrl: '/icons/gifts/gifta-logo.png',
     giftImagePrompt: undefined,
     goalCents: 0,
     message: result.data.message,
