@@ -2,7 +2,6 @@ import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 
 import { getCachedDreamBoardBySlug } from '@/lib/dream-boards/cache';
-import { extractIconIdFromPath, getGiftIconById, toAbsoluteGiftImageUrl } from '@/lib/icons/gift-icons';
 
 export const runtime = 'nodejs';
 
@@ -29,10 +28,7 @@ export async function GET(
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? request.nextUrl.origin;
-  const iconId = extractIconIdFromPath(board.giftImageUrl ?? '') ?? 'teddy-bear';
-  const iconMeta = getGiftIconById(iconId) ?? getGiftIconById('teddy-bear');
-
-  const iconUrl = toAbsoluteGiftImageUrl(iconMeta?.src ?? '/icons/gifts/teddy-bear.png', baseUrl);
+  const iconUrl = toAbsoluteUrl('/Logos/Original.png', baseUrl);
   const childPhotoUrl = toAbsoluteUrl(board.childPhotoUrl, baseUrl);
 
   return new ImageResponse(
@@ -88,7 +84,7 @@ export async function GET(
             height: '180px',
             borderRadius: '28px',
             overflow: 'hidden',
-            backgroundColor: iconMeta?.bgColor ?? '#F5F5F5',
+            backgroundColor: '#F5F5F5',
             border: '1px solid rgba(0,0,0,0.05)',
             display: 'flex',
             alignItems: 'center',
@@ -101,7 +97,7 @@ export async function GET(
             alt={board.giftName}
             width={180}
             height={180}
-            style={{ width: '180px', height: '180px', objectFit: 'contain', padding: '16px' }}
+            style={{ width: '180px', height: '180px', objectFit: 'contain', padding: '14px' }}
           />
         </div>
       </div>

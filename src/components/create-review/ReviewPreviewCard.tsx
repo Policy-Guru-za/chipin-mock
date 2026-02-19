@@ -19,6 +19,8 @@ type ReviewPreviewCardProps = {
   onCopyShareUrl?: () => void;
 };
 
+const REVIEW_GIFT_ICON_SRC = '/Logos/Original.png';
+
 function LinkIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -41,7 +43,7 @@ export function ReviewPreviewCard({
   childPhotoUrl,
   birthdayLabel,
   giftName,
-  giftImageUrl,
+  giftImageUrl: _giftImageUrl,
   partyDateTimeLabel,
   campaignCloseLabel,
   payoutSummary,
@@ -78,7 +80,13 @@ export function ReviewPreviewCard({
       <div className="px-6 py-5 sm:px-9 sm:py-6">
         <div className="mb-5 flex items-center gap-4 rounded-2xl border border-border-soft bg-bg-warmth px-4 py-3">
           <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-sage-light">
-            <Image src={giftImageUrl} alt={giftName} fill sizes="64px" className="object-cover" />
+            <Image
+              src={REVIEW_GIFT_ICON_SRC}
+              alt={giftName}
+              fill
+              sizes="64px"
+              className="object-contain p-[4px]"
+            />
           </div>
           <p className="text-lg font-semibold text-ink">{giftName}</p>
         </div>

@@ -12,7 +12,7 @@ afterEach(() => {
 });
 
 describe('GET /api/og/[slug]', () => {
-  it('returns a png image when board exists', async () => {
+  it('returns a png image and uses the forced system icon for curated boards', async () => {
     vi.doMock('@/lib/dream-boards/cache', () => ({
       getCachedDreamBoardBySlug: vi.fn(async () => ({
         id: 'board-1',
@@ -33,7 +33,7 @@ describe('GET /api/og/[slug]', () => {
     expect(response.headers.get('content-type')).toContain('image/png');
   });
 
-  it('returns a png image when board uses gifta-logo system icon', async () => {
+  it('returns a png image and uses the forced system icon for gifta-logo boards', async () => {
     vi.doMock('@/lib/dream-boards/cache', () => ({
       getCachedDreamBoardBySlug: vi.fn(async () => ({
         id: 'board-1',

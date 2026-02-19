@@ -51,7 +51,8 @@ describe('ReviewPreviewCard', () => {
     expect(html).toContain('Payout');
     expect(html).toContain('No charity split selected.');
     expect(html).toContain('https://images.example/max-avatar.jpg');
-    expect(html).toContain('https://images.example/playstation.jpg');
+    expect(html).toContain('/Logos/Original.png');
+    expect(html).not.toContain('https://images.example/playstation.jpg');
     expect(html).toContain('mb-5 flex items-center');
     expect(html).not.toContain('/public/images/kid-tank-top.png');
   });

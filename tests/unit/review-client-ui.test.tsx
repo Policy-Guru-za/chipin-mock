@@ -83,6 +83,10 @@ describe('ReviewClient', () => {
       'href',
       '/create/payout'
     );
+    const renderedImages = screen.getAllByRole('img');
+    expect(renderedImages.some((img) => img.getAttribute('src') === '/Logos/Original.png')).toBe(
+      true
+    );
   });
 
   it('renders stepper progress for review step', () => {
