@@ -131,7 +131,7 @@ describe('ChildPhotoDropZone', () => {
     const headingContainer = heading.closest('div');
 
     expect(headingContainer).not.toBeNull();
-    expect(headingContainer).toHaveClass('min-[801px]:pt-9');
+    expect(headingContainer).toHaveClass('min-[801px]:pt-[36px]');
     expect(container).toContainElement(headingContainer);
   });
 });
