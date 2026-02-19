@@ -34,13 +34,6 @@ vi.mock('next/navigation', () => ({
   redirect: vi.fn(),
 }));
 
-vi.mock('next/image', () => ({
-  __esModule: true,
-  default: ({ priority: _priority, src, ...props }: Record<string, unknown>) => (
-    <span data-mock-image-src={String(src ?? '')} {...props} />
-  ),
-}));
-
 vi.mock('@/components/create-wizard', () => ({
   WizardStepper: (props: Record<string, unknown>) => (
     <div data-testid="wizard-stepper" data-step={props.currentStep} />
@@ -48,7 +41,11 @@ vi.mock('@/components/create-wizard', () => ({
   WizardCenteredLayout: (props: Record<string, unknown>) => (
     <div data-testid="centered-layout">{props.children as ReactNode}</div>
   ),
-  WizardPanelTitle: (props: Record<string, unknown>) => <h2>{props.children as ReactNode}</h2>,
+  WizardPanelTitle: (props: Record<string, unknown>) => (
+    <h2 data-testid="panel-title" data-variant={String(props.variant ?? '')}>
+      {props.children as ReactNode}
+    </h2>
+  ),
   WizardFieldWrapper: (props: Record<string, unknown>) => (
     <div data-testid={`field-${props.htmlFor}`} data-error={(props.error as string | null) ?? ''}>
       {props.children as ReactNode}
@@ -106,12 +103,16 @@ describe('Create Gift Page', () => {
   it('renders centered layout with gift name and message fields', async () => {
     const html = await renderPage();
     expect(html).toContain('data-testid="centered-layout"');
+    expect(html).toContain('data-testid="panel-title"');
+    expect(html).toContain('data-variant="form"');
+    expect(html).toContain('class="mb-7 text-[13px] font-light leading-relaxed text-ink-soft"');
     expect(html).toContain('data-testid="field-giftName"');
     expect(html).toContain('data-testid="field-message"');
     expect(html).not.toContain('data-testid="split-layout"');
     expect(html).not.toContain('data-testid="gift-icon-preview"');
     expect(html).not.toContain('data-testid="field-giftDescription"');
     expect(html).not.toContain('data-testid="field-giftIconId"');
+    expect(html).not.toContain('/icons/gifts/gifta-logo.png');
   });
 
   it('prefills gift name from draft', async () => {
@@ -154,9 +155,8 @@ describe('Create Gift Page', () => {
     }
   });
 
-  it('renders decorative Gifta logo', async () => {
+  it('does not render decorative logo markup', async () => {
     const html = await renderPage();
-    expect(html).toContain('data-mock-image-src="/icons/gifts/gifta-logo.png"');
-    expect(html).toContain('aria-hidden="true"');
+    expect(html).not.toContain('/icons/gifts/gifta-logo.png');
   });
 });

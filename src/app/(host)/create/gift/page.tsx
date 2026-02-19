@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 
@@ -60,18 +59,6 @@ export default async function CreateGiftPage({
       <Suspense fallback={<WizardSkeletonLoader variant="centered" />}>
         <form action={saveManualGiftAction}>
           <WizardCenteredLayout>
-            <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center">
-              <Image
-                src="/icons/gifts/gifta-logo.png"
-                alt=""
-                width={80}
-                height={80}
-                className="h-20 w-20 object-contain"
-                aria-hidden="true"
-                priority
-              />
-            </div>
-
             <WizardPanelTitle variant="form">The dream gift</WizardPanelTitle>
             <p className="mb-7 text-[13px] font-light leading-relaxed text-ink-soft">
               What&apos;s the one gift {messageAuthor} is dreaming of?

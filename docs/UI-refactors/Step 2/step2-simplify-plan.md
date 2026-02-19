@@ -131,21 +131,7 @@ The current page is a server component with an inline form using `WizardSplitLay
 
 **Add:**
 - `WizardCenteredLayout` import (from `@/components/create-wizard`)
-- A static decorative logo element above the heading (using `next/image`):
-  ```tsx
-  <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center">
-    <Image
-      src="/icons/gifts/gifta-logo.png"
-      alt=""
-      width={80}
-      height={80}
-      className="h-20 w-20 object-contain"
-      aria-hidden="true"
-      priority
-    />
-  </div>
-  ```
-  The logo is decorative (not functional), so `alt=""` and `aria-hidden="true"` are correct. It sits above the title to give the page a visual anchor without being interactive.
+- No logo/icon UI in the Step 2 form card. The stored `giftImageUrl` remains `/icons/gifts/gifta-logo.png` for downstream surfaces (review/public/OG).
 
 **New layout structure:**
 ```tsx
@@ -154,19 +140,6 @@ The current page is a server component with an inline form using `WizardSplitLay
   <Suspense fallback={<WizardSkeletonLoader variant="centered" />}>
     <form action={saveManualGiftAction}>
       <WizardCenteredLayout>
-        {/* Decorative logo */}
-        <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center">
-          <Image
-            src="/icons/gifts/gifta-logo.png"
-            alt=""
-            width={80}
-            height={80}
-            className="h-20 w-20 object-contain"
-            aria-hidden="true"
-            priority
-          />
-        </div>
-
         <WizardPanelTitle variant="form">The dream gift</WizardPanelTitle>
         <p className="mb-7 text-[13px] font-light leading-relaxed text-ink-soft">
           What's the one gift {messageAuthor} is dreaming of?
@@ -251,7 +224,7 @@ This file tests the server-rendered page output. Major changes:
 | `does NOT pass error to individual field wrappers` | **Update** — remove `giftDescription` and `giftIconId` from the field ID list. New list: `['giftName', 'message']` |
 
 **Add new test:**
-- `renders decorative Gifta logo` — assert the page HTML contains `src="/icons/gifts/gifta-logo.png"` and `aria-hidden="true"`.
+- `does not render decorative logo markup` — assert the page HTML does **not** contain `/icons/gifts/gifta-logo.png`.
 
 #### 4b. `tests/unit/create-step-gift.test.ts`
 
@@ -337,7 +310,7 @@ The review page (Step 6) shows a 64×64 gift image via `ReviewPreviewCard`. It r
 2. **Lint**: `pnpm lint` — zero errors (warnings acceptable).
 3. **Tests**: `pnpm test` — all tests pass, including updated Step 2 tests.
 4. **Asset**: Verify `/public/icons/gifts/gifta-logo.png` exists and is the transparent-background variant.
-5. **Visual — Step 2 desktop**: Single centred card with Gifta logo, gift name field, message textarea, and CTA. No icon picker, no description field, no preview panel.
-6. **Visual — Step 2 mobile**: Same single card, responsive. Logo above heading.
+5. **Visual — Step 2 desktop**: Single centred card with gift name field, message textarea, and CTA. No icon picker, no description field, no preview panel, no decorative logo.
+6. **Visual — Step 2 mobile**: Same single card, responsive, with no logo/icon in the form card.
 7. **Visual — Step 6 review**: Gift image slot in ReviewPreviewCard shows the Gifta logo (small but recognisable).
 8. **Flow**: Complete the full wizard end-to-end. Step 2 submits successfully, draft is saved with `giftImageUrl: '/icons/gifts/gifta-logo.png'`, `giftDescription: undefined`, `giftIconId: undefined`. Subsequent steps read the draft correctly.
