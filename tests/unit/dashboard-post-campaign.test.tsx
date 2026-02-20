@@ -133,6 +133,7 @@ describe('DashboardPostCampaignClient', () => {
       />
     );
 
+    expect(screen.getByRole('heading', { name: /contributions \(1\)/i })).toBeInTheDocument();
     expect(screen.getByText('Guest A')).toBeInTheDocument();
     expect(screen.queryByText(/R\s*543/)).not.toBeInTheDocument();
   });

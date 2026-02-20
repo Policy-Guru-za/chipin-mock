@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mia's Dreamboard – Gifta (Mobile)</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&family=Nunito:wght@700;800&family=Outfit:wght@400;500;600;700&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --sage: #4A7E66;
+      --sage-deep: #3B6B55;
+      --sage-light: #E9F3ED;
+      --sage-wash: #F1F7F4;
+      --sage-cta-from: #6B9E88;
+      --sage-cta-to: #5A8E78;
+      --teal-500: #14B8A6;
+      --teal-600: #0D9488;
+      --teal-700: #0f766e;
+      --teal-800: #115e59;
+      --teal-50: #f0fdfa;
+      --amber: #C49A5C;
+      --amber-light: #F7EFE2;
+      --amber-glow: #EBDCC8;
+      --sienna: #C4785A;
+      --plum: #7E6B9B;
+      --plum-wash: #F1EDF7;
+      --ink: #2C2520;
+      --ink-mid: #5C544C;
+      --ink-soft: #8A827A;
+      --ink-faint: #B5AEA5;
+      --ink-ghost: #D1CBC3;
+      --text-primary: #1C1917;
+      --text-secondary: #57534E;
+      --text-muted: #A8A29E;
+      --bg-primary: #FEFDFB;
+      --bg-subtle: #FDF8F3;
+      --bg-muted: #FAF9F7;
+      --bg-warmth: #FBF8F3;
+      --border-default: #E7E5E4;
+      --border-strong: #D6D3D1;
+      --border-warmth: #EDE7DE;
+      --border-soft: #F5F1EA;
+      --success: #059669;
+      --warning: #D97706;
+      --shadow-card: 0 1px 2px rgba(44,37,32,0.03), 0 4px 12px rgba(44,37,32,0.04), 0 12px 36px rgba(44,37,32,0.04);
+      --shadow-input: 0 1px 3px rgba(44,37,32,0.04);
+      --radius-sm: 14px;
+      --radius-md: 20px;
+    }
+
+    html {
+      font-family: 'DM Sans', 'Outfit', sans-serif;
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Mobile-first: constrain to phone width */
+    body {
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      background: var(--bg-primary);
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -10%;
+      right: -20%;
+      width: 70%;
+      height: 50%;
+      background: radial-gradient(circle, rgba(248,220,180,0.1) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      border-bottom: 1px solid var(--border-default);
+      background: rgba(254, 253, 251, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .logo-emoji { font-size: 24px; }
+
+    .logo-text {
+      font-size: 22px;
+      font-weight: 700;
+      color: #3D3D3D;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-link {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .btn-primary-sm {
+      height: 34px;
+      padding: 0 14px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      color: white;
+      background: linear-gradient(135deg, var(--sage-cta-from) 0%, var(--sage-cta-to) 100%);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(107,158,136,0.3);
+    }
+
+    /* ===== MAIN ===== */
+    main {
+      padding: 20px 16px 32px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--teal-700);
+      text-decoration: none;
+      margin-bottom: 20px;
+    }
+
+    /* ===== CARDS ===== */
+    .card {
+      background: white;
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid rgba(231, 229, 228, 0.5);
+      margin-bottom: 16px;
+      animation: fadeUpIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeUpIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card:nth-child(1) { animation-delay: 0ms; }
+    .card:nth-child(2) { animation-delay: 60ms; }
+    .card:nth-child(3) { animation-delay: 120ms; }
+    .card:nth-child(4) { animation-delay: 180ms; }
+    .card:nth-child(5) { animation-delay: 240ms; }
+    .card:nth-child(6) { animation-delay: 300ms; }
+    .card:nth-child(7) { animation-delay: 360ms; }
+    .card:nth-child(8) { animation-delay: 420ms; }
+
+    /* ===== HERO ===== */
+    .hero-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, rgba(74,126,102,0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #E9F3ED 0%, #d4e8dc 100%);
+      border: 2.5px solid var(--sage);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-family: 'Fraunces', serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--sage-deep);
+      box-shadow: 0 4px 12px rgba(74, 126, 102, 0.15);
+    }
+
+    .hero-content { flex: 1; min-width: 0; }
+
+    .hero-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .dreamboard-title {
+      font-family: 'Fraunces', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--teal-50);
+      color: var(--teal-700);
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: 1px solid rgba(13, 148, 136, 0.15);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      display: inline-block;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .gift-line {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .gift-line .icon { font-size: 13px; opacity: 0.7; }
+
+    .hero-dates {
+      display: flex;
+      gap: 14px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .hero-date-item {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .giving-back-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #F1EDF7;
+      color: #7E6B9B;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid rgba(126, 107, 155, 0.15);
+      margin-top: 10px;
+    }
+
+    /* ===== PROGRESS ===== */
+    .progress-card {
+      background: linear-gradient(135deg, var(--sage-wash) 0%, white 60%);
+      border: 1px solid rgba(74, 126, 102, 0.12) !important;
+      text-align: center;
+      padding: 24px 20px;
+    }
+
+    .progress-raised {
+      font-family: 'Fraunces', serif;
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--sage);
+      letter-spacing: -0.02em;
+      text-shadow: 0 0 30px rgba(74, 126, 102, 0.1);
+      margin-bottom: 2px;
+    }
+
+    .progress-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .progress-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* ===== STATS ROW ===== */
+    .stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 4px;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(74,126,102,0.1);
+    }
+
+    .stat-item { text-align: center; }
+
+    .stat-number {
+      font-family: 'Fraunces', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-top: 1px;
+    }
+
+    /* ===== SECTION HEADER ===== */
+    .section-header {
+      font-family: 'Fraunces', serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-header .count {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--sage);
+      background: var(--sage-light);
+      padding: 2px 9px;
+      border-radius: 999px;
+    }
+
+    /* ===== CONTRIBUTIONS ===== */
+    .contributions-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .contribution-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .contribution-row:last-child { border-bottom: none; }
+
+    .contribution-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .contributor-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .contributor-avatar.sage { background: var(--sage-light); color: var(--sage); }
+    .contributor-avatar.amber { background: var(--amber-light); color: var(--amber); }
+    .contributor-avatar.plum { background: #F1EDF7; color: #7E6B9B; }
+    .contributor-avatar.teal { background: var(--teal-50); color: var(--teal-600); }
+    .contributor-avatar.sienna { background: #fbe9e1; color: var(--sienna); }
+
+    .contributor-details {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      min-width: 0;
+    }
+
+    .contributor-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .has-message-icon {
+      color: var(--teal-600);
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .contribution-date {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .contribution-date-right {
+      font-size: 11px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .show-more-link {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--teal-700);
+      text-decoration: none;
+      margin-top: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* ===== MESSAGES ===== */
+    .messages-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .message-box {
+      background: var(--bg-muted);
+      border: 1px solid var(--border-default);
+      border-radius: 12px;
+      padding: 14px;
+      position: relative;
+    }
+
+    .message-box::before {
+      content: '"';
+      position: absolute;
+      top: 6px;
+      left: 12px;
+      font-family: 'Fraunces', serif;
+      font-size: 32px;
+      color: var(--sage-light);
+      line-height: 1;
+    }
+
+    .message-sender {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      padding-left: 18px;
+    }
+
+    .message-text {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      padding-left: 18px;
+    }
+
+    .btn-outline {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 42px;
+      padding: 0 16px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text-primary);
+      background: white;
+      border: 1.5px solid var(--border-default);
+      border-radius: 12px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 14px;
+    }
+
+    /* ===== QUICK ACTIONS (mobile) ===== */
+    .actions-title {
+      font-family: 'Fraunces', serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .quick-actions { display: flex; flex-direction: column; }
+
+    .action-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-soft);
+      cursor: pointer;
+      text-decoration: none;
+      background: transparent;
+      border-left: none;
+      border-right: none;
+      border-top: none;
+      font-family: 'DM Sans', sans-serif;
+      width: 100%;
+      text-align: left;
+    }
+
+    .action-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .action-item:first-child { padding-top: 0; }
+
+    .action-icon-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--bg-muted);
+      border: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .action-icon-wrap svg {
+      width: 16px;
+      height: 16px;
+      color: var(--text-secondary);
+    }
+
+    .action-text { flex: 1; }
+
+    .action-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .action-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .action-arrow {
+      color: var(--ink-ghost);
+      font-size: 16px;
+      font-weight: 300;
+    }
+
+    /* ===== PAYOUT ===== */
+    .payout-card {
+      background: linear-gradient(135deg, var(--bg-muted) 0%, var(--bg-subtle) 100%) !important;
+      border: 1px solid var(--border-warmth) !important;
+    }
+
+    .payout-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .payout-header-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: white;
+      border: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-input);
+    }
+
+    .payout-header-icon svg {
+      width: 16px;
+      height: 16px;
+      color: var(--teal-600);
+    }
+
+    .payout-title {
+      font-family: 'Fraunces', serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .payout-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .payout-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .payout-row-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .payout-row-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .payout-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .payout-status-badge.pending {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+    }
+
+    .status-dot-sm {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .status-dot-sm.amber { background: var(--warning); }
+
+    .payout-divider {
+      height: 1px;
+      background: var(--border-warmth);
+      margin: 2px 0;
+    }
+
+    .payout-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-top: 6px;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      border-top: 1px solid var(--border-default);
+      background: var(--bg-muted);
+      padding: 24px 20px;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #3D3D3D;
+      margin-bottom: 8px;
+    }
+
+    .footer-logo-emoji { font-size: 18px; }
+    .footer-tagline { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+    .footer-copyright { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-content">
+      <a href="#" class="logo">
+        <span class="logo-emoji">🎁</span>
+        <span class="logo-text">Gifta</span>
+      </a>
+      <div class="header-right">
+        <a href="#" class="header-link">How it works</a>
+        <button class="btn-primary-sm">Create</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <a href="#" class="back-link">
+      <span>←</span> Back to Dreamboards
+    </a>
+
+    <!-- Hero Card -->
+    <div class="card hero-card">
+      <div class="avatar">M</div>
+      <div class="hero-content">
+        <div class="hero-header">
+          <h1 class="dreamboard-title">Mia's Dreamboard</h1>
+          <div class="badge">
+            <span class="status-dot"></span>
+            Active
+          </div>
+        </div>
+        <div class="gift-line">
+          <span class="icon">🎀</span>
+          Pink Bicycle with Training Wheels
+        </div>
+        <div class="hero-dates">
+          <span class="hero-date-item">
+            <span class="icon">🎂</span> 15 Mar 2026
+          </span>
+          <span class="hero-date-item">
+            <span class="icon">🎈</span> Party: 16 Mar
+          </span>
+        </div>
+        <div class="giving-back-badge">
+          <span>💜</span> 10% to Reach for a Dream
+        </div>
+      </div>
+    </div>
+
+    <!-- Amount Raised + Stats Card -->
+    <div class="card progress-card">
+      <div class="progress-raised">R 2,450</div>
+      <div class="progress-label">Raised so far</div>
+      <div class="progress-meta">
+        <span>23 days remaining</span>
+      </div>
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-number">8</div>
+          <div class="stat-label">Contributors</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">5</div>
+          <div class="stat-label">Messages</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">23</div>
+          <div class="stat-label">Days left</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contributions Card -->
+    <div class="card">
+      <h2 class="section-header">
+        Contributors
+        <span class="count">8</span>
+      </h2>
+      <div class="contributions-list">
+        <div class="contribution-row">
+          <div class="contribution-left">
+            <div class="contributor-avatar sage">GR</div>
+            <div class="contributor-details">
+              <span class="contributor-name">Grandma Rose <span class="has-message-icon">💬</span></span>
+            </div>
+          </div>
+          <span class="contribution-date-right">1 week ago</span>
+        </div>
+        <div class="contribution-row">
+          <div class="contribution-left">
+            <div class="contributor-avatar amber">SJ</div>
+            <div class="contributor-details">
+              <span class="contributor-name">Sarah Johnson <span class="has-message-icon">💬</span></span>
+            </div>
+          </div>
+          <span class="contribution-date-right">2 days ago</span>
+        </div>
+        <div class="contribution-row">
+          <div class="contribution-left">
+            <div class="contributor-avatar teal">UD</div>
+            <div class="contributor-details">
+              <span class="contributor-name">Uncle David</span>
+            </div>
+          </div>
+          <span class="contribution-date-right">3 days ago</span>
+        </div>
+        <div class="contribution-row">
+          <div class="contribution-left">
+            <div class="contributor-avatar plum">A</div>
+            <div class="contributor-details">
+              <span class="contributor-name">Anonymous <span class="has-message-icon">💬</span></span>
+            </div>
+          </div>
+          <span class="contribution-date-right">5 days ago</span>
+        </div>
+        <div class="contribution-row">
+          <div class="contribution-left">
+            <div class="contributor-avatar sienna">TP</div>
+            <div class="contributor-details">
+              <span class="contributor-name">The Petersons</span>
+            </div>
+          </div>
+          <span class="contribution-date-right">1 week ago</span>
+        </div>
+        <div class="contribution-row">
+          <div class="contribution-left">
+            <div class="contributor-avatar sage">AK</div>
+            <div class="contributor-details">
+              <span class="contributor-name">Auntie Kim <span class="has-message-icon">💬</span></span>
+            </div>
+          </div>
+          <span class="contribution-date-right">1 week ago</span>
+        </div>
+      </div>
+      <a href="#" class="show-more-link">View all 8 contributors →</a>
+    </div>
+
+    <!-- Birthday Messages Card -->
+    <div class="card">
+      <h2 class="section-header">
+        Birthday Messages
+        <span class="count">5</span>
+      </h2>
+      <div class="messages-list">
+        <div class="message-box">
+          <div class="message-sender">Grandma Rose</div>
+          <div class="message-text">Happy birthday my sweet Mia! Can't wait to see you riding your new bike around the garden. All my love! 🎂</div>
+        </div>
+        <div class="message-box">
+          <div class="message-sender">Sarah Johnson</div>
+          <div class="message-text">Mia you're going to LOVE this bike! Happy 7th birthday superstar! 🌟</div>
+        </div>
+        <div class="message-box">
+          <div class="message-sender">Anonymous</div>
+          <div class="message-text">What a wonderful idea! Wishing Mia the happiest birthday ever 💝</div>
+        </div>
+        <div class="message-box">
+          <div class="message-sender">Auntie Kim</div>
+          <div class="message-text">We love you Mia! So excited for you to get this special gift from all of us 🎁</div>
+        </div>
+      </div>
+      <a href="#" class="show-more-link">View all 5 messages →</a>
+      <button class="btn-outline">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download Messages
+      </button>
+    </div>
+
+    <!-- Quick Actions Card -->
+    <div class="card">
+      <div class="actions-title">Quick Actions</div>
+      <div class="quick-actions">
+        <button class="action-item">
+          <div class="action-icon-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          </div>
+          <div class="action-text">
+            <div class="action-label">Share Dreamboard</div>
+            <div class="action-desc">Copy link to share via WhatsApp</div>
+          </div>
+          <span class="action-arrow">›</span>
+        </button>
+        <button class="action-item">
+          <div class="action-icon-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <div class="action-text">
+            <div class="action-label">Edit Dreamboard</div>
+            <div class="action-desc">Update details or dates</div>
+          </div>
+          <span class="action-arrow">›</span>
+        </button>
+        <button class="action-item">
+          <div class="action-icon-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </div>
+          <div class="action-text">
+            <div class="action-label">View Public Page</div>
+            <div class="action-desc">See what guests see</div>
+          </div>
+          <span class="action-arrow">›</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Payout Details Card -->
+    <div class="card payout-card">
+      <div class="payout-header">
+        <div class="payout-header-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        </div>
+        <div class="payout-title">Payout Details</div>
+      </div>
+      <div class="payout-rows">
+        <div class="payout-row">
+          <span class="payout-row-label">Method</span>
+          <span class="payout-row-value">Karri Card</span>
+        </div>
+        <div class="payout-row">
+          <span class="payout-row-label">Recipient</span>
+          <span class="payout-row-value">Ryan L.</span>
+        </div>
+        <div class="payout-divider"></div>
+        <div class="payout-row">
+          <span class="payout-row-label">Status</span>
+          <div class="payout-status-badge pending">
+            <span class="status-dot-sm amber"></span>
+            Pending
+          </div>
+        </div>
+        <div class="payout-row">
+          <span class="payout-row-label">Est. payout</span>
+          <span class="payout-row-value">R 2,205</span>
+        </div>
+      </div>
+      <div class="payout-note">Payout processed when Dreamboard closes. Platform fee (R 245) deducted automatically.</div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-logo">
+      <span class="footer-logo-emoji">🎁</span>
+      <span>Gifta</span>
+    </div>
+    <div class="footer-tagline">One dream gift. Everyone chips in. Magic made together.</div>
+    <div class="footer-copyright">&copy; 2026 Gifta. All rights reserved.</div>
+  </footer>
+
+</body>
+</html>

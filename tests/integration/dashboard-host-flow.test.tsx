@@ -143,6 +143,7 @@ describe('host dashboard flow', () => {
 
     expect(screen.getByRole('heading', { name: /maya's dreamboard/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /contributions \(2\)/i })).toBeInTheDocument();
+    expect(screen.getByAltText(/gifta gift icon/i)).toBeInTheDocument();
     expect(screen.getAllByText('Ava').length).toBeGreaterThan(0);
     expect(screen.queryByText(/R\s*250/)).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /quick actions/i })).toBeInTheDocument();

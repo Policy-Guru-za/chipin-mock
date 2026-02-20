@@ -13,6 +13,7 @@
 
 - Runtime source: `src/app/(host)/dashboard/[id]/page.tsx`, `src/app/(host)/dashboard/[id]/DashboardDetailClient.tsx`, `src/lib/host/dashboard-view-model.ts`.
 - Active host detail now uses a two-column layout (`left content + sticky right rail`) on desktop and a single-column stack on mobile.
+- Active hero card displays the status chip in the top-right slot (replacing the prior time-label position).
 - Implemented quick actions: share link copy, edit modal, and view public page.
 - Host close action is not currently exposed in dashboard UI; close is handled via partner API (`POST /api/v1/dream-boards/{id}/close`).
 - Contribution rows intentionally show contributor identity + relative time + message indicator only (no per-contributor amount display).

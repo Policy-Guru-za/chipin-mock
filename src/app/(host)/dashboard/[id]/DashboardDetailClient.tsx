@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { type ReactNode, useEffect, useState } from 'react';
 
@@ -194,20 +195,28 @@ export function DashboardDetailClient({
                   )}
                 </div>
                 <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <h1 className="font-display text-4xl font-bold text-text [overflow-wrap:anywhere]">
-                      {view.childName}&apos;s Dreamboard
-                    </h1>
-                    <span className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold ${statusClass}`}>
-                      <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-current" />
-                      {view.statusLabel}
-                    </span>
-                  </div>
-                  <p className="mt-3 text-sm text-text-secondary [overflow-wrap:anywhere]">{view.giftName}</p>
+                  <h1 className="font-display text-4xl font-bold text-text [overflow-wrap:anywhere]">
+                    {view.childName}&apos;s Dreamboard
+                  </h1>
+                  <p className="mt-3 flex items-center gap-2 text-sm text-text-secondary">
+                    <Image
+                      src="/icons/gifts/gifta-logo.png"
+                      alt="Gifta gift icon"
+                      width={20}
+                      height={20}
+                      className="h-5 w-5 flex-shrink-0"
+                    />
+                    <span className="[overflow-wrap:anywhere]">{view.giftName}</span>
+                  </p>
                   {birthdayLabel ? <p className="mt-1 text-sm text-text-secondary">Birthday: {birthdayLabel}</p> : null}
                 </div>
               </div>
-              <p className="text-sm font-medium text-text-secondary">{view.timeLabel}</p>
+              <span
+                className={`inline-flex items-center gap-1 self-start rounded-full border px-3 py-1 text-xs font-semibold ${statusClass}`}
+              >
+                <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-current" />
+                {view.statusLabel}
+              </span>
             </div>
           </article>
 
