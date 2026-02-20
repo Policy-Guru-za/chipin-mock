@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nav Avatar Variant 3 — Soft Signet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@700;800&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --sage: #4A7E66;
+      --sage-deep: #3B6B55;
+      --sage-light: #E9F3ED;
+      --sage-cta-from: #6B9E88;
+      --sage-cta-to: #5A8E78;
+      --teal-600: #0D9488;
+      --teal-700: #0f766e;
+      --amber: #C49A5C;
+      --amber-light: #F7EFE2;
+      --amber-glow: #EBDCC8;
+      --sienna: #C4785A;
+      --plum: #7E6B9B;
+      --plum-wash: #F1EDF7;
+      --text-primary: #1C1917;
+      --text-muted: #A8A29E;
+      --bg-primary: #FEFDFB;
+      --bg-subtle: #FDF8F3;
+      --border-default: #E7E5E4;
+      --border-warmth: #EDE7DE;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .variant-label {
+      text-align: center;
+      padding: 40px 24px 20px;
+      font-family: 'Fraunces', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .variant-desc {
+      text-align: center;
+      padding: 0 24px 40px;
+      font-size: 14px;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      border-bottom: 1px solid var(--border-default);
+      background: rgba(254, 253, 251, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .header-content {
+      max-width: 72rem;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 32px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .logo-emoji { font-size: 30px; }
+    .logo-text { font-size: 28px; font-weight: 700; color: #3D3D3D; }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-link {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 150ms ease;
+    }
+
+    .nav-link:hover { color: var(--text-primary); }
+
+    .btn-primary-sm {
+      height: 38px;
+      padding: 0 20px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      color: white;
+      background: linear-gradient(135deg, var(--sage-cta-from) 0%, var(--sage-cta-to) 100%);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(107,158,136,0.3);
+      transition: all 200ms ease;
+    }
+
+    .btn-primary-sm:hover {
+      box-shadow: 0 6px 20px rgba(107,158,136,0.4);
+      transform: translateY(-1px);
+    }
+
+    /* ===== VARIANT 3: SOFT SIGNET AVATAR ===== */
+    .avatar-wrapper {
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .avatar-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 14px 4px 4px;
+      border-radius: 999px;
+      background: var(--bg-subtle);
+      border: 1.5px solid var(--border-warmth);
+      transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle shimmer sweep on hover */
+    .avatar-pill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(196,154,92,0.08), transparent);
+      transition: left 0s;
+      pointer-events: none;
+    }
+
+    .avatar-pill:hover::after {
+      left: 100%;
+      transition: left 600ms ease;
+    }
+
+    .avatar-pill:hover {
+      border-color: var(--amber-glow);
+      background: white;
+      box-shadow:
+        0 2px 8px rgba(196,154,92,0.1),
+        0 0 0 3px rgba(196,154,92,0.06);
+      transform: translateY(-1px);
+    }
+
+    /* The circle */
+    .avatar-signet {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(150deg, var(--sage-light) 0%, #c8dfd2 50%, var(--sage-light) 100%);
+      border: 1.5px solid var(--sage);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Fraunces', serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--sage-deep);
+      letter-spacing: -0.02em;
+      position: relative;
+      flex-shrink: 0;
+      box-shadow:
+        inset 0 1px 2px rgba(255,255,255,0.5),
+        0 1px 4px rgba(74,126,102,0.1);
+      transition: box-shadow 300ms ease, border-color 300ms ease;
+    }
+
+    .avatar-pill:hover .avatar-signet {
+      border-color: var(--sage-deep);
+      box-shadow:
+        inset 0 1px 2px rgba(255,255,255,0.5),
+        0 2px 8px rgba(74,126,102,0.15),
+        0 0 0 2px rgba(74,126,102,0.08);
+    }
+
+    /* Online dot on the circle */
+    .signet-status {
+      position: absolute;
+      bottom: -1px;
+      right: -1px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #059669;
+      border: 2px solid var(--bg-subtle);
+      z-index: 2;
+      transition: border-color 300ms ease;
+    }
+
+    .avatar-pill:hover .signet-status {
+      border-color: white;
+    }
+
+    /* Name text */
+    .avatar-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      transition: color 300ms ease;
+    }
+
+    .avatar-pill:hover .avatar-name {
+      color: var(--sage-deep);
+    }
+
+    /* Chevron */
+    .avatar-chevron {
+      margin-left: 2px;
+      transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), color 300ms ease;
+      color: var(--text-muted);
+      font-size: 11px;
+      line-height: 1;
+    }
+
+    .avatar-pill:hover .avatar-chevron {
+      transform: translateY(1px);
+      color: var(--sage);
+    }
+
+    /* ===== DEMO ===== */
+    .demo-area {
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 48px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .demo-enlarged {
+      display: flex;
+      align-items: center;
+      gap: 48px;
+    }
+
+    .demo-avatar-large .avatar-pill {
+      padding: 8px 28px 8px 8px;
+      gap: 14px;
+    }
+
+    .demo-avatar-large .avatar-signet {
+      width: 72px;
+      height: 72px;
+      font-size: 26px;
+      border-width: 2px;
+    }
+
+    .demo-avatar-large .signet-status {
+      width: 16px;
+      height: 16px;
+      border-width: 3px;
+      bottom: 0;
+      right: 0;
+    }
+
+    .demo-avatar-large .avatar-name {
+      font-size: 22px;
+    }
+
+    .demo-avatar-large .avatar-chevron {
+      font-size: 16px;
+    }
+
+    .demo-notes {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    .demo-notes strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <!-- Nav Bar -->
+  <header>
+    <div class="header-content">
+      <a href="#" class="logo">
+        <span class="logo-emoji">🎁</span>
+        <span class="logo-text">Gifta</span>
+      </a>
+      <nav class="nav">
+        <a href="#" class="nav-link">How it works</a>
+        <a href="#" class="nav-link">Trust &amp; safety</a>
+        <button class="btn-primary-sm">Create a Dreamboard</button>
+
+        <!-- VARIANT 3: Soft Signet Avatar -->
+        <div class="avatar-wrapper">
+          <div class="avatar-pill">
+            <div class="avatar-signet">
+              RL
+              <div class="signet-status"></div>
+            </div>
+            <span class="avatar-name">Ryan</span>
+            <svg class="avatar-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="variant-label">Variant 3 — Soft Signet</div>
+  <div class="variant-desc">
+    A pill-shaped capsule that contains the avatar circle, the user's first name, and a dropdown chevron — all within a warm, softly bordered container. The circle has a signet-ring quality with an inset light edge. On hover, the whole pill lifts, gains a warm glow border, and a subtle golden shimmer sweeps across the surface.
+  </div>
+
+  <div class="demo-area">
+    <div class="demo-enlarged">
+      <div class="demo-avatar-large">
+        <div class="avatar-wrapper">
+          <div class="avatar-pill">
+            <div class="avatar-signet">
+              RL
+              <div class="signet-status"></div>
+            </div>
+            <span class="avatar-name">Ryan</span>
+            <svg class="avatar-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <strong>Shape:</strong> Pill capsule with warm border<br>
+        <strong>Circle:</strong> Sage signet with inset highlight<br>
+        <strong>Name:</strong> First name in DM Sans semibold<br>
+        <strong>Chevron:</strong> Drops down subtly on hover<br>
+        <strong>Hover:</strong> Lift, amber glow outline, golden shimmer sweep<br>
+        <strong>Status:</strong> Small emerald dot on the circle
+      </div>
+    </div>
+  </div>
+</body>
+</html>

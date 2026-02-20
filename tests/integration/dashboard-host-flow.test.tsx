@@ -151,14 +151,32 @@ describe('host dashboard flow', () => {
     render(await DreamBoardDetailPage({ params: Promise.resolve({ id: 'board-1' }) }));
 
     expect(screen.getByRole('heading', { name: /maya's dreamboard/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /contributors/i })).toBeInTheDocument();
-    expect(screen.getByAltText(/gifta gift icon/i)).toBeInTheDocument();
+    const contributorsHeading = screen.getByRole('heading', { name: /contributors/i });
+    expect(contributorsHeading).toHaveClass('text-[18px]');
+    expect(contributorsHeading).not.toHaveClass('text-[30px]');
+    const giftLine = screen.getByText('Scooter').closest('p');
+    expect(giftLine).not.toBeNull();
+    if (!giftLine) {
+      throw new Error('Expected gift line to render');
+    }
+    expect(giftLine).toHaveClass('text-[14px]');
+    const brandGiftIcon = giftLine.querySelector('span[aria-hidden="true"]');
+    expect(brandGiftIcon).not.toBeNull();
+    expect(brandGiftIcon).toHaveTextContent('🎁');
     expect(screen.getByText(/11 june 2099/i)).toBeInTheDocument();
     expect(screen.getByText(/party:\s*12 june/i)).toBeInTheDocument();
     expect(screen.getByText(/10% to reach for a dream/i)).toBeInTheDocument();
+    expect(screen.getByText(/10% to reach for a dream/i).closest('p')).toHaveClass('text-[12px]');
+    expect(contributorsHeading.querySelector('span')).toHaveClass('text-[13px]');
     expect(screen.getAllByText('Ava').length).toBeGreaterThan(0);
+    expect(screen.getByText('Happy birthday')).toHaveClass('text-sm');
     expect(screen.queryByText(/R\s*250/)).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /quick actions/i })).toBeInTheDocument();
+    const quickActionsHeading = screen.getByRole('heading', { name: /quick actions/i });
+    expect(quickActionsHeading).toHaveClass('text-[16px]');
+    expect(quickActionsHeading).not.toHaveClass('text-[28px]');
+    const payoutHeading = screen.getByRole('heading', { name: /payout details/i });
+    expect(payoutHeading).toHaveClass('text-[16px]');
+    expect(payoutHeading).not.toHaveClass('text-[24px]');
     expect(screen.getByRole('button', { name: /download birthday messages/i })).toBeInTheDocument();
   });
 

@@ -136,8 +136,12 @@ describe('DashboardPostCampaignClient', () => {
       />
     );
 
-    expect(screen.getByRole('heading', { name: /contributors/i })).toBeInTheDocument();
+    const contributorsHeading = screen.getByRole('heading', { name: /contributors/i });
+    expect(contributorsHeading).toHaveClass('text-[18px]');
+    expect(contributorsHeading).not.toHaveClass('text-[28px]');
+    expect(contributorsHeading.querySelector('span')).toHaveClass('text-[13px]');
     expect(screen.getByText('Guest A')).toBeInTheDocument();
+    expect(screen.getByText('Guest A')).toHaveClass('text-sm');
     expect(screen.queryByText(/R\s*543/)).not.toBeInTheDocument();
   });
 
@@ -158,9 +162,16 @@ describe('DashboardPostCampaignClient', () => {
       />
     );
 
-    expect(screen.getByRole('heading', { name: /birthday messages/i })).toBeInTheDocument();
+    const financialHeading = screen.getByRole('heading', { name: /financial summary/i });
+    expect(financialHeading).toHaveClass('text-[18px]');
+    expect(financialHeading).not.toHaveClass('text-[28px]');
+    const payoutStatusHeading = screen.getByRole('heading', { name: /payout status/i });
+    expect(payoutStatusHeading).toHaveClass('text-[18px]');
+    const birthdayHeading = screen.getByRole('heading', { name: /birthday messages/i });
+    expect(birthdayHeading).toHaveClass('text-[18px]');
     expect(screen.getByText('Grandma Rose')).toBeInTheDocument();
     expect(screen.getByText(/happy birthday, superstar!/i)).toBeInTheDocument();
+    expect(screen.getByText(/happy birthday, superstar!/i)).toHaveClass('text-sm');
     expect(
       container.querySelectorAll('span[aria-hidden="true"]')[0]?.textContent
     ).toContain('“');

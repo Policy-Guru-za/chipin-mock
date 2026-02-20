@@ -20,6 +20,18 @@
 - Birthday Messages now use the same quote-style full-text card treatment as active detail.
 - Contributor CSV export intentionally excludes per-contributor financial columns and currently exports: `Name, Date, Message, Anonymous`.
 
+## Locked Typography Tokens (Desktop)
+
+Source of truth: `docs/UI-refactors/Dreamboard-Dashboard/gifta-dashboard-mockup-desktop.html`.
+
+- Shared analog sections follow the same desktop token scale as active detail:
+  - Section headers: `18px` (`Fraunces`)
+  - Count chip: `13px`, semibold (`DM Sans`)
+  - Row body text: `14px`
+  - Secondary/meta text: `12px`
+  - Message sender/body: `14px` / `14px` with `line-height: 1.6`
+- Post-campaign-only sections keep current structure but use the same heading/body/meta hierarchy (`18px` / `14px` / `12px`).
+
 ---
 
 ## Table of Contents

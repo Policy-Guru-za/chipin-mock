@@ -125,12 +125,12 @@ export function DashboardPostCampaignClient({
         <h1 className="mt-3 font-display text-[34px] font-bold leading-[1.12] tracking-[-0.02em] text-text">
           {view.childName}&apos;s Dreamboard is complete!
         </h1>
-        <p className="mt-2 font-warmth-sans text-sm text-text-muted">Campaign complete</p>
+        <p className="mt-2 font-warmth-sans text-xs text-text-muted">Campaign complete</p>
       </article>
 
       <article className="rounded-[14px] border border-border/60 bg-white p-6 shadow-card">
-        <h2 className="font-display text-[28px] font-bold tracking-[-0.01em] text-text">Financial Summary</h2>
-        <div className="mt-4 space-y-3 font-warmth-sans text-[15px]">
+        <h2 className="font-display text-[18px] font-bold tracking-[-0.01em] text-text">Financial Summary</h2>
+        <div className="mt-4 space-y-3 font-warmth-sans text-sm">
           <div className="flex items-center justify-between">
             <span>Total Raised</span>
             <span className="font-semibold">{view.raisedLabel}</span>
@@ -148,7 +148,7 @@ export function DashboardPostCampaignClient({
           <hr className="border-border" />
           <div className="rounded-lg bg-primary-50 px-4 py-3">
             <div className="flex items-center justify-between">
-              <span className="font-display text-xl font-bold text-text">Your Payout</span>
+              <span className="font-display text-[18px] font-bold text-text">Your Payout</span>
               <span className="font-display text-[28px] font-bold text-sage">{view.payoutLabel}</span>
             </div>
           </div>
@@ -156,9 +156,9 @@ export function DashboardPostCampaignClient({
       </article>
 
       <article className="rounded-[14px] border border-border/60 bg-white p-6 shadow-card">
-        <h2 className="font-display text-[28px] font-bold tracking-[-0.01em] text-text">Payout Status</h2>
+        <h2 className="font-display text-[18px] font-bold tracking-[-0.01em] text-text">Payout Status</h2>
         {view.payouts.length === 0 ? (
-          <p className="mt-4 font-warmth-sans text-sm text-text-muted">Payout processing has not started yet.</p>
+          <p className="mt-4 font-warmth-sans text-xs text-text-muted">Payout processing has not started yet.</p>
         ) : (
           <ul className="mt-4 space-y-4">
             {view.payouts.map((payout) => {
@@ -173,7 +173,7 @@ export function DashboardPostCampaignClient({
                     />
                     <span className={payoutColor.textClass}>{payout.statusLabel}</span>
                   </div>
-                  <p className="mt-2 font-warmth-sans text-sm text-text-muted">
+                  <p className="mt-2 font-warmth-sans text-xs text-text-muted">
                     {payout.type === 'charity' ? 'via Charity' : `via ${view.payoutMethodLabel}`}
                   </p>
                   {payout.externalRef ? (
@@ -214,20 +214,20 @@ export function DashboardPostCampaignClient({
         ) : null}
       </div>
       {errorToast ? (
-        <p aria-live="polite" className="rounded-md bg-subtle px-3 py-2 font-warmth-sans text-sm text-text">
+        <p aria-live="polite" className="rounded-md bg-subtle px-3 py-2 font-warmth-sans text-xs text-text">
           {errorToast}
         </p>
       ) : null}
 
       <article className="rounded-[14px] border border-border/60 bg-white p-6 shadow-card">
-        <h2 className="flex items-center gap-3 font-display text-[28px] font-bold tracking-[-0.01em] text-text">
+        <h2 className="flex items-center gap-3 font-display text-[18px] font-bold tracking-[-0.01em] text-text">
           Contributors
           <span className="inline-flex items-center rounded-full bg-sage-light px-3 py-0.5 font-warmth-sans text-[13px] font-semibold text-sage">
             {view.contributionCount}
           </span>
         </h2>
         {contributions.length === 0 ? (
-          <p className="mt-4 font-warmth-sans text-sm text-text-muted">No contributors yet</p>
+          <p className="mt-4 font-warmth-sans text-xs text-text-muted">No contributors yet</p>
         ) : (
           <ul className="mt-4">
             {contributions.map((contribution, index) => {
@@ -260,14 +260,14 @@ export function DashboardPostCampaignClient({
       </article>
 
       <article className="rounded-[14px] border border-border/60 bg-white p-6 shadow-card">
-        <h2 className="flex items-center gap-3 font-display text-[28px] font-bold tracking-[-0.01em] text-text">
+        <h2 className="flex items-center gap-3 font-display text-[18px] font-bold tracking-[-0.01em] text-text">
           Birthday Messages
           <span className="inline-flex items-center rounded-full bg-sage-light px-3 py-0.5 font-warmth-sans text-[13px] font-semibold text-sage">
             {view.messageCount}
           </span>
         </h2>
         {messages.length === 0 ? (
-          <p className="mt-4 font-warmth-sans text-sm text-text-muted">No birthday messages yet</p>
+          <p className="mt-4 font-warmth-sans text-xs text-text-muted">No birthday messages yet</p>
         ) : (
           <ul className="mt-4 space-y-4">
             {messages.map((item) => (

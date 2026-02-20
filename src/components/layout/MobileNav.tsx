@@ -180,7 +180,7 @@ export function MobileNav({ isOpen, onClose, isClerkEnabled = false }: MobileNav
                         </Link>
                       </SignedOut>
                       <SignedIn>
-                        <UserAvatarMenu afterSignOutUrl="/" />
+                        <UserAvatarMenu afterSignOutUrl="/" variant="compact" />
                       </SignedIn>
                     </div>
                   ) : null}

@@ -119,7 +119,7 @@ export function LandingNav({
                 </SignedOut>
                 <SignedIn>
                   <div className="flex justify-center px-4 py-1">
-                    <UserAvatarMenu afterSignOutUrl="/" />
+                    <UserAvatarMenu afterSignOutUrl="/" variant="compact" />
                   </div>
                 </SignedIn>
               </>

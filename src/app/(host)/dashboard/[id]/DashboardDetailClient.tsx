@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { type ReactNode, useEffect, useState } from 'react';
 
@@ -137,7 +136,7 @@ const QuickActionRowContent = ({ icon, label, description }: Omit<QuickActionRow
     </span>
     <span
       aria-hidden="true"
-      className="text-[20px] leading-none text-ink-ghost transition group-hover:translate-x-0.5 group-hover:text-primary-700"
+      className="text-[16px] leading-none text-ink-ghost transition group-hover:translate-x-0.5 group-hover:text-primary-700"
     >
       ›
     </span>
@@ -263,14 +262,13 @@ export function DashboardDetailClient({
                   <h1 className="font-display text-[28px] font-bold leading-[1.12] tracking-[-0.02em] text-text [overflow-wrap:anywhere]">
                     {view.childName}&apos;s Dreamboard
                   </h1>
-                  <p className="mt-2 flex items-center gap-2.5 font-warmth-sans text-[15px] font-medium text-text-secondary">
-                    <Image
-                      src="/icons/gifts/gifta-logo.png"
-                      alt="Gifta gift icon"
-                      width={20}
-                      height={20}
-                      className="h-5 w-5 flex-shrink-0"
-                    />
+                  <p className="mt-2 flex items-center gap-2.5 font-warmth-sans text-[14px] font-medium text-text-secondary">
+                    <span
+                      aria-hidden="true"
+                      className="inline-flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center text-[18px] leading-none"
+                    >
+                      🎁
+                    </span>
                     <span className="[overflow-wrap:anywhere]">{view.giftName}</span>
                   </p>
                   {birthdayLabel || partyLabel ? (
@@ -290,7 +288,7 @@ export function DashboardDetailClient({
                     </div>
                   ) : null}
                   {view.givingBackLabel ? (
-                    <p className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-plum-soft bg-plum-wash px-4 py-1 font-warmth-sans text-[13px] font-semibold text-plum">
+                    <p className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-plum-soft bg-plum-wash px-4 py-1 font-warmth-sans text-[12px] font-semibold text-plum">
                       <span aria-hidden="true">💜</span>
                       {view.givingBackLabel}
                     </p>
@@ -298,7 +296,7 @@ export function DashboardDetailClient({
                 </div>
               </div>
               <span
-                className={`inline-flex items-center gap-1.5 self-start rounded-full border px-3 py-1.5 font-warmth-sans text-[12px] font-semibold tracking-[0.04em] ${statusClass}`}
+                className={`inline-flex items-center gap-1.5 self-start rounded-full border px-3 py-1.5 font-warmth-sans text-[12px] font-semibold tracking-[0.5px] ${statusClass}`}
               >
                 <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-current" />
                 {view.statusLabel}
@@ -307,7 +305,7 @@ export function DashboardDetailClient({
           </article>
 
           <article className="rounded-[14px] border border-border/60 bg-white p-6 shadow-card">
-            <h2 className="flex items-center gap-3 font-display text-[30px] font-bold leading-tight tracking-[-0.01em] text-text">
+            <h2 className="flex items-center gap-3 font-display text-[18px] font-bold leading-tight tracking-[-0.01em] text-text">
               Contributors
               <span className="inline-flex items-center rounded-full bg-sage-light px-3 py-0.5 font-warmth-sans text-[13px] font-semibold text-sage">
                 {view.contributionCount}
@@ -358,7 +356,7 @@ export function DashboardDetailClient({
           </article>
 
           <article className="rounded-[14px] border border-border/60 bg-white p-6 shadow-card">
-            <h2 className="flex items-center gap-3 font-display text-[30px] font-bold leading-tight tracking-[-0.01em] text-text">
+            <h2 className="flex items-center gap-3 font-display text-[18px] font-bold leading-tight tracking-[-0.01em] text-text">
               Birthday Messages
               <span className="inline-flex items-center rounded-full bg-sage-light px-3 py-0.5 font-warmth-sans text-[13px] font-semibold text-sage">
                 {view.messageCount}
@@ -413,7 +411,7 @@ export function DashboardDetailClient({
             <p className="relative inline-block font-display text-[42px] font-bold leading-none tracking-[-0.02em] text-sage">
               {view.raisedLabel}
             </p>
-            <p className="mt-3 font-warmth-sans text-[12px] font-semibold uppercase tracking-[0.14em] text-text-muted">
+            <p className="mt-3 font-warmth-sans text-[12px] font-semibold uppercase tracking-[1.5px] text-text-muted">
               Total raised
             </p>
             <div className="mb-1 mt-5 h-[2px] bg-gradient-to-r from-transparent via-amber-glow to-transparent" />
@@ -434,7 +432,7 @@ export function DashboardDetailClient({
           </article>
 
           <article className="rounded-[14px] border border-border/60 bg-white p-6 shadow-card">
-            <h2 className="font-display text-[28px] font-bold tracking-[-0.01em] text-text">Quick Actions</h2>
+            <h2 className="font-display text-[16px] font-bold tracking-[-0.01em] text-text">Quick Actions</h2>
             <div className="mt-3 divide-y divide-border-soft">
               <QuickActionRow
                 icon={<ShareActionIcon />}
@@ -470,16 +468,16 @@ export function DashboardDetailClient({
               <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] border border-border bg-white text-primary-700 shadow-input">
                 <WalletIcon size="sm" />
               </span>
-              <h2 className="font-display text-[24px] font-bold tracking-[-0.01em] text-text">Payout Details</h2>
+              <h2 className="font-display text-[16px] font-bold tracking-[-0.01em] text-text">Payout Details</h2>
             </div>
-            <p className="mt-4 font-warmth-sans text-sm text-text-secondary">
-              Method: <span className="font-semibold text-text">{view.payoutMethodLabel}</span>
+            <p className="mt-4 font-warmth-sans text-[13px] text-text-secondary">
+              Method: <span className="text-[14px] font-semibold text-text">{view.payoutMethodLabel}</span>
             </p>
-            <p className="mt-1 font-warmth-sans text-sm text-text-secondary [overflow-wrap:anywhere]">
-              Recipient: <span className="font-semibold text-text">{view.payoutRecipientDisplay}</span>
+            <p className="mt-1 font-warmth-sans text-[13px] text-text-secondary [overflow-wrap:anywhere]">
+              Recipient: <span className="text-[14px] font-semibold text-text">{view.payoutRecipientDisplay}</span>
             </p>
             {view.payouts.length === 0 ? (
-              <p className="mt-4 font-warmth-sans text-sm text-text-secondary">
+              <p className="mt-4 font-warmth-sans text-xs text-text-secondary">
                 Payout will be processed when the Dreamboard is closed.
               </p>
             ) : (
@@ -487,10 +485,10 @@ export function DashboardDetailClient({
                 {view.payouts.map((payout) => (
                   <li key={payout.id} className="rounded-xl border border-border bg-white p-4">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-warmth-sans text-sm font-semibold text-text">{payout.typeLabel}</p>
-                      <p className="font-warmth-sans text-sm font-semibold text-text">{payout.amountLabel}</p>
+                      <p className="font-warmth-sans text-[13px] font-semibold text-text">{payout.typeLabel}</p>
+                      <p className="font-warmth-sans text-[14px] font-semibold text-text">{payout.amountLabel}</p>
                     </div>
-                    <div className="mt-2 flex items-center gap-2 font-warmth-sans text-sm">
+                    <div className="mt-2 flex items-center gap-2 font-warmth-sans text-[13px]">
                       <span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full ${payoutDot[payout.statusVariant]}`} />
                       <span>{payout.statusLabel}</span>
                     </div>

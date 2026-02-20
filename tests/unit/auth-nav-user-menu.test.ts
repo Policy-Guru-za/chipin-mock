@@ -24,7 +24,8 @@ describe('auth-aware navigation and user avatar menu', () => {
     const landingNav = readSource('src/components/landing/LandingNav.tsx');
 
     expect(header).toContain('<UserAvatarMenu afterSignOutUrl="/" />');
-    expect(mobileNav).toContain('<UserAvatarMenu afterSignOutUrl="/" />');
+    expect(mobileNav).toContain('<UserAvatarMenu afterSignOutUrl="/" variant="compact" />');
+    expect(landingNav).toContain('<UserAvatarMenu afterSignOutUrl="/" variant="compact" />');
     expect(landingNav).toContain('<UserAvatarMenu afterSignOutUrl="/" />');
   });
 

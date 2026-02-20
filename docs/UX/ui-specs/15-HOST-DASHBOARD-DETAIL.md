@@ -17,9 +17,10 @@
   - `Fraunces` (`font-display`) for major headings and key numerals.
   - `DM Sans` (`font-warmth-sans`) for body/meta/action copy.
 - Active hero card includes:
-  - gift-line brand icon + gift name,
+  - gift-line navbar brand glyph (`🎁`) + gift name,
   - birthday/party metadata row (`🎂` birthday, `🎈 Party:`),
   - conditional giving-back pill (`💜`) rendered only for percentage charity split with available charity name.
+- Hero gift-line no longer uses `/icons/gifts/gifta-logo.png`; the icon token is the same navbar brand symbol for consistency.
 - Top-right hero status chip remains the status anchor for active/funded states.
 - Right rail top card now follows the mockup structure: centered raised amount, uppercase micro-label, divider, and 3 stat columns (contributors/messages/days left).
 - Quick actions are rendered as stacked rows with icon box + label + description + chevron affordance.
@@ -27,6 +28,24 @@
 - Contributors rows intentionally show contributor identity + relative time + message indicator only (no per-contributor amount display).
 - Birthday message cards now render full text with muted surface, subtle border, and decorative opening quote treatment.
 - Payout status list and contributor/message sections remain live and match runtime data queries.
+
+## Locked Typography Tokens (Desktop)
+
+Source of truth: `docs/UI-refactors/Dreamboard-Dashboard/gifta-dashboard-mockup-desktop.html`.
+
+- Hero title: `28px` (`Fraunces`)
+- Status chip: `12px`, semibold, uppercase, `0.5px` tracking
+- Gift line: `14px` (`DM Sans`)
+- Hero dates row: `13px`
+- Giving-back pill: `12px`, semibold
+- Section headers (Contributors, Birthday Messages): `18px` (`Fraunces`)
+- Count chip: `13px`, semibold
+- Contributor name/date: `14px` / `12px`
+- Message sender/body: `14px` / `14px` (`line-height: 1.6`)
+- Total raised amount/label: `42px` / `12px` (label `1.5px` tracking, uppercase)
+- Stat numbers/labels: `24px` / `11px`
+- Quick Actions title/row label/row description/chevron: `16px` / `14px` / `12px` / `16px`
+- Payout Details title/row label/row value/meta: `16px` / `13px` / `14px` / `12px`
 
 ## Table of Contents
 
