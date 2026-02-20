@@ -7,7 +7,6 @@ import {
   getDreamBoardHostAccessById,
   listCompletedContributionsForDreamBoard,
 } from '@/lib/host/queries';
-import { formatZar } from '@/lib/utils/money';
 
 const querySchema = z.object({
   dreamBoardId: z.string().uuid(),
@@ -44,13 +43,11 @@ export async function GET(request: NextRequest) {
   }
 
   const contributions = await listCompletedContributionsForDreamBoard(parsed.data.dreamBoardId);
-  const header = ['Name', 'Amount (ZAR)', 'Fee (ZAR)', 'Date', 'Message', 'Anonymous'];
+  const header = ['Name', 'Date', 'Message', 'Anonymous'];
   const rows = contributions.map((contribution) => {
     const name = contribution.isAnonymous ? 'Anonymous' : contribution.contributorName || 'Anonymous';
     return [
       name,
-      formatZar(contribution.amountCents),
-      formatZar(contribution.feeCents),
       contribution.createdAt.toISOString(),
       contribution.message ?? '',
       contribution.isAnonymous ? 'Yes' : 'No',

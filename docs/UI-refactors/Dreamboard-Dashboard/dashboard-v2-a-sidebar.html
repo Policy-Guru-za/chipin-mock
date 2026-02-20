@@ -414,93 +414,209 @@
       font-weight: 500;
     }
 
-    .birthday-info {
-      font-size: 14px;
-      color: #57534E;
-    }
 
     /* Quick Actions */
+    .actions-title {
+      font-family: 'Fraunces', serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #1C1917;
+      margin-bottom: 16px;
+    }
+
     .quick-actions {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 0;
     }
 
-    .btn-outline {
+    .action-item {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 8px;
-      height: 44px;
-      padding: 0 20px;
-      font-size: 14px;
-      font-weight: 600;
-      color: #1C1917;
-      background: white;
-      border: 2px solid #E7E5E4;
-      border-radius: 12px;
+      gap: 14px;
+      padding: 14px 4px;
+      border-bottom: 1px solid #f5f1ea;
       cursor: pointer;
       text-decoration: none;
-      transition: all 150ms ease;
+      transition: all 200ms ease;
+      border-radius: 0;
+      background: transparent;
+      border-left: none;
+      border-right: none;
+      border-top: none;
+      font-family: 'Outfit', sans-serif;
+      width: 100%;
+      text-align: left;
     }
 
-    .btn-outline:hover {
-      border-color: #0D9488;
+    .action-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .action-item:first-child {
+      padding-top: 0;
+    }
+
+    .action-item:hover {
+      padding-left: 8px;
+    }
+
+    .action-item:hover .action-icon-wrap {
       background: #f0fdfa;
+      border-color: #ccfbf1;
+    }
+
+    .action-item:hover .action-icon-wrap svg {
+      color: #0D9488;
+    }
+
+    .action-item:hover .action-label {
       color: #0f766e;
     }
 
-    .btn-icon {
-      font-size: 16px;
+    .action-icon-wrap {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: #fafaf9;
+      border: 1px solid #E7E5E4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 200ms ease;
     }
 
-    /* Payout Details */
-    .payout-label {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #A8A29E;
-      font-weight: 600;
-      margin-bottom: 12px;
+    .action-icon-wrap svg {
+      width: 18px;
+      height: 18px;
+      color: #57534E;
+      transition: color 200ms ease;
     }
 
-    .payout-method {
+    .action-text {
+      flex: 1;
+    }
+
+    .action-label {
       font-size: 14px;
       font-weight: 600;
       color: #1C1917;
-      margin-bottom: 8px;
+      transition: color 200ms ease;
     }
 
-    .payout-account {
+    .action-desc {
+      font-size: 12px;
+      color: #A8A29E;
+      margin-top: 1px;
+    }
+
+    .action-arrow {
+      color: #D6D3D1;
       font-size: 14px;
-      color: #57534E;
-      margin-bottom: 12px;
+      transition: all 200ms ease;
     }
 
-    .payout-status {
+    .action-item:hover .action-arrow {
+      color: #0D9488;
+      transform: translateX(2px);
+    }
+
+    /* Payout Details */
+    .payout-card {
+      background: linear-gradient(135deg, #fafaf9 0%, #f5f1ea 100%);
+      border: 1px solid #ede7de;
+    }
+
+    .payout-header {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .payout-header-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: white;
+      border: 1px solid #E7E5E4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(44, 37, 32, 0.04);
+    }
+
+    .payout-header-icon svg {
+      width: 18px;
+      height: 18px;
+      color: #0D9488;
+    }
+
+    .payout-title {
+      font-family: 'Fraunces', serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #1C1917;
+    }
+
+    .payout-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .payout-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .payout-row-label {
+      font-size: 13px;
+      color: #A8A29E;
+      font-weight: 500;
+    }
+
+    .payout-row-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1C1917;
+    }
+
+    .payout-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #92400e;
     }
 
     .status-amber-dot {
-      width: 10px;
-      height: 10px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: #D97706;
       flex-shrink: 0;
     }
 
-    .payout-status-text {
-      font-size: 14px;
-      color: #D97706;
-      font-weight: 600;
+    .payout-divider {
+      height: 1px;
+      background: #ede7de;
+      margin: 4px 0;
     }
 
     .payout-note {
       font-size: 12px;
       color: #A8A29E;
+      line-height: 1.5;
+      margin-top: 4px;
     }
 
     /* ===== FOOTER ===== */
@@ -624,7 +740,8 @@
                 Active
               </div>
             </div>
-            <div class="gift-line">🚲 Pink Bicycle with Training Wheels</div>
+            <div class="gift-line">Pink Bicycle with Training Wheels</div>
+            <div class="gift-line">Birthday: 15 March 2026</div>
           </div>
         </div>
 
@@ -666,7 +783,7 @@
               <span class="contribution-date">1 week ago</span>
             </div>
           </div>
-          <a href="#" class="show-more-link">Show all 8 contributions</a>
+          <a href="#" class="show-more-link">Show all 8 contributors</a>
         </div>
 
         <!-- Birthday Messages Card -->
@@ -683,8 +800,8 @@
             </div>
           </div>
           <a href="#" class="show-more-link">View all 5 messages</a>
-          <button class="btn-outline download-messages-btn">
-            <span class="btn-icon">⬇</span>
+          <button class="btn-outline download-messages-btn" style="display:flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 20px;font-size:14px;font-weight:600;color:#1C1917;background:white;border:2px solid #E7E5E4;border-radius:12px;cursor:pointer;transition:all 150ms ease;width:100%;margin-top:16px;font-family:'Outfit',sans-serif" onmouseover="this.style.borderColor='#0D9488';this.style.background='#f0fdfa';this.style.color='#0f766e'" onmouseout="this.style.borderColor='#E7E5E4';this.style.background='white';this.style.color='#1C1917'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Download Birthday Messages
           </button>
         </div>
@@ -711,38 +828,73 @@
               <div class="stat-number">23</div>
               <div class="stat-label">Days remaining</div>
             </div>
-            <div class="birthday-info">Birthday: 15 March 2026</div>
           </div>
         </div>
 
         <!-- Quick Actions Card -->
         <div class="card">
+          <div class="actions-title">Quick Actions</div>
           <div class="quick-actions">
-            <button class="btn-outline">
-              <span class="btn-icon">📋</span>
-              Share Dreamboard
+            <button class="action-item">
+              <div class="action-icon-wrap">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+              </div>
+              <div class="action-text">
+                <div class="action-label">Share Dreamboard</div>
+                <div class="action-desc">Copy link to share via WhatsApp</div>
+              </div>
+              <span class="action-arrow">›</span>
             </button>
-            <button class="btn-outline">
-              <span class="btn-icon">✏️</span>
-              Edit Dreamboard
+            <button class="action-item">
+              <div class="action-icon-wrap">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </div>
+              <div class="action-text">
+                <div class="action-label">Edit Dreamboard</div>
+                <div class="action-desc">Update details or dates</div>
+              </div>
+              <span class="action-arrow">›</span>
             </button>
-            <button class="btn-outline">
-              <span class="btn-icon">👁️</span>
-              View Public Page
+            <button class="action-item">
+              <div class="action-icon-wrap">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </div>
+              <div class="action-text">
+                <div class="action-label">View Public Page</div>
+                <div class="action-desc">See what guests see</div>
+              </div>
+              <span class="action-arrow">›</span>
             </button>
           </div>
         </div>
 
         <!-- Payout Details Card -->
-        <div class="card">
-          <div class="payout-label">Payout Details</div>
-          <div class="payout-method">Karri Card</div>
-          <div class="payout-account">Ryan L.</div>
-          <div class="payout-status">
-            <div class="status-amber-dot"></div>
-            <span class="payout-status-text">Pending</span>
+        <div class="card payout-card">
+          <div class="payout-header">
+            <div class="payout-header-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            </div>
+            <div class="payout-title">Payout Details</div>
           </div>
-          <div class="payout-note">Processed when campaign closes</div>
+          <div class="payout-rows">
+            <div class="payout-row">
+              <span class="payout-row-label">Method</span>
+              <span class="payout-row-value">Karri Card</span>
+            </div>
+            <div class="payout-row">
+              <span class="payout-row-label">Recipient</span>
+              <span class="payout-row-value">Ryan L.</span>
+            </div>
+            <div class="payout-divider"></div>
+            <div class="payout-row">
+              <span class="payout-row-label">Status</span>
+              <div class="payout-status-badge">
+                <span class="status-amber-dot"></span>
+                Pending
+              </div>
+            </div>
+          </div>
+          <div class="payout-note">Payout will be processed when the Dreamboard is closed.</div>
         </div>
       </div>
     </div>

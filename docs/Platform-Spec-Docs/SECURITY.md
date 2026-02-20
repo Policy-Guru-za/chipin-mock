@@ -29,7 +29,7 @@ Data visible to anyone with the Dreamboard link:
 
 ### Private Data (Host Only)
 Data visible only to the authenticated host:
-- Individual contribution amounts
+- Contributor names and timestamps
 - Contributor messages
 - Payout email address
 - Total raised (exact amount)

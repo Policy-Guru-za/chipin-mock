@@ -4,8 +4,16 @@
 **Document Version:** 1.0
 **Status:** Implementation-Ready
 **Route:** `/dashboard/[id]` (state-dependent rendering)
-**Last Updated:** February 2025
+**Last Updated:** February 20, 2026
 **Target Audience:** AI coding agents, UI developers
+
+---
+
+## Runtime Alignment (2026-02-20)
+
+- Runtime source: `src/app/(host)/dashboard/[id]/page.tsx`, `src/app/(host)/dashboard/[id]/DashboardPostCampaignClient.tsx`, `src/app/api/internal/downloads/contributor-list/route.ts`.
+- Post-campaign contributions list intentionally excludes per-contributor contribution amounts.
+- Contributor CSV export intentionally excludes per-contributor financial columns and currently exports: `Name, Date, Message, Anonymous`.
 
 ---
 
@@ -477,9 +485,6 @@ const downloadThankYouList = async () => {
                 Has message
               </p>
             )}
-          </div>
-          <div className="text-right flex-shrink-0">
-            <p className="font-bold text-text">R{contrib.amount}</p>
           </div>
         </div>
       </div>
@@ -990,13 +995,12 @@ export async function generateThankYouListCSV(
   const contributions = await getContributions(boardId);
 
   const csv = [
-    ['Name', 'Email', 'Amount', 'Date', 'Has Message'],
+    ['Name', 'Date', 'Message', 'Anonymous'],
     ...contributions.map((c) => [
       c.contributor_name,
-      c.contributor_email,
-      `R${(c.amount_cents / 100).toFixed(2)}`,
       new Date(c.created_at).toISOString().split('T')[0],
-      c.has_message ? 'Yes' : 'No',
+      c.message ?? '',
+      c.is_anonymous ? 'Yes' : 'No',
     ]),
   ]
     .map((row) => row.map((cell) => `"${cell}"`).join(','))

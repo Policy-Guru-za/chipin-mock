@@ -66,9 +66,6 @@ export type HostContributionRow = {
   contributorName: string | null;
   isAnonymous: boolean;
   message: string | null;
-  amountCents: number;
-  feeCents: number;
-  charityCents: number | null;
   paymentStatus: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
   createdAt: Date;
 };
@@ -78,7 +75,6 @@ export type HostBirthdayMessageRow = {
   contributorName: string | null;
   isAnonymous: boolean;
   message: string;
-  amountCents: number;
   createdAt: Date;
 };
 
@@ -240,9 +236,6 @@ export async function listCompletedContributionsForDreamBoard(
       contributorName: contributions.contributorName,
       isAnonymous: contributions.isAnonymous,
       message: contributions.message,
-      amountCents: contributions.amountCents,
-      feeCents: contributions.feeCents,
-      charityCents: contributions.charityCents,
       paymentStatus: contributions.paymentStatus,
       createdAt: contributions.createdAt,
     })
@@ -265,7 +258,6 @@ export async function listBirthdayMessages(
       contributorName: contributions.contributorName,
       isAnonymous: contributions.isAnonymous,
       message: contributions.message,
-      amountCents: contributions.amountCents,
       createdAt: contributions.createdAt,
     })
     .from(contributions)

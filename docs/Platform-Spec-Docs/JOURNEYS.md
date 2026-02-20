@@ -285,7 +285,7 @@ Both journeys are optimized for mobile-first usage via WhatsApp distribution.
 └─────────────────────────────────┘
 ```
 
-**Note:** Guests see percentage funded and totals raised vs goal. Individual contribution amounts are visible to the host only.
+**Note:** Guests and hosts see percentage funded and totals raised vs goal. Individual contribution amounts are not displayed in dashboard contribution history.
 
 **Actions:**
 - "Edit" links next to each section (→ back to respective step)
@@ -368,11 +368,11 @@ You'll receive notifications when friends chip in.
 #### Contributors Tab
 - List of contributions:
   ```
-  Sarah M.        R200    2 days ago    "Happy birthday Maya!"
-  John D.         R150    3 days ago    
-  Anonymous       R100    5 days ago    "🎉"
+  Sarah M.        2 days ago    "Happy birthday Maya!"
+  John D.         3 days ago
+  Anonymous       5 days ago    "🎉"
   ```
-- Note: Amounts visible to host only, not public
+- Note: Individual contribution amounts are intentionally not shown.
 
 #### Settings Tab
 - Edit message

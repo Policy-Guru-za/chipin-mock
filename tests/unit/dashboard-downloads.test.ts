@@ -88,7 +88,6 @@ describe('internal download routes', () => {
         contributorName: 'Ava',
         isAnonymous: false,
         message: 'Happy birthday!',
-        amountCents: 25000,
         createdAt: new Date('2026-01-01T00:00:00.000Z'),
       },
     ]);
@@ -120,7 +119,6 @@ describe('internal download routes', () => {
         contributorName: 'Ava',
         isAnonymous: false,
         message: 'Happy birthday 🎉 Привет مرحبا',
-        amountCents: 25000,
         createdAt: new Date('2026-01-01T00:00:00.000Z'),
       },
     ]);
@@ -150,7 +148,6 @@ describe('internal download routes', () => {
         isAnonymous: false,
         message:
           'Wishing you the happiest birthday with many joyful memories and lots of laughter for every celebration.',
-        amountCents: 25000,
         createdAt: new Date('2026-01-01T00:00:00.000Z'),
       }))
     );
@@ -179,9 +176,6 @@ describe('internal download routes', () => {
         contributorName: 'Ava, Mom',
         isAnonymous: false,
         message: 'He said "hi", and smiled\nBest day',
-        amountCents: 25000,
-        feeCents: 750,
-        charityCents: 0,
         paymentStatus: 'completed',
         createdAt: new Date('2026-01-01T00:00:00.000Z'),
       },
@@ -196,7 +190,7 @@ describe('internal download routes', () => {
     expect(response.headers.get('Content-Type')).toBe('text/csv; charset=utf-8');
     expect(response.headers.get('Content-Disposition')).toContain('maya-jane-contributors.csv');
     const csv = await response.text();
-    expect(csv).toContain('"Name","Amount (ZAR)","Fee (ZAR)","Date","Message","Anonymous"');
+    expect(csv).toContain('"Name","Date","Message","Anonymous"');
     expect(csv).toContain('"Ava, Mom"');
     expect(csv).toContain('"He said ""hi"", and smiled\nBest day"');
   });

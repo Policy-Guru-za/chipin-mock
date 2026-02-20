@@ -4,16 +4,18 @@
 **Document Version:** 1.0
 **Status:** Runtime-aligned with noted action-surface differences
 **Route:** `/dashboard/[id]`
-**Last Updated:** February 11, 2026
+**Last Updated:** February 20, 2026
 **Target Audience:** AI coding agents, UI developers
 
 ---
 
-## Runtime Alignment (2026-02-11)
+## Runtime Alignment (2026-02-20)
 
 - Runtime source: `src/app/(host)/dashboard/[id]/page.tsx`, `src/app/(host)/dashboard/[id]/DashboardDetailClient.tsx`, `src/lib/host/dashboard-view-model.ts`.
+- Active host detail now uses a two-column layout (`left content + sticky right rail`) on desktop and a single-column stack on mobile.
 - Implemented quick actions: share link copy, edit modal, and view public page.
 - Host close action is not currently exposed in dashboard UI; close is handled via partner API (`POST /api/v1/dream-boards/{id}/close`).
+- Contribution rows intentionally show contributor identity + relative time + message indicator only (no per-contributor amount display).
 - Payout status list and contribution/message sections are live and match runtime data queries.
 
 ## Table of Contents
@@ -360,17 +362,6 @@ The Detail View displays comprehensive information about a single Dreamboard. Pa
       </p>
     )}
   </div>
-  <div className="text-right flex-shrink-0">
-    <p className="font-bold text-text">R{amount}</p>
-    {hasMessage && (
-      <button
-        aria-label={`View message from ${contributorName}`}
-        className="text-primary hover:text-primary-700 text-sm font-semibold mt-1"
-      >
-        💬
-      </button>
-    )}
-  </div>
 </div>
 ```
 
@@ -389,6 +380,9 @@ The Detail View displays comprehensive information about a single Dreamboard. Pa
   {isExpanded ? '- Show less' : `+ Show all contributions (${remaining} more)`}
 </button>
 ```
+
+**Privacy rule:**
+- Individual contribution amounts are not shown in host dashboard contribution history.
 
 ---
 
@@ -584,7 +578,7 @@ DashboardDetailPage (Server Component)
 │   │   ├── Section Title
 │   │   ├── Contribution List Items
 │   │   │   ├── Contributor Name
-│   │   │   ├── Amount + Time
+│   │   │   ├── Relative Time
 │   │   │   └── Message Indicator
 │   │   └── Show More/Less Toggle
 │   │
@@ -650,17 +644,11 @@ interface DreamBoardDetail {
 interface ContributionItem {
   id: string;
   dream_board_id: string;
-  contributor_name: string;
-  contributor_email: string;
-  amount_cents: number;
-  fee_cents: number;
-  net_amount_cents: number;
-  payment_method: string;
+  contributor_name: string | null;
+  is_anonymous: boolean;
+  message: string | null;
   status: 'completed' | 'pending' | 'failed';
-  message?: string;
-  message_text?: string;
   created_at: string; // ISO 8601
-  updated_at: string;
 }
 ```
 

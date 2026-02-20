@@ -20,6 +20,13 @@ const queryMocks = vi.hoisted(() => ({
 
 vi.mock('@/lib/auth/clerk-wrappers', () => authMocks);
 vi.mock('@/lib/host/queries', () => queryMocks);
+vi.mock('next/navigation', async () => {
+  const actual = await vi.importActual<typeof import('next/navigation')>('next/navigation');
+  return {
+    ...actual,
+    useRouter: () => ({ refresh: vi.fn() }),
+  };
+});
 vi.mock('next/image', () => ({
   default: ({ src, alt, ...props }: { src: string; alt: string }) =>
     createElement('img', { src, alt, ...props }),
@@ -94,9 +101,6 @@ beforeEach(() => {
       contributorName: 'Ava',
       isAnonymous: false,
       message: 'Happy birthday',
-      amountCents: 25000,
-      feeCents: 750,
-      charityCents: 0,
       paymentStatus: 'completed',
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
     },
@@ -105,9 +109,6 @@ beforeEach(() => {
       contributorName: 'Liam',
       isAnonymous: false,
       message: null,
-      amountCents: 25000,
-      feeCents: 750,
-      charityCents: 0,
       paymentStatus: 'completed',
       createdAt: new Date('2026-01-02T00:00:00.000Z'),
     },
@@ -118,7 +119,6 @@ beforeEach(() => {
       contributorName: 'Ava',
       isAnonymous: false,
       message: 'Happy birthday',
-      amountCents: 25000,
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
     },
   ]);
@@ -129,6 +129,26 @@ afterEach(() => {
 });
 
 describe('host dashboard flow', () => {
+  it('renders active detail without per-contributor amounts while keeping aggregate totals', async () => {
+    queryMocks.getDashboardDetailExpanded.mockResolvedValue({
+      ...boardDetailRow,
+      status: 'funded',
+      totalRaisedCents: 45000,
+      totalFeeCents: 1350,
+      contributionCount: 2,
+      messageCount: 1,
+    });
+
+    render(await DreamBoardDetailPage({ params: Promise.resolve({ id: 'board-1' }) }));
+
+    expect(screen.getByRole('heading', { name: /maya's dreamboard/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /contributions \(2\)/i })).toBeInTheDocument();
+    expect(screen.getAllByText('Ava').length).toBeGreaterThan(0);
+    expect(screen.queryByText(/R\s*250/)).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /quick actions/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /download birthday messages/i })).toBeInTheDocument();
+  });
+
   it('renders list card link and matching closed-board totals on detail page', async () => {
     render(await HostDashboardPage());
     const link = screen.getByRole('link', { name: /scooter — complete/i });

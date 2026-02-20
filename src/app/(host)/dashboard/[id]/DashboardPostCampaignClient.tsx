@@ -6,7 +6,6 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import type { DashboardDetailViewModel } from '@/lib/host/dashboard-view-model';
 import type { HostBirthdayMessageRow, HostContributionRow } from '@/lib/host/queries';
-import { formatZar } from '@/lib/utils/money';
 
 type DashboardPostCampaignClientProps = {
   view: DashboardDetailViewModel;
@@ -211,7 +210,6 @@ export function DashboardPostCampaignClient({
                   </p>
                   <p className="text-xs text-gray-400">{formatRelativeDate(contribution.createdAt)}</p>
                 </div>
-                <p className="text-sm font-semibold text-teal-600">{formatZar(contribution.amountCents)}</p>
               </li>
             ))}
           </ul>

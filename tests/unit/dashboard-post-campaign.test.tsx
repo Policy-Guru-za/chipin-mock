@@ -26,10 +26,7 @@ const baseView: DashboardDetailViewModel = {
   message: null,
   goalCents: 50000,
   raisedCents: 45000,
-  percentage: 90,
   raisedLabel: 'R 450',
-  goalLabel: 'R 500',
-  progressLabel: '90% funded',
   totalFeeCents: 1350,
   totalCharityCents: 0,
   netPayoutCents: 43650,
@@ -96,9 +93,6 @@ describe('DashboardPostCampaignClient', () => {
             contributorName: 'Ava',
             isAnonymous: false,
             message: 'Happy birthday',
-            amountCents: 25000,
-            feeCents: 750,
-            charityCents: 0,
             paymentStatus: 'completed',
             createdAt: new Date('2026-01-01T00:00:00.000Z'),
           },
@@ -109,7 +103,6 @@ describe('DashboardPostCampaignClient', () => {
             contributorName: 'Ava',
             isAnonymous: false,
             message: 'Happy birthday',
-            amountCents: 25000,
             createdAt: new Date('2026-01-01T00:00:00.000Z'),
           },
         ]}
@@ -120,5 +113,27 @@ describe('DashboardPostCampaignClient', () => {
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/internal/downloads/contributor-list?dreamBoardId=board-1'
     );
+  });
+
+  it('does not render per-contributor amounts in contribution history', () => {
+    render(
+      <DashboardPostCampaignClient
+        view={{ ...baseView, contributionCount: 1 }}
+        contributions={[
+          {
+            id: 'contrib-2',
+            contributorName: 'Guest A',
+            isAnonymous: false,
+            message: null,
+            paymentStatus: 'completed',
+            createdAt: new Date('2026-01-03T00:00:00.000Z'),
+          },
+        ]}
+        messages={[]}
+      />
+    );
+
+    expect(screen.getByText('Guest A')).toBeInTheDocument();
+    expect(screen.queryByText(/R\s*543/)).not.toBeInTheDocument();
   });
 });
