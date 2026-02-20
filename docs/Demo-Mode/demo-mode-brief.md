@@ -408,6 +408,66 @@ When demo mode is no longer needed:
 
 ---
 
-## Decision needed
+## Decision: Option D — Demo showcase route with in-memory data
 
-Select one of Options A through E (or a combination) and provide it to the coding agent along with this brief. The agent has all the context needed to begin implementation immediately upon receiving the chosen approach.
+**Selected by:** Product owner, after reviewing all five options.
+
+### Why Option D
+
+The primary directive is to minimise impact on the production platform. Option D is the only approach that satisfies this without compromise:
+
+1. **Zero auth tampering.** It does not require adding a `DEMO_AUTH_BYPASS` flag or any backdoor to the production authentication flow (`clerk.ts`, `middleware.ts`). The `/demo` route is simply added to the existing public route matcher — the same mechanism used for guest pages.
+
+2. **Strict isolation.** All demo code lives in a quarantined `/src/app/demo/*` namespace and a few static data files (`/src/lib/demo/`). No existing page, component, query, or server action is modified.
+
+3. **Cleanest removal.** When the demo is no longer needed: delete `/src/app/demo/`, delete `/src/lib/demo/`, remove `/demo(.*)` from the public route matcher in `middleware.ts`, and delete `/public/demo/`. No conditional branches to unpick from production files.
+
+4. **No database dependency.** No separate demo database to provision, seed, maintain, or risk schema drift against. No seed script to keep in sync with migrations. The demo runs on in-memory TypeScript constants.
+
+### Trade-offs accepted
+
+- **The guest contribution flow does not write live state.** Tapping "Chip in" on an active demo board cannot create a real contribution (there is no database). The implementation must handle this gracefully — either by routing to a mock thank-you page with pre-built data, or by showing a tasteful "demo mode" indicator. The exact UX for this dead-end is an implementation decision for the coding agent.
+
+- **Data does not flow through the real query/view-model pipeline.** The demo pages render the same components as production, but the data is injected as props from constants rather than fetched via `getDreamBoardBySlug()` or host queries. If production view model types change, the demo constants must be updated manually. This is acceptable — the demo data surface is small (4 boards, ~30 contributions) and the types are well-defined.
+
+### What to build
+
+The implementation scope for Option D is:
+
+1. **Static data layer** (`/src/lib/demo/data.ts` or similar)
+   - 4 `GuestViewModel` objects (one per board lifecycle stage).
+   - Contributor lists per board (typed to match `ContributorItem[]` and `HostContributionRow[]`).
+   - Charity records (2 charities with name, description, category, logoUrl).
+   - Payout records per board (typed to match `HostPayoutRow[]`).
+   - Host dashboard list data (typed to match `DashboardCardViewModel[]`).
+   - Host board detail data (typed to match `HostDashboardDetailRow`).
+   - Admin stats data (GMV, counts, fees).
+   - Thank-you view model data (typed to match `ThankYouViewModel`).
+   - All contributor messages, names, and personas as described in the "Content requirements" section above.
+
+2. **Demo route tree** (`/src/app/demo/`)
+   - `/demo` — Landing page: 4 board cards + host dashboard card + admin card. Clean, minimal grid. No auth.
+   - `/demo/board/[slug]` — Renders the guest Dreamboard using existing guest components (`HeroStrip`, `GiftCard`, `CharitableGivingCard`, `DreamboardCtaCard`, `ContributorDisplay`, `DreamboardDetailsCard`) with demo data injected via props.
+   - `/demo/board/[slug]/contribute` — Renders the contribution form using existing components with demo data. The "Continue to payment" button navigates to the demo payment page.
+   - `/demo/board/[slug]/contribute/payment` — Renders the payment provider selection page. All three providers visible. Selecting any provider routes to the demo thank-you page (no real payment initiation).
+   - `/demo/board/[slug]/thanks` — Renders the thank-you page with pre-built contribution data, confetti, receipt input, charity impact (if applicable), and share CTA.
+   - `/demo/dashboard` — Renders the host dashboard list using existing `DashboardTimeline` (or equivalent) with all 4 demo boards.
+   - `/demo/dashboard/[id]` — Renders the host board detail using existing `DashboardDetailClient` or `DashboardPostCampaignClient` with demo data, depending on board lifecycle stage.
+   - `/demo/admin` — Renders the admin dashboard with demo stats, payout queue, and contribution list.
+
+3. **Static assets** (`/public/demo/`)
+   - `/public/demo/children/` — 4 AI-generated child illustrations (provided by product owner).
+   - `/public/demo/charities/` — 2 charity logo images (placeholder or real).
+
+4. **Middleware update** (`/src/middleware.ts`)
+   - Add `/demo(.*)` to the `createRouteMatcher` public routes array. One line. No other middleware changes.
+
+5. **No other production file changes.** No modifications to auth, queries, components, server actions, or existing pages.
+
+### Implementation guidance
+
+- **Use real component imports.** The demo pages should import and render the same React components used by production pages. The difference is only in how data reaches them: production pages call database queries in server components; demo pages resolve data from the static constants.
+- **Type safety matters.** Demo data constants must satisfy the exact TypeScript types used by the real components. If a component expects `GuestViewModel`, the demo constant must be a valid `GuestViewModel`. This ensures the demo stays in sync with production and catches drift at compile time.
+- **Contribution flow dead-end.** For active boards (Boards 1 & 2), the "Chip in" CTA should link to `/demo/board/[slug]/contribute` (not the real `/[slug]/contribute`). The payment page should bypass real payment initiation and redirect to `/demo/board/[slug]/thanks` with mock thank-you data.
+- **Dates should be relative.** Compute demo dates relative to `new Date()` at render time (not hardcoded absolute dates). "Board 1 party = 14 days from now", "Board 3 closed = 2 weeks ago", etc. This keeps the demo evergreen without re-seeding.
+- **South African content.** Contributor names, messages, and tone should reflect real South African families — culturally diverse, occasionally bilingual (English/Afrikaans), warm and casual. See the "Content requirements" section for examples and personas.

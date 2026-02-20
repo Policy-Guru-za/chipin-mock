@@ -3,6 +3,7 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-20 | user | Assumed the preferred avatar simplification was compact-only, but preference is desktop pill retained with initials + smaller chevron and no visible name | For avatar refinements, lock desktop/mobile variant preference explicitly before implementation and treat desktop/landing pill visuals as a separate contract from mobile compact |
 | 2026-02-20 | user | Unicode initials regression: avatar parsing used ASCII-only `[A-Z0-9]`, dropping accented/non-Latin letters | Use Unicode property escapes (`\\p{L}\\p{N}` with `u` flag) for display initials so Clerk names render correctly across locales |
 | 2026-02-20 | self | `UserAvatarMenu` first-name derivation split on whitespace, which over-normalized Clerk `firstName` and masked CSS-content escaping behavior for edge-case characters | Treat `user.firstName` as the source of truth (trim only), and handle safety in a dedicated CSS content encoder instead of semantic splitting |
 | 2026-02-20 | self | Host dashboard typography pass matched font families but left oversized heading scales (`30/28/24`) vs mockup tokens (`18/16/16`) | For parity refactors, lock exact token map first and add class-level regression assertions for key typography roles (headings, chips, right-rail titles, gift line) |

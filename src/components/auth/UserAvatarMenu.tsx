@@ -81,6 +81,9 @@ export function UserAvatarMenu({ afterSignOutUrl = '/', variant = 'pill' }: User
     user?.primaryEmailAddress?.emailAddress
   );
   const isCompact = variant === 'compact';
+  const identifierVariantClass = isCompact
+    ? 'gifta-soft-signet-identifier--compact'
+    : 'gifta-soft-signet-identifier--pill-chevron-only';
 
   const wrapperStyle: SoftSignetStyle = {
     '--gifta-soft-signet-initials': encodeCssContent(initialsDisplay),
@@ -103,7 +106,8 @@ export function UserAvatarMenu({ afterSignOutUrl = '/', variant = 'pill' }: User
             userButtonAvatarBox: 'gifta-soft-signet-avatar',
             userButtonAvatarBox__open: 'gifta-soft-signet-avatar-open',
             userButtonAvatarImage: 'gifta-soft-signet-avatar-image',
-            userButtonOuterIdentifier: `gifta-soft-signet-identifier ${isCompact ? 'gifta-soft-signet-identifier--compact' : ''}`.trim(),
+            userButtonOuterIdentifier:
+              `gifta-soft-signet-identifier ${identifierVariantClass}`.trim(),
             userButtonOuterIdentifier__open: 'gifta-soft-signet-identifier-open',
           },
         }}

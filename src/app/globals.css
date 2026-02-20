@@ -342,6 +342,11 @@ a:focus-visible {
   overflow: hidden;
 }
 
+.gifta-soft-signet--pill .gifta-soft-signet-trigger {
+  gap: 6px;
+  padding: 4px 10px 4px 4px;
+}
+
 .gifta-soft-signet-trigger::after {
   content: '';
   position: absolute;
@@ -448,6 +453,14 @@ a:focus-visible {
   line-height: 1;
 }
 
+.gifta-soft-signet-identifier--pill-chevron-only {
+  gap: 0;
+}
+
+.gifta-soft-signet-identifier--pill-chevron-only::before {
+  content: none;
+}
+
 .gifta-soft-signet-identifier::before {
   content: var(--gifta-soft-signet-name, "User");
   font-family: var(--font-dm-sans);
@@ -474,6 +487,15 @@ a:focus-visible {
     border-color 300ms ease;
 }
 
+.gifta-soft-signet-identifier--pill-chevron-only::after {
+  width: 9px;
+  height: 9px;
+  margin-left: 0;
+  border-right-width: 1.25px;
+  border-bottom-width: 1.25px;
+  transform: rotate(45deg) translateY(-1px);
+}
+
 .gifta-soft-signet-trigger:hover .gifta-soft-signet-identifier::before,
 .gifta-soft-signet-identifier-open::before {
   color: var(--color-sage-deep);
@@ -483,6 +505,11 @@ a:focus-visible {
 .gifta-soft-signet-identifier-open::after {
   transform: rotate(45deg) translateY(-1px);
   border-color: var(--color-sage);
+}
+
+.gifta-soft-signet-trigger:hover .gifta-soft-signet-identifier--pill-chevron-only::after,
+.gifta-soft-signet-identifier-open.gifta-soft-signet-identifier--pill-chevron-only::after {
+  transform: rotate(45deg) translateY(-0.5px);
 }
 
 .gifta-soft-signet--compact .gifta-soft-signet-trigger {

@@ -73,6 +73,12 @@ describe('UserAvatarMenu', () => {
     expect(props.appearance.elements.userButtonAvatarBox__open).toBe('gifta-soft-signet-avatar-open');
     expect(props.appearance.elements.userButtonAvatarImage).toBe('gifta-soft-signet-avatar-image');
     expect(props.appearance.elements.userButtonOuterIdentifier).toContain('gifta-soft-signet-identifier');
+    expect(props.appearance.elements.userButtonOuterIdentifier).toContain(
+      'gifta-soft-signet-identifier--pill-chevron-only'
+    );
+    expect(props.appearance.elements.userButtonOuterIdentifier).not.toContain(
+      'gifta-soft-signet-identifier--compact'
+    );
     expect(props.appearance.elements.userButtonOuterIdentifier__open).toBe(
       'gifta-soft-signet-identifier-open'
     );
@@ -107,6 +113,9 @@ describe('UserAvatarMenu', () => {
     );
     expect(props.appearance.elements.userButtonOuterIdentifier).toContain(
       'gifta-soft-signet-identifier--compact'
+    );
+    expect(props.appearance.elements.userButtonOuterIdentifier).not.toContain(
+      'gifta-soft-signet-identifier--pill-chevron-only'
     );
   });
 
