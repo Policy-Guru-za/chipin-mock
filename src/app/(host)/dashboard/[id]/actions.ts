@@ -20,11 +20,46 @@ const editSchema = z.object({
 });
 
 const EDITABLE_STATUSES = new Set(['active', 'funded']);
+const JOHANNESBURG_TIME_ZONE = 'Africa/Johannesburg';
+const JOHANNESBURG_OFFSET = '+02:00';
+
+const johannesburgTimeFormatter = new Intl.DateTimeFormat('en-GB', {
+  timeZone: JOHANNESBURG_TIME_ZONE,
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+});
 
 const toDateOrNull = (value: string | null | undefined) => {
   if (!value) return null;
   const parsed = parseDateOnly(value);
   return parsed ? formatDateOnly(parsed) : null;
+};
+
+const rebasePartyDateTimeToDate = (
+  nextPartyDate: string,
+  existingPartyDateTime: Date | null
+): string | null => {
+  if (!existingPartyDateTime) {
+    return null;
+  }
+  if (!parseDateOnly(nextPartyDate)) {
+    return null;
+  }
+
+  const timeParts = johannesburgTimeFormatter.formatToParts(existingPartyDateTime);
+  const hour = timeParts.find((part) => part.type === 'hour')?.value;
+  const minute = timeParts.find((part) => part.type === 'minute')?.value;
+  if (!hour || !minute) {
+    return null;
+  }
+
+  const rebased = new Date(`${nextPartyDate}T${hour}:${minute}:00${JOHANNESBURG_OFFSET}`);
+  if (Number.isNaN(rebased.getTime())) {
+    return null;
+  }
+
+  return rebased.toISOString();
 };
 
 export async function updateDreamBoard(
@@ -106,6 +141,11 @@ export async function updateDreamBoard(
     childName: parsed.data.childName?.trim(),
     childPhotoUrl: uploadedPhotoUrl,
     partyDate: nextPartyDate ?? undefined,
+    ...(nextPartyDate
+      ? {
+          partyDateTime: rebasePartyDateTimeToDate(nextPartyDate, board.partyDateTime),
+        }
+      : {}),
     campaignEndDate: nextCampaignEndDate ?? undefined,
   });
 

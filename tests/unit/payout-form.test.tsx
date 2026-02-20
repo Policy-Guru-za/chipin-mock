@@ -189,4 +189,21 @@ describe('PayoutForm', () => {
 
     expect(screen.getByText(/•••• 4567/)).toBeInTheDocument();
   });
+
+  it('shows Recommended badge when Karri Card is selected', () => {
+    render(<PayoutForm {...defaultProps()} />);
+
+    expect(screen.getByText('Recommended')).toBeInTheDocument();
+  });
+
+  it('hides Recommended badge when switching to bank transfer', () => {
+    const { container } = render(<PayoutForm {...defaultProps()} />);
+    const bankRadio = container.querySelector<HTMLInputElement>(
+      'input[name="payoutMethod"][value="bank"]',
+    );
+
+    fireEvent.click(bankRadio!);
+
+    expect(screen.queryByText('Recommended')).not.toBeInTheDocument();
+  });
 });

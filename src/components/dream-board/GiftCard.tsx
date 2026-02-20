@@ -19,6 +19,8 @@ const categoryEmoji: Record<string, string> = {
 export function GiftCard({ view }: GiftCardProps) {
   const iconMeta = getGiftIconById(extractIconIdFromPath(view.giftImage ?? '') ?? '');
   const giftEmoji = iconMeta ? (categoryEmoji[iconMeta.category] ?? '🎁') : '🎁';
+  const normalizedSubtitle = view.giftSubtitle?.trim().toLowerCase() ?? '';
+  const showSubtitle = normalizedSubtitle.length > 0 && normalizedSubtitle !== 'dream gift';
 
   return (
     <section className="overflow-hidden rounded-[28px] border border-border-soft bg-white shadow-card">
@@ -27,20 +29,22 @@ export function GiftCard({ view }: GiftCardProps) {
           {giftEmoji}
         </span>
       </div>
-      <div className="space-y-4 px-6 pb-6 pt-5 sm:px-7 sm:pb-7">
+      <div className="px-6 pb-6 pt-5 sm:px-7 sm:pb-7">
         <p className="font-warmth-sans text-[11px] font-semibold uppercase tracking-[0.13em] text-amber">
           ✦ {view.childName.toUpperCase()}&apos;S ONE BIG WISH
         </p>
-        <h2 className="font-warmth-serif text-[1.75rem] leading-tight text-ink [overflow-wrap:anywhere]">
+        <h2 className="mt-3 font-warmth-serif text-[1.75rem] leading-tight text-ink [overflow-wrap:anywhere]">
           {view.giftTitle}
         </h2>
-        {view.giftSubtitle ? (
-          <p className="font-warmth-sans text-[0.95rem] text-ink-mid [overflow-wrap:anywhere]">
+        {showSubtitle ? (
+          <p className="mt-3 font-warmth-sans text-[0.95rem] text-ink-mid [overflow-wrap:anywhere]">
             {view.giftSubtitle}
           </p>
         ) : null}
         {view.message ? (
-          <div className="rounded-[20px] border border-amber-glow bg-amber-light px-4 py-3.5">
+          <div
+            className={`rounded-[20px] border border-amber-glow bg-amber-light px-4 py-3.5 ${showSubtitle ? 'mt-4' : 'mt-5'}`}
+          >
             <div className="flex items-start gap-3">
               <span className="mt-0.5 inline-flex h-7 w-7 flex-none items-center justify-center rounded-full bg-white text-amber">
                 <ChatBubbleIcon className="h-4 w-4" />

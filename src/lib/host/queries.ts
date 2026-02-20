@@ -32,6 +32,7 @@ export type HostDashboardDetailRow = {
   giftName: string;
   giftImageUrl: string;
   partyDate: string;
+  partyDateTime: Date | null;
   campaignEndDate: string | null;
   message: string | null;
   status: string;
@@ -85,6 +86,7 @@ type HostDreamBoardPatch = {
   childName?: string;
   childPhotoUrl?: string;
   partyDate?: string | Date;
+  partyDateTime?: string | Date | null;
   campaignEndDate?: string | Date;
 };
 
@@ -92,6 +94,13 @@ const normalizeDateOnly = (value: string | Date | undefined) => {
   if (!value) return undefined;
   const parsed = parseDateOnly(value);
   return parsed ? formatDateOnly(parsed) : undefined;
+};
+
+const normalizeDateTime = (value: string | Date | null | undefined) => {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+  const parsed = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed;
 };
 
 export async function listDreamBoardsForHostExpanded(hostId: string): Promise<HostDashboardListRow[]> {
@@ -141,6 +150,7 @@ export async function getDashboardDetailExpanded(
       giftName: dreamBoards.giftName,
       giftImageUrl: dreamBoards.giftImageUrl,
       partyDate: dreamBoards.partyDate,
+      partyDateTime: dreamBoards.partyDateTime,
       campaignEndDate: dreamBoards.campaignEndDate,
       message: dreamBoards.message,
       status: dreamBoards.status,
@@ -279,6 +289,7 @@ export async function updateDreamBoardForHost(
     childName: data.childName,
     childPhotoUrl: data.childPhotoUrl,
     partyDate: normalizeDateOnly(data.partyDate),
+    partyDateTime: normalizeDateTime(data.partyDateTime),
     campaignEndDate: normalizeDateOnly(data.campaignEndDate),
   };
 

@@ -61,7 +61,7 @@ export function DreamboardCtaCard({ slug, childName, stateMessage, disabled }: D
       )}
       <p className="mt-3 inline-flex items-center gap-1.5 font-warmth-sans text-xs text-ink-faint">
         <LockIcon className="h-3.5 w-3.5" />
-        Secure payments powered by PayFast.
+        Secured payments powered by SnapScan, Stitch, Payfast and Ozow.
       </p>
     </section>
   );

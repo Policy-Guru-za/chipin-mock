@@ -39,7 +39,14 @@ import { updateDreamBoard } from '@/app/(host)/dashboard/[id]/actions';
 
 const BOARD_ID = '00000000-0000-4000-8000-000000000001';
 
-const makeBoard = (status: string) => ({
+const makeBoard = (
+  status: string,
+  overrides: Partial<{
+    partyDate: string;
+    partyDateTime: Date | null;
+    campaignEndDate: string | null;
+  }> = {}
+) => ({
   id: BOARD_ID,
   hostId: 'host-1',
   slug: 'maya-birthday',
@@ -48,6 +55,7 @@ const makeBoard = (status: string) => ({
   giftName: 'Scooter',
   giftImageUrl: 'https://example.com/gift.jpg',
   partyDate: '2099-06-12',
+  partyDateTime: new Date('2099-06-12T07:30:00.000Z'),
   campaignEndDate: '2099-06-10',
   message: 'Hello',
   status,
@@ -63,6 +71,7 @@ const makeBoard = (status: string) => ({
   totalCharityCents: 0,
   contributionCount: 0,
   messageCount: 0,
+  ...overrides,
 });
 
 beforeEach(() => {
@@ -108,5 +117,66 @@ describe('updateDreamBoard action', () => {
     );
     expect(cacheMocks.revalidatePath).toHaveBeenCalledWith('/dashboard');
     expect(cacheMocks.revalidatePath).toHaveBeenCalledWith(`/dashboard/${BOARD_ID}`);
+  });
+
+  it('rebases existing partyDateTime when partyDate moves forward', async () => {
+    queryMocks.getDashboardDetailExpanded.mockResolvedValue(makeBoard('funded'));
+    queryMocks.updateDreamBoardForHost.mockResolvedValue(true);
+
+    const formData = new FormData();
+    formData.set('boardId', BOARD_ID);
+    formData.set('partyDate', '2099-06-20');
+
+    const result = await updateDreamBoard(formData);
+
+    expect(result).toEqual({ success: true });
+    expect(queryMocks.updateDreamBoardForHost).toHaveBeenCalledWith(
+      BOARD_ID,
+      'host-1',
+      expect.objectContaining({
+        partyDate: '2099-06-20',
+        partyDateTime: '2099-06-20T07:30:00.000Z',
+      })
+    );
+  });
+
+  it('does not mutate partyDateTime when partyDate is unchanged', async () => {
+    queryMocks.getDashboardDetailExpanded.mockResolvedValue(makeBoard('funded'));
+    queryMocks.updateDreamBoardForHost.mockResolvedValue(true);
+
+    const formData = new FormData();
+    formData.set('boardId', BOARD_ID);
+    formData.set('childName', 'Maya Updated');
+
+    const result = await updateDreamBoard(formData);
+
+    expect(result).toEqual({ success: true });
+    expect(queryMocks.updateDreamBoardForHost).toHaveBeenCalledTimes(1);
+    expect(queryMocks.updateDreamBoardForHost.mock.calls[0]?.[2]).not.toHaveProperty(
+      'partyDateTime'
+    );
+  });
+
+  it('keeps partyDateTime null when partyDate changes without an existing time', async () => {
+    queryMocks.getDashboardDetailExpanded.mockResolvedValue(
+      makeBoard('funded', { partyDateTime: null })
+    );
+    queryMocks.updateDreamBoardForHost.mockResolvedValue(true);
+
+    const formData = new FormData();
+    formData.set('boardId', BOARD_ID);
+    formData.set('partyDate', '2099-06-20');
+
+    const result = await updateDreamBoard(formData);
+
+    expect(result).toEqual({ success: true });
+    expect(queryMocks.updateDreamBoardForHost).toHaveBeenCalledWith(
+      BOARD_ID,
+      'host-1',
+      expect.objectContaining({
+        partyDate: '2099-06-20',
+        partyDateTime: null,
+      })
+    );
   });
 });

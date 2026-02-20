@@ -18,7 +18,7 @@ describe('host dashboard view model', () => {
       giftName: 'Scooter',
       giftImageUrl: 'https://example.com/scooter.jpg',
       partyDate: '2099-06-12',
-      partyDateTime: null,
+      partyDateTime: new Date('2099-06-14T09:30:00.000Z'),
       campaignEndDate: '2099-06-10',
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
       status: 'paid_out',
@@ -31,6 +31,7 @@ describe('host dashboard view model', () => {
     expect(card.statusLabel).toBe('Complete');
     expect(card.statusVariant).toBe('paid_out');
     expect(card.timeLabel).toMatch(/days left/);
+    expect(card.partyDateTime?.toISOString()).toBe('2099-06-14T09:30:00.000Z');
   });
 
   it('builds ended and no-deadline labels deterministically', () => {

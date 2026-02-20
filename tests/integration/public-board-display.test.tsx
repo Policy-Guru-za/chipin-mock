@@ -12,6 +12,7 @@ import {
 } from '@/components/dream-board/DreamboardCtaCard';
 import { DreamboardDetailsCard } from '@/components/dream-board/DreamboardDetailsCard';
 import { ContributorDisplay } from '@/components/dream-board/ContributorDisplay';
+import { formatBirthdayPartyLine, hasBirthdayParty } from '@/lib/dream-boards/party-visibility';
 import { buildGuestViewModel } from '@/lib/dream-boards/view-model';
 
 type BoardRecord = Parameters<typeof buildGuestViewModel>[0];
@@ -82,6 +83,17 @@ function PublicBoardHarness({
   contributors: ReturnType<typeof makeContributors>;
 }) {
   const view = buildGuestViewModel(board, { now });
+  const hasPartyOutput = hasBirthdayParty({
+    birthdayDate: board.birthdayDate,
+    partyDate: board.partyDate,
+    partyDateTime: view.partyDateTime,
+  });
+  const partySummary = formatBirthdayPartyLine({
+    birthdayDate: board.birthdayDate,
+    partyDate: board.partyDate,
+    partyDateTime: view.partyDateTime,
+  });
+  const partyDateTimeLine = partySummary ? `Birthday Party · ${partySummary}` : null;
   const ctaStateMessage = buildDreamboardCtaStateMessage({
     contributionCount: view.contributionCount,
     isFunded: view.isFunded,
@@ -99,7 +111,12 @@ function PublicBoardHarness({
         disabled={view.isExpired || view.isClosed}
       />
       <ContributorDisplay contributors={contributors} totalCount={view.contributionCount} />
-      <DreamboardDetailsCard partyDateTimeLine={null} hasBirthdayParty={false} />
+      {hasPartyOutput ? (
+        <DreamboardDetailsCard
+          partyDateTimeLine={partyDateTimeLine}
+          hasBirthdayParty={hasPartyOutput}
+        />
+      ) : null}
       {view.charityEnabled && view.charityName && view.charityAllocationLabel ? (
         <CharitableGivingCard
           charityName={view.charityName}
@@ -198,8 +215,23 @@ describe('public board display integration', () => {
     expect(screen.getByText(/days left to chip in|Plenty of time|Just .* days left/)).toBeInTheDocument();
   });
 
-  it('uses fixed location copy in details card', () => {
+  it('does not render location copy in details card', () => {
+    const board = makeBoard({
+      partyDate: addDays(22),
+      partyDateTime: new Date(`${addDays(22)}T14:00:00.000Z`),
+      contributionCount: 2,
+    });
+
+    render(<PublicBoardHarness board={board} contributors={makeContributors(2)} />);
+    expect(screen.getByText('Birthday Party')).toBeInTheDocument();
+    expect(screen.queryByText('Shared after you chip in')).not.toBeInTheDocument();
+    expect(screen.queryByText('Location')).not.toBeInTheDocument();
+  });
+
+  it('hides details card entirely when no party details are available', () => {
     render(<PublicBoardHarness board={makeBoard({ contributionCount: 2 })} contributors={makeContributors(2)} />);
-    expect(screen.getByText('Shared after you chip in')).toBeInTheDocument();
+
+    expect(screen.queryByText('Birthday Party')).not.toBeInTheDocument();
+    expect(screen.queryByText('Location')).not.toBeInTheDocument();
   });
 });

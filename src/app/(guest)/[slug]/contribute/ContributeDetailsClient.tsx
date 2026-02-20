@@ -24,6 +24,14 @@ const MAX_CONTRIBUTION_CENTS = 1000000;
 const MAX_MESSAGE_LENGTH = 500;
 
 const sanitizeAmountDigits = (value: string) => value.replace(/[^0-9]/g, '');
+// iPadOS Safari can report a desktop-like Macintosh UA, so include touchpoint detection.
+const isIosNavigationDeferralTarget = (): boolean => {
+  if (typeof navigator === 'undefined') return false;
+
+  const isClassicIos = /iP(hone|ad|od)/i.test(navigator.userAgent);
+  const isIpadDesktopMode = /Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1;
+  return isClassicIos || isIpadDesktopMode;
+};
 
 export function ContributeDetailsClient({
   slug,
@@ -98,6 +106,16 @@ export function ContributeDetailsClient({
     if (!didSave) {
       setSaveError("We couldn't save your details. Please try again or use a different browser.");
       setIsSaving(false);
+      return;
+    }
+    const activeElement = document.activeElement;
+    if (activeElement instanceof HTMLElement) {
+      activeElement.blur();
+    }
+    if (isIosNavigationDeferralTarget() && typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+      window.requestAnimationFrame(() => {
+        router.push(`/${slug}/contribute/payment`);
+      });
       return;
     }
     router.push(`/${slug}/contribute/payment`);
@@ -229,7 +247,7 @@ export function ContributeDetailsClient({
               onChange={(event) => setMessage(event.target.value.slice(0, MAX_MESSAGE_LENGTH))}
               placeholder={`Write a message for ${childName}! (e.g., 'Dear ${childName}, we're so excited for your birthday...')`}
               rows={5}
-              className="min-h-[120px] w-full max-w-full rounded-xl border border-border bg-white p-3 text-sm text-text shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              className="min-h-[120px] w-full max-w-full rounded-xl border border-border bg-white p-3 text-base text-text shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             />
             <p
               aria-live="polite"

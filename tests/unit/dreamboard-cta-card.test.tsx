@@ -77,6 +77,9 @@ describe('DreamboardCtaCard', () => {
 
     const link = screen.getByRole('link', { name: 'Chip in for Maya 💝' });
     expect(link).toHaveAttribute('href', '/maya-birthday/contribute?source=dream-board');
+    expect(
+      screen.getByText('Secured payments powered by SnapScan, Stitch, Payfast and Ozow.')
+    ).toBeInTheDocument();
   });
 
   it('renders closed state without CTA link when disabled', () => {

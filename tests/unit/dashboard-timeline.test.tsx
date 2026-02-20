@@ -30,6 +30,7 @@ const makeCard = (overrides: Partial<DashboardCardViewModel> = {}): DashboardCar
   childPhotoUrl: null,
   birthdayDate: new Date('2026-02-27T00:00:00.000Z'),
   partyDate: new Date('2026-02-28T00:00:00.000Z'),
+  partyDateTime: null,
   hasBirthdayParty: true,
   campaignEndDate: new Date('2026-02-26T00:00:00.000Z'),
   daysRemaining: 17,
@@ -172,5 +173,24 @@ describe('DashboardTimeline', () => {
 
     expect(screen.getByText('Birthday')).toBeInTheDocument();
     expect(screen.queryByText(/^Party:/)).not.toBeInTheDocument();
+  });
+
+  it('prefers partyDateTime date over partyDate for party labels', () => {
+    render(
+      <DashboardTimeline
+        cards={[
+          makeCard({
+            boardId: 'board-party-datetime',
+            birthdayDate: new Date('2026-02-27T00:00:00.000Z'),
+            partyDate: new Date('2026-02-27T00:00:00.000Z'),
+            partyDateTime: new Date('2026-02-28T10:00:00.000Z'),
+            hasBirthdayParty: true,
+          }),
+        ]}
+      />
+    );
+
+    expect(screen.getByText('Party: 28 February 2026')).toBeInTheDocument();
+    expect(screen.getByText('28 Feb')).toBeInTheDocument();
   });
 });

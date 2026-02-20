@@ -43,7 +43,7 @@ const SOUTH_AFRICAN_BANKS = [
 ];
 
 const methodTabClassName =
-  'wizard-interactive flex flex-1 items-center justify-center gap-2 rounded-[14px] border-[1.5px] px-5 py-4 text-sm font-semibold transition-all duration-200';
+  'wizard-interactive relative flex min-h-[68px] w-full items-center rounded-[14px] border-[1.5px] px-4 py-3 text-sm font-semibold transition-all duration-200';
 
 export function PayoutForm({
   action,
@@ -98,7 +98,7 @@ export function PayoutForm({
                     methodTabClassName,
                     'cursor-pointer',
                     payoutMethod === 'karri_card'
-                      ? 'border-primary bg-primary text-white'
+                      ? 'border-primary bg-primary pr-24 text-white'
                       : 'border-border bg-background text-ink-soft hover:border-primary',
                   )}
                 >
@@ -110,32 +110,29 @@ export function PayoutForm({
                     onChange={() => setPayoutMethod('karri_card')}
                     className="sr-only"
                   />
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="shrink-0"
-                    aria-hidden="true"
-                  >
-                    <rect x="3" y="6" width="18" height="12" rx="2" />
-                    <path d="M3 10h18" />
-                  </svg>
-                  <span>Karri Card</span>
-                  <span
-                    className={cn(
-                      'rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide',
-                      payoutMethod === 'karri_card'
-                        ? 'bg-white/20 text-white'
-                        : 'bg-sage/10 text-sage',
-                    )}
-                  >
-                    Recommended
+                  <span className="flex min-w-0 items-center gap-2">
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="shrink-0"
+                      aria-hidden="true"
+                    >
+                      <rect x="3" y="6" width="18" height="12" rx="2" />
+                      <path d="M3 10h18" />
+                    </svg>
+                    <span className="truncate whitespace-nowrap leading-tight">Karri Card</span>
                   </span>
+                  {payoutMethod === 'karri_card' ? (
+                    <span className="pointer-events-none absolute right-3 top-2 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                      Recommended
+                    </span>
+                  ) : null}
                 </label>
 
                 <label
@@ -155,21 +152,23 @@ export function PayoutForm({
                     onChange={() => setPayoutMethod('bank')}
                     className="sr-only"
                   />
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="shrink-0"
-                    aria-hidden="true"
-                  >
-                    <path d="M3 6h18M3 10h18M7 14h10M3 18h18" />
-                  </svg>
-                  <span>Bank Transfer</span>
+                  <span className="flex min-w-0 items-center gap-2">
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="shrink-0"
+                      aria-hidden="true"
+                    >
+                      <path d="M3 6h18M3 10h18M7 14h10M3 18h18" />
+                    </svg>
+                    <span className="truncate whitespace-nowrap leading-tight">Bank Transfer</span>
+                  </span>
                 </label>
               </div>
             </fieldset>

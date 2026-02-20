@@ -143,10 +143,12 @@ export default async function DreamBoardPage({
             />
           )}
           <ContributorDisplay contributors={contributors} totalCount={view.contributionCount} />
-          <DreamboardDetailsCard
-            partyDateTimeLine={partyDateTimeLine}
-            hasBirthdayParty={hasPartyOutput}
-          />
+          {hasPartyOutput ? (
+            <DreamboardDetailsCard
+              partyDateTimeLine={partyDateTimeLine}
+              hasBirthdayParty={hasPartyOutput}
+            />
+          ) : null}
         </div>
       </div>
     </section>

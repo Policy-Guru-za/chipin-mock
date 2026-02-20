@@ -23,19 +23,17 @@ describe('DreamboardDetailsCard', () => {
 
     expect(screen.getByText('Birthday Party')).toBeInTheDocument();
     expect(screen.getByText('Birthday Party · Saturday, 8 March at 14:00')).toBeInTheDocument();
+    expect(screen.queryByText('Location')).not.toBeInTheDocument();
+    expect(screen.queryByText('Shared after you chip in')).not.toBeInTheDocument();
   });
 
-  it('hides birthday party row when no party is planned', () => {
-    render(<DreamboardDetailsCard partyDateTimeLine={null} hasBirthdayParty={false} />);
+  it('does not render any details card when no party is planned', () => {
+    const { container } = render(
+      <DreamboardDetailsCard partyDateTimeLine={null} hasBirthdayParty={false} />
+    );
 
+    expect(container.firstChild).toBeNull();
     expect(screen.queryByText('Birthday Party')).not.toBeInTheDocument();
-    expect(screen.queryByText('Date and time to be confirmed')).not.toBeInTheDocument();
-  });
-
-  it('always renders fixed location copy', () => {
-    render(<DreamboardDetailsCard partyDateTimeLine={null} hasBirthdayParty={false} />);
-
-    expect(screen.getByText('Location')).toBeInTheDocument();
-    expect(screen.getByText('Shared after you chip in')).toBeInTheDocument();
+    expect(screen.queryByText('Location')).not.toBeInTheDocument();
   });
 });

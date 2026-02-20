@@ -35,6 +35,7 @@ export interface DashboardCardViewModel {
   childPhotoUrl: string | null;
   birthdayDate: Date | null;
   partyDate: Date | null;
+  partyDateTime: Date | null;
   hasBirthdayParty: boolean;
   campaignEndDate: Date | null;
   daysRemaining: number | null;
@@ -248,6 +249,7 @@ export const buildDashboardCardViewModel = (
     childPhotoUrl: board.childPhotoUrl,
     birthdayDate,
     partyDate,
+    partyDateTime: board.partyDateTime,
     hasBirthdayParty: hasBirthdayParty({
       birthdayDate,
       partyDate,

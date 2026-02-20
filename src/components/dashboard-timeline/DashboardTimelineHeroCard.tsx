@@ -8,6 +8,8 @@ type DashboardTimelineHeroCardProps = {
   card: DashboardCardViewModel;
 };
 
+const JOHANNESBURG_TIME_ZONE = 'Africa/Johannesburg';
+
 const formatShortDate = (date: Date | null) =>
   date
     ? date.toLocaleDateString('en-ZA', {
@@ -46,13 +48,35 @@ const getDaysStat = (card: DashboardCardViewModel) => {
   return '--';
 };
 
+const toJohannesburgDateOnly = (value: Date | null): Date | null => {
+  if (!value) return null;
+
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: JOHANNESBURG_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(value);
+
+  const year = Number(parts.find((part) => part.type === 'year')?.value);
+  const month = Number(parts.find((part) => part.type === 'month')?.value);
+  const day = Number(parts.find((part) => part.type === 'day')?.value);
+
+  if (!year || !month || !day) {
+    return null;
+  }
+
+  return new Date(year, month - 1, day);
+};
+
 export function DashboardTimelineHeroCard({ card }: DashboardTimelineHeroCardProps) {
   const progress = Math.min(100, card.goalCents > 0 ? (card.raisedCents / card.goalCents) * 100 : 0);
   const contributorLabel = `from ${card.contributionCount} ${
     card.contributionCount === 1 ? 'contributor' : 'contributors'
   }`;
   const shareHint = card.contributionCount === 0 ? 'Share to start collecting' : 'Keep sharing your Dreamboard';
-  const headlineDate = card.hasBirthdayParty ? card.partyDate : card.birthdayDate;
+  const partyDateForDisplay = toJohannesburgDateOnly(card.partyDateTime) ?? card.partyDate;
+  const headlineDate = card.hasBirthdayParty ? partyDateForDisplay : card.birthdayDate;
 
   return (
     <Link
@@ -78,7 +102,7 @@ export function DashboardTimelineHeroCard({ card }: DashboardTimelineHeroCardPro
         <div className="min-w-0">
           <h3 className="font-warmth-serif text-[21px] text-ink">{card.boardTitle}</h3>
           {card.hasBirthdayParty ? (
-            <p className="text-sm text-ink-soft">Party: {formatLongDate(card.partyDate)}</p>
+            <p className="text-sm text-ink-soft">Party: {formatLongDate(partyDateForDisplay)}</p>
           ) : null}
         </div>
 
