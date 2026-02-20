@@ -22,7 +22,8 @@ describe('DreamboardDetailsCard', () => {
     );
 
     expect(screen.getByText('Birthday Party')).toBeInTheDocument();
-    expect(screen.getByText('Birthday Party · Saturday, 8 March at 14:00')).toBeInTheDocument();
+    expect(screen.getByText('Saturday, 8 March at 14:00')).toBeInTheDocument();
+    expect(screen.queryByText('Birthday Party · Saturday, 8 March at 14:00')).not.toBeInTheDocument();
     expect(screen.queryByText('Location')).not.toBeInTheDocument();
     expect(screen.queryByText('Shared after you chip in')).not.toBeInTheDocument();
   });

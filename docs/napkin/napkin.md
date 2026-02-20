@@ -3,6 +3,7 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-02-20 | user | Unicode initials regression: avatar parsing used ASCII-only `[A-Z0-9]`, dropping accented/non-Latin letters | Use Unicode property escapes (`\\p{L}\\p{N}` with `u` flag) for display initials so Clerk names render correctly across locales |
 | 2026-02-20 | self | `UserAvatarMenu` first-name derivation split on whitespace, which over-normalized Clerk `firstName` and masked CSS-content escaping behavior for edge-case characters | Treat `user.firstName` as the source of truth (trim only), and handle safety in a dedicated CSS content encoder instead of semantic splitting |
 | 2026-02-20 | self | Host dashboard typography pass matched font families but left oversized heading scales (`30/28/24`) vs mockup tokens (`18/16/16`) | For parity refactors, lock exact token map first and add class-level regression assertions for key typography roles (headings, chips, right-rail titles, gift line) |
 | 2026-02-20 | user | Renamed host dashboard list copy to "Contributors" while underlying metric/list remains contribution events | Keep host dashboard section copy as "Contributions" unless query/model changes to deduplicated contributor-level data |

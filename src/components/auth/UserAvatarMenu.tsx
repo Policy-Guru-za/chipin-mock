@@ -13,7 +13,11 @@ interface UserAvatarMenuProps {
 }
 
 const toAlphaNumericChars = (value: string | null | undefined) =>
-  (value ?? '').trim().toUpperCase().match(/[A-Z0-9]/g) ?? [];
+  (value ?? '')
+    .trim()
+    .normalize('NFC')
+    .toUpperCase()
+    .match(/[\p{L}\p{N}]/gu) ?? [];
 
 const deriveInitials = (
   firstName: string | null | undefined,

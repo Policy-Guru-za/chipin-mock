@@ -124,6 +124,34 @@ describe('UserAvatarMenu', () => {
     expect(wrapper?.style.getPropertyValue('--gifta-soft-signet-initials')).toBe('"AL"');
   });
 
+  it('derives initials from accented Latin names', () => {
+    setMockUser({
+      firstName: 'Élodie',
+      lastName: 'Brûlé',
+      primaryEmailAddress: { emailAddress: 'elodie@example.com' },
+    });
+
+    const { container } = render(<UserAvatarMenu />);
+    const wrapper = container.querySelector('.gifta-soft-signet');
+
+    expect(wrapper?.style.getPropertyValue('--gifta-soft-signet-name')).toBe('"Élodie"');
+    expect(wrapper?.style.getPropertyValue('--gifta-soft-signet-initials')).toBe('"ÉB"');
+  });
+
+  it('derives initials from non-Latin names before email fallback', () => {
+    setMockUser({
+      firstName: '李',
+      lastName: '王',
+      primaryEmailAddress: { emailAddress: 'alpha@example.com' },
+    });
+
+    const { container } = render(<UserAvatarMenu />);
+    const wrapper = container.querySelector('.gifta-soft-signet');
+
+    expect(wrapper?.style.getPropertyValue('--gifta-soft-signet-name')).toBe('"李"');
+    expect(wrapper?.style.getPropertyValue('--gifta-soft-signet-initials')).toBe('"李王"');
+  });
+
   it('uses final fallback initials when names and email are unavailable', () => {
     setMockUser({
       firstName: null,

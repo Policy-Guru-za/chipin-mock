@@ -10,6 +10,8 @@ export function DreamboardDetailsCard({ partyDateTimeLine, hasBirthdayParty }: D
     return null;
   }
 
+  const detailLine = partyDateTimeLine.replace(/^Birthday Party\s*[·•]\s*/i, '').trim() || partyDateTimeLine;
+
   return (
     <section className="rounded-[20px] border border-border-soft bg-white shadow-card">
       <div className="flex items-start gap-3 px-5 py-4 sm:px-6 sm:py-5">
@@ -20,7 +22,7 @@ export function DreamboardDetailsCard({ partyDateTimeLine, hasBirthdayParty }: D
           <p className="font-warmth-sans text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-faint">
             Birthday Party
           </p>
-          <p className="mt-1 font-warmth-sans text-sm text-ink">{partyDateTimeLine}</p>
+          <p className="mt-1 font-warmth-sans text-sm text-ink">{detailLine}</p>
         </div>
       </div>
     </section>

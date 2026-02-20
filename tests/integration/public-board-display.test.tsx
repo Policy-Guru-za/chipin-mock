@@ -224,6 +224,7 @@ describe('public board display integration', () => {
 
     render(<PublicBoardHarness board={board} contributors={makeContributors(2)} />);
     expect(screen.getByText('Birthday Party')).toBeInTheDocument();
+    expect(screen.queryByText(/Birthday Party\s*[·•]/i)).not.toBeInTheDocument();
     expect(screen.queryByText('Shared after you chip in')).not.toBeInTheDocument();
     expect(screen.queryByText('Location')).not.toBeInTheDocument();
   });
