@@ -1,8 +1,8 @@
 # Gifta UX v2: Host Dashboard - Post-Campaign (Completed Board)
 ## Comprehensive UI Specification
 
-**Document Version:** 1.0
-**Status:** Implementation-Ready
+**Document Version:** 1.1
+**Status:** Runtime-aligned
 **Route:** `/dashboard/[id]` (state-dependent rendering)
 **Last Updated:** February 20, 2026
 **Target Audience:** AI coding agents, UI developers
@@ -12,7 +12,12 @@
 ## Runtime Alignment (2026-02-20)
 
 - Runtime source: `src/app/(host)/dashboard/[id]/page.tsx`, `src/app/(host)/dashboard/[id]/DashboardPostCampaignClient.tsx`, `src/app/api/internal/downloads/contributor-list/route.ts`.
-- Post-campaign contributions list intentionally excludes per-contributor contribution amounts.
+- Typography baseline mirrors active detail styling:
+  - `Fraunces` (`font-display`) for section/display headings.
+  - `DM Sans` (`font-warmth-sans`) for body/meta/action copy.
+- Post-campaign contributors list intentionally excludes per-contributor contribution amounts.
+- Contributors card naming is standardized as “Contributors” (not “Contributions”).
+- Birthday Messages now use the same quote-style full-text card treatment as active detail.
 - Contributor CSV export intentionally excludes per-contributor financial columns and currently exports: `Name, Date, Message, Anonymous`.
 
 ---
@@ -51,7 +56,7 @@ The Post-Campaign View displays the completed Dreamboard with a celebration tone
 - ✅ Payout status shows completion state
 - ✅ No edit/extend buttons (board is closed)
 - ✅ Download buttons for messages and thank you cards
-- ✅ Full contribution history preserved
+- ✅ Full contributor history preserved
 - ✅ Birthday messages section still visible
 
 ---

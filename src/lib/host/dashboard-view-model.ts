@@ -64,9 +64,11 @@ export interface DashboardDetailViewModel {
   slug: string;
   childName: string;
   childPhotoUrl: string | null;
+  birthdayDate: Date | null;
   giftName: string;
   giftImageUrl: string | null;
   partyDate: Date | null;
+  hasBirthdayParty: boolean;
   campaignEndDate: Date | null;
   status: string;
   statusLabel: string;
@@ -91,6 +93,7 @@ export interface DashboardDetailViewModel {
   payouts: PayoutSummary[];
   charityEnabled: boolean;
   charityName: string | null;
+  givingBackLabel: string | null;
   shareUrl: string;
   publicUrl: string;
   isComplete: boolean;
@@ -186,6 +189,19 @@ const resolveGiftInfo = (board: {
     giftImageUrl: board.giftImageUrl,
     giftDescription: null,
   });
+
+const getGivingBackLabel = (board: HostDashboardDetailRow) => {
+  if (
+    !board.charityEnabled ||
+    board.charitySplitType !== 'percentage' ||
+    typeof board.charityPercentageBps !== 'number' ||
+    !board.charityName
+  ) {
+    return null;
+  }
+
+  return `${Math.round(board.charityPercentageBps / 100)}% to ${board.charityName}`;
+};
 
 export const buildFinancialBreakdown = (
   raisedCents: number,
@@ -283,15 +299,24 @@ export const buildDashboardDetailViewModel = (
     board.payoutMethod === 'bank'
       ? board.bankAccountHolder || board.payoutEmail
       : board.karriCardHolderName || board.payoutEmail;
+  const birthdayDate = toDate(board.birthdayDate) ?? toDate(board.partyDate);
+  const partyDate = toDate(board.partyDate);
+  const detailHasBirthdayParty = hasBirthdayParty({
+    birthdayDate,
+    partyDate,
+    partyDateTime: board.partyDateTime,
+  });
 
   return {
     boardId: board.id,
     slug: board.slug,
     childName: board.childName,
     childPhotoUrl: board.childPhotoUrl,
+    birthdayDate,
     giftName: board.giftName,
     giftImageUrl: board.giftImageUrl,
-    partyDate: toDate(board.partyDate),
+    partyDate,
+    hasBirthdayParty: detailHasBirthdayParty,
     campaignEndDate: toDate(board.campaignEndDate),
     status: board.status,
     statusLabel: getStatusLabel(board.status),
@@ -316,6 +341,7 @@ export const buildDashboardDetailViewModel = (
     payouts: payouts.map(buildPayoutSummary),
     charityEnabled: board.charityEnabled,
     charityName: board.charityName,
+    givingBackLabel: getGivingBackLabel(board),
     shareUrl: `${options.baseUrl}/${board.slug}`,
     publicUrl: `${options.baseUrl}/${board.slug}`,
     isComplete,

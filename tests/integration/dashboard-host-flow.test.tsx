@@ -58,9 +58,11 @@ const boardDetailRow = {
   slug: 'maya-birthday',
   childName: 'Maya',
   childPhotoUrl: 'https://example.com/child.jpg',
+  birthdayDate: '2099-06-11',
   giftName: 'Scooter',
   giftImageUrl: 'https://example.com/scooter.jpg',
   partyDate: '2099-06-12',
+  partyDateTime: null,
   campaignEndDate: '2099-06-10',
   message: 'A dream gift',
   status: 'closed',
@@ -71,6 +73,9 @@ const boardDetailRow = {
   payoutEmail: 'parent@example.com',
   charityEnabled: false,
   charityName: null,
+  charitySplitType: null,
+  charityPercentageBps: null,
+  charityThresholdCents: null,
   totalRaisedCents: 50000,
   totalFeeCents: 1500,
   totalCharityCents: 0,
@@ -133,6 +138,10 @@ describe('host dashboard flow', () => {
     queryMocks.getDashboardDetailExpanded.mockResolvedValue({
       ...boardDetailRow,
       status: 'funded',
+      charityEnabled: true,
+      charityName: 'Reach for a Dream',
+      charitySplitType: 'percentage',
+      charityPercentageBps: 1000,
       totalRaisedCents: 45000,
       totalFeeCents: 1350,
       contributionCount: 2,
@@ -142,12 +151,30 @@ describe('host dashboard flow', () => {
     render(await DreamBoardDetailPage({ params: Promise.resolve({ id: 'board-1' }) }));
 
     expect(screen.getByRole('heading', { name: /maya's dreamboard/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /contributions \(2\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /contributors/i })).toBeInTheDocument();
     expect(screen.getByAltText(/gifta gift icon/i)).toBeInTheDocument();
+    expect(screen.getByText(/11 june 2099/i)).toBeInTheDocument();
+    expect(screen.getByText(/party:\s*12 june/i)).toBeInTheDocument();
+    expect(screen.getByText(/10% to reach for a dream/i)).toBeInTheDocument();
     expect(screen.getAllByText('Ava').length).toBeGreaterThan(0);
     expect(screen.queryByText(/R\s*250/)).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /quick actions/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /download birthday messages/i })).toBeInTheDocument();
+  });
+
+  it('hides party metadata when party date matches birthday and no party time is set', async () => {
+    queryMocks.getDashboardDetailExpanded.mockResolvedValue({
+      ...boardDetailRow,
+      status: 'funded',
+      birthdayDate: '2099-06-12',
+      partyDate: '2099-06-12',
+      partyDateTime: null,
+    });
+
+    render(await DreamBoardDetailPage({ params: Promise.resolve({ id: 'board-1' }) }));
+
+    expect(screen.getByText(/12 june 2099/i)).toBeInTheDocument();
+    expect(screen.queryByText(/party:\s*12 june/i)).not.toBeInTheDocument();
   });
 
   it('renders list card link and matching closed-board totals on detail page', async () => {

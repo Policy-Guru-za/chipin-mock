@@ -131,6 +131,7 @@ describe('host dashboard view model', () => {
         slug: 'maya-birthday-123',
         childName: 'Maya',
         childPhotoUrl: 'https://example.com/child.jpg',
+        birthdayDate: '2099-06-11',
         giftName: 'Scooter',
         giftImageUrl: 'https://example.com/scooter.jpg',
         partyDate: '2099-06-12',
@@ -144,6 +145,9 @@ describe('host dashboard view model', () => {
         payoutEmail: 'parent@example.com',
         charityEnabled: true,
         charityName: 'Gift of the Givers',
+        charitySplitType: 'percentage',
+        charityPercentageBps: 1000,
+        charityThresholdCents: null,
         totalRaisedCents: 55000,
         totalFeeCents: 1650,
         totalCharityCents: 5000,
@@ -159,6 +163,85 @@ describe('host dashboard view model', () => {
     expect(detail.isComplete).toBe(false);
     expect(detail.isEditable).toBe(true);
     expect(detail.netPayoutCents).toBe(48350);
+    expect(detail.hasBirthdayParty).toBe(true);
+    expect(detail.givingBackLabel).toBe('10% to Gift of the Givers');
+  });
+
+  it('suppresses giving-back label for threshold charity split', () => {
+    const detail = buildDashboardDetailViewModel(
+      {
+        id: 'board-3',
+        hostId: 'host-1',
+        slug: 'maya-birthday-456',
+        childName: 'Maya',
+        childPhotoUrl: 'https://example.com/child.jpg',
+        birthdayDate: '2099-06-11',
+        giftName: 'Scooter',
+        giftImageUrl: 'https://example.com/scooter.jpg',
+        partyDate: '2099-06-12',
+        campaignEndDate: '2099-06-10',
+        message: null,
+        status: 'active',
+        goalCents: 50000,
+        payoutMethod: 'karri_card',
+        karriCardHolderName: 'Maya Parent',
+        bankAccountHolder: null,
+        payoutEmail: 'parent@example.com',
+        charityEnabled: true,
+        charityName: 'Gift of the Givers',
+        charitySplitType: 'threshold',
+        charityPercentageBps: null,
+        charityThresholdCents: 500000,
+        totalRaisedCents: 55000,
+        totalFeeCents: 1650,
+        totalCharityCents: 5000,
+        contributionCount: 11,
+        messageCount: 6,
+      },
+      [],
+      { baseUrl: 'https://gifta.co.za' }
+    );
+
+    expect(detail.givingBackLabel).toBeNull();
+  });
+
+  it('marks detail as no-party when party date equals birthday and no party time exists', () => {
+    const detail = buildDashboardDetailViewModel(
+      {
+        id: 'board-4',
+        hostId: 'host-1',
+        slug: 'maya-birthday-789',
+        childName: 'Maya',
+        childPhotoUrl: 'https://example.com/child.jpg',
+        birthdayDate: '2099-06-11',
+        giftName: 'Scooter',
+        giftImageUrl: 'https://example.com/scooter.jpg',
+        partyDate: '2099-06-11',
+        partyDateTime: null,
+        campaignEndDate: '2099-06-10',
+        message: null,
+        status: 'active',
+        goalCents: 50000,
+        payoutMethod: 'karri_card',
+        karriCardHolderName: 'Maya Parent',
+        bankAccountHolder: null,
+        payoutEmail: 'parent@example.com',
+        charityEnabled: false,
+        charityName: null,
+        charitySplitType: null,
+        charityPercentageBps: null,
+        charityThresholdCents: null,
+        totalRaisedCents: 55000,
+        totalFeeCents: 1650,
+        totalCharityCents: 0,
+        contributionCount: 11,
+        messageCount: 6,
+      },
+      [],
+      { baseUrl: 'https://gifta.co.za' }
+    );
+
+    expect(detail.hasBirthdayParty).toBe(false);
   });
 
   it('keeps compatibility wrapper share URL behavior', () => {

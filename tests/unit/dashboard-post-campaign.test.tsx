@@ -16,9 +16,11 @@ const baseView: DashboardDetailViewModel = {
   slug: 'maya-birthday',
   childName: 'Maya',
   childPhotoUrl: 'https://example.com/child.jpg',
+  birthdayDate: new Date('2099-06-11T00:00:00.000Z'),
   giftName: 'Scooter',
   giftImageUrl: 'https://example.com/scooter.jpg',
   partyDate: new Date('2099-06-12T00:00:00.000Z'),
+  hasBirthdayParty: true,
   campaignEndDate: new Date('2099-06-10T00:00:00.000Z'),
   status: 'closed',
   statusLabel: 'Complete',
@@ -43,6 +45,7 @@ const baseView: DashboardDetailViewModel = {
   payouts: [],
   charityEnabled: false,
   charityName: null,
+  givingBackLabel: null,
   shareUrl: 'https://gifta.co.za/maya-birthday',
   publicUrl: 'https://gifta.co.za/maya-birthday',
   isComplete: true,
@@ -133,8 +136,33 @@ describe('DashboardPostCampaignClient', () => {
       />
     );
 
-    expect(screen.getByRole('heading', { name: /contributions \(1\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /contributors/i })).toBeInTheDocument();
     expect(screen.getByText('Guest A')).toBeInTheDocument();
     expect(screen.queryByText(/R\s*543/)).not.toBeInTheDocument();
+  });
+
+  it('renders birthday messages with quote-style cards', () => {
+    const { container } = render(
+      <DashboardPostCampaignClient
+        view={{ ...baseView, messageCount: 1 }}
+        contributions={[]}
+        messages={[
+          {
+            id: 'msg-2',
+            contributorName: 'Grandma Rose',
+            isAnonymous: false,
+            message: "Happy birthday, superstar!",
+            createdAt: new Date('2026-01-01T00:00:00.000Z'),
+          },
+        ]}
+      />
+    );
+
+    expect(screen.getByRole('heading', { name: /birthday messages/i })).toBeInTheDocument();
+    expect(screen.getByText('Grandma Rose')).toBeInTheDocument();
+    expect(screen.getByText(/happy birthday, superstar!/i)).toBeInTheDocument();
+    expect(
+      container.querySelectorAll('span[aria-hidden="true"]')[0]?.textContent
+    ).toContain('“');
   });
 });

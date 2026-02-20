@@ -29,6 +29,7 @@ export type HostDashboardDetailRow = {
   slug: string;
   childName: string;
   childPhotoUrl: string;
+  birthdayDate: string | null;
   giftName: string;
   giftImageUrl: string;
   partyDate: string;
@@ -43,6 +44,9 @@ export type HostDashboardDetailRow = {
   payoutEmail: string;
   charityEnabled: boolean;
   charityName: string | null;
+  charitySplitType: 'percentage' | 'threshold' | null;
+  charityPercentageBps: number | null;
+  charityThresholdCents: number | null;
   totalRaisedCents: number;
   totalFeeCents: number;
   totalCharityCents: number;
@@ -143,6 +147,7 @@ export async function getDashboardDetailExpanded(
       slug: dreamBoards.slug,
       childName: dreamBoards.childName,
       childPhotoUrl: dreamBoards.childPhotoUrl,
+      birthdayDate: dreamBoards.birthdayDate,
       giftName: dreamBoards.giftName,
       giftImageUrl: dreamBoards.giftImageUrl,
       partyDate: dreamBoards.partyDate,
@@ -157,6 +162,9 @@ export async function getDashboardDetailExpanded(
       payoutEmail: dreamBoards.payoutEmail,
       charityEnabled: dreamBoards.charityEnabled,
       charityName: charities.name,
+      charitySplitType: dreamBoards.charitySplitType,
+      charityPercentageBps: dreamBoards.charityPercentageBps,
+      charityThresholdCents: dreamBoards.charityThresholdCents,
       totalRaisedCents: sql<number>`COALESCE(SUM(${contributions.amountCents}), 0)`.as(
         'total_raised_cents'
       ),

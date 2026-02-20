@@ -1,8 +1,8 @@
 # Gifta UX v2: Host Dashboard - Dreamboard Detail View
 ## Comprehensive UI Specification
 
-**Document Version:** 1.0
-**Status:** Runtime-aligned with noted action-surface differences
+**Document Version:** 1.1
+**Status:** Runtime-aligned (V2 elegance refresh)
 **Route:** `/dashboard/[id]`
 **Last Updated:** February 20, 2026
 **Target Audience:** AI coding agents, UI developers
@@ -12,12 +12,21 @@
 ## Runtime Alignment (2026-02-20)
 
 - Runtime source: `src/app/(host)/dashboard/[id]/page.tsx`, `src/app/(host)/dashboard/[id]/DashboardDetailClient.tsx`, `src/lib/host/dashboard-view-model.ts`.
-- Active host detail now uses a two-column layout (`left content + sticky right rail`) on desktop and a single-column stack on mobile.
-- Active hero card displays the status chip in the top-right slot (replacing the prior time-label position).
-- Implemented quick actions: share link copy, edit modal, and view public page.
+- Active host detail uses a two-column layout (`left content + sticky right rail`) on desktop and a single-column stack on mobile.
+- Typography baseline is now consistent with the design mockup:
+  - `Fraunces` (`font-display`) for major headings and key numerals.
+  - `DM Sans` (`font-warmth-sans`) for body/meta/action copy.
+- Active hero card includes:
+  - gift-line brand icon + gift name,
+  - birthday/party metadata row (`🎂` birthday, `🎈 Party:`),
+  - conditional giving-back pill (`💜`) rendered only for percentage charity split with available charity name.
+- Top-right hero status chip remains the status anchor for active/funded states.
+- Right rail top card now follows the mockup structure: centered raised amount, uppercase micro-label, divider, and 3 stat columns (contributors/messages/days left).
+- Quick actions are rendered as stacked rows with icon box + label + description + chevron affordance.
 - Host close action is not currently exposed in dashboard UI; close is handled via partner API (`POST /api/v1/dream-boards/{id}/close`).
-- Contribution rows intentionally show contributor identity + relative time + message indicator only (no per-contributor amount display).
-- Payout status list and contribution/message sections are live and match runtime data queries.
+- Contributors rows intentionally show contributor identity + relative time + message indicator only (no per-contributor amount display).
+- Birthday message cards now render full text with muted surface, subtle border, and decorative opening quote treatment.
+- Payout status list and contributor/message sections remain live and match runtime data queries.
 
 ## Table of Contents
 
@@ -51,7 +60,7 @@ The Detail View displays comprehensive information about a single Dreamboard. Pa
 - Back navigation to list
 - Dreamboard metadata and progress
 - Financial breakdown with fees
-- Contributor list with details
+- Contributors list with details
 - Birthday messages section with preview & download
 - Quick action buttons
 - Payout status and details
