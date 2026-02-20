@@ -131,6 +131,7 @@ a:focus-visible {
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -153,16 +154,19 @@ a:focus-visible {
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(100%);
   }
 }
 
 @keyframes bounce-subtle {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-3px);
   }
@@ -173,6 +177,7 @@ a:focus-visible {
     opacity: 0;
     transform: translateY(24px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -185,6 +190,7 @@ a:focus-visible {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -192,16 +198,19 @@ a:focus-visible {
 }
 
 @keyframes landing-testimonial-fade {
+
   0%,
   8% {
     opacity: 0;
     transform: translateY(8px);
   }
+
   12%,
   88% {
     opacity: 1;
     transform: translateY(0);
   }
+
   92%,
   100% {
     opacity: 0;
@@ -210,11 +219,13 @@ a:focus-visible {
 }
 
 @keyframes landing-soft-pulse {
+
   0%,
   100% {
     transform: scale(1);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
+
   50% {
     transform: scale(1.08);
     box-shadow: 0 4px 16px rgba(200, 160, 100, 0.25);
@@ -222,10 +233,12 @@ a:focus-visible {
 }
 
 @keyframes landing-float {
+
   0%,
   100% {
     transform: translateY(0) rotate(0deg);
   }
+
   50% {
     transform: translateY(-12px) rotate(1deg);
   }
@@ -235,6 +248,7 @@ a:focus-visible {
   0% {
     left: -100%;
   }
+
   100% {
     left: 100%;
   }
@@ -261,8 +275,14 @@ a:focus-visible {
 }
 
 /* Giving Back section: scrollbar-hide utility */
-.scrollbar-hide::-webkit-scrollbar { display: none; }
-.scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
 
 /* How It Works decorative elements */
 .hiw-card-circle {
@@ -281,38 +301,83 @@ a:focus-visible {
 /* ================================================================== */
 
 @keyframes givingBack-floatOrb1 {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(-20px, 30px); }
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(-20px, 30px);
+  }
 }
 
 @keyframes givingBack-floatOrb2 {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(20px, -20px); }
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(20px, -20px);
+  }
 }
 
 @keyframes givingBack-heartGlow {
-  0%, 100% { box-shadow: 0 3px 10px rgba(126,107,155,0.25); }
-  50% { box-shadow: 0 3px 16px rgba(126,107,155,0.4); }
+
+  0%,
+  100% {
+    box-shadow: 0 3px 10px rgba(126, 107, 155, 0.25);
+  }
+
+  50% {
+    box-shadow: 0 3px 16px rgba(126, 107, 155, 0.4);
+  }
 }
 
 @keyframes givingBack-nudge-x {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(4px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(4px);
+  }
 }
 
 @keyframes givingBack-nudge-y {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(4px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(4px);
+  }
 }
 
 @keyframes givingBack-barGrow80 {
-  from { width: 0%; }
-  to { width: 80%; }
+  from {
+    width: 0%;
+  }
+
+  to {
+    width: 80%;
+  }
 }
 
 @keyframes givingBack-barGrow20 {
-  from { width: 0%; }
-  to { width: 20%; }
+  from {
+    width: 0%;
+  }
+
+  to {
+    width: 20%;
+  }
 }
 
 /* ================================================================== */
@@ -381,16 +446,15 @@ a:focus-visible {
 }
 
 .gifta-soft-signet-avatar {
+  order: 1;
   width: 34px;
   height: 34px;
   min-width: 34px;
   border-radius: 50%;
-  background: linear-gradient(
-    150deg,
-    var(--color-sage-light) 0%,
-    var(--color-sage-wash) 50%,
-    var(--color-sage-light) 100%
-  );
+  background: linear-gradient(150deg,
+      var(--color-sage-light) 0%,
+      var(--color-sage-wash) 50%,
+      var(--color-sage-light) 100%);
   border: 1.5px solid var(--color-sage);
   display: inline-flex;
   align-items: center;
@@ -445,6 +509,7 @@ a:focus-visible {
 }
 
 .gifta-soft-signet-identifier {
+  order: 2;
   display: inline-flex;
   align-items: center;
   gap: 6px;
