@@ -37,6 +37,13 @@ describe('openapi spec', () => {
     expect(updateRequest.properties).toHaveProperty('charity_enabled');
   });
 
+  it('documents voucher fulfilment contact fields on payout recipient data', () => {
+    const payoutRecipientData = openApiSpec.components.schemas.PayoutRecipientData;
+
+    expect(payoutRecipientData.properties).toHaveProperty('host_whatsapp_number');
+    expect(payoutRecipientData.properties).toHaveProperty('fulfilment_mode');
+  });
+
   it('keeps create-request payout and gift icon constraints aligned with runtime', () => {
     const createRequest = openApiSpec.components.schemas.DreamBoardCreateRequest;
     const requiredFields = createRequest.required ?? [];

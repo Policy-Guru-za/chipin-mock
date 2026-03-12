@@ -1,6 +1,9 @@
 import type { DreamBoardDraft } from '@/lib/dream-boards/draft';
+import { DEFAULT_HOST_CREATE_PAYOUT_METHOD } from '@/lib/dream-boards/payout-methods';
 
-export type CreateFlowStep = 'child' | 'gift' | 'dates' | 'giving-back' | 'payout' | 'review';
+export const CREATE_FLOW_TOTAL_STEPS = 5 as const;
+
+export type CreateFlowStep = 'child' | 'gift' | 'dates' | 'voucher' | 'review';
 
 type GiftPreview = {
   title: string;
@@ -22,12 +25,11 @@ export type CreateFlowViewModel = {
 };
 
 const stepLabels: Record<CreateFlowStep, string> = {
-  child: 'Step 1 of 6 — The Child',
-  gift: 'Step 2 of 6 — The Gift',
-  dates: 'Step 3 of 6 — The Dates',
-  'giving-back': 'Step 4 of 6 — Giving Back',
-  payout: 'Step 5 of 6 — Payout Setup',
-  review: 'Step 6 of 6 — Review',
+  child: 'Step 1 of 5 — The Child',
+  gift: 'Step 2 of 5 — The Gift',
+  dates: 'Step 3 of 5 — The Dates',
+  voucher: 'Step 4 of 5 — Voucher Details',
+  review: 'Step 5 of 5 — Review',
 };
 
 const getStepTitle = (step: CreateFlowStep, childName?: string) => {
@@ -36,16 +38,15 @@ const getStepTitle = (step: CreateFlowStep, childName?: string) => {
     return childName ? `What's ${childName}'s dream gift?` : "What's the dream gift?";
   }
   if (step === 'dates') return "When's the big day?";
-  if (step === 'giving-back') return 'Want to share the love? 💚';
-  if (step === 'payout') return 'How should we send your payout?';
+  if (step === 'voucher') return 'Where should we send voucher updates?';
   return 'Review your Dreamboard';
 };
 
 const getStepSubtitle = (step: CreateFlowStep, childName?: string) => {
-  if (step === 'giving-back') {
+  if (step === 'voucher') {
     return childName
-      ? `Help a cause while celebrating ${childName}.`
-      : 'Help a cause while celebrating.';
+      ? `We’ll use these details when ${childName}'s Dreamboard closes.`
+      : 'We’ll use these details when the Dreamboard closes.';
   }
   return undefined;
 };
@@ -73,43 +74,19 @@ const isGiftComplete = (draft?: DreamBoardDraft | null) =>
 const isDatesComplete = (draft?: DreamBoardDraft | null) =>
   Boolean(draft?.birthdayDate && draft?.partyDate && draft?.campaignEndDate);
 
-const isGivingBackComplete = (draft?: DreamBoardDraft | null) => {
-  if (draft?.charityEnabled === false) {
-    return true;
-  }
-  if (draft?.charityEnabled !== true) {
-    return false;
-  }
-
-  const hasSplitValue =
-    draft.charitySplitType === 'percentage'
-      ? draft.charityPercentageBps !== undefined && draft.charityPercentageBps !== null
-      : draft.charitySplitType === 'threshold'
-        ? draft.charityThresholdCents !== undefined && draft.charityThresholdCents !== null
-        : false;
-
-  return Boolean(draft.charityId && draft.charitySplitType && hasSplitValue);
-};
-
-const isPayoutComplete = (draft?: DreamBoardDraft | null) =>
+const isVoucherComplete = (draft?: DreamBoardDraft | null) =>
   Boolean(
     draft?.payoutEmail &&
       draft?.hostWhatsAppNumber &&
-      ((draft?.payoutMethod ?? 'karri_card') === 'karri_card'
-        ? draft?.karriCardNumberEncrypted && draft?.karriCardHolderName
-        : draft?.bankName &&
-            draft?.bankAccountNumberEncrypted &&
-            draft?.bankAccountLast4 &&
-            draft?.bankBranchCode &&
-            draft?.bankAccountHolder)
+      (draft?.payoutMethod ?? DEFAULT_HOST_CREATE_PAYOUT_METHOD) ===
+        DEFAULT_HOST_CREATE_PAYOUT_METHOD
   );
 
 const getCompletionState = (draft?: DreamBoardDraft | null) => ({
   childComplete: isChildComplete(draft),
   giftComplete: isGiftComplete(draft),
   datesComplete: isDatesComplete(draft),
-  givingBackComplete: isGivingBackComplete(draft),
-  payoutComplete: isPayoutComplete(draft),
+  voucherComplete: isVoucherComplete(draft),
 });
 
 const redirectRules: Record<
@@ -119,11 +96,8 @@ const redirectRules: Record<
   child: [],
   gift: [(completion) => (!completion.childComplete ? '/create/child' : undefined)],
   dates: [(completion) => (!completion.giftComplete ? '/create/gift' : undefined)],
-  'giving-back': [(completion) => (!completion.datesComplete ? '/create/dates' : undefined)],
-  payout: [(completion) => (!completion.givingBackComplete ? '/create/giving-back' : undefined)],
-  review: [
-    (completion) => (!completion.payoutComplete ? '/create/payout' : undefined),
-  ],
+  voucher: [(completion) => (!completion.datesComplete ? '/create/dates' : undefined)],
+  review: [(completion) => (!completion.voucherComplete ? '/create/voucher' : undefined)],
 };
 
 const getRedirectTarget = (

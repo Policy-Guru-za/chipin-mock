@@ -15,7 +15,10 @@ import {
 } from '@/components/create-wizard';
 import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
 import { getDreamBoardDraft } from '@/lib/dream-boards/draft';
-import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
+import {
+  buildCreateFlowViewModel,
+  CREATE_FLOW_TOTAL_STEPS,
+} from '@/lib/host/create-view-model';
 
 type GiftSearchParams = {
   error?: string;
@@ -54,7 +57,7 @@ export default async function CreateGiftPage({
 
   return (
     <>
-      <WizardStepper currentStep={2} totalSteps={6} stepLabel="The gift" />
+      <WizardStepper currentStep={2} totalSteps={CREATE_FLOW_TOTAL_STEPS} stepLabel="The gift" />
 
       <Suspense fallback={<WizardSkeletonLoader variant="centered" />}>
         <form action={saveManualGiftAction}>

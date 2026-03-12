@@ -9,6 +9,7 @@ import { listDreamBoardsForApi } from '@/lib/db/api-queries';
 import { ensureHostForEmail, getActiveCharityById } from '@/lib/db/queries';
 import { db } from '@/lib/db';
 import { dreamBoards } from '@/lib/db/schema';
+import type { DreamBoardGiftPayoutMethod } from '@/lib/dream-boards/payout-methods';
 import {
   isBankAccountNumberValid,
   isPartyDateWithinRange,
@@ -141,6 +142,23 @@ const createSchema = z
           code: z.ZodIssueCode.custom,
           path: ['payout_method'],
           message: 'Karri card fields require payout_method=karri_card',
+        });
+      }
+    }
+
+    if (payoutMethod === 'takealot_voucher') {
+      if (hasAnyKarriField) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['payout_method'],
+          message: 'Karri card fields require payout_method=karri_card',
+        });
+      }
+      if (hasAnyBankField) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['payout_method'],
+          message: 'Bank fields require payout_method=bank',
         });
       }
     }
@@ -288,7 +306,7 @@ const insertDreamBoard = async (params: {
   payload: CreatePayload;
   giftImageUrl: string;
   hostId: string;
-  payoutMethod: 'karri_card' | 'bank';
+  payoutMethod: DreamBoardGiftPayoutMethod;
   karriCardNumberEncrypted?: string | null;
   bankAccountNumberEncrypted?: string | null;
   bankAccountLast4?: string | null;
@@ -490,7 +508,7 @@ export const POST = withApiAuth('dreamboards:write', async (request: NextRequest
       return karriVerification.response;
     }
     karriCardNumberEncrypted = encryptSensitiveValue(karriVerification.cardNumber);
-  } else {
+  } else if (payoutMethod === 'bank') {
     const normalizedBankAccountNumber = normalizeBankAccountNumber(
       parsed.data.bank_account_number ?? ''
     );

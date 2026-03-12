@@ -41,10 +41,6 @@ export default async function CreateReviewPage() {
           karriCardHolderName: parsed.data.karriCardHolderName,
           bankName: parsed.data.bankName,
           bankAccountLast4: parsed.data.bankAccountLast4,
-          charityEnabled: parsed.data.charityEnabled,
-          charitySplitType: parsed.data.charitySplitType,
-          charityPercentageBps: parsed.data.charityPercentageBps,
-          charityThresholdCents: parsed.data.charityThresholdCents,
         }}
         publishAction={publishDreamBoardAction}
       />

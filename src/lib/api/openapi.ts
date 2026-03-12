@@ -1066,7 +1066,7 @@ export const openApiSpec = {
         type: 'string',
         enum: LOCKED_PAYOUT_METHODS,
         description:
-          'UX v2 enum set. Legacy clients that assumed karri_card-only responses must handle bank values.',
+          'UX v2 enum set. Legacy clients that assumed karri_card-only responses must handle bank and takealot_voucher values.',
       },
       CharitySplitType: {
         type: 'string',
@@ -1560,7 +1560,7 @@ export const openApiSpec = {
         type: 'string',
         enum: LOCKED_PAYOUT_TYPES,
         description:
-          'UX v2 enum set. Legacy clients that assumed karri_card-only payout types must handle bank and charity.',
+          'UX v2 enum set. Legacy clients that assumed karri_card-only payout types must handle bank, takealot_voucher, and charity.',
       },
       PayoutStatus: {
         type: 'string',
@@ -1578,6 +1578,16 @@ export const openApiSpec = {
           },
           payout_method: {
             $ref: '#/components/schemas/PayoutMethod',
+          },
+          host_whatsapp_number: {
+            type: 'string',
+            nullable: true,
+          },
+          fulfilment_mode: {
+            type: 'string',
+            nullable: true,
+            description:
+              'Voucher fulfilment state for manual placeholder flows and future automated delivery modes.',
           },
           karri_card_holder_name: {
             type: 'string',

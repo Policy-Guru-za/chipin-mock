@@ -12,8 +12,8 @@ A locked decision may change only via explicit update in this file with rational
 
 | ID | Decision | Status | Effective Value | Rationale | Impacted Areas |
 |---|---|---|---|---|---|
-| D-001 | Payout method enum | LOCKED | `karri_card`, `bank` | Matches current schema/runtime and avoids naming drift | DB, API, payouts, UI |
-| D-002 | Payout type enum | LOCKED | `karri_card`, `bank`, `charity` | Supports gift payout + charity payout ledger | Payout engine, admin, reports |
+| D-001 | Payout method enum | LOCKED | `karri_card`, `bank`, `takealot_voucher` | Matches current schema/runtime and keeps the default host-create payout method explicit instead of hidden UI-only behavior | DB, API, payouts, UI |
+| D-002 | Payout type enum | LOCKED | `karri_card`, `bank`, `takealot_voucher`, `charity` | Supports gift payout + voucher-placeholder payout + charity payout ledger | Payout engine, admin, reports |
 | D-003 | Charity split modes | LOCKED | `percentage`, `threshold` | Matches UX v2 architecture options | Create flow, validation, payout calc |
 | D-004 | Fee semantics | LOCKED | Contributor chooses gift amount; active checkout charges that amount with no added platform fee; raised amount tracks gift amount | Fee-free active product + stable payout math for legacy rows | Payment create, views, funded logic, payouts |
 | D-005 | Raised/funded source | LOCKED | `raised_cents` reflects contribution amount toward gift goal; funded when raised >= goal | Prevent fee distortion in goal progress | Guest/host UI, lifecycle transitions |
@@ -25,7 +25,7 @@ A locked decision may change only via explicit update in this file with rational
 
 ## Derived Implementation Rules
 
-- Any code path assuming Karri-only payout behavior is a defect after Phase B completion.
+- Any code path assuming Karri-only payout behavior or a Karri/bank-only host create path is a defect after Phase B completion.
 - OpenAPI enums must match runtime enums in all payout and Dreamboard schemas.
 - Charity-enabled boards require complete charity configuration; partial payloads rejected.
 - Reminder scheduling and dispatch must be idempotent by `(dream_board_id, email, remind_at)`.

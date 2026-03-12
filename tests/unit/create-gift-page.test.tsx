@@ -28,6 +28,7 @@ vi.mock('@/app/(host)/create/gift/actions', () => ({
 
 vi.mock('@/lib/host/create-view-model', () => ({
   buildCreateFlowViewModel: mocks.buildCreateFlowViewModel,
+  CREATE_FLOW_TOTAL_STEPS: 5,
 }));
 
 vi.mock('next/navigation', () => ({
@@ -36,7 +37,11 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/components/create-wizard', () => ({
   WizardStepper: (props: Record<string, unknown>) => (
-    <div data-testid="wizard-stepper" data-step={props.currentStep} />
+    <div
+      data-testid="wizard-stepper"
+      data-step={props.currentStep}
+      data-total={props.totalSteps}
+    />
   ),
   WizardCenteredLayout: (props: Record<string, unknown>) => (
     <div data-testid="centered-layout">{props.children as ReactNode}</div>
@@ -94,10 +99,11 @@ async function renderPage(sp: Record<string, string> = {}) {
 }
 
 describe('Create Gift Page', () => {
-  it('renders stepper at step 2 of 6', async () => {
+  it('renders stepper at step 2 of 5', async () => {
     const html = await renderPage();
     expect(html).toContain('data-testid="wizard-stepper"');
     expect(html).toContain('data-step="2"');
+    expect(html).toContain('data-total="5"');
   });
 
   it('renders centered layout with gift name and message fields', async () => {

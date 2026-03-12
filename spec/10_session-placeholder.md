@@ -1,4 +1,4 @@
-# 08_session-placeholder
+# 10_session-placeholder
 
 ## Objective
 
@@ -24,7 +24,7 @@
 
 ## Stage Plan
 
-1. Stage 1 — rename this placeholder in place to `08_<topic>.md`.
+1. Stage 1 — rename this placeholder in place to `10_<topic>.md`.
 2. Stage 2 — lock scope, dependencies, bounded stages, and test gate for that session.
 3. Stage 3 — implement, verify, dogfood, and hand off with a successor placeholder active.
 

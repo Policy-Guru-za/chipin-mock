@@ -2,6 +2,10 @@ import { and, asc, desc, eq, isNotNull, ne, sql } from 'drizzle-orm';
 
 import { db } from '@/lib/db';
 import { charities, contributions, dreamBoards, payouts } from '@/lib/db/schema';
+import type {
+  DreamBoardGiftPayoutMethod,
+  DreamBoardPayoutType,
+} from '@/lib/dream-boards/payout-methods';
 import { formatDateOnly, parseDateOnly } from '@/lib/utils/date';
 
 export type HostDashboardListRow = {
@@ -38,10 +42,11 @@ export type HostDashboardDetailRow = {
   message: string | null;
   status: string;
   goalCents: number;
-  payoutMethod: 'karri_card' | 'bank';
+  payoutMethod: DreamBoardGiftPayoutMethod;
   karriCardHolderName: string | null;
   bankAccountHolder: string | null;
   payoutEmail: string;
+  hostWhatsAppNumber: string;
   charityEnabled: boolean;
   charityName: string | null;
   charitySplitType: 'percentage' | 'threshold' | null;
@@ -56,7 +61,7 @@ export type HostDashboardDetailRow = {
 
 export type HostPayoutRow = {
   id: string;
-  type: 'karri_card' | 'bank' | 'charity';
+  type: DreamBoardPayoutType;
   status: 'pending' | 'processing' | 'completed' | 'failed';
   grossCents: number;
   feeCents: number;
@@ -160,6 +165,7 @@ export async function getDashboardDetailExpanded(
       karriCardHolderName: dreamBoards.karriCardHolderName,
       bankAccountHolder: dreamBoards.bankAccountHolder,
       payoutEmail: dreamBoards.payoutEmail,
+      hostWhatsAppNumber: dreamBoards.hostWhatsAppNumber,
       charityEnabled: dreamBoards.charityEnabled,
       charityName: charities.name,
       charitySplitType: dreamBoards.charitySplitType,

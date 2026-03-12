@@ -1,4 +1,5 @@
 import { decodeCursor, type PaginationCursor } from '@/lib/api/pagination';
+import { DREAMBOARD_GIFT_PAYOUT_METHODS, DREAMBOARD_PAYOUT_TYPES } from '@/lib/dream-boards/payout-methods';
 
 import type {
   AdminCharityFilters,
@@ -106,11 +107,11 @@ export const parseAdminPayoutFilters = (params: URLSearchParams): AdminPayoutFil
     ['pending', 'processing', 'completed', 'failed'].includes(status),
   ) as AdminPayoutFilters['statuses'],
   types: splitCsv(params.get('type')).filter((type) =>
-    ['karri_card', 'bank', 'charity'].includes(type),
+    (DREAMBOARD_PAYOUT_TYPES as readonly string[]).includes(type),
   ) as AdminPayoutFilters['types'],
   giftMethod:
-    params.get('gift_method') === 'karri_card' || params.get('gift_method') === 'bank'
-      ? (params.get('gift_method') as 'karri_card' | 'bank')
+    (DREAMBOARD_GIFT_PAYOUT_METHODS as readonly string[]).includes(params.get('gift_method') ?? '')
+      ? (params.get('gift_method') as AdminPayoutFilters['giftMethod'])
       : undefined,
   charityId: params.get('charity_id') || undefined,
   createdFrom: parseDateParam(params.get('created_from')),

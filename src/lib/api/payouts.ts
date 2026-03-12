@@ -38,6 +38,12 @@ const serializeRecipientBasics = (record: Record<string, unknown>) => {
   if (typeof record.email === 'string') payload.email = record.email;
   if (typeof record.childName === 'string') payload.child_name = record.childName;
   if (typeof record.payoutMethod === 'string') payload.payout_method = record.payoutMethod;
+  if (typeof record.hostWhatsAppNumber === 'string') {
+    payload.host_whatsapp_number = record.hostWhatsAppNumber;
+  }
+  if (typeof record.fulfilmentMode === 'string') {
+    payload.fulfilment_mode = record.fulfilmentMode;
+  }
   if (typeof record.karriCardHolderName === 'string') {
     payload.karri_card_holder_name = record.karriCardHolderName;
   }

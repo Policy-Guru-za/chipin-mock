@@ -6,6 +6,7 @@ import { LEGACY_PLACEHOLDER } from '@/lib/constants';
 import { isMockSentry } from '@/lib/config/feature-flags';
 import { db } from '@/lib/db';
 import { dreamBoards, payoutItems, payouts } from '@/lib/db/schema';
+import type { DreamBoardPayoutType } from '@/lib/dream-boards/payout-methods';
 import { log } from '@/lib/observability/logger';
 
 import { calculatePayoutTotals } from './calculation';
@@ -21,7 +22,7 @@ type BoardPayoutContext = NonNullable<Awaited<ReturnType<typeof getDreamBoardPay
 
 type PayoutRecord = typeof payouts.$inferSelect;
 type PayoutItemRecord = typeof payoutItems.$inferSelect;
-type PayoutType = PayoutRecord['type'];
+type PayoutType = DreamBoardPayoutType & PayoutRecord['type'];
 type PayoutItemType = PayoutItemRecord['type'];
 
 const isLegacyPlaceholder = (value?: string | null) =>
@@ -96,6 +97,24 @@ const getRecipientDataForBankGift = (params: {
   };
 };
 
+const getRecipientDataForVoucherGift = (params: {
+  payoutEmail: string;
+  hostWhatsAppNumber: string;
+  childName: string;
+  giftName: string;
+  giftImageUrl: string;
+  giftImagePrompt?: string | null;
+}) => ({
+  email: params.payoutEmail,
+  payoutMethod: 'takealot_voucher',
+  hostWhatsAppNumber: params.hostWhatsAppNumber,
+  childName: params.childName,
+  giftName: params.giftName,
+  giftImageUrl: params.giftImageUrl,
+  giftImagePrompt: params.giftImagePrompt ?? null,
+  fulfilmentMode: 'manual_placeholder',
+});
+
 const getGiftRecipientData = (board: BoardPayoutContext): PayoutRecipientData => {
   if (board.payoutMethod === 'karri_card') {
     return getRecipientDataForKarriGift({
@@ -121,6 +140,17 @@ const getGiftRecipientData = (board: BoardPayoutContext): PayoutRecipientData =>
       bankAccountLast4: board.bankAccountLast4,
       bankBranchCode: board.bankBranchCode,
       bankAccountHolder: board.bankAccountHolder,
+    });
+  }
+
+  if (board.payoutMethod === 'takealot_voucher') {
+    return getRecipientDataForVoucherGift({
+      payoutEmail: board.payoutEmail,
+      hostWhatsAppNumber: board.hostWhatsAppNumber,
+      childName: board.childName,
+      giftName: board.giftName,
+      giftImageUrl: board.giftImageUrl,
+      giftImagePrompt: board.giftImagePrompt,
     });
   }
 

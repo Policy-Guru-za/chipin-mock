@@ -1,4 +1,8 @@
 import { kvAdapter } from '@/lib/demo/kv-adapter';
+import {
+  DEFAULT_HOST_CREATE_PAYOUT_METHOD,
+  type DreamBoardGiftPayoutMethod,
+} from '@/lib/dream-boards/payout-methods';
 
 const DRAFT_EXPIRY_SECONDS = 60 * 60 * 24 * 7;
 
@@ -17,7 +21,7 @@ export type DreamBoardDraftInput = {
   giftImageUrl?: string;
   giftImagePrompt?: string;
   goalCents?: number;
-  payoutMethod?: 'karri_card' | 'bank';
+  payoutMethod?: DreamBoardGiftPayoutMethod;
   payoutEmail?: string;
   karriCardNumberEncrypted?: string;
   karriCardHolderName?: string;
@@ -50,7 +54,7 @@ export type DreamBoardDraft = {
   giftImageUrl?: string;
   giftImagePrompt?: string;
   goalCents?: number;
-  payoutMethod?: 'karri_card' | 'bank';
+  payoutMethod?: DreamBoardGiftPayoutMethod;
   payoutEmail?: string;
   karriCardNumberEncrypted?: string;
   karriCardHolderName?: string;
@@ -71,13 +75,42 @@ export type DreamBoardDraft = {
 
 const draftKey = (hostId: string) => `draft:host:${hostId}`;
 
+const normalizeDreamBoardDraftPayload = (draft: DreamBoardDraft): DreamBoardDraft => ({
+  ...draft,
+  payoutMethod: DEFAULT_HOST_CREATE_PAYOUT_METHOD,
+  karriCardNumberEncrypted: undefined,
+  karriCardHolderName: undefined,
+  bankName: undefined,
+  bankAccountNumberEncrypted: undefined,
+  bankAccountLast4: undefined,
+  bankBranchCode: undefined,
+  bankAccountHolder: undefined,
+  charityEnabled: false,
+  charityId: undefined,
+  charitySplitType: undefined,
+  charityPercentageBps: undefined,
+  charityThresholdCents: undefined,
+});
+
+export const normalizeDreamBoardDraft = (draft?: DreamBoardDraft | null): DreamBoardDraft | null => {
+  if (!draft) return null;
+
+  return normalizeDreamBoardDraftPayload({
+    ...draft,
+    updatedAt:
+      typeof draft.updatedAt === 'string' && draft.updatedAt.length
+        ? draft.updatedAt
+        : new Date().toISOString(),
+  });
+};
+
 export async function updateDreamBoardDraft(hostId: string, draft: DreamBoardDraftInput) {
   const existing = await getDreamBoardDraft(hostId);
-  const payload: DreamBoardDraft = {
+  const payload = normalizeDreamBoardDraftPayload({
     ...(existing ?? {}),
     ...draft,
     updatedAt: new Date().toISOString(),
-  };
+  });
 
   await kvAdapter.set(draftKey(hostId), payload, { ex: DRAFT_EXPIRY_SECONDS });
   return payload;
@@ -88,7 +121,18 @@ export async function saveDreamBoardDraft(hostId: string, draft: DreamBoardDraft
 }
 
 export async function getDreamBoardDraft(hostId: string) {
-  return kvAdapter.get<DreamBoardDraft>(draftKey(hostId));
+  const draft = await kvAdapter.get<DreamBoardDraft>(draftKey(hostId));
+  const normalized = normalizeDreamBoardDraft(draft);
+
+  if (!draft || !normalized) {
+    return normalized;
+  }
+
+  if (JSON.stringify(draft) !== JSON.stringify(normalized)) {
+    await kvAdapter.set(draftKey(hostId), normalized, { ex: DRAFT_EXPIRY_SECONDS });
+  }
+
+  return normalized;
 }
 
 export async function clearDreamBoardDraft(hostId: string) {

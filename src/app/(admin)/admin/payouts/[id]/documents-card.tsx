@@ -8,7 +8,7 @@ export const DocumentsCard = ({ payout }: { payout: PayoutDetail }) => {
     <Card className="space-y-4 p-6">
       <h2 className="text-lg font-semibold">Documents</h2>
       <p className="text-sm text-text-muted">
-        Karri card credits do not require receipts or certificates.
+        No receipt or certificate workflow is attached to this payout type yet.
       </p>
     </Card>
   );

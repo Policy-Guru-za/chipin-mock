@@ -1,4 +1,5 @@
 import { serializeGiftData } from '@/lib/api/gifts';
+import type { DreamBoardGiftPayoutMethod } from '@/lib/dream-boards/payout-methods';
 
 type DreamBoardApiRecord = {
   id: string;
@@ -13,7 +14,7 @@ type DreamBoardApiRecord = {
   giftDescription?: string | null;
   giftImageUrl: string | null;
   giftImagePrompt: string | null;
-  payoutMethod: 'karri_card' | 'bank';
+  payoutMethod: DreamBoardGiftPayoutMethod;
   karriCardHolderName?: string | null;
   bankName?: string | null;
   bankAccountLast4?: string | null;

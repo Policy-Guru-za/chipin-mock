@@ -2,7 +2,7 @@
 
 ## Current Spec
 
-- `08_session-placeholder`
+- `10_session-placeholder`
 
 ## Current Stage
 
@@ -10,9 +10,9 @@
 
 ## Status
 
-- Closed [`spec/07_napkin-enforcement.md`](./spec/07_napkin-enforcement.md) as done after registering a real repo-local napkin skill and wiring `Napkin Evidence` into the execution ledger.
-- Activated [`spec/08_session-placeholder.md`](./spec/08_session-placeholder.md) as the single successor placeholder for the next bounded session.
-- Locked napkin startup and handoff into the enforced path across AGENTS, repo skills, docs audit, and execution-artifact validation.
+- Closed [`spec/09_voucher-payout-api-contract-fix.md`](./spec/09_voucher-payout-api-contract-fix.md) as done after exposing voucher fulfilment contact data through payout read APIs and generated OpenAPI.
+- Activated [`spec/10_session-placeholder.md`](./spec/10_session-placeholder.md) as the single successor placeholder for the next bounded session.
+- Voucher payout read/list responses now publish `host_whatsapp_number` and `fulfilment_mode`, and regression coverage now locks those fields on both list and detail paths.
 
 ## Blockers
 
@@ -20,18 +20,19 @@
 
 ## Next Step
 
-- Rename [`spec/08_session-placeholder.md`](./spec/08_session-placeholder.md) in place to the next concrete session topic before substantive work starts.
+- Rename [`spec/10_session-placeholder.md`](./spec/10_session-placeholder.md) in place to the next concrete session topic before substantive work starts.
 
 ## Last Session Spec
 
-- `07_napkin-enforcement`
+- `09_voucher-payout-api-contract-fix`
 
 ## Last Completed Spec
 
-- `07_napkin-enforcement`
+- `09_voucher-payout-api-contract-fix`
 
 ## Last Green Commands
 
+- `pnpm openapi:generate`
 - `pnpm docs:audit -- --sync`
 - `pnpm docs:audit`
 - `pnpm lint`
@@ -40,10 +41,10 @@
 
 ## Dogfood Evidence
 
-- Session proof is now recorded under [`spec/07_napkin-enforcement.md`](./spec/07_napkin-enforcement.md), which captures the repo-local napkin skill, startup-path alignment, `Napkin Evidence` enforcement, and audit regression coverage.
-- Registry dogfood succeeded: [`spec/00_overview.md`](./spec/00_overview.md) now marks [`spec/07_napkin-enforcement.md`](./spec/07_napkin-enforcement.md) as `Done`, while [`spec/08_session-placeholder.md`](./spec/08_session-placeholder.md) is the single `Active` row.
-- Verification dogfood succeeded: `pnpm docs:audit -- --sync`, `pnpm docs:audit`, `pnpm lint`, `pnpm typecheck`, and `pnpm test` all passed on the final napkin-enforcement state; lint remained warning-only due existing repo debt, and the test suite finished at `196` files / `996` tests passing.
+- Session proof is recorded under [`spec/09_voucher-payout-api-contract-fix.md`](./spec/09_voucher-payout-api-contract-fix.md), which captures the voucher payout contract patch and bounded verification state.
+- Verification dogfood succeeded: `pnpm openapi:generate`, `pnpm docs:audit -- --sync`, `pnpm docs:audit`, `pnpm lint`, `pnpm typecheck`, and `pnpm test` all passed on the completed voucher payout contract state; lint remained warning-only due existing repo debt, and the final test suite finished at `198` files / `965` tests passing.
+- Contract dogfood succeeded: generated [`public/v1/openapi.json`](./public/v1/openapi.json) now documents voucher recipient fulfilment fields, while integration coverage proves both `GET /api/v1/payouts/pending` and `GET /api/v1/payouts/[id]` serialize those fields for `takealot_voucher` payouts.
 
 ## Napkin Evidence
 
-- Recorded the enforcement learning in [`docs/napkin/napkin.md`](./docs/napkin/napkin.md): the repo now loads a real napkin skill first and requires explicit handoff proof through `## Napkin Evidence`.
+- No durable napkin update.

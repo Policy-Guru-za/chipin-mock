@@ -174,7 +174,12 @@ export function DashboardDetailClient({
   const statusClass = badgeStyles[view.statusVariant] ?? badgeStyles.active;
   const visibleContributions = showAllContributions ? contributions : contributions.slice(0, 5);
   const visibleMessages = showAllMessages ? messages : messages.slice(0, 2);
-  const payoutMethodNote = view.payoutMethod === 'bank' ? 'via Bank Transfer' : 'via Karri Card';
+  const payoutMethodNote =
+    view.payoutMethod === 'bank'
+      ? 'via Bank Transfer'
+      : view.payoutMethod === 'takealot_voucher'
+        ? 'via Takealot Voucher'
+        : 'via Karri Card';
   const birthdayLabel = formatHeroDate(view.birthdayDate, {
     day: 'numeric',
     month: 'long',
@@ -468,7 +473,9 @@ export function DashboardDetailClient({
               <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] border border-border bg-white text-primary-700 shadow-input">
                 <WalletIcon size="sm" />
               </span>
-              <h2 className="font-display text-[16px] font-bold tracking-[-0.01em] text-text">Payout Details</h2>
+              <h2 className="font-display text-[16px] font-bold tracking-[-0.01em] text-text">
+                {view.payoutMethod === 'takealot_voucher' ? 'Voucher Details' : 'Payout Details'}
+              </h2>
             </div>
             <p className="mt-4 font-warmth-sans text-[13px] text-text-secondary">
               Method: <span className="text-[14px] font-semibold text-text">{view.payoutMethodLabel}</span>
@@ -478,7 +485,9 @@ export function DashboardDetailClient({
             </p>
             {view.payouts.length === 0 ? (
               <p className="mt-4 font-warmth-sans text-xs text-text-secondary">
-                Payout will be processed when the Dreamboard is closed.
+                {view.payoutMethod === 'takealot_voucher'
+                  ? 'Voucher follow-up will be prepared when the Dreamboard is closed.'
+                  : 'Payout will be processed when the Dreamboard is closed.'}
               </p>
             ) : (
               <ul className="mt-4 space-y-3">

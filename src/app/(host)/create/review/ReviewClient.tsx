@@ -14,6 +14,11 @@ import {
 } from '@/components/create-wizard';
 import { ConfettiTrigger } from '@/components/effects/ConfettiTrigger';
 import { formatBirthdayPartyLine } from '@/lib/dream-boards/party-visibility';
+import {
+  getDreamBoardGiftPayoutLabel,
+  type DreamBoardGiftPayoutMethod,
+} from '@/lib/dream-boards/payout-methods';
+import { CREATE_FLOW_TOTAL_STEPS } from '@/lib/host/create-view-model';
 import { parseDateOnly } from '@/lib/utils/date';
 
 type ReviewDraftData = {
@@ -26,16 +31,12 @@ type ReviewDraftData = {
   campaignEndDate: string;
   giftName: string;
   giftImageUrl: string;
-  payoutMethod: 'karri_card' | 'bank';
+  payoutMethod: DreamBoardGiftPayoutMethod;
   payoutEmail: string;
   hostWhatsAppNumber: string;
   karriCardHolderName?: string;
   bankName?: string;
   bankAccountLast4?: string;
-  charityEnabled?: boolean;
-  charitySplitType?: 'percentage' | 'threshold';
-  charityPercentageBps?: number;
-  charityThresholdCents?: number;
 };
 
 export type PublishState = {
@@ -61,31 +62,21 @@ const formatDate = (value: string) => {
   });
 };
 
-const formatRand = (cents: number) => `R${Math.round(cents / 100).toLocaleString('en-ZA')}`;
-
-const buildCharitySummary = (draft: ReviewDraftData) => {
-  if (!draft.charityEnabled) {
-    return 'No charity split selected.';
-  }
-  if (draft.charitySplitType === 'percentage' && draft.charityPercentageBps) {
-    return `Charity split: ${Math.round(draft.charityPercentageBps / 100)}% of contributions.`;
-  }
-  if (draft.charitySplitType === 'threshold' && draft.charityThresholdCents) {
-    return `Charity split: ${formatRand(draft.charityThresholdCents)} fixed amount.`;
-  }
-  return 'Charity split enabled.';
-};
-
 export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
   const [state, formAction, pending] = useActionState(publishAction, { status: 'preview' });
   const [copied, setCopied] = useState(false);
   const published = state.status === 'published';
   const shareUrl = state.shareUrl;
-  const charitySummary = useMemo(() => buildCharitySummary(draft), [draft]);
-  const payoutSummary =
-    draft.payoutMethod === 'bank'
-      ? `Bank transfer${draft.bankName ? ` (${draft.bankName})` : ''}${draft.bankAccountLast4 ? ` •••• ${draft.bankAccountLast4}` : ''}`
-      : `Karri Card${draft.karriCardHolderName ? ` (${draft.karriCardHolderName})` : ''}`;
+  const voucherSummary = useMemo(() => {
+    if (draft.payoutMethod === 'bank') {
+      return `Bank transfer${draft.bankName ? ` (${draft.bankName})` : ''}${draft.bankAccountLast4 ? ` •••• ${draft.bankAccountLast4}` : ''}`;
+    }
+    if (draft.payoutMethod === 'karri_card') {
+      return `Karri Card${draft.karriCardHolderName ? ` (${draft.karriCardHolderName})` : ''}`;
+    }
+
+    return `${getDreamBoardGiftPayoutLabel(draft.payoutMethod)} placeholder via ${draft.payoutEmail} and ${draft.hostWhatsAppNumber}`;
+  }, [draft]);
   const partyDateTimeSummary = formatBirthdayPartyLine({
     birthdayDate: draft.birthdayDate,
     partyDate: draft.partyDate,
@@ -133,8 +124,7 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
             giftImageUrl={draft.giftImageUrl}
             partyDateTimeLabel={partyDateTimeSummary}
             campaignCloseLabel={campaignCloseLabel}
-            payoutSummary={payoutSummary}
-            charitySummary={charitySummary}
+            voucherSummary={voucherSummary}
             shareUrl={shareUrl}
             copied={copied}
             onCopyShareUrl={copyShareUrl}
@@ -161,7 +151,11 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
 
   return (
     <>
-      <WizardStepper currentStep={6} totalSteps={6} stepLabel="Review" />
+      <WizardStepper
+        currentStep={5}
+        totalSteps={CREATE_FLOW_TOTAL_STEPS}
+        stepLabel="Review"
+      />
       <form action={formAction}>
         <WizardCenteredLayout>
           <WizardPanelTitle variant="form">Review your Dreamboard</WizardPanelTitle>
@@ -179,8 +173,7 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
               giftImageUrl={draft.giftImageUrl}
               partyDateTimeLabel={partyDateTimeSummary}
               campaignCloseLabel={campaignCloseLabel}
-              payoutSummary={payoutSummary}
-              charitySummary={charitySummary}
+              voucherSummary={voucherSummary}
             />
           </div>
 
@@ -203,24 +196,16 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
             >
               Edit dates
             </Link>
-            {draft.charityEnabled ? (
-              <Link
-                href="/create/giving-back"
-                className="wizard-interactive block py-1.5 text-[13px] font-medium text-primary transition-colors hover:text-sage-deep"
-              >
-                Edit charity settings
-              </Link>
-            ) : null}
             <Link
-              href="/create/payout"
+              href="/create/voucher"
               className="wizard-interactive block py-1.5 text-[13px] font-medium text-primary transition-colors hover:text-sage-deep"
             >
-              Edit payout details
+              Edit voucher details
             </Link>
           </div>
 
           <WizardCTA
-            backHref="/create/payout"
+            backHref="/create/voucher"
             submitLabel="Create Dreamboard"
             pendingLabel="Creating..."
             submitIcon="star"

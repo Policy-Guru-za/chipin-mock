@@ -1,14 +1,13 @@
 import type { ReactNode } from 'react';
 
-import { GiftIcon, HeartIcon, WalletIcon } from '@/components/icons';
+import { GiftIcon, WalletIcon } from '@/components/icons';
 import { CalendarIcon } from '@/components/icons/dreamboard-icons';
 
 type ReviewDetailRowsProps = {
   giftName: string;
   partyDateTimeLabel?: string | null;
   campaignCloseLabel: string;
-  payoutSummary: string;
-  charitySummary: string;
+  voucherSummary: string;
 };
 
 function ClockIcon({ className }: { className?: string }) {
@@ -59,8 +58,7 @@ export function ReviewDetailRows({
   giftName,
   partyDateTimeLabel,
   campaignCloseLabel,
-  payoutSummary,
-  charitySummary,
+  voucherSummary,
 }: ReviewDetailRowsProps) {
   return (
     <div>
@@ -90,15 +88,8 @@ export function ReviewDetailRows({
       <Row
         icon={<WalletIcon className="h-4 w-4 text-ink-faint" />}
         iconContainerClassName="bg-border-soft"
-        label="Payout"
-        value={payoutSummary}
-      />
-
-      <Row
-        icon={<HeartIcon className="h-4 w-4 text-sage" />}
-        iconContainerClassName="bg-sage-light"
-        label="Giving back"
-        value={charitySummary}
+        label="Voucher plan"
+        value={voucherSummary}
       />
     </div>
   );

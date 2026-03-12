@@ -27,7 +27,7 @@ const expectRedirect = async (promise: Promise<unknown>, expected: string) => {
   await expect(promise).rejects.toThrow(`REDIRECT:${expected}`);
 };
 
-const loadActions = async (store: DraftRecord, options?: { verifyKarriThrows?: boolean }) => {
+const loadActions = async (store: DraftRecord) => {
   vi.resetModules();
 
   vi.doMock('next/navigation', () => ({
@@ -53,25 +53,6 @@ const loadActions = async (store: DraftRecord, options?: { verifyKarriThrows?: b
     }),
   }));
 
-  vi.doMock('@/lib/utils/encryption', () => ({
-    encryptSensitiveValue: vi.fn((value: string) => `enc:${value}`),
-  }));
-
-  vi.doMock('@/lib/integrations/karri', () => ({
-    verifyKarriCard: vi.fn(async () => {
-      if (options?.verifyKarriThrows) {
-        throw new Error('karri unavailable');
-      }
-      return { valid: true };
-    }),
-  }));
-
-  vi.doMock('@/lib/config/feature-flags', () => ({
-    isMockSentry: () => true,
-  }));
-
-  vi.doMock('@sentry/nextjs', () => ({ captureException: vi.fn() }));
-
   const datesModule = await import('@/app/(host)/create/dates/actions');
   const givingBackModule = await import('@/app/(host)/create/giving-back/actions');
   const payoutModule = await import('@/app/(host)/create/payout/actions');
@@ -87,147 +68,53 @@ afterEach(() => {
   vi.unmock('next/navigation');
   vi.unmock('@/lib/auth/clerk-wrappers');
   vi.unmock('@/lib/dream-boards/draft');
-  vi.unmock('@/lib/utils/encryption');
-  vi.unmock('@/lib/integrations/karri');
-  vi.unmock('@/lib/config/feature-flags');
-  vi.unmock('@sentry/nextjs');
   vi.clearAllMocks();
   vi.resetModules();
 });
 
 describe('create flow step transitions', () => {
-  it('full happy path: karri payout with no charity', async () => {
-    process.env.CARD_DATA_ENCRYPTION_KEY = 'secret';
-
+  it('full happy path: voucher placeholder with no charity', async () => {
     const store: DraftRecord = { [hostId]: seedChildAndGift() };
-    const { saveDatesAction, saveGivingBackAction, savePayoutAction } = await loadActions(store);
+    const { saveDatesAction, savePayoutAction } = await loadActions(store);
 
     const datesForm = new FormData();
     datesForm.set('birthdayDate', addDays(20));
     datesForm.set('noPartyPlanned', 'on');
-    await expectRedirect(saveDatesAction(datesForm), '/create/giving-back');
+    await expectRedirect(saveDatesAction(datesForm), '/create/voucher');
 
-    expect(store[hostId].birthdayDate).toBe(addDays(20));
-    expect(store[hostId].partyDate).toBe(addDays(20));
-    expect(store[hostId].campaignEndDate).toBe(addDays(20));
+    const voucherForm = new FormData();
+    voucherForm.set('payoutEmail', 'parent@example.com');
+    voucherForm.set('hostWhatsAppNumber', '+27821234567');
+    await expectRedirect(savePayoutAction(voucherForm), '/create/review');
 
-    const givingBackForm = new FormData();
-    await expectRedirect(saveGivingBackAction(givingBackForm), '/create/payout');
-
+    expect(store[hostId].payoutMethod).toBe('takealot_voucher');
     expect(store[hostId].charityEnabled).toBe(false);
-    expect(store[hostId].charityId).toBeUndefined();
-
-    const payoutForm = new FormData();
-    payoutForm.set('payoutMethod', 'karri_card');
-    payoutForm.set('payoutEmail', 'parent@example.com');
-    payoutForm.set('hostWhatsAppNumber', '+27821234567');
-    payoutForm.set('karriCardNumber', '1234567890123456');
-    payoutForm.set('karriCardHolderName', 'Maya Parent');
-
-    await expectRedirect(savePayoutAction(payoutForm), '/create/review');
-
-    expect(store[hostId].karriCardNumberEncrypted).toBe('enc:1234567890123456');
     expect(store[hostId].bankAccountNumberEncrypted).toBeUndefined();
+    expect(store[hostId].karriCardNumberEncrypted).toBeUndefined();
 
     const view = buildCreateFlowViewModel({ step: 'review', draft: store[hostId] as any });
     expect(view.redirectTo).toBeUndefined();
   });
 
-  it('full happy path: bank payout with charity percentage split', async () => {
-    process.env.CARD_DATA_ENCRYPTION_KEY = 'secret';
-
-    const store: DraftRecord = { [hostId]: seedChildAndGift() };
-    const { saveDatesAction, saveGivingBackAction, savePayoutAction } = await loadActions(store);
-
-    const datesForm = new FormData();
-    datesForm.set('birthdayDate', addDays(25));
-    datesForm.set('noPartyPlanned', 'on');
-    await expectRedirect(saveDatesAction(datesForm), '/create/giving-back');
-
-    const givingBackForm = new FormData();
-    givingBackForm.set('charityEnabled', 'on');
-    givingBackForm.set('charityId', '00000000-0000-4000-8000-000000000001');
-    givingBackForm.set('charitySplitType', 'percentage');
-    givingBackForm.set('charityPercentage', '25');
-    await expectRedirect(saveGivingBackAction(givingBackForm), '/create/payout');
-
-    const payoutForm = new FormData();
-    payoutForm.set('payoutMethod', 'bank');
-    payoutForm.set('payoutEmail', 'parent@example.com');
-    payoutForm.set('hostWhatsAppNumber', '+27821234567');
-    payoutForm.set('bankName', 'Standard Bank');
-    payoutForm.set('bankAccountNumber', '123456789012');
-    payoutForm.set('bankBranchCode', '051001');
-    payoutForm.set('bankAccountHolder', 'Maya Parent');
-    await expectRedirect(savePayoutAction(payoutForm), '/create/review');
-
-    expect(store[hostId].charityPercentageBps).toBe(2500);
-    expect(store[hostId].charityThresholdCents).toBeUndefined();
-    expect(store[hostId].bankAccountNumberEncrypted).toBe('enc:123456789012');
-  });
-
-  it('full happy path: bank payout with charity threshold split', async () => {
-    process.env.CARD_DATA_ENCRYPTION_KEY = 'secret';
-
-    const store: DraftRecord = { [hostId]: seedChildAndGift() };
-    const { saveDatesAction, saveGivingBackAction, savePayoutAction } = await loadActions(store);
-
-    const datesForm = new FormData();
-    datesForm.set('birthdayDate', addDays(25));
-    datesForm.set('noPartyPlanned', 'on');
-    await expectRedirect(saveDatesAction(datesForm), '/create/giving-back');
-
-    const givingBackForm = new FormData();
-    givingBackForm.set('charityEnabled', 'on');
-    givingBackForm.set('charityId', '00000000-0000-4000-8000-000000000001');
-    givingBackForm.set('charitySplitType', 'threshold');
-    givingBackForm.set('charityThresholdAmount', '120');
-    await expectRedirect(saveGivingBackAction(givingBackForm), '/create/payout');
-
-    const payoutForm = new FormData();
-    payoutForm.set('payoutMethod', 'bank');
-    payoutForm.set('payoutEmail', 'parent@example.com');
-    payoutForm.set('hostWhatsAppNumber', '+27821234567');
-    payoutForm.set('bankName', 'Standard Bank');
-    payoutForm.set('bankAccountNumber', '123456789012');
-    payoutForm.set('bankBranchCode', '051001');
-    payoutForm.set('bankAccountHolder', 'Maya Parent');
-    await expectRedirect(savePayoutAction(payoutForm), '/create/review');
-
-    expect(store[hostId].charityThresholdCents).toBe(12000);
-    expect(store[hostId].charityPercentageBps).toBeUndefined();
-  });
-
-  it('prevents skipping steps and redirects to unmet prerequisite', async () => {
-    process.env.CARD_DATA_ENCRYPTION_KEY = 'secret';
-
+  it('prevents skipping voucher setup and redirects back to dates', async () => {
     const store: DraftRecord = {
       [hostId]: {
         ...seedChildAndGift(),
-        birthdayDate: addDays(20),
-        partyDate: addDays(20),
-        campaignEndDate: addDays(20),
       },
     };
 
     const { savePayoutAction } = await loadActions(store);
+    const voucherForm = new FormData();
+    voucherForm.set('payoutEmail', 'parent@example.com');
+    voucherForm.set('hostWhatsAppNumber', '+27821234567');
 
-    const payoutForm = new FormData();
-    payoutForm.set('payoutMethod', 'karri_card');
-    payoutForm.set('payoutEmail', 'parent@example.com');
-    payoutForm.set('hostWhatsAppNumber', '+27821234567');
-    payoutForm.set('karriCardNumber', '1234567890123456');
-    payoutForm.set('karriCardHolderName', 'Maya Parent');
-
-    await expectRedirect(savePayoutAction(payoutForm), '/create/giving-back');
+    await expectRedirect(savePayoutAction(voucherForm), '/create/dates');
 
     const reviewView = buildCreateFlowViewModel({ step: 'review', draft: store[hostId] as any });
-    expect(reviewView.redirectTo).toBe('/create/payout');
+    expect(reviewView.redirectTo).toBe('/create/voucher');
   });
 
-  it('preserves draft data across reload and later updates', async () => {
-    process.env.CARD_DATA_ENCRYPTION_KEY = 'secret';
-
+  it('preserves draft data across later updates', async () => {
     const store: DraftRecord = { [hostId]: seedChildAndGift() };
     const { saveDatesAction } = await loadActions(store);
 
@@ -236,45 +123,35 @@ describe('create flow step transitions', () => {
     datesForm.set('partyDate', addDays(23));
     datesForm.set('campaignEndDate', addDays(23));
 
-    await expectRedirect(saveDatesAction(datesForm), '/create/giving-back');
+    await expectRedirect(saveDatesAction(datesForm), '/create/voucher');
 
     expect(store[hostId].childName).toBe('Maya');
     expect(store[hostId].giftName).toBe('Scooter');
     expect(store[hostId].partyDate).toBe(addDays(23));
-
-    store[hostId] = {
-      ...store[hostId],
-      giftName: 'Scooter Deluxe',
-    };
-
-    expect(store[hostId].partyDate).toBe(addDays(23));
     expect(store[hostId].campaignEndDate).toBe(addDays(23));
   });
 
-  it('clears charity fields when toggling giving-back off after it was enabled', async () => {
+  it('clears charity fields when legacy giving-back submits into the new flow', async () => {
     const store: DraftRecord = {
       [hostId]: {
         ...seedChildAndGift(),
         birthdayDate: addDays(20),
         partyDate: addDays(20),
         campaignEndDate: addDays(20),
+        charityEnabled: true,
+        charityId: '00000000-0000-4000-8000-000000000001',
+        charitySplitType: 'percentage',
+        charityPercentageBps: 3000,
       },
     };
 
     const { saveGivingBackAction } = await loadActions(store);
 
-    const onForm = new FormData();
-    onForm.set('charityEnabled', 'on');
-    onForm.set('charityId', '00000000-0000-4000-8000-000000000001');
-    onForm.set('charitySplitType', 'percentage');
-    onForm.set('charityPercentage', '30');
-    await expectRedirect(saveGivingBackAction(onForm), '/create/payout');
+    const formData = new FormData();
+    formData.set('charityEnabled', 'on');
+    formData.set('charityId', '00000000-0000-4000-8000-000000000001');
 
-    expect(store[hostId].charityEnabled).toBe(true);
-    expect(store[hostId].charityPercentageBps).toBe(3000);
-
-    const offForm = new FormData();
-    await expectRedirect(saveGivingBackAction(offForm), '/create/payout');
+    await expectRedirect(saveGivingBackAction(formData), '/create/voucher');
 
     expect(store[hostId].charityEnabled).toBe(false);
     expect(store[hostId].charityId).toBeUndefined();
@@ -283,34 +160,25 @@ describe('create flow step transitions', () => {
     expect(store[hostId].charityThresholdCents).toBeUndefined();
   });
 
-  it('preserves host message while later steps update other draft fields', async () => {
-    process.env.CARD_DATA_ENCRYPTION_KEY = 'secret';
-
+  it('preserves the host message while voucher details update later fields', async () => {
     const store: DraftRecord = {
       [hostId]: {
         ...seedChildAndGift(),
+        birthdayDate: addDays(20),
+        partyDate: addDays(22),
+        campaignEndDate: addDays(22),
         message: 'Thanks for helping make this happen.',
       },
     };
-    const { saveDatesAction, saveGivingBackAction, savePayoutAction } = await loadActions(store);
+    const { savePayoutAction } = await loadActions(store);
 
-    const datesForm = new FormData();
-    datesForm.set('birthdayDate', addDays(20));
-    datesForm.set('partyDate', addDays(22));
-    datesForm.set('campaignEndDate', addDays(22));
-    await expectRedirect(saveDatesAction(datesForm), '/create/giving-back');
+    const voucherForm = new FormData();
+    voucherForm.set('payoutEmail', 'parent@example.com');
+    voucherForm.set('hostWhatsAppNumber', '+27821234567');
 
-    const givingBackForm = new FormData();
-    await expectRedirect(saveGivingBackAction(givingBackForm), '/create/payout');
-
-    const payoutForm = new FormData();
-    payoutForm.set('payoutMethod', 'karri_card');
-    payoutForm.set('payoutEmail', 'parent@example.com');
-    payoutForm.set('hostWhatsAppNumber', '+27821234567');
-    payoutForm.set('karriCardNumber', '1234567890123456');
-    payoutForm.set('karriCardHolderName', 'Maya Parent');
-    await expectRedirect(savePayoutAction(payoutForm), '/create/review');
+    await expectRedirect(savePayoutAction(voucherForm), '/create/review');
 
     expect(store[hostId].message).toBe('Thanks for helping make this happen.');
+    expect(store[hostId].payoutMethod).toBe('takealot_voucher');
   });
 });

@@ -10,7 +10,10 @@ import {
 } from '@/components/create-wizard';
 import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
 import { getDreamBoardDraft } from '@/lib/dream-boards/draft';
-import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
+import {
+  buildCreateFlowViewModel,
+  CREATE_FLOW_TOTAL_STEPS,
+} from '@/lib/host/create-view-model';
 
 const datesErrorMessages: Record<string, string> = {
   invalid: 'Please complete all required date fields.',
@@ -84,7 +87,7 @@ export default async function CreateDatesPage({
 
   return (
     <>
-      <WizardStepper currentStep={3} totalSteps={6} stepLabel="The dates" />
+      <WizardStepper currentStep={3} totalSteps={CREATE_FLOW_TOTAL_STEPS} stepLabel="The dates" />
 
       <Suspense fallback={<WizardSkeletonLoader variant="split" />}>
         <DatesForm

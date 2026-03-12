@@ -16,6 +16,12 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
+import {
+  DEFAULT_HOST_CREATE_PAYOUT_METHOD,
+  DREAMBOARD_GIFT_PAYOUT_METHODS,
+  DREAMBOARD_PAYOUT_TYPES,
+} from '@/lib/dream-boards/payout-methods';
+
 export const dreamBoardStatusEnum = pgEnum('dream_board_status', [
   'draft',
   'active',
@@ -26,7 +32,7 @@ export const dreamBoardStatusEnum = pgEnum('dream_board_status', [
   'cancelled',
 ]);
 
-export const payoutMethodEnum = pgEnum('payout_method', ['karri_card', 'bank']);
+export const payoutMethodEnum = pgEnum('payout_method', DREAMBOARD_GIFT_PAYOUT_METHODS);
 
 export const charitySplitTypeEnum = pgEnum('charity_split_type', ['percentage', 'threshold']);
 
@@ -47,7 +53,7 @@ export const payoutStatusEnum = pgEnum('payout_status', [
   'failed',
 ]);
 
-export const payoutTypeEnum = pgEnum('payout_type', ['karri_card', 'bank', 'charity']);
+export const payoutTypeEnum = pgEnum('payout_type', DREAMBOARD_PAYOUT_TYPES);
 
 export const payoutItemTypeEnum = pgEnum('payout_item_type', ['gift', 'charity']);
 
@@ -138,8 +144,10 @@ export const dreamBoards = pgTable(
     giftImagePrompt: text('gift_image_prompt'), // Deprecated, null for icon-based boards
     goalCents: integer('goal_cents').notNull().default(0),
 
-    // v3.0: Karri Card or bank transfer payout
-    payoutMethod: payoutMethodEnum('payout_method').notNull().default('karri_card'),
+    // Active host create flow: voucher placeholder; legacy/API flows may still use Karri or bank.
+    payoutMethod: payoutMethodEnum('payout_method')
+      .notNull()
+      .default(DEFAULT_HOST_CREATE_PAYOUT_METHOD),
     karriCardNumber: text('karri_card_number'),
     karriCardHolderName: varchar('karri_card_holder_name', { length: 100 }),
     bankName: varchar('bank_name', { length: 120 }),
@@ -229,6 +237,16 @@ export const dreamBoards = pgTable(
         AND ${table.bankAccountLast4} IS NOT NULL
         AND ${table.bankBranchCode} IS NOT NULL
         AND ${table.bankAccountHolder} IS NOT NULL
+      )
+      OR (
+        ${table.payoutMethod} = 'takealot_voucher'
+        AND ${table.karriCardNumber} IS NULL
+        AND ${table.karriCardHolderName} IS NULL
+        AND ${table.bankName} IS NULL
+        AND ${table.bankAccountNumberEncrypted} IS NULL
+        AND ${table.bankAccountLast4} IS NULL
+        AND ${table.bankBranchCode} IS NULL
+        AND ${table.bankAccountHolder} IS NULL
       )`
     ),
   })

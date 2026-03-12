@@ -1,4 +1,8 @@
 import type { PaginationCursor } from '@/lib/api/pagination';
+import type {
+  DreamBoardGiftPayoutMethod,
+  DreamBoardPayoutType,
+} from '@/lib/dream-boards/payout-methods';
 
 export type AdminPage<T> = {
   items: T[];
@@ -71,8 +75,8 @@ export type AdminContributionDataset = {
 
 export type AdminPayoutFilters = AdminListParams & {
   statuses?: Array<'pending' | 'processing' | 'completed' | 'failed'>;
-  types?: Array<'karri_card' | 'bank' | 'charity'>;
-  giftMethod?: 'karri_card' | 'bank';
+  types?: Array<DreamBoardPayoutType>;
+  giftMethod?: DreamBoardGiftPayoutMethod;
   charityId?: string;
   createdFrom?: Date;
   createdTo?: Date;
@@ -83,7 +87,7 @@ export type AdminPayoutDataset = {
   dreamBoardId: string;
   dreamBoardSlug: string;
   childName: string;
-  type: 'karri_card' | 'bank' | 'charity';
+  type: DreamBoardPayoutType;
   status: 'pending' | 'processing' | 'completed' | 'failed';
   grossCents: number;
   charityCents: number;

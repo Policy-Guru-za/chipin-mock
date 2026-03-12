@@ -7,12 +7,12 @@
 ## Core Enums
 
 - `dream_board_status`: `draft | active | funded | closed | paid_out | expired | cancelled`
-- `payout_method`: `karri_card | bank`
+- `payout_method`: `karri_card | bank | takealot_voucher`
 - `charity_split_type`: `percentage | threshold`
 - `payment_status`: `pending | processing | completed | failed | refunded`
 - `payment_provider`: `payfast | ozow | snapscan`
 - `payout_status`: `pending | processing | completed | failed`
-- `payout_type`: `karri_card | bank | charity`
+- `payout_type`: `karri_card | bank | takealot_voucher | charity`
 
 ## Core Tables
 
@@ -26,6 +26,7 @@ Important fields:
 - gift fields and icon/image path
 - `goal_cents`
 - payout method + method-specific recipient data
+- default host-create path writes `payout_method='takealot_voucher'` and clears Karri/bank fields
 - optional charity configuration
 - `status`
 
@@ -43,6 +44,9 @@ Important money fields:
 ### `payouts`
 
 Stores gift payout rows and, when applicable, charity payout rows.
+
+- gift payout type matches the Dreamboard `payout_method`
+- `takealot_voucher` rows are manual placeholder fulfilment records; they are not auto-executed
 
 ### `payout_items`
 

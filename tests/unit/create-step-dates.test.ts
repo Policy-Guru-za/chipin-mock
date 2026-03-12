@@ -34,7 +34,7 @@ afterEach(() => {
 });
 
 describe('saveDatesAction', () => {
-  it('saves valid dates and redirects to giving-back', async () => {
+  it('saves valid dates and redirects to voucher setup', async () => {
     const redirectMock = vi.fn((url: string) => {
       throw new Error(`REDIRECT:${url}`);
     });
@@ -52,7 +52,7 @@ describe('saveDatesAction', () => {
     formData.set('partyDate', addDays(22));
     formData.set('campaignEndDate', addDays(22));
 
-    await expect(saveDatesAction(formData)).rejects.toThrow('REDIRECT:/create/giving-back');
+    await expect(saveDatesAction(formData)).rejects.toThrow('REDIRECT:/create/voucher');
     expect(updateDreamBoardDraft).toHaveBeenCalledWith('host-1', {
       birthdayDate: addDays(20),
       partyDate: addDays(22),
@@ -163,7 +163,7 @@ describe('saveDatesAction', () => {
     formData.set('birthdayDate', addDays(20));
     formData.set('noPartyPlanned', 'on');
 
-    await expect(saveDatesAction(formData)).rejects.toThrow('REDIRECT:/create/giving-back');
+    await expect(saveDatesAction(formData)).rejects.toThrow('REDIRECT:/create/voucher');
     expect(updateDreamBoardDraft).toHaveBeenCalledWith('host-1', {
       birthdayDate: addDays(20),
       partyDate: addDays(20),
@@ -193,7 +193,7 @@ describe('saveDatesAction', () => {
     formData.set('campaignEndDate', addDays(22));
     formData.set('partyDateTimeDate', partyDateTimeDate);
 
-    await expect(saveDatesAction(formData)).rejects.toThrow('REDIRECT:/create/giving-back');
+    await expect(saveDatesAction(formData)).rejects.toThrow('REDIRECT:/create/voucher');
     expect(updateDreamBoardDraft).toHaveBeenCalledWith('host-1', {
       birthdayDate: addDays(20),
       partyDate: addDays(22),

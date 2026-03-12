@@ -14,8 +14,7 @@ afterEach(() => {
 const baseProps = {
   giftName: 'Electric Scooter',
   campaignCloseLabel: '28 February 2026',
-  payoutSummary: 'Karri Card (Max Charter)',
-  charitySummary: 'No charity split selected.',
+  voucherSummary: 'Takealot Voucher placeholder via parent@example.com and +27821234567',
 };
 
 const getRowForLabel = (label: string) => {
@@ -31,7 +30,7 @@ describe('ReviewDetailRows', () => {
   it('renders five rows in order when party date/time is present', () => {
     render(<ReviewDetailRows {...baseProps} partyDateTimeLabel="28 February 2026, 11:00" />);
 
-    const labels = ['Dream gift', 'Birthday party', 'Campaign closes', 'Payout', 'Giving back'];
+    const labels = ['Dream gift', 'Birthday party', 'Campaign closes', 'Voucher plan'];
     const nodes = labels.map((label) => screen.getByText(label));
 
     for (let index = 1; index < nodes.length; index += 1) {
@@ -44,8 +43,8 @@ describe('ReviewDetailRows', () => {
 
     expect(screen.getByText('Dream gift')).toBeInTheDocument();
     expect(screen.getByText('Campaign closes')).toBeInTheDocument();
-    expect(screen.getByText('Payout')).toBeInTheDocument();
-    expect(screen.getByText('Giving back')).toBeInTheDocument();
+    expect(screen.getByText('Voucher plan')).toBeInTheDocument();
+    expect(screen.getByText(baseProps.voucherSummary)).toBeInTheDocument();
     expect(screen.queryByText('Birthday party')).not.toBeInTheDocument();
   });
 

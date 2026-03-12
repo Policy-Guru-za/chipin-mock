@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+import {
+  DEFAULT_HOST_CREATE_PAYOUT_METHOD,
+  DREAMBOARD_GIFT_PAYOUT_METHODS,
+} from '@/lib/dream-boards/payout-methods';
 import { SA_MOBILE_REGEX } from '@/lib/dream-boards/validation';
 
 export const dreamBoardDraftSchema = z
@@ -17,7 +21,7 @@ export const dreamBoardDraftSchema = z
     giftImageUrl: z.string().regex(/^\/icons\/gifts\/[a-z0-9-]+\.png$/, 'Must be a valid gift icon path'),
     giftImagePrompt: z.string().optional(),
     goalCents: z.number().int().min(0).optional().default(0),
-    payoutMethod: z.enum(['karri_card', 'bank']),
+    payoutMethod: z.enum(DREAMBOARD_GIFT_PAYOUT_METHODS).default(DEFAULT_HOST_CREATE_PAYOUT_METHOD),
     payoutEmail: z.string().email(),
     karriCardNumberEncrypted: z.string().min(1).optional(),
     karriCardHolderName: z.string().min(2).max(100).optional(),

@@ -12,9 +12,10 @@ Current create flow:
 1. `/create/child`
 2. `/create/gift`
 3. `/create/dates`
-4. `/create/giving-back`
-5. `/create/payout`
-6. `/create/review`
+4. `/create/voucher`
+5. `/create/review`
+
+Legacy compatibility routes `/create/giving-back` and `/create/payout` redirect to `/create/voucher`; they are not active wizard steps.
 
 Hosts then manage boards from `/dashboard` and `/dashboard/[id]`.
 

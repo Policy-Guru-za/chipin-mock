@@ -1,7 +1,12 @@
+import {
+  DREAMBOARD_GIFT_PAYOUT_METHODS,
+  DREAMBOARD_PAYOUT_TYPES,
+} from '@/lib/dream-boards/payout-methods';
+
 export const LOCK_STATUS = 'LOCKED' as const;
 
-export const LOCKED_PAYOUT_METHODS = ['karri_card', 'bank'] as const;
-export const LOCKED_PAYOUT_TYPES = ['karri_card', 'bank', 'charity'] as const;
+export const LOCKED_PAYOUT_METHODS = DREAMBOARD_GIFT_PAYOUT_METHODS;
+export const LOCKED_PAYOUT_TYPES = DREAMBOARD_PAYOUT_TYPES;
 export const LOCKED_CHARITY_SPLIT_MODES = ['percentage', 'threshold'] as const;
 
 export const LOCKED_FEE_SEMANTICS = {

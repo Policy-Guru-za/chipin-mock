@@ -24,6 +24,7 @@ vi.mock('@/lib/dream-boards/draft', () => ({
 
 vi.mock('@/lib/host/create-view-model', () => ({
   buildCreateFlowViewModel: mocks.buildCreateFlowViewModel,
+  CREATE_FLOW_TOTAL_STEPS: 5,
 }));
 
 vi.mock('@/app/(host)/create/dates/actions', () => ({
@@ -36,7 +37,11 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/components/create-wizard', () => ({
   WizardStepper: (props: Record<string, unknown>) => (
-    <div data-testid="wizard-stepper" data-step={props.currentStep} />
+    <div
+      data-testid="wizard-stepper"
+      data-step={props.currentStep}
+      data-total={props.totalSteps}
+    />
   ),
   WizardSkeletonLoader: () => <div data-testid="wizard-skeleton-loader" />,
   resolveWizardError: (code: string | undefined) => (code ? `Resolved: ${code}` : null),
@@ -87,10 +92,11 @@ async function renderPage(sp: Record<string, string> = {}) {
 }
 
 describe('Create Dates Page', () => {
-  it('renders stepper at step 3 of 6', async () => {
+  it('renders stepper at step 3 of 5', async () => {
     const html = await renderPage();
     expect(html).toContain('data-testid="wizard-stepper"');
     expect(html).toContain('data-step="3"');
+    expect(html).toContain('data-total="5"');
   });
 
   it('passes draft birthday date to DatesForm', async () => {

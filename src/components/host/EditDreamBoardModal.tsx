@@ -263,7 +263,7 @@ export function EditDreamBoardModal({
         </div>
 
         <div className="mb-5 rounded-r-lg border-l-4 border-blue-400 bg-blue-50 p-4 text-sm text-blue-800">
-          Gift details and charity settings cannot be changed after creation to protect contributor trust.
+          Gift and fulfilment settings cannot be changed after creation to protect contributor trust.
         </div>
 
         {!showConfirm ? (

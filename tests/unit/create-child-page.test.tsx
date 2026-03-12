@@ -22,6 +22,7 @@ vi.mock('@/lib/dream-boards/draft', () => ({
 
 vi.mock('@/lib/host/create-view-model', () => ({
   buildCreateFlowViewModel: mocks.buildCreateFlowViewModel,
+  CREATE_FLOW_TOTAL_STEPS: 5,
 }));
 
 vi.mock('@/app/(host)/create/child/actions', () => ({
@@ -30,7 +31,11 @@ vi.mock('@/app/(host)/create/child/actions', () => ({
 
 vi.mock('@/components/create-wizard', () => ({
   WizardStepper: (props: Record<string, unknown>) => (
-    <div data-testid="wizard-stepper" data-step={props.currentStep} />
+    <div
+      data-testid="wizard-stepper"
+      data-step={props.currentStep}
+      data-total={props.totalSteps}
+    />
   ),
   WizardSkeletonLoader: () => <div data-testid="skeleton" />,
   resolveWizardError: (code: string | undefined) => (code ? `Error: ${code}` : null),
@@ -66,10 +71,11 @@ async function renderPage(sp: Record<string, string> = {}) {
 }
 
 describe('Create Child Page', () => {
-  it('renders stepper at step 1 of 6', async () => {
+  it('renders stepper at step 1 of 5', async () => {
     const html = await renderPage();
     expect(html).toContain('data-testid="wizard-stepper"');
     expect(html).toContain('data-step="1"');
+    expect(html).toContain('data-total="5"');
   });
 
   it('delegates rendering to ChildStepForm', async () => {

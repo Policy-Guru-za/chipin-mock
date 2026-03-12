@@ -79,6 +79,7 @@ export function DashboardPostCampaignClient({
     contributors: false,
   });
   const [errorToast, setErrorToast] = useState<string | null>(null);
+  const settlementLabel = view.payoutMethod === 'takealot_voucher' ? 'Your Voucher Value' : 'Your Payout';
 
   const downloadMessages = async () => {
     setDownloadState((state) => ({ ...state, messages: true }));
@@ -144,7 +145,7 @@ export function DashboardPostCampaignClient({
           <hr className="border-border" />
           <div className="rounded-lg bg-primary-50 px-4 py-3">
             <div className="flex items-center justify-between">
-              <span className="font-display text-[18px] font-bold text-text">Your Payout</span>
+              <span className="font-display text-[18px] font-bold text-text">{settlementLabel}</span>
               <span className="font-display text-[28px] font-bold text-sage">{view.payoutLabel}</span>
             </div>
           </div>
@@ -154,7 +155,11 @@ export function DashboardPostCampaignClient({
       <article className="rounded-[14px] border border-border/60 bg-white p-6 shadow-card">
         <h2 className="font-display text-[18px] font-bold tracking-[-0.01em] text-text">Payout Status</h2>
         {view.payouts.length === 0 ? (
-          <p className="mt-4 font-warmth-sans text-xs text-text-muted">Payout processing has not started yet.</p>
+          <p className="mt-4 font-warmth-sans text-xs text-text-muted">
+            {view.payoutMethod === 'takealot_voucher'
+              ? 'Voucher follow-up has not started yet.'
+              : 'Payout processing has not started yet.'}
+          </p>
         ) : (
           <ul className="mt-4 space-y-4">
             {view.payouts.map((payout) => {

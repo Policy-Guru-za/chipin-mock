@@ -31,8 +31,7 @@ const baseProps = {
   giftImageUrl: 'https://images.example/playstation.jpg',
   partyDateTimeLabel: '28 February 2026, 11:00',
   campaignCloseLabel: '28 February 2026',
-  payoutSummary: 'Karri Card (Max Charter)',
-  charitySummary: 'No charity split selected.',
+  voucherSummary: 'Takealot Voucher placeholder via parent@example.com and +27821234567',
 };
 
 afterEach(() => {
@@ -48,8 +47,8 @@ describe('ReviewPreviewCard', () => {
     expect(html).toContain('PlayStation II');
     expect(html).toContain('Birthday party');
     expect(html).toContain('Campaign closes');
-    expect(html).toContain('Payout');
-    expect(html).toContain('No charity split selected.');
+    expect(html).toContain('Voucher plan');
+    expect(html).toContain('Takealot Voucher placeholder');
     expect(html).toContain('https://images.example/max-avatar.jpg');
     expect(html).toContain('/Logos/Original.png');
     expect(html).not.toContain('https://images.example/playstation.jpg');

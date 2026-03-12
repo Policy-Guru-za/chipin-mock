@@ -1,6 +1,7 @@
 import type { PublishState } from '@/app/(host)/create/review/ReviewClient';
 import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
 import { clearDreamBoardDraft, getDreamBoardDraft } from '@/lib/dream-boards/draft';
+import { DEFAULT_HOST_CREATE_PAYOUT_METHOD } from '@/lib/dream-boards/payout-methods';
 import { dreamBoardDraftSchema } from '@/lib/dream-boards/schema';
 import { db } from '@/lib/db';
 import { DEFAULT_PARTNER_ID } from '@/lib/db/partners';
@@ -46,7 +47,10 @@ export async function publishDreamBoardAction(
         giftImageUrl: parsed.data.giftImageUrl,
         giftImagePrompt: parsed.data.giftImagePrompt,
         goalCents: parsed.data.goalCents ?? 0,
-        payoutMethod: parsed.data.payoutMethod,
+        payoutMethod:
+          parsed.data.payoutMethod === DEFAULT_HOST_CREATE_PAYOUT_METHOD
+            ? DEFAULT_HOST_CREATE_PAYOUT_METHOD
+            : parsed.data.payoutMethod,
         karriCardNumber:
           parsed.data.payoutMethod === 'karri_card' ? parsed.data.karriCardNumberEncrypted : null,
         karriCardHolderName:
@@ -60,15 +64,11 @@ export async function publishDreamBoardAction(
           parsed.data.payoutMethod === 'bank' ? (parsed.data.bankBranchCode ?? null) : null,
         bankAccountHolder:
           parsed.data.payoutMethod === 'bank' ? (parsed.data.bankAccountHolder ?? null) : null,
-        charityEnabled: parsed.data.charityEnabled ?? false,
-        charityId: parsed.data.charityEnabled ? (parsed.data.charityId ?? null) : null,
-        charitySplitType: parsed.data.charityEnabled ? (parsed.data.charitySplitType ?? null) : null,
-        charityPercentageBps: parsed.data.charityEnabled
-          ? (parsed.data.charityPercentageBps ?? null)
-          : null,
-        charityThresholdCents: parsed.data.charityEnabled
-          ? (parsed.data.charityThresholdCents ?? null)
-          : null,
+        charityEnabled: false,
+        charityId: null,
+        charitySplitType: null,
+        charityPercentageBps: null,
+        charityThresholdCents: null,
         hostWhatsAppNumber: parsed.data.hostWhatsAppNumber,
         message: parsed.data.message,
         payoutEmail: parsed.data.payoutEmail,

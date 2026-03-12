@@ -42,6 +42,7 @@ type AuditLog = Awaited<ReturnType<typeof listAuditLogsForTarget>>[number];
 const payoutTypeLabel = (type: string) =>
   ({
     karri_card: 'Karri Card Credit',
+    takealot_voucher: 'Takealot Voucher',
   })[type] ?? type;
 
 const payoutStatusLabel = (status: string) =>
@@ -155,7 +156,7 @@ const StatusActions = ({ payoutId, status }: { payoutId: string; status: string 
       <input type="hidden" name="payoutId" value={payoutId} />
       <div>
         <label className="text-sm font-semibold">External reference</label>
-        <Input name="externalRef" placeholder="Karri transaction ID" />
+        <Input name="externalRef" placeholder="Settlement or fulfilment reference" />
       </div>
       <Button type="submit" size="sm" disabled={status === 'completed'}>
         Mark as completed

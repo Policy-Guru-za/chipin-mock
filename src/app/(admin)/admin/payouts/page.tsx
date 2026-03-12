@@ -24,6 +24,7 @@ const payoutTypeLabel = (type: AdminPayoutDataset['type']) =>
   ({
     karri_card: 'Karri card',
     bank: 'Bank transfer',
+    takealot_voucher: 'Takealot voucher',
     charity: 'Charity',
   })[type] ?? type;
 
@@ -133,6 +134,7 @@ export default async function AdminPayoutQueuePage({
               { value: '', label: 'Any' },
               { value: 'karri_card', label: 'Karri card' },
               { value: 'bank', label: 'Bank transfer' },
+              { value: 'takealot_voucher', label: 'Takealot voucher' },
               { value: 'charity', label: 'Charity' },
             ],
           },

@@ -3,8 +3,7 @@
  */
 import { createElement } from 'react';
 import type { ReactNode } from 'react';
-import { afterEach } from 'vitest';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
@@ -48,11 +47,9 @@ const draft = {
   campaignEndDate: '2026-02-28',
   giftName: 'PlayStation II',
   giftImageUrl: 'https://images.example/playstation.jpg',
-  payoutMethod: 'karri_card' as const,
+  payoutMethod: 'takealot_voucher' as const,
   payoutEmail: 'parent@example.com',
   hostWhatsAppNumber: '+27821234567',
-  karriCardHolderName: 'Max Charter',
-  charityEnabled: false,
 };
 
 afterEach(() => {
@@ -60,7 +57,7 @@ afterEach(() => {
 });
 
 describe('ReviewClient', () => {
-  it('renders preview mode with Create Dreamboard CTA and edit links', () => {
+  it('renders preview mode with Create Dreamboard CTA and voucher edit link', () => {
     const publishAction = async (
       _state: PublishState,
       _formData: FormData
@@ -78,18 +75,17 @@ describe('ReviewClient', () => {
       'href',
       '/create/gift'
     );
-    expect(screen.getByRole('link', { name: 'Edit dates' })).toHaveAttribute('href', '/create/dates');
-    expect(screen.getByRole('link', { name: 'Edit payout details' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Edit dates' })).toHaveAttribute(
       'href',
-      '/create/payout'
+      '/create/dates'
     );
-    const renderedImages = screen.getAllByRole('img');
-    expect(renderedImages.some((img) => img.getAttribute('src') === '/Logos/Original.png')).toBe(
-      true
+    expect(screen.getByRole('link', { name: 'Edit voucher details' })).toHaveAttribute(
+      'href',
+      '/create/voucher'
     );
   });
 
-  it('renders stepper progress for review step', () => {
+  it('renders stepper progress for the fifth step', () => {
     const publishAction = async (
       _state: PublishState,
       _formData: FormData
@@ -97,10 +93,10 @@ describe('ReviewClient', () => {
 
     render(<ReviewClient draft={draft} publishAction={publishAction} />);
 
-    expect(screen.getByRole('progressbar', { name: 'Step 6 of 6: Review' })).toBeInTheDocument();
+    expect(screen.getByRole('progressbar', { name: 'Step 5 of 5: Review' })).toBeInTheDocument();
   });
 
-  it('renders the review heading', () => {
+  it('renders the voucher placeholder summary for the default flow', () => {
     const publishAction = async (
       _state: PublishState,
       _formData: FormData
@@ -108,43 +104,30 @@ describe('ReviewClient', () => {
 
     render(<ReviewClient draft={draft} publishAction={publishAction} />);
 
-    expect(screen.getByRole('heading', { name: 'Review your Dreamboard' })).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Takealot Voucher placeholder via parent@example.com and +27821234567'
+      )
+    ).toBeInTheDocument();
   });
 
-  it('renders ReviewPreviewCard with child name', () => {
+  it('still renders fallback summary copy for Karri Card drafts', () => {
     const publishAction = async (
       _state: PublishState,
       _formData: FormData
     ): Promise<PublishState> => ({ status: 'preview' });
+    const karriDraft = {
+      ...draft,
+      payoutMethod: 'karri_card' as const,
+      karriCardHolderName: 'Max Charter',
+    };
 
-    render(<ReviewClient draft={draft} publishAction={publishAction} />);
-
-    expect(screen.getByText('Max turns 8!')).toBeInTheDocument();
-  });
-
-  it('renders ReviewPreviewCard with gift name', () => {
-    const publishAction = async (
-      _state: PublishState,
-      _formData: FormData
-    ): Promise<PublishState> => ({ status: 'preview' });
-
-    render(<ReviewClient draft={draft} publishAction={publishAction} />);
-
-    expect(screen.getAllByText('PlayStation II').length).toBeGreaterThan(0);
-  });
-
-  it('renders payout summary for Karri Card', () => {
-    const publishAction = async (
-      _state: PublishState,
-      _formData: FormData
-    ): Promise<PublishState> => ({ status: 'preview' });
-
-    render(<ReviewClient draft={draft} publishAction={publishAction} />);
+    render(<ReviewClient draft={karriDraft} publishAction={publishAction} />);
 
     expect(screen.getByText('Karri Card (Max Charter)')).toBeInTheDocument();
   });
 
-  it('renders payout summary for bank transfer', () => {
+  it('still renders fallback summary copy for bank drafts', () => {
     const publishAction = async (
       _state: PublishState,
       _formData: FormData
@@ -154,7 +137,6 @@ describe('ReviewClient', () => {
       payoutMethod: 'bank' as const,
       bankName: 'FNB',
       bankAccountLast4: '4567',
-      karriCardHolderName: undefined,
     };
 
     render(<ReviewClient draft={bankDraft} publishAction={publishAction} />);
@@ -162,55 +144,7 @@ describe('ReviewClient', () => {
     expect(screen.getByText(/Bank transfer \(FNB\)/)).toBeInTheDocument();
   });
 
-  it('renders charity summary when disabled', () => {
-    const publishAction = async (
-      _state: PublishState,
-      _formData: FormData
-    ): Promise<PublishState> => ({ status: 'preview' });
-
-    render(<ReviewClient draft={draft} publishAction={publishAction} />);
-
-    expect(screen.getByText('No charity split selected.')).toBeInTheDocument();
-  });
-
-  it('renders charity summary with percentage split', () => {
-    const publishAction = async (
-      _state: PublishState,
-      _formData: FormData
-    ): Promise<PublishState> => ({ status: 'preview' });
-    const charityDraft = {
-      ...draft,
-      charityEnabled: true,
-      charitySplitType: 'percentage' as const,
-      charityPercentageBps: 2500,
-    };
-
-    render(<ReviewClient draft={charityDraft} publishAction={publishAction} />);
-
-    expect(screen.getByText('Charity split: 25% of contributions.')).toBeInTheDocument();
-  });
-
-  it('shows edit charity link when charity is enabled', () => {
-    const publishAction = async (
-      _state: PublishState,
-      _formData: FormData
-    ): Promise<PublishState> => ({ status: 'preview' });
-    const charityDraft = {
-      ...draft,
-      charityEnabled: true,
-      charitySplitType: 'percentage' as const,
-      charityPercentageBps: 2500,
-    };
-
-    render(<ReviewClient draft={charityDraft} publishAction={publishAction} />);
-
-    expect(screen.getByRole('link', { name: 'Edit charity settings' })).toHaveAttribute(
-      'href',
-      '/create/giving-back'
-    );
-  });
-
-  it('hides edit charity link when charity is disabled', () => {
+  it('does not show a charity edit link in the default flow', () => {
     const publishAction = async (
       _state: PublishState,
       _formData: FormData

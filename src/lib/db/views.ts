@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 
 import { db } from '@/lib/db';
+import type { DreamBoardGiftPayoutMethod } from '@/lib/dream-boards/payout-methods';
 
 export type DreamBoardWithTotals = {
   id: string;
@@ -11,7 +12,7 @@ export type DreamBoardWithTotals = {
   giftName: string;
   giftImageUrl: string;
   giftImagePrompt: string | null;
-  payoutMethod: 'karri_card' | 'bank';
+  payoutMethod: DreamBoardGiftPayoutMethod;
   goalCents: number;
   payoutEmail: string;
   message: string | null;

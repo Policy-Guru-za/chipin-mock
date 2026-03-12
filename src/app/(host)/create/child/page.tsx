@@ -9,7 +9,10 @@ import {
 } from '@/components/create-wizard';
 import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
 import { getDreamBoardDraft } from '@/lib/dream-boards/draft';
-import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
+import {
+  buildCreateFlowViewModel,
+  CREATE_FLOW_TOTAL_STEPS,
+} from '@/lib/host/create-view-model';
 
 type ChildSearchParams = {
   error?: string;
@@ -40,7 +43,7 @@ export default async function CreateChildPage({
 
   return (
     <>
-      <WizardStepper currentStep={1} totalSteps={6} stepLabel="The child" />
+      <WizardStepper currentStep={1} totalSteps={CREATE_FLOW_TOTAL_STEPS} stepLabel="The child" />
       <Suspense fallback={<WizardSkeletonLoader variant="split" />}>
         <ChildStepForm
           action={saveChildDetailsAction}

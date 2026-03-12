@@ -5,7 +5,7 @@
 
 ## Current Product Shape
 
-Gifta is a birthday gifting product built around one Dreamboard:
+Gifta is a free Dreamboard gifting orchestration platform built around one primary Dreamboard flow:
 
 - one child
 - one gift concept
@@ -19,8 +19,8 @@ Gifta is a birthday gifting product built around one Dreamboard:
 - five-step host create flow plus review/publish
 - public guest contribute + payment + thank-you flow
 - PayFast, Ozow, SnapScan payments
-- Karri Card and bank payout method support in the data model and payout engine
-- optional charity configuration and charity payout rows
+- `takealot_voucher` default host-create payout path, with Karri Card and bank still supported in the data model and payout engine
+- optional charity configuration and charity payout rows outside the active default host create path
 - partner API for dream boards, contributions, payouts, and webhooks
 
 ## Current Out-of-Scope Reality
