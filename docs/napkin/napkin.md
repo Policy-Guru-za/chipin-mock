@@ -127,6 +127,7 @@
 - For admin CSV exports, use shared header lists and always emit header-only CSV for empty datasets to keep download behavior deterministic.
 - For implementation-plan docs, lock repo execution constraints up front (`pnpm`, main-only strategy, Conventional Commits) and explicitly include generated-artifact sync rules when source contracts (like `src/lib/api/openapi.ts`) are edited.
 - For large doc-governance sweeps, drive control-matrix generation and status-banner sync from one shared classification module so 100+ docs stay consistent.
+- When adding agent-facing Markdown under hidden directories like `.agents/`, remember that `pnpm docs:audit` still scans them; add control-matrix classification in the same change.
 - For Axiom/Vercel log triage, default to `format=tabular`, alias dotted fields (`path=['request.path']`, `status=['request.statusCode']`, `deployment=['vercel.deploymentId']`), and extract rows with `jq -r '.tables[0].columns | transpose[] | @tsv'`.
 - For Axiom incidents, start broad (project + path + time window), then pivot to single `request.id` trace; this is fastest to separate edge/lambda/log events.
 

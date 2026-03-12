@@ -18,9 +18,14 @@ This matrix is generated from `scripts/docs/control-matrix.mjs`. Run `pnpm docs:
 
 | Path | Tier | Status | Owner | Source of truth | Last reviewed | Superseded by |
 | --- | --- | --- | --- | --- | --- | --- |
+| `.agents/skills/docs-sync/SKILL.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `docs/agent-playbooks/code_review.md`, `docs/Platform-Spec-Docs/CANONICAL.md` | 2026-03-12 | — |
+| `.agents/skills/payments-webhooks-debug/SKILL.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `docs/agent-playbooks/code_review.md`, `docs/Platform-Spec-Docs/CANONICAL.md` | 2026-03-12 | — |
+| `.agents/skills/release-verification/SKILL.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `docs/agent-playbooks/code_review.md`, `docs/Platform-Spec-Docs/CANONICAL.md` | 2026-03-12 | — |
+| `.agents/skills/review-flow/SKILL.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `docs/agent-playbooks/code_review.md`, `docs/Platform-Spec-Docs/CANONICAL.md` | 2026-03-12 | — |
 | `AGENTS.md` | Tier 1 | current-operational | Ryan Laubscher | `package.json`, `docs/Platform-Spec-Docs/CANONICAL.md`, `docs/forensic-audit/WORKSPACE_BASELINE_2026-03-12.md`, `workflow-orchestration.md` | 2026-03-12 | — |
 | `BACKLOG.md` | Tier 1 | current-operational | Ryan Laubscher | `docs/forensic-audit/REPORT.md`, `docs/Platform-Spec-Docs/CANONICAL.md`, `src/` | 2026-03-12 | — |
 | `CHANGELOG.md` | Tier 1 | current-reference | Ryan Laubscher | `git log`, `docs/forensic-audit/WORKSPACE_BASELINE_2026-03-12.md`, `docs/DOCUMENT_CONTROL_MATRIX.md` | 2026-03-12 | — |
+| `docs/agent-playbooks/code_review.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `README.md`, `docs/Platform-Spec-Docs/CANONICAL.md`, `TESTING.md` | 2026-03-12 | — |
 | `docs/demo_db_full_reset.md` | Tier 2 | reference-non-authoritative | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/Platform-Spec-Docs/CANONICAL.md` |
 | `docs/Demo-Mode/demo-mode-brief.md` | Tier 2 | reference-non-authoritative | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/Platform-Spec-Docs/CANONICAL.md` |
 | `docs/DOCUMENT_CONTROL_MATRIX.md` | Tier 1 | current-authoritative | Ryan Laubscher | `scripts/docs/control-matrix.mjs`, `scripts/docs/audit.mjs` | 2026-03-12 | — |

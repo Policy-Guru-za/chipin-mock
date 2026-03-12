@@ -42,6 +42,12 @@ If a doc is marked non-authoritative in the control matrix, do not treat it as c
 - Prefer current runtime truth over legacy plan prose
 - Use [`proxy.ts`](./proxy.ts) as the current root request hook reference; do not reintroduce legacy root-middleware guidance unless that file exists again
 
+## Agent Operations
+
+- Repo-scoped Codex safety rail lives in [`.codex/config.toml`](./.codex/config.toml); it keeps file mutation inside this repo and leaves internet access enabled for legitimate research/debugging.
+- Canonical review contract lives in [`docs/agent-playbooks/code_review.md`](./docs/agent-playbooks/code_review.md).
+- Repo-local reusable skills live under [`.agents/skills/`](./.agents/skills/). Use them when the task matches their scope before inventing one-off workflows.
+
 ## Runtime Notes
 
 - Product name: `Gifta`

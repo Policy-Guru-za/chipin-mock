@@ -13,6 +13,7 @@ Read in this order:
 3. [`docs/Platform-Spec-Docs/CANONICAL.md`](./docs/Platform-Spec-Docs/CANONICAL.md)
 4. [`docs/forensic-audit/WORKSPACE_BASELINE_2026-03-12.md`](./docs/forensic-audit/WORKSPACE_BASELINE_2026-03-12.md)
 5. [`docs/forensic-audit/REPORT.md`](./docs/forensic-audit/REPORT.md)
+6. [`docs/agent-playbooks/code_review.md`](./docs/agent-playbooks/code_review.md) when the task is a review or audit
 
 If docs disagree, use the current workspace code plus [`docs/Platform-Spec-Docs/CANONICAL.md`](./docs/Platform-Spec-Docs/CANONICAL.md). Historical and reference-only docs are labeled in the control matrix and, where required, inside the files themselves.
 
@@ -69,10 +70,16 @@ pnpm docs:audit
 - [`docs/Platform-Spec-Docs/API.md`](./docs/Platform-Spec-Docs/API.md): human API companion to OpenAPI
 - [`docs/forensic-audit/REPORT.md`](./docs/forensic-audit/REPORT.md): current-state assessment
 - [`docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md`](./docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md): current UX v2 control doc
+- [`docs/agent-playbooks/code_review.md`](./docs/agent-playbooks/code_review.md): canonical review contract for this repo
 
 ### Tier 2
 
 Tier 2 docs remain useful, but many are non-authoritative plans, evidence packs, vendor references, or design artifacts. Use the control matrix before treating any of them as current implementation truth.
+
+## Agent Operations
+
+- Repo-scoped Codex config lives at [`.codex/config.toml`](./.codex/config.toml); it narrows file mutation to this repo while keeping network access enabled.
+- Repo-local reusable skills live under [`.agents/skills/`](./.agents/skills/).
 
 ## Verification Baseline
 

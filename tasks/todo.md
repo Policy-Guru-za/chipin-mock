@@ -1,5 +1,36 @@
 # Task Todo
 
+## Plan (Codex Guardrails, Review Playbook, and Repo-Local Skills)
+- [x] Add repo-scoped `.codex/config.toml` with repo-only write guardrails and network access enabled.
+- [x] Add Tier 1 review playbook at `docs/agent-playbooks/code_review.md`.
+- [x] Add repo-local skills under `.agents/skills/` for review, docs sync, payments/webhooks debugging, and release verification.
+- [x] Update agent onboarding docs and control-matrix rules for the new artifacts.
+- [x] Run docs sync and full verification gates.
+
+## Review (Codex Guardrails, Review Playbook, and Repo-Local Skills)
+- Added repo-scoped Codex config in `.codex/config.toml` with:
+- `sandbox_mode = "workspace-write"`
+- `network_access = true`
+- no extra writable roots
+- `exclude_slash_tmp = true`
+- `exclude_tmpdir_env_var = true`
+- tmp exclusions enabled so writes stay inside the repo context
+- Added current operational review contract at `docs/agent-playbooks/code_review.md`.
+- Added repo-local skills:
+- `.agents/skills/review-flow/SKILL.md`
+- `.agents/skills/docs-sync/SKILL.md`
+- `.agents/skills/payments-webhooks-debug/SKILL.md`
+- `.agents/skills/release-verification/SKILL.md`
+- Updated `.agents/skills/review-flow/SKILL.md` so its read order mirrors the canonical review playbook and its workflow allows current-reference subsystem docs when they are the active scope references.
+- Updated `AGENTS.md`, `README.md`, and `scripts/docs/control-matrix.mjs` so the new artifacts are discoverable and governed by `pnpm docs:audit`.
+- Verification:
+- `pnpm docs:audit -- --sync`
+- `pnpm docs:audit`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test`
+- Manual Codex Mac app verification of repo-scoped sandbox behavior and skill discovery still needs to be done in the app itself.
+
 ## Plan (Workspace-State Documentation Audit and Sync)
 - [x] Add document governance scaffolding (`docs/DOCUMENT_CONTROL_MATRIX.md`, `scripts/docs/audit.mjs`, `pnpm docs:audit`).
 - [x] Freeze the March 12, 2026 workspace baseline in forensic docs.

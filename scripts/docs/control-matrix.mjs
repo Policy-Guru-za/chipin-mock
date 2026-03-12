@@ -81,6 +81,13 @@ const exactEntries = {
     sourceOfTruth: '`scripts/docs/control-matrix.mjs`, `scripts/docs/audit.mjs`',
     supersededBy: '',
   },
+  'docs/agent-playbooks/code_review.md': {
+    tier: 'Tier 1',
+    status: 'current-operational',
+    sourceOfTruth:
+      '`AGENTS.md`, `README.md`, `docs/Platform-Spec-Docs/CANONICAL.md`, `TESTING.md`',
+    supersededBy: '',
+  },
   'docs/napkin/SKILL.md': {
     tier: 'Tier 1',
     status: 'current-operational',
@@ -224,8 +231,27 @@ const exactEntries = {
 
 const patternEntries = [
   {
+    test: /^\.agents\/skills\/[^/]+\/SKILL\.md$/,
+    meta: {
+      tier: 'Tier 1',
+      status: 'current-operational',
+      sourceOfTruth:
+        '`AGENTS.md`, `docs/agent-playbooks/code_review.md`, `docs/Platform-Spec-Docs/CANONICAL.md`',
+      supersededBy: '',
+    },
+  },
+  {
     test: /^docs\/[^/]+\.md$/,
     meta: referenceMeta('`docs/Platform-Spec-Docs/CANONICAL.md`'),
+  },
+  {
+    test: /^docs\/agent-playbooks\/.*\.md$/,
+    meta: {
+      tier: 'Tier 1',
+      status: 'current-operational',
+      sourceOfTruth: '`AGENTS.md`, `README.md`, `docs/Platform-Spec-Docs/CANONICAL.md`',
+      supersededBy: '',
+    },
   },
   {
     test: /^docs\/UX\/ui-specs\/.*\.md$/,
