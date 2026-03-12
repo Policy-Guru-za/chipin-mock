@@ -82,7 +82,7 @@ describe('publishDreamBoardAction', () => {
     expect(clearDreamBoardDraft).toHaveBeenCalledWith('host-1');
     expect(sendDreamBoardLink).toHaveBeenCalledWith(
       '+27821234567',
-      'https://gifta.co/maya-birthday-abc123',
+      'https://gifta.co.za/maya-birthday-abc123',
       'Maya'
     );
 
@@ -90,7 +90,7 @@ describe('publishDreamBoardAction', () => {
       status: 'published',
       boardId: 'board-1',
       slug: 'maya-birthday-abc123',
-      shareUrl: 'https://gifta.co/maya-birthday-abc123',
+      shareUrl: 'https://gifta.co.za/maya-birthday-abc123',
     });
   });
 });

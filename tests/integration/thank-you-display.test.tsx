@@ -214,4 +214,24 @@ describe('thank-you display integration', () => {
 
     expect(await screen.findByText('Receipt sent to your email!')).toBeInTheDocument();
   });
+
+  it('uses the current support email domain in the footer', () => {
+    const view = buildThankYouViewModel({
+      board: makeBoard(),
+      contribution: makeContribution(),
+    });
+
+    render(
+      <ThankYouClient
+        view={view}
+        slug="maya-birthday"
+        requestReceiptAction={async () => ({ success: true })}
+      />
+    );
+
+    expect(screen.getByRole('link', { name: 'Need help? Contact us' })).toHaveAttribute(
+      'href',
+      'mailto:support@gifta.co.za'
+    );
+  });
 });

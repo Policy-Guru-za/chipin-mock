@@ -1,6 +1,7 @@
 import { and, desc, eq, lt, or, sql, type SQL } from 'drizzle-orm';
 
 import type { PaginationCursor } from '@/lib/api/pagination';
+import type { WebhookEventType } from '@/lib/webhooks';
 
 import { db } from './index';
 import { contributions, dreamBoards, payouts, webhookEndpoints } from './schema';
@@ -232,7 +233,7 @@ export const getPayoutForApi = async (params: { id: string; partnerId: string })
 export const createWebhookEndpoint = async (params: {
   apiKeyId: string;
   url: string;
-  events: string[];
+  events: WebhookEventType[];
   secret: string;
 }) => {
   const [created] = await db

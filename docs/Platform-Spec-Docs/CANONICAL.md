@@ -98,6 +98,8 @@ Decision Register D-004 (LOCKED): transparent fee model.
 - **Inbound providers:** PayFast (card, primary), Ozow (EFT), SnapScan (QR).
 - **PayFast ITN hardening required:** signature verification, source IP validation, amount check, PayFast server validation call, idempotency by `(payment_provider, payment_ref)`.
 - **Stitch:** parked until float/settlement/compliance clarified; revisit in Phase 2.
+- **Current outbound partner webhook events:** `contribution.received`, `pot.funded`.
+- **Unsupported outbound webhook subscriptions:** wildcard `*` and all non-emitted legacy event names are legacy data only and are normalized away at the webhook-endpoint boundary.
 
 ### Auth and Session Storage
 

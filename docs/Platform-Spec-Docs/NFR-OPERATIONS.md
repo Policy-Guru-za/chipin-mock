@@ -31,3 +31,9 @@ External scheduler required for:
 - Current lint baseline passes with warnings only
 - Current type/test baselines are green
 - `pnpm docs:audit` is part of the documentation integrity gate and should run beside the standard code gates
+
+## Webhook Endpoint Rollback Tooling
+
+- Before applying the webhook-endpoint event sanitization migration in any non-local environment, generate a rollback artifact with `pnpm webhooks:snapshot -- --ticket <change-ticket>`.
+- Validate the snapshot against the target database before any restore or rollback with `pnpm webhooks:restore -- --input <artifact-path> --dry-run`.
+- Restore re-applies `events` and `is_active` by row id and aborts if any snapshot row is missing from the target database.

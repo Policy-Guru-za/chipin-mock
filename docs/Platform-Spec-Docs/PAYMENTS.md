@@ -39,6 +39,13 @@ Webhook route handlers live under:
 
 On successful completion they update contribution state, refresh board totals, and may emit partner webhooks / notifications.
 
+Current outbound partner webhook events:
+
+- `contribution.received`
+- `pot.funded`
+
+Legacy wildcard endpoint subscriptions and non-emitted legacy event names are not part of the supported partner contract.
+
 ## Known Constraints
 
 - Current docs should describe provider reality as implemented, not older freehand examples.

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { LockIcon } from '@/components/icons/dreamboard-icons';
+import { PAYMENT_TRUST_COPY } from '@/lib/payments/copy';
 
 type DreamboardCtaCardProps = {
   slug: string;
@@ -61,7 +62,7 @@ export function DreamboardCtaCard({ slug, childName, stateMessage, disabled }: D
       )}
       <p className="mt-3 inline-flex items-center gap-1.5 font-warmth-sans text-xs text-ink-faint">
         <LockIcon className="h-3.5 w-3.5" />
-        Secured payments powered by SnapScan, Stitch, Payfast and Ozow.
+        {PAYMENT_TRUST_COPY}
       </p>
     </section>
   );

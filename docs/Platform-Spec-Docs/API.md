@@ -48,6 +48,10 @@
 - Public dream board identifiers accept UUIDs and, where implemented, slug-compatible public IDs.
 - `raised_cents` is based on completed `amount_cents`, not `net_cents`.
 - Close is explicit through the close endpoint; there is no in-repo scheduler that auto-closes boards.
+- Webhook endpoint subscriptions currently accept only:
+  - `contribution.received`
+  - `pot.funded`
+- Legacy wildcard or non-emitted webhook event names are not part of the current public API contract.
 - Generated OpenAPI is the canonical response/request contract. The human doc exists to orient implementers, not to override the generated artifact.
 
 ## Legacy Protocol Details Still Present

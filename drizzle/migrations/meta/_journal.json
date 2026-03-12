@@ -127,6 +127,13 @@
       "when": 1771000000000,
       "tag": "0017_make_charity_ops_fields_nullable",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1773327184000,
+      "tag": "0018_sanitize_webhook_endpoint_events",
+      "breakpoints": true
     }
   ]
 }

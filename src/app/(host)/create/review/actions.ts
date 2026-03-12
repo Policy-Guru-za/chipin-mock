@@ -83,7 +83,10 @@ export async function publishDreamBoardAction(
       };
     }
 
-    const baseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? 'https://gifta.co').replace(/\/$/, '');
+    const baseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? 'https://gifta.co.za').replace(
+      /\/$/,
+      ''
+    );
     const shareUrl = `${baseUrl}/${slug}`;
 
     try {

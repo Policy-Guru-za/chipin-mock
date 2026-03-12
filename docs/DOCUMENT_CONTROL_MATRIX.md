@@ -169,7 +169,7 @@ This matrix is generated from `scripts/docs/control-matrix.mjs`. Run `pnpm docs:
 | `spec/01_agent-execution-system-import.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `spec/02_always-active-spec-invariant.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `spec/03_placeholder-handoff-proof-model.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/04_session-placeholder.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/04_contract-truth-and-payfast-recovery.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `spec/SPEC_TEMPLATE.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `tasks/todo.md` | Tier 2 | historical-evidence | Ryan Laubscher | `progress.md`, `spec/00_overview.md`, `workflow-orchestration.md` | 2026-03-12 | `progress.md`, `spec/00_overview.md` |
 | `TESTING.md` | Tier 1 | current-operational | Ryan Laubscher | `package.json`, `vitest.config.ts`, `tests/`, `progress.md`, `spec/SPEC_TEMPLATE.md` | 2026-03-12 | — |

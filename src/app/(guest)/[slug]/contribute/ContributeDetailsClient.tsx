@@ -8,6 +8,7 @@ import { ReminderModal } from '@/components/contribute/ReminderModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { saveFlowData } from '@/lib/contributions/flow-storage';
+import { PAYMENT_TRUST_COPY } from '@/lib/payments/copy';
 import { formatZar } from '@/lib/utils/money';
 
 type ContributeDetailsClientProps = {
@@ -301,7 +302,7 @@ export function ContributeDetailsClient({
         >
           {isSaving ? 'Processing...' : 'Continue to payment'}
         </Button>
-        <p className="text-center text-xs text-text-muted">🔒 Payments secured by PayFast</p>
+        <p className="text-center text-xs text-text-muted">🔒 {PAYMENT_TRUST_COPY}</p>
       </section>
 
       <ReminderModal

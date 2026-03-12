@@ -41,7 +41,7 @@ const buildEndpoint = (id: string) => ({
   id,
   apiKeyId: 'key-1',
   url: `https://hooks.test/${id}`,
-  events: ['*'],
+  events: ['contribution.received', 'pot.funded'],
   secret: 'encrypted',
   isActive: true,
 });

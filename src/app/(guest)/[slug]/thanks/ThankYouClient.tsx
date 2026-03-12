@@ -180,7 +180,7 @@ export function ThankYouClient({ view, slug, requestReceiptAction }: ThankYouCli
         <Link href={`/${slug}`} className="hover:text-text">
           ← Back to Dreamboard
         </Link>
-        <a href="mailto:support@gifta.co" className="hover:text-text">
+        <a href="mailto:support@gifta.co.za" className="hover:text-text">
           Need help? Contact us
         </a>
       </footer>

@@ -5,17 +5,12 @@ import { parseBody, withApiAuth } from '@/lib/api/route-utils';
 import { jsonError, jsonSuccess } from '@/lib/api/response';
 import { createWebhookEndpoint, listWebhookEndpointsForApiKey } from '@/lib/db/api-queries';
 import { encryptSensitiveValue } from '@/lib/utils/encryption';
+import {
+  SUPPORTED_WEBHOOK_EVENT_TYPES,
+  normalizeWebhookEndpointEvents,
+} from '@/lib/webhooks';
 
-const eventSchema = z.enum([
-  'dreamboard.created',
-  'dreamboard.updated',
-  'contribution.received',
-  'pot.funded',
-  'pot.closed',
-  'payout.ready',
-  'payout.completed',
-  'payout.failed',
-]);
+const eventSchema = z.enum(SUPPORTED_WEBHOOK_EVENT_TYPES);
 
 const requestSchema = z.object({
   url: z.string().url(),
@@ -32,7 +27,7 @@ export const GET = withApiAuth('webhooks:manage', async (_request: NextRequest, 
     data: endpoints.map((endpoint) => ({
       id: endpoint.id,
       url: endpoint.url,
-      events: endpoint.events,
+      events: normalizeWebhookEndpointEvents(endpoint.events),
       is_active: endpoint.isActive,
       created_at: endpoint.createdAt.toISOString(),
     })),
@@ -54,7 +49,7 @@ export const POST = withApiAuth('webhooks:manage', async (request: NextRequest, 
   const created = await createWebhookEndpoint({
     apiKeyId: apiKey.id,
     url: parsed.data.url,
-    events: Array.from(new Set(parsed.data.events)),
+    events: normalizeWebhookEndpointEvents(parsed.data.events),
     secret: encryptSensitiveValue(parsed.data.secret),
   });
 
@@ -71,7 +66,7 @@ export const POST = withApiAuth('webhooks:manage', async (request: NextRequest, 
     data: {
       id: created.id,
       url: created.url,
-      events: created.events,
+      events: normalizeWebhookEndpointEvents(created.events),
       is_active: created.isActive,
       created_at: created.createdAt.toISOString(),
     },

@@ -1,12 +1,6 @@
-export type WebhookEventType =
-  | 'dreamboard.created'
-  | 'dreamboard.updated'
-  | 'contribution.received'
-  | 'pot.funded'
-  | 'pot.closed'
-  | 'payout.ready'
-  | 'payout.completed'
-  | 'payout.failed';
+import type { SupportedWebhookEventType } from './contract';
+
+export type WebhookEventType = SupportedWebhookEventType;
 
 export type WebhookEventStatus = 'pending' | 'delivered' | 'failed';
 

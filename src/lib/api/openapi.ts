@@ -5,6 +5,7 @@ import {
   LOCKED_PAYOUT_METHODS,
   LOCKED_PAYOUT_TYPES,
 } from '@/lib/ux-v2/decision-locks';
+import { SUPPORTED_WEBHOOK_EVENT_TYPES } from '@/lib/webhooks';
 
 export const openApiSpec = {
   openapi: '3.0.3',
@@ -1746,16 +1747,7 @@ export const openApiSpec = {
       },
       WebhookEvent: {
         type: 'string',
-        enum: [
-          'dreamboard.created',
-          'dreamboard.updated',
-          'contribution.received',
-          'pot.funded',
-          'pot.closed',
-          'payout.ready',
-          'payout.completed',
-          'payout.failed',
-        ],
+        enum: [...SUPPORTED_WEBHOOK_EVENT_TYPES],
       },
       WebhookEndpoint: {
         type: 'object',

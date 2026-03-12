@@ -19,6 +19,8 @@
     "test:load": "tsx scripts/load-test/index.ts",
     "openapi:generate": "tsx scripts/generate-openapi.ts",
     "docs:audit": "node scripts/docs/audit.mjs",
+    "webhooks:snapshot": "tsx scripts/webhooks/snapshot-endpoints.ts",
+    "webhooks:restore": "tsx scripts/webhooks/restore-endpoints.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:seed": "tsx scripts/seed.ts",

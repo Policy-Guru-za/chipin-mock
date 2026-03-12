@@ -21,6 +21,7 @@ import {
 import { trackPaymentRedirectStarted } from '@/lib/analytics/metrics';
 import { calculateFee } from '@/lib/payments/fees';
 import type { PaymentProvider } from '@/lib/payments';
+import { PAYMENT_TRUST_COPY } from '@/lib/payments/copy';
 import { savePaymentAttemptData } from '@/lib/payments/recovery';
 import { formatZar, formatZarWithCents } from '@/lib/utils/money';
 
@@ -264,7 +265,7 @@ export function PaymentClient({
         </Button>
       ) : null}
 
-      <p className="text-center text-xs text-text-muted">🔒 Payments secured by PayFast</p>
+      <p className="text-center text-xs text-text-muted">🔒 {PAYMENT_TRUST_COPY}</p>
 
       <Link
         href={`/${slug}/contribute`}

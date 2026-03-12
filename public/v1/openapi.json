@@ -1839,14 +1839,8 @@
       "WebhookEvent": {
         "type": "string",
         "enum": [
-          "dreamboard.created",
-          "dreamboard.updated",
           "contribution.received",
-          "pot.funded",
-          "pot.closed",
-          "payout.ready",
-          "payout.completed",
-          "payout.failed"
+          "pot.funded"
         ]
       },
       "WebhookEndpoint": {

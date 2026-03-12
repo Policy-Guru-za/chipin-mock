@@ -7,6 +7,7 @@ import {
   WEBHOOK_RESPONSE_BODY_LIMIT,
   WEBHOOK_RETRY_MINUTES,
 } from '@/lib/constants/webhooks';
+import { matchesWebhookEndpointEvent } from './contract';
 import type { PendingWebhookEvent, WebhookEndpoint, WebhookEventPayload } from './types';
 
 export const getActiveApiKeysForPartner = async (partnerId: string): Promise<string[]> => {
@@ -59,9 +60,7 @@ export const getActiveEndpointsForEvent = async (
       )
     );
 
-  return results.filter(
-    (endpoint) => endpoint.events.includes('*') || endpoint.events.includes(eventType)
-  );
+  return results.filter((endpoint) => matchesWebhookEndpointEvent(endpoint.events, eventType));
 };
 
 export const getPendingWebhookEvents = async (limit = 50): Promise<PendingWebhookEvent[]> => {

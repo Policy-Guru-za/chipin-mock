@@ -73,7 +73,7 @@ export function PaymentFailedClient({ slug, childName, display, isClosed }: Paym
         )}
 
         <footer className="mt-6 flex flex-col items-center gap-2 text-sm text-text-muted">
-          <a href="mailto:support@gifta.co" className="hover:text-text">
+          <a href="mailto:support@gifta.co.za" className="hover:text-text">
             Need help? Contact us 💬
           </a>
           <Link href={`/${slug}`} className="hover:text-text">

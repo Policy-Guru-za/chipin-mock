@@ -3,6 +3,7 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-03-12 | self | Added raw SQL migration `0018_sanitize_webhook_endpoint_events.sql` without the matching `drizzle/migrations/meta/_journal.json` entry, so review caught an incomplete migration ledger | Whenever a numbered migration file is added in this repo, update `_journal.json` in the same change and verify the last entry tag/idx before handoff |
 | 2026-03-12 | self | New doc-audit classifier compared absolute file paths against repo-relative control-matrix rules, so the first sync failed immediately on `AGENTS.md` | In repo tooling that classifies paths, normalize with `path.relative(process.cwd(), filePath)` before rule lookup or reporting |
 | 2026-03-12 | self | Tried grouped `find` parentheses inside a `node execSync` shell string without escaping them, and `/bin/sh` rejected the command before the real audit ran | For shell-invoked `find` expressions inside scripts, escape grouping parentheses or avoid shell grouping entirely by traversing with Node FS APIs |
 | 2026-03-12 | user | Repo process drifted because `tasks/todo.md` had become a mixed tracker/history doc and agent instructions were no longer converging on one execution system | For every Gifta work session, use `progress.md` plus numbered specs under `spec/`; keep `tasks/todo.md` historical only |

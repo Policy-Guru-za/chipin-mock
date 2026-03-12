@@ -71,6 +71,30 @@ describe('POST /api/v1/webhooks', () => {
     expect(payload.data.id).toBe('wh-1');
     expect(markApiKeyUsed).toHaveBeenCalledWith('api-key-4');
   });
+
+  it('rejects unsupported webhook events', async () => {
+    mockAuth();
+
+    vi.doMock('@/lib/db/api-queries', () => ({
+      createWebhookEndpoint: vi.fn(),
+      listWebhookEndpointsForApiKey: vi.fn(),
+    }));
+    vi.doMock('@/lib/db/queries', () => ({ markApiKeyUsed: vi.fn(async () => undefined) }));
+
+    const { POST } = await loadHandler();
+    const response = await POST(
+      new Request('http://localhost/api/v1/webhooks', {
+        method: 'POST',
+        body: JSON.stringify({
+          url: 'https://partner.example/webhooks',
+          events: ['payout.completed'],
+          secret: 'whsec_test_secret',
+        }),
+      })
+    );
+
+    expect(response.status).toBe(400);
+  });
 });
 
 describe('GET /api/v1/webhooks', () => {
@@ -99,6 +123,31 @@ describe('GET /api/v1/webhooks', () => {
     expect(payload.data).toHaveLength(1);
     expect(payload.data[0].id).toBe('wh-1');
     expect(markApiKeyUsed).toHaveBeenCalledWith('api-key-4');
+  });
+
+  it('normalizes legacy wildcard rows in the response payload', async () => {
+    mockAuth();
+
+    const listWebhookEndpointsForApiKey = vi.fn(async () => [
+      {
+        id: 'wh-legacy',
+        url: 'https://partner.example/webhooks',
+        events: ['*', 'payout.completed'],
+        isActive: true,
+        createdAt: new Date('2026-01-12T10:00:00.000Z'),
+      },
+    ]);
+    const markApiKeyUsed = vi.fn(async () => undefined);
+
+    vi.doMock('@/lib/db/api-queries', () => ({ listWebhookEndpointsForApiKey }));
+    vi.doMock('@/lib/db/queries', () => ({ markApiKeyUsed }));
+
+    const { GET } = await loadHandler();
+    const response = await GET(new Request('http://localhost/api/v1/webhooks'));
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload.data[0].events).toEqual(['contribution.received', 'pot.funded']);
   });
 });
 
