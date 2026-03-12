@@ -135,10 +135,6 @@ export function DashboardPostCampaignClient({
             <span>Total Raised</span>
             <span className="font-semibold">{view.raisedLabel}</span>
           </div>
-          <div className="flex items-center justify-between text-text-muted">
-            <span>Gifta Fee (3%)</span>
-            <span>-{view.feeLabel}</span>
-          </div>
           {view.charityEnabled ? (
             <div className="flex items-center justify-between text-text-muted">
               <span>Charity contribution</span>

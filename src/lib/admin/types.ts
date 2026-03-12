@@ -64,8 +64,6 @@ export type AdminContributionDataset = {
   paymentProvider: 'payfast' | 'ozow' | 'snapscan';
   paymentStatus: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
   amountCents: number;
-  feeCents: number;
-  netCents: number;
   charityCents: number;
   paymentRef: string;
   createdAt: Date;
@@ -88,7 +86,6 @@ export type AdminPayoutDataset = {
   type: 'karri_card' | 'bank' | 'charity';
   status: 'pending' | 'processing' | 'completed' | 'failed';
   grossCents: number;
-  feeCents: number;
   charityCents: number;
   netCents: number;
   payoutEmail: string;
@@ -157,7 +154,6 @@ export type AdminPlatformSummaryDataset = {
   totalContributions: number;
   totalRaisedCents: number;
   totalPaidOutCents: number;
-  totalFeesRetainedCents: number;
 };
 
 export type AdminDashboardDataset = {
@@ -167,7 +163,6 @@ export type AdminDashboardDataset = {
   activeBoards: number;
   totalContributors: number;
   totalContributions: number;
-  totalFeesRetainedCents: number;
   pendingPayoutsCount: number;
   failedPayoutsCount: number;
 };
@@ -193,13 +188,6 @@ export type AdminMonthlyCharityReconciliationDataset = {
 export type AdminPlatformSettingsDataset = {
   brand: string;
   accessibilityBaseline: string;
-  feeConfiguration: {
-    percentage: number;
-    percentageBps: number;
-    minFeeCents: number;
-    maxFeeCents: number;
-    addedOnTopAtCheckout: boolean;
-  };
   contributionLimits: {
     minContributionCents: number;
     maxContributionCents: number;
@@ -240,8 +228,6 @@ export type AdminContributionCsvRow = {
   payment_provider: string;
   payment_status: string;
   amount_cents: number;
-  fee_cents: number;
-  net_cents: number;
   charity_cents: number;
   payment_ref: string;
   created_at_iso: string;
@@ -255,7 +241,6 @@ export type AdminPayoutCsvRow = {
   type: string;
   status: string;
   gross_cents: number;
-  fee_cents: number;
   charity_cents: number;
   net_cents: number;
   payout_email: string;

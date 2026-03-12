@@ -17,7 +17,6 @@ const headers = [
   'type',
   'status',
   'gross_cents',
-  'fee_cents',
   'charity_cents',
   'net_cents',
   'payout_email',

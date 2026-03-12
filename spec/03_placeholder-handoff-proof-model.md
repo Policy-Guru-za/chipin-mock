@@ -50,3 +50,10 @@
 - [`../scripts/docs/audit.mjs`](../scripts/docs/audit.mjs) enforces the new ledger contract and placeholder/completed-spec linkage.
 - Review and release-verification guidance resolve the verified/reviewed spec correctly when a successor placeholder is active.
 - Verification passes and a newer numbered placeholder exists before this spec is marked `Done`.
+
+## Final State
+
+- Status: Done
+- Exit Criteria State: satisfied
+- Successor Slot: none
+- Notes: Placeholder-aware proof ownership shipped cleanly before spec 04 opened.

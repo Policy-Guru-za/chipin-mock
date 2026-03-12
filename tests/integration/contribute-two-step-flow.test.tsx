@@ -118,7 +118,7 @@ describe('contribute two-step flow integration', () => {
       />
     );
 
-    await userEvent.click(screen.getByRole('button', { name: /Pay R\s*257(?:[,.]50)/i }));
+    await userEvent.click(screen.getByRole('button', { name: /Pay R\s*250(?:[,.]00)?/i }));
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/internal/contributions/create',
       expect.objectContaining({ method: 'POST' })
@@ -171,7 +171,7 @@ describe('contribute two-step flow integration', () => {
       />
     );
 
-    await userEvent.click(screen.getByRole('button', { name: /Pay R\s*257(?:[,.]50)/i }));
+    await userEvent.click(screen.getByRole('button', { name: /Pay R\s*250(?:[,.]00)?/i }));
     const payload = JSON.parse(fetchMock.mock.calls[0][1].body as string);
     expect(payload.contributorName).toBeUndefined();
   });

@@ -54,7 +54,7 @@ export function ReportsClient({
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <AdminStatsCard label="Raised" value={currency(summary.totalRaisedCents)} />
         <AdminStatsCard label="Paid out" value={currency(summary.totalPaidOutCents)} />
-        <AdminStatsCard label="Fees retained" value={currency(summary.totalFeesRetainedCents)} />
+        <AdminStatsCard label="Dreamboards" value={String(summary.totalBoards)} />
         <AdminStatsCard label="Contributions" value={String(summary.totalContributions)} />
       </div>
 

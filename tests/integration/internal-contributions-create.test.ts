@@ -103,7 +103,7 @@ describe('POST /api/internal/contributions/create', () => {
     expect(createPaymentIntent).toHaveBeenCalledWith(
       'payfast',
       expect.objectContaining({
-        amountCents: 5300,
+        amountCents: 5000,
         reference: 'PF-123',
       })
     );

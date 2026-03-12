@@ -6,8 +6,8 @@ export const LOCKED_CHARITY_SPLIT_MODES = ['percentage', 'threshold'] as const;
 
 export const LOCKED_FEE_SEMANTICS = {
   contributionAmountSource: 'contributor_selected_gift_amount',
-  platformFeeApplication: 'added_on_top_at_checkout',
-  raisedTracks: 'gift_amount_excluding_platform_fee',
+  platformFeeApplication: 'not_charged_in_active_checkout',
+  raisedTracks: 'gift_amount_charged_to_provider_and_goal',
 } as const;
 
 export const LOCKED_RAISED_FUNDED_SEMANTICS = {
@@ -86,4 +86,3 @@ export const UX_V2_DECISION_LOCKS = {
     effectiveValue: LOCKED_ACCESSIBILITY_BASELINE,
   },
 } as const;
-

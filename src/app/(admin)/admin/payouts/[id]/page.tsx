@@ -96,9 +96,7 @@ const SummaryCard = ({ payout }: { payout: PayoutDetail }) => (
   <Card className="space-y-3 p-6">
     <h2 className="text-lg font-semibold">Payout summary</h2>
     <div className="text-2xl font-semibold">{formatZar(payout.netCents)}</div>
-    <div className="text-sm text-text-muted">
-      Gross {formatZarWithCents(payout.grossCents)} · Fees {formatZarWithCents(payout.feeCents)}
-    </div>
+    <div className="text-sm text-text-muted">Gross {formatZarWithCents(payout.grossCents)}</div>
     {payout.errorMessage ? (
       <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
         {payout.errorMessage}

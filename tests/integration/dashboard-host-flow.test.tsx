@@ -205,6 +205,7 @@ describe('host dashboard flow', () => {
 
     expect(screen.getByText(/Financial Summary/i)).toBeInTheDocument();
     expect(screen.getByText(/Total Raised/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Gifta Fee/i)).not.toBeInTheDocument();
     expect(screen.getByText(/R\s*500/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /download birthday messages/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /download contributor list/i })).toBeInTheDocument();

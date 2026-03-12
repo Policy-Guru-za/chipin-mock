@@ -20,8 +20,6 @@ const headers = [
   'payment_provider',
   'payment_status',
   'amount_cents',
-  'fee_cents',
-  'net_cents',
   'charity_cents',
   'payment_ref',
   'created_at_iso',

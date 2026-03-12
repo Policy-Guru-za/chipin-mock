@@ -114,7 +114,6 @@ describe('admin datasets integration', () => {
           totalContributions: 40,
           totalRaisedCents: 120000,
           totalPaidOutCents: 98000,
-          totalFeesRetainedCents: 22000,
         },
       ],
     });
@@ -128,7 +127,6 @@ describe('admin datasets integration', () => {
     expect(result.totalContributions).toBe(40);
     expect(result.totalRaisedCents).toBe(120000);
     expect(result.totalPaidOutCents).toBe(98000);
-    expect(result.totalFeesRetainedCents).toBe(22000);
   });
 });
 

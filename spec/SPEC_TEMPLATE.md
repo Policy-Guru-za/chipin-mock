@@ -33,3 +33,11 @@ If the current active file is `spec/NN_session-placeholder.md`, rename that same
 ## Exit Criteria
 
 - Define the conditions that must be true before the spec can be marked done.
+- Include how session-close napkin handling will be proven in [`../progress.md`](../progress.md) when the spec hands off.
+
+## Final State
+
+- Status: Active | Done | Superseded
+- Exit Criteria State: pending | satisfied | not-satisfied
+- Successor Slot: none | NN
+- Notes: <free text>

@@ -115,10 +115,10 @@ describe('PaymentClient', () => {
     expect(screen.getByRole('radio', { name: /SnapScan/i })).toBeInTheDocument();
   });
 
-  it('shows total amount including fee and Gifta fee label', () => {
+  it('shows the contribution total without a platform fee line item', () => {
     renderPage({ amountCents: 25000 });
-    expect(screen.getByText('Gifta fee (3%)')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Pay R\s*257(?:[,.]50)/i })).toBeInTheDocument();
+    expect(screen.queryByText('Gifta fee (3%)')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Pay R\s*250(?:[,.]00)?/i })).toBeInTheDocument();
   });
 
   it('submits create payload and truncates message to 280 chars', async () => {
@@ -130,7 +130,7 @@ describe('PaymentClient', () => {
       json: async () => ({ mode: 'redirect', redirectUrl: 'https://pay.example/redirect' }),
     });
 
-    await userEvent.click(screen.getByRole('button', { name: /Pay R\s*257(?:[,.]50)/i }));
+    await userEvent.click(screen.getByRole('button', { name: /Pay R\s*250(?:[,.]00)?/i }));
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const body = JSON.parse(fetchMock.mock.calls[0][1].body as string);
@@ -145,7 +145,7 @@ describe('PaymentClient', () => {
       json: async () => ({ mode: 'redirect', redirectUrl: 'https://pay.example/redirect' }),
     });
 
-    await userEvent.click(screen.getByRole('button', { name: /Pay R\s*257(?:[,.]50)/i }));
+    await userEvent.click(screen.getByRole('button', { name: /Pay R\s*250(?:[,.]00)?/i }));
     const body = JSON.parse(fetchMock.mock.calls[0][1].body as string);
     expect(body.contributorName).toBeUndefined();
   });
@@ -157,7 +157,7 @@ describe('PaymentClient', () => {
       json: async () => ({ mode: 'redirect', redirectUrl: 'https://pay.example/redirect' }),
     });
 
-    await userEvent.click(screen.getByRole('button', { name: /Pay R\s*257(?:[,.]50)/i }));
+    await userEvent.click(screen.getByRole('button', { name: /Pay R\s*250(?:[,.]00)?/i }));
 
     expect(savePaymentAttemptDataMock).toHaveBeenCalledWith(
       'maya-board',

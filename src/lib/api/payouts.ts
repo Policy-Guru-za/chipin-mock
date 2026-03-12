@@ -96,6 +96,7 @@ export const serializePayout = (record: PayoutApiRecord) => ({
   dream_board_id: record.dreamBoardId,
   type: record.type,
   gross_cents: record.grossCents,
+  // Legacy compatibility field retained for historical payout rows.
   fee_cents: record.feeCents,
   charity_cents: record.charityCents ?? 0,
   net_cents: record.netCents,

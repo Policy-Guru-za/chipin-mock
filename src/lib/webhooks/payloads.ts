@@ -10,6 +10,7 @@ type ContributionRecord = {
   contributorName: string | null;
   message: string | null;
   amountCents: number;
+  // Legacy compatibility fields retained in outgoing payloads.
   feeCents: number;
   netCents: number | null;
   charityCents?: number | null;

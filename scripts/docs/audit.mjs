@@ -22,7 +22,7 @@ const BANNER_PREFIX = '> **Document Status:**';
 const AGENT_GUIDANCE_RULES = [
   {
     test: /^AGENTS\.md$/,
-    required: ['progress.md', 'spec/00_overview.md'],
+    required: ['.agents/skills/napkin/SKILL.md', 'docs/napkin/napkin.md', 'Napkin Evidence', 'progress.md', 'spec/00_overview.md'],
     banned: [/tasks\/todo\.md/g],
   },
   {
@@ -32,7 +32,7 @@ const AGENT_GUIDANCE_RULES = [
   },
   {
     test: /^workflow-orchestration\.md$/,
-    required: ['progress.md', 'spec/00_overview.md'],
+    required: ['.agents/skills/napkin/SKILL.md', 'docs/napkin/napkin.md', 'Napkin Evidence', 'progress.md', 'spec/00_overview.md'],
     banned: [/tasks\/todo\.md/g],
   },
   {
@@ -47,12 +47,17 @@ const AGENT_GUIDANCE_RULES = [
   },
   {
     test: /^docs\/napkin\/SKILL\.md$/,
-    required: ['progress.md', 'spec/'],
+    required: ['.agents/skills/napkin/SKILL.md', 'docs/napkin/napkin.md', 'Napkin Evidence', 'progress.md', 'spec/'],
+    banned: [/tasks\/todo\.md/g],
+  },
+  {
+    test: /^\.agents\/skills\/napkin\/SKILL\.md$/,
+    required: ['docs/napkin/napkin.md', 'progress.md', 'spec/00_overview.md'],
     banned: [/tasks\/todo\.md/g],
   },
   {
     test: /^\.agents\/skills\/[^/]+\/SKILL\.md$/,
-    required: ['progress.md', 'spec/00_overview.md'],
+    required: ['../napkin/SKILL.md', 'docs/napkin/napkin.md', 'progress.md', 'spec/00_overview.md'],
     banned: [/tasks\/todo\.md/g],
   },
 ];

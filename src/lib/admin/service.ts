@@ -17,11 +17,6 @@ import { listMonthlyCharitySummary } from '@/lib/charities/service';
 import { db } from '@/lib/db';
 import { charities, contributions, dreamBoards, hosts, payouts } from '@/lib/db/schema';
 import {
-  MAX_FEE_CENTS,
-  MIN_FEE_CENTS,
-  PLATFORM_FEE_PERCENTAGE,
-} from '@/lib/payments/fees';
-import {
   LOCKED_ACCESSIBILITY_BASELINE,
   LOCKED_BRAND_STRING,
   LOCKED_CHARITY_PAYOUT_POLICY,
@@ -321,8 +316,6 @@ export const listAdminContributions = async (
       paymentProvider: contributions.paymentProvider,
       paymentStatus: contributions.paymentStatus,
       amountCents: contributions.amountCents,
-      feeCents: contributions.feeCents,
-      netCents: sql<number>`COALESCE(${contributions.netCents}, 0)`,
       charityCents: sql<number>`COALESCE(${contributions.charityCents}, 0)`,
       paymentRef: contributions.paymentRef,
       createdAt: contributions.createdAt,
@@ -351,8 +344,6 @@ export const listAdminContributions = async (
     paymentProvider: row.paymentProvider,
     paymentStatus: row.paymentStatus,
     amountCents: row.amountCents,
-    feeCents: row.feeCents,
-    netCents: row.netCents,
     charityCents: row.charityCents,
     paymentRef: row.paymentRef,
     createdAt: row.createdAt,
@@ -413,7 +404,6 @@ export const listAdminPayouts = async (
       type: payouts.type,
       status: payouts.status,
       grossCents: payouts.grossCents,
-      feeCents: payouts.feeCents,
       charityCents: payouts.charityCents,
       netCents: payouts.netCents,
       payoutEmail: dreamBoards.payoutEmail,
@@ -456,7 +446,6 @@ export const listAdminPayouts = async (
       type: row.type,
       status: row.status,
       grossCents: row.grossCents,
-      feeCents: row.feeCents,
       charityCents: row.charityCents,
       netCents: row.netCents,
       payoutEmail: row.payoutEmail,
@@ -693,7 +682,6 @@ export const getAdminPlatformSummaryDataset = async (
     totalContributions: number;
     totalRaisedCents: number;
     totalPaidOutCents: number;
-    totalFeesRetainedCents: number;
   }>(sql`
     SELECT
       COALESCE((
@@ -722,14 +710,7 @@ export const getAdminPlatformSummaryDataset = async (
         WHERE p.created_at >= ${period.from}
           AND p.created_at <= ${period.to}
           AND p.status = 'completed'
-      ), 0) as "totalPaidOutCents",
-      COALESCE((
-        SELECT SUM(c.fee_cents)::int
-        FROM contributions c
-        WHERE c.created_at >= ${period.from}
-          AND c.created_at <= ${period.to}
-          AND c.payment_status = 'completed'
-      ), 0) as "totalFeesRetainedCents"
+      ), 0) as "totalPaidOutCents"
   `);
 
   const row = result.rows[0] ?? {
@@ -737,7 +718,6 @@ export const getAdminPlatformSummaryDataset = async (
     totalContributions: 0,
     totalRaisedCents: 0,
     totalPaidOutCents: 0,
-    totalFeesRetainedCents: 0,
   };
 
   return {
@@ -746,7 +726,6 @@ export const getAdminPlatformSummaryDataset = async (
     totalContributions: row.totalContributions,
     totalRaisedCents: row.totalRaisedCents,
     totalPaidOutCents: row.totalPaidOutCents,
-    totalFeesRetainedCents: row.totalFeesRetainedCents,
   };
 };
 
@@ -761,7 +740,6 @@ export const getAdminDashboardDataset = async (
     activeBoards: number;
     totalContributors: number;
     totalContributions: number;
-    totalFeesRetainedCents: number;
     pendingPayoutsCount: number;
     failedPayoutsCount: number;
   }>(sql`
@@ -802,13 +780,6 @@ export const getAdminDashboardDataset = async (
           AND c.payment_status = 'completed'
       ), 0) as "totalContributions",
       COALESCE((
-        SELECT SUM(c.fee_cents)::int
-        FROM contributions c
-        WHERE c.created_at >= ${period.from}
-          AND c.created_at <= ${period.to}
-          AND c.payment_status = 'completed'
-      ), 0) as "totalFeesRetainedCents",
-      COALESCE((
         SELECT COUNT(p.id)::int
         FROM payouts p
         WHERE p.created_at >= ${period.from}
@@ -830,7 +801,6 @@ export const getAdminDashboardDataset = async (
     activeBoards: 0,
     totalContributors: 0,
     totalContributions: 0,
-    totalFeesRetainedCents: 0,
     pendingPayoutsCount: 0,
     failedPayoutsCount: 0,
   };
@@ -842,7 +812,6 @@ export const getAdminDashboardDataset = async (
     activeBoards: row.activeBoards,
     totalContributors: row.totalContributors,
     totalContributions: row.totalContributions,
-    totalFeesRetainedCents: row.totalFeesRetainedCents,
     pendingPayoutsCount: row.pendingPayoutsCount,
     failedPayoutsCount: row.failedPayoutsCount,
   };
@@ -879,13 +848,6 @@ export const getAdminMonthlyCharityReconciliationDataset = async (params: {
 export const getAdminPlatformSettingsDataset = (): AdminPlatformSettingsDataset => ({
   brand: LOCKED_BRAND_STRING,
   accessibilityBaseline: LOCKED_ACCESSIBILITY_BASELINE,
-  feeConfiguration: {
-    percentage: PLATFORM_FEE_PERCENTAGE,
-    percentageBps: Math.round(PLATFORM_FEE_PERCENTAGE * 10000),
-    minFeeCents: MIN_FEE_CENTS,
-    maxFeeCents: MAX_FEE_CENTS,
-    addedOnTopAtCheckout: true,
-  },
   contributionLimits: {
     minContributionCents: 2000,
     maxContributionCents: 1000000,

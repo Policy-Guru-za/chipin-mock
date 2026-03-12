@@ -17,17 +17,17 @@ Current behavior:
 
 - validates `dreamBoardId`, contribution amount, contributor details, and provider
 - allows contributions while board status is `active` or `funded`
-- calculates checkout total as `amount_cents + fee_cents`
+- charges the provider `amount_cents` only for new contribution attempts
 - persists contribution with `amount_cents`, `fee_cents`, provider, ref, and pending status
 - creates provider-specific payment intent/redirect payload
 
 ## Current Money Semantics
 
 - contributor chooses gift amount
-- platform fee is calculated separately
-- checkout total is provider charge amount
+- active checkout is fee-free; provider charge amount equals `amount_cents`
 - completed goal progress uses `amount_cents`
-- payout math uses `net_cents`
+- payout math still respects stored legacy `fee_cents` and current `net_cents`
+- `fee_cents` and contribution `net_cents` remain in storage and partner payloads for backward compatibility only
 
 ## Webhooks
 

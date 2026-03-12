@@ -1,8 +1,6 @@
 import { StatusBadge } from '@/components/admin';
 import { getAdminPlatformSettingsDataset } from '@/lib/admin';
 
-const toPercent = (value: number) => `${(value * 100).toFixed(2)}%`;
-
 export default async function AdminSettingsPage() {
   const settings = getAdminPlatformSettingsDataset();
 
@@ -32,24 +30,8 @@ export default async function AdminSettingsPage() {
       </article>
 
       <article className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-        <h2 className="font-display text-xl font-bold text-text">Fees and limits</h2>
+        <h2 className="font-display text-xl font-bold text-text">Contribution limits</h2>
         <dl className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div>
-            <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-gray-500">Platform fee</dt>
-            <dd className="text-sm text-text">{toPercent(settings.feeConfiguration.percentage)}</dd>
-          </div>
-          <div>
-            <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-gray-500">Fee basis points</dt>
-            <dd className="text-sm text-text">{settings.feeConfiguration.percentageBps}</dd>
-          </div>
-          <div>
-            <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-gray-500">Minimum fee cents</dt>
-            <dd className="text-sm text-text">{settings.feeConfiguration.minFeeCents}</dd>
-          </div>
-          <div>
-            <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-gray-500">Maximum fee cents</dt>
-            <dd className="text-sm text-text">{settings.feeConfiguration.maxFeeCents}</dd>
-          </div>
           <div>
             <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-gray-500">Min contribution cents</dt>
             <dd className="text-sm text-text">{settings.contributionLimits.minContributionCents}</dd>

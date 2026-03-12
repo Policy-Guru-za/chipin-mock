@@ -36,8 +36,8 @@ Stores guest contribution attempts and completion state.
 Important money fields:
 
 - `amount_cents`: contributor-selected gift amount
-- `fee_cents`: platform fee charged on top
-- `net_cents`: generated column for payout-ledger math
+- `fee_cents`: legacy compatibility field; new contribution rows write `0`
+- `net_cents`: generated legacy compatibility field for contribution payout math; new rows now match `amount_cents`
 - `charity_cents`: optional charity allocation
 
 ### `payouts`
@@ -59,8 +59,9 @@ Reminder scheduling, retry, and WhatsApp opt-in / opt-out state.
 ## Current Money Semantics
 
 - Goal progress uses completed `amount_cents`
-- Checkout total uses `amount_cents + fee_cents`
-- `net_cents` exists for payout-ledger calculations, not goal progress
+- Active checkout total uses `amount_cents`
+- Historical rows may still carry non-zero `fee_cents`; payout calculations must continue to respect stored values
+- Contribution `net_cents` remains for backward compatibility, not goal progress
 
 ## Retention
 

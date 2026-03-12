@@ -45,3 +45,10 @@
 - [`./00_overview.md`](./00_overview.md) uses only `Active` and `Done` statuses and contains exactly one `Active` row.
 - `pnpm docs:audit` fails when `## Current Spec` is empty or points at a `Done` spec.
 - Current operational docs and repo-local skills describe the always-active spec and placeholder rollover rule.
+
+## Final State
+
+- Status: Done
+- Exit Criteria State: satisfied
+- Successor Slot: none
+- Notes: Locked the always-active invariant and handed the next refinement to spec 03.

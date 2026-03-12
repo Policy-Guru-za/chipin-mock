@@ -1,6 +1,6 @@
 # Gifta Canonical Spec (Source of Truth)
 
-> **Version:** 2.0.3
+> **Version:** 2.0.4
 > **Last Updated:** March 12, 2026
 > **Status:** Authoritative
 > **Supersedes:** v1.1.1 (January 21, 2026)
@@ -19,6 +19,7 @@ This document reflects current runtime behavior in `src/` and `drizzle/migration
 
 | Version | Date | Summary |
 |---------|------|---------|
+| 2.0.4 | 2026-03-12 | Dreamboard fee removal: active checkout is now fee-free, contributor/admin/host fee copy removed from active surfaces, and fee-related contract fields are retained as deprecated compatibility fields only. |
 | 2.0.3 | 2026-03-12 | Workspace-state documentation sync: confirmed generated OpenAPI host is `https://api.gifta.co.za/v1`, confirmed root request hook is `proxy.ts`, and aligned current doc governance to the March 12 workspace baseline. |
 | 2.0.2 | 2026-02-13 | Charity onboarding simplification: create flow requires public-facing fields only (`name`, `description`, `category`, `logo_url`); operational fields (`website`, contacts, bank JSON) are optional and editable later. Added admin URL draft-autofill policy and clarified charity monthly settlement as manual reconciliation over close-created payout ledger rows. |
 | 2.0.1 | 2026-02-11 | Runtime alignment pass: corrected goal/net semantics, close-path ownership, payout automation scope, reminder schema/dispatch details, and UI rollout status. |
@@ -73,18 +74,17 @@ This document reflects current runtime behavior in `src/` and `drizzle/migration
 
 ### Fee Semantics
 
-Decision Register D-004 (LOCKED): transparent fee model.
+Decision Register D-004 (LOCKED): fee-free active checkout with legacy fee compatibility.
 
-- **Contributor chooses gift amount only.** Platform fee is calculated and shown separately at checkout.
-- **Fee calculation:** 3% of gift amount, minimum R3 (300 cents), maximum R500 (50,000 cents).
-- **Checkout display:** itemized as "R350 gift + R10.50 processing fee = R360.50 total".
-- **`raised_cents` tracks gift amount only** (excludes platform fee). This prevents fee distortion in goal progress.
+- **Contributor chooses gift amount only.** Active checkout charges that amount with no additional Gifta platform fee.
+- **Checkout display:** contribution amount and total are the same for new payments.
+- **`raised_cents` tracks gift amount only.** This remains the source for goal progress and funded checks.
 - **Funded condition** (Decision Register D-005, LOCKED): Dreamboard is funded when `raised_cents >= goal_cents`, where `raised_cents` = `SUM(contributions.amount_cents)` for completed contributions.
 - **Runtime rule for status transition:** auto-transition to `funded` is executed only when current status is `active` and `goal_cents > 0`.
-- **`contributions.net_cents`** is a generated column: `amount_cents - fee_cents`.
-  - `amount_cents` = the gift amount the contributor chose and the amount that counts toward the gift goal.
-  - `fee_cents` = the platform fee calculated on that amount and added at checkout.
-  - `net_cents` = payout-ledger amount after fee; used for settlement calculations, not goal progress.
+- **Legacy compatibility fields remain:** `contributions.fee_cents`, `contributions.net_cents`, and `payouts.fee_cents` are still stored and serialized so historical records reconcile correctly.
+  - New contribution rows write `fee_cents = 0`.
+  - Contribution `net_cents` therefore matches `amount_cents` for new rows.
+  - Historical payout math must continue using stored legacy fee values where present.
 
 ### Public vs Private Display
 
@@ -188,8 +188,8 @@ Timestamps:
 - `contributor_name` (nullable), `contributor_email` (nullable), `is_anonymous` (boolean, default false)
 - `message` (nullable)
 - `amount_cents` (integer, not null, minimum 2000 = R20) — the gift amount chosen by the contributor.
-- `fee_cents` (integer, not null) — platform fee calculated on the gift amount.
-- `net_cents` (generated column: `amount_cents - fee_cents`) — payout-ledger amount after platform fee; does not drive goal progress.
+- `fee_cents` (integer, not null) — legacy compatibility field; new rows write `0`.
+- `net_cents` (generated column: `amount_cents - fee_cents`) — legacy contribution compatibility field; equals `amount_cents` for new rows and does not drive goal progress.
 - `charity_cents` (integer, nullable) — portion allocated to charity from this contribution.
 - `payment_provider` = `payfast | ozow | snapscan` (enum, not null)
 - `payment_ref` (not null, unique with provider), `payment_status` = `pending | processing | completed | failed | refunded`
@@ -202,6 +202,7 @@ Timestamps:
 - `id` (UUID, PK), `partner_id` (FK), `dream_board_id` (FK)
 - `type` = `karri_card | bank | charity` (enum, not null)
 - `gross_cents`, `fee_cents`, `charity_cents` (default 0), `net_cents` (all integer, not null)
+  - `fee_cents` remains available for historical payout rows; new fee-free contribution history will typically produce `0`.
 - Constraint: `gross_cents >= net_cents`, `charity_cents >= 0`, `net_cents >= 0`
 - `recipient_data` (JSONB, not null — payout-method-specific fields, encrypted where needed)
 - `status` = `pending | processing | completed | failed` (enum, default `pending`)
@@ -262,6 +263,7 @@ Timestamps:
 
 - On board close, the payout engine creates payout rows: one gift payout (type matches `payout_method`) and, if charity allocation > 0, one charity payout (type = `charity`).
 - **Gift payout calculation:** `gross_cents = raised_cents`; `fee_cents = platform_fee_cents`; `net_cents = raised_cents - platform_fee_cents - charity_total_cents`.
+  - `platform_fee_cents` may be non-zero for legacy contribution history but is `0` for newly created fee-free contributions.
 - **Charity payout calculation:** `gross_cents = charity_total_cents`; `net_cents = charity_total_cents` (no additional fee on charity payouts).
 - **Payout state machine:** `pending` → `processing` → `completed` or `failed`. Failed payouts may be retried (`failed` → `processing`).
 - **Board `paid_out` transition:** the Dreamboard status moves to `paid_out` only when all required payout rows for that board have status `completed`.

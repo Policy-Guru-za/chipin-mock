@@ -103,19 +103,14 @@ export const SnapScanPanel = ({ qr, slug, dreamBoardId, onBack }: SnapScanPanelP
 
 type PaymentSummaryProps = {
   contributionCents: number;
-  feeCents: number;
   totalCents: number;
 };
 
-export const PaymentSummary = ({ contributionCents, feeCents, totalCents }: PaymentSummaryProps) => (
+export const PaymentSummary = ({ contributionCents, totalCents }: PaymentSummaryProps) => (
   <div className="rounded-2xl border border-border bg-white p-4 text-sm text-text">
     <div className="flex items-center justify-between">
       <span>Contribution</span>
       <span>{formatZarWithCents(contributionCents)}</span>
-    </div>
-    <div className="mt-2 flex items-center justify-between text-text-muted">
-      <span>Gifta fee (3%)</span>
-      <span>{formatZarWithCents(feeCents)}</span>
     </div>
     <div className="mt-3 flex items-center justify-between border-t border-border pt-3 font-semibold">
       <span>Total</span>

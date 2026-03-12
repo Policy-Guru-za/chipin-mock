@@ -74,7 +74,7 @@ export async function seedDatabase() {
     contributorName: 'Ava',
     message: 'Happy birthday, Maya!',
     amountCents: 5000,
-    feeCents: 300,
+    feeCents: 0,
     paymentProvider: 'payfast',
     paymentRef: 'PF-TEST-001',
     paymentStatus: 'completed',
@@ -88,8 +88,8 @@ export async function seedDatabase() {
       dreamBoardId: dreamBoard.id,
       type: 'karri_card',
       grossCents: 5000,
-      feeCents: 300,
-      netCents: 4700,
+      feeCents: 0,
+      netCents: 5000,
       recipientData: {
         email: 'lerato@chipin.co.za',
         karriCardNumber: '5234123456781234',
@@ -103,7 +103,7 @@ export async function seedDatabase() {
     payoutId: payout.id,
     dreamBoardId: dreamBoard.id,
     type: 'gift',
-    amountCents: 4700,
+    amountCents: 5000,
     metadata: { seeded: true },
   });
 

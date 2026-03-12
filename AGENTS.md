@@ -23,7 +23,7 @@ If docs and code disagree, trust current code and update the docs or clearly lab
 
 ## First-Read Workflow
 
-1. Read [`docs/napkin/SKILL.md`](./docs/napkin/SKILL.md)
+1. Read [`.agents/skills/napkin/SKILL.md`](./.agents/skills/napkin/SKILL.md)
 2. Read [`docs/napkin/napkin.md`](./docs/napkin/napkin.md)
 3. Read this file
 4. Read [`workflow-orchestration.md`](./workflow-orchestration.md)
@@ -67,12 +67,14 @@ Workflow: Discovery -> Spec -> Planning -> Build -> Verify -> Dogfood -> Handoff
 
 ### 0) The Napkin
 
-- Start with [`docs/napkin/SKILL.md`](./docs/napkin/SKILL.md).
+- Start with [`.agents/skills/napkin/SKILL.md`](./.agents/skills/napkin/SKILL.md).
 - Use [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) for mistakes, corrections, and patterns.
+- Before handoff, update [`progress.md`](./progress.md) `## Napkin Evidence` with either a link to the napkin update or explicit `No durable napkin update.`.
 - Napkin is memory only, not progress tracking.
 
 ### 1) Discovery
 
+- Read [`.agents/skills/napkin/SKILL.md`](./.agents/skills/napkin/SKILL.md) and [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) before any other repo work.
 - Confirm the relevant Tier 1 doc set exists and is internally consistent.
 - Confirm current repo state; do not assume a clean or empty repo.
 - Map the task to the active spec, current runtime code, and relevant subsystem docs.
@@ -110,7 +112,7 @@ Workflow: Discovery -> Spec -> Planning -> Build -> Verify -> Dogfood -> Handoff
 ### 7) Handoff
 
 - Ensure docs reflect reality.
-- Handoff summary must include the completed spec id, commands run, dogfood result, blockers, remaining risk, and the next numbered placeholder.
+- Handoff summary must include the closed spec id, whether it finished as `Done` or `Superseded`, the napkin outcome, commands run, dogfood result, blockers, remaining risk, and the next numbered placeholder.
 
 ## Execution Artifacts
 
@@ -118,7 +120,7 @@ Workflow: Discovery -> Spec -> Planning -> Build -> Verify -> Dogfood -> Handoff
 - [`spec/SPEC_TEMPLATE.md`](./spec/SPEC_TEMPLATE.md): required spec structure
 - `spec/NN_<topic>.md`: execution spec for the current session
 - `spec/NN_session-placeholder.md`: standing active placeholder between sessions
-- [`progress.md`](./progress.md): live execution ledger for the active spec plus the proof ledger for the most recently completed spec
+- [`progress.md`](./progress.md): live execution ledger for the active spec plus terminal state, napkin outcome, and proof for the most recently closed / completed sessions
 - [`docs/napkin/napkin.md`](./docs/napkin/napkin.md): working memory only
 
 ### Every Work Session
@@ -127,7 +129,7 @@ Use numbered specs plus [`progress.md`](./progress.md) for every session.
 
 If the active spec is a placeholder, rename it in place before substantive work and keep the same number through handoff.
 
-When handoff activates the next `NN_session-placeholder`, keep `Current Spec` pointed at that placeholder and move the finished session's proof into `Last Completed Spec`, `Last Green Commands`, and `Dogfood Evidence`.
+When handoff activates the next `NN_session-placeholder`, keep `Current Spec` pointed at that placeholder, set `Last Session Spec` to the most recently closed session, record that session's napkin outcome in `## Napkin Evidence`, and only move proof into `Last Completed Spec`, `Last Green Commands`, and `Dogfood Evidence` when that closed session is actually `Done`.
 
 Use the fullest stage, gate, and dogfood discipline when the session touches:
 
@@ -149,13 +151,13 @@ Use the fullest stage, gate, and dogfood discipline when the session touches:
 6. Debug until green.
 7. Dogfood the changed flow.
 8. Record current-session status in [`progress.md`](./progress.md).
-9. Mark the finished session spec `Done`, create the next numbered placeholder, and update [`progress.md`](./progress.md) so `Current Spec` points at that active placeholder while `Last Completed Spec`, `Last Green Commands`, and `Dogfood Evidence` point at the completed session before closing the handoff.
+9. Mark the finished session spec `Done` or `Superseded`, create the next numbered placeholder, and update [`progress.md`](./progress.md) so `Current Spec` points at that active placeholder while `Last Session Spec` points at the closed session, `Napkin Evidence` captures the session's napkin outcome, and `Last Completed Spec`, `Last Green Commands`, and `Dogfood Evidence` still point at the latest `Done` session.
 
 Rules:
 
 - No stage is complete while a required gate is red.
 - Do not claim “done” while `Last Green Commands` or `Dogfood Evidence` are stale.
-- No session closes without the next numbered placeholder already active in [`progress.md`](./progress.md) and [`spec/00_overview.md`](./spec/00_overview.md), and without `Last Completed Spec` attributing the proof sections to the finished session.
+- No session closes without the next numbered placeholder already active in [`progress.md`](./progress.md) and [`spec/00_overview.md`](./spec/00_overview.md), without `Last Session Spec` attributing the most recently closed session, without `Napkin Evidence` capturing that session's napkin outcome, and without `Last Completed Spec` attributing proof to the latest `Done` session.
 - A real blocker must include the failing command, exact error, current hypothesis, and the missing dependency or external input.
 
 ## Verification Gate
@@ -190,6 +192,8 @@ Stop and request approval after the first green bounded slice on any of these su
 - schema or migration path
 - major UX or route flow changes
 
+If a session stops at Gate A before its exit criteria are satisfied and the work is later continued elsewhere, close that session as `Superseded`, not `Done`.
+
 ### Gate B — Before Trust-Critical Expansion
 
 Stop and request approval before broadening or shipping changes that affect:
@@ -199,6 +203,8 @@ Stop and request approval before broadening or shipping changes that affect:
 - retention, deletion, or sensitive-data handling
 - migrations or irreversible data changes
 - public API, webhook, or partner-facing contract changes
+
+If a session stops at Gate B before its exit criteria are satisfied and a later session takes over, close the earlier session as `Superseded`.
 
 ## Runtime Notes
 

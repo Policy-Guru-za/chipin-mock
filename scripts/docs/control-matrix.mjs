@@ -71,7 +71,7 @@ const exactEntries = {
     tier: 'Tier 1',
     status: 'current-operational',
     sourceOfTruth:
-      '`AGENTS.md`, `workflow-orchestration.md`, `spec/00_overview.md`, `active numbered spec`, `most recent done spec`, `git status`',
+      '`AGENTS.md`, `workflow-orchestration.md`, `.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `spec/00_overview.md`, `active numbered spec`, `most recent closed spec`, `most recent done spec`, `git status`',
     supersededBy: '',
   },
   'spec/00_overview.md': {
@@ -107,7 +107,8 @@ const exactEntries = {
   'docs/napkin/SKILL.md': {
     tier: 'Tier 1',
     status: 'current-operational',
-    sourceOfTruth: '`docs/napkin/napkin.md`, `AGENTS.md`, `workflow-orchestration.md`',
+    sourceOfTruth:
+      '`.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `workflow-orchestration.md`, `progress.md`',
     supersededBy: '',
   },
   'docs/napkin/napkin.md': {
@@ -245,11 +246,21 @@ const exactEntries = {
 
 const patternEntries = [
   {
+    test: /^\.agents\/skills\/napkin\/SKILL\.md$/,
+    meta: {
+      tier: 'Tier 1',
+      status: 'current-operational',
+      sourceOfTruth: '`docs/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `progress.md`',
+      supersededBy: '',
+    },
+  },
+  {
     test: /^\.agents\/skills\/[^/]+\/SKILL\.md$/,
     meta: {
       tier: 'Tier 1',
       status: 'current-operational',
-      sourceOfTruth: '`AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md`, `docs/agent-playbooks/code_review.md`',
+      sourceOfTruth:
+        '`.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md`, `docs/agent-playbooks/code_review.md`',
       supersededBy: '',
     },
   },

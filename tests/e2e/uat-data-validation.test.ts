@@ -10,11 +10,11 @@ import { calculatePayoutTotals } from '@/lib/payouts/calculation';
 const readSource = (path: string) => readFileSync(join(process.cwd(), path), 'utf8');
 
 describe('UAT data validation', () => {
-  it('validates platform fee bounds and 3% nominal behavior', () => {
-    expect(calculateFee(1000)).toBe(300);
-    expect(calculateFee(10000)).toBe(300);
-    expect(calculateFee(25000)).toBe(750);
-    expect(calculateFee(10_000_000)).toBe(50000);
+  it('keeps active checkout fee-free across contribution amounts', () => {
+    expect(calculateFee(1000)).toBe(0);
+    expect(calculateFee(10000)).toBe(0);
+    expect(calculateFee(25000)).toBe(0);
+    expect(calculateFee(10_000_000)).toBe(0);
   });
 
   it('validates payout arithmetic and non-negative bounded totals', () => {

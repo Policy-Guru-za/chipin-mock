@@ -1503,9 +1503,15 @@ export const openApiSpec = {
           },
           fee_cents: {
             type: 'integer',
+            deprecated: true,
+            description:
+              'Legacy field retained for backward compatibility. New contributions are fee-free and write 0.',
           },
           net_cents: {
             type: 'integer',
+            deprecated: true,
+            description:
+              'Legacy field retained for backward compatibility. New contributions are fee-free, so this now matches amount_cents.',
           },
           charity_cents: {
             type: 'integer',
@@ -1657,6 +1663,9 @@ export const openApiSpec = {
           },
           fee_cents: {
             type: 'integer',
+            deprecated: true,
+            description:
+              'Legacy field retained for backward compatibility with historical payout rows that were created before checkout became fee-free.',
           },
           charity_cents: {
             type: 'integer',

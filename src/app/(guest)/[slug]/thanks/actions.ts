@@ -33,12 +33,10 @@ const buildReceiptEmail = (params: {
   childName: string;
   giftName: string;
   amountCents: number;
-  feeCents: number;
   createdAt: Date;
   boardUrl: string;
   to: string;
 }) => {
-  const totalCents = params.amountCents + params.feeCents;
   const contributionDate = params.createdAt.toLocaleDateString('en-ZA', {
     year: 'numeric',
     month: 'long',
@@ -54,9 +52,7 @@ const buildReceiptEmail = (params: {
     subject,
     text: [
       `Thanks for contributing to ${params.childName}'s Dreamboard for ${params.giftName}.`,
-      `Gift contribution: ${formatZar(params.amountCents)}`,
-      `Processing fee: ${formatZar(params.feeCents)}`,
-      `Total paid: ${formatZar(totalCents)}`,
+      `Contribution paid: ${formatZar(params.amountCents)}`,
       `Date: ${contributionDate}`,
       `View Dreamboard: ${params.boardUrl}`,
       '',
@@ -68,9 +64,7 @@ const buildReceiptEmail = (params: {
       `<p>Thanks for contributing to <strong>${safeChildName}</strong>'s Dreamboard for <strong>${safeGiftName}</strong>.</p>`,
       '<p><strong>Receipt details</strong></p>',
       '<ul>',
-      `<li>Gift contribution: ${formatZar(params.amountCents)}</li>`,
-      `<li>Processing fee: ${formatZar(params.feeCents)}</li>`,
-      `<li>Total paid: ${formatZar(totalCents)}</li>`,
+      `<li>Contribution paid: ${formatZar(params.amountCents)}</li>`,
       `<li>Date: ${contributionDate}</li>`,
       '</ul>',
       `<p><a href="${safeBoardUrl}">View Dreamboard</a></p>`,
@@ -124,7 +118,6 @@ export async function requestReceiptAction(
       childName: contribution.childName,
       giftName: contribution.giftName,
       amountCents: contribution.amountCents,
-      feeCents: contribution.feeCents,
       createdAt: contribution.createdAt,
       boardUrl,
       to: normalizedEmail,

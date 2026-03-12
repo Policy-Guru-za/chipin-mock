@@ -169,6 +169,7 @@ describe('DashboardPostCampaignClient', () => {
     expect(payoutStatusHeading).toHaveClass('text-[18px]');
     const birthdayHeading = screen.getByRole('heading', { name: /birthday messages/i });
     expect(birthdayHeading).toHaveClass('text-[18px]');
+    expect(screen.queryByText(/Gifta Fee/i)).not.toBeInTheDocument();
     expect(screen.getByText('Grandma Rose')).toBeInTheDocument();
     expect(screen.getByText(/happy birthday, superstar!/i)).toBeInTheDocument();
     expect(screen.getByText(/happy birthday, superstar!/i)).toHaveClass('text-sm');

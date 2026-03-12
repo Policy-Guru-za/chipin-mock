@@ -19,6 +19,8 @@ continuously as you work — whenever you learn something worth recording.
 
 **This skill is always active. Every session. No trigger required.**
 
+Repo-local activation entry: [`.agents/skills/napkin/SKILL.md`](../../.agents/skills/napkin/SKILL.md). Keep that loaded skill in sync with this document.
+
 ## Session Start: Read Your Notes
 
 First thing, every session — read `docs/napkin/napkin.md` before doing anything
@@ -71,6 +73,21 @@ across sessions, not a journal you write in once.
 
 The napkin is not a progress tracker. In this repo, current session state
 lives in `progress.md` and numbered specs under `spec/`.
+
+## Handoff Proof
+
+Before handoff, update `progress.md` `## Napkin Evidence` for the most recently
+closed session.
+
+Allowed outcomes:
+
+- Link the session outcome to `docs/napkin/napkin.md` when you added or refined
+  a durable note.
+- Write the exact sentence `No durable napkin update.` when the session
+  produced no reusable correction, pattern, or preference.
+
+Do not invent a napkin entry just to satisfy the proof. The requirement is
+explicit evidence, not forced churn.
 
 ## What to Log
 

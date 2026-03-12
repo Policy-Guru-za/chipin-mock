@@ -3,6 +3,7 @@
 ### Operating Loop
 
 1. **Discovery**
+- read [`.agents/skills/napkin/SKILL.md`](./.agents/skills/napkin/SKILL.md) and [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) before other repo work
 - confirm source-of-truth docs and current repo state
 - inspect [`progress.md`](./progress.md), [`spec/00_overview.md`](./spec/00_overview.md), and the active numbered spec for the current session
 - map the task to the relevant runtime surfaces before changing code or docs
@@ -33,24 +34,26 @@
 
 7. **Handoff**
 - docs reflect reality
-- summary includes the completed spec id, commands run, dogfood result, blockers, remaining risk, and the next numbered placeholder
+- summary includes the closed spec id, whether it finished as `Done` or `Superseded`, the napkin outcome, commands run, dogfood result, blockers, remaining risk, and the next numbered placeholder
 
 ### Artifact Rules
 
-- [`progress.md`](./progress.md) is the live ledger for the active spec and the proof ledger for the most recently completed spec
+- [`progress.md`](./progress.md) is the live ledger for the active spec, the terminal ledger plus napkin outcome for the most recently closed spec, and the proof ledger for the most recently completed spec
 - [`spec/00_overview.md`](./spec/00_overview.md) is the ordered registry of numbered specs
 - [`spec/SPEC_TEMPLATE.md`](./spec/SPEC_TEMPLATE.md) defines the required spec structure
 - `spec/NN_<topic>.md` is the active execution spec for the current session
 - `spec/NN_session-placeholder.md` is the standing active placeholder between sessions
 - [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) is memory only
 
-When `Current Spec` is a successor placeholder, use `Last Completed Spec` as the owner of `Last Green Commands` and `Dogfood Evidence`.
+When `Current Spec` is a successor placeholder, use `Last Session Spec` as the owner of the most recently closed session state, `Napkin Evidence` as the owner of that session's napkin outcome, and `Last Completed Spec` as the owner of `Last Green Commands` and `Dogfood Evidence`.
 
 ### Definition Of Done
 
 - relevant gate is green
 - dogfood is complete or clearly blocked with explicit evidence
 - [`progress.md`](./progress.md) contains current active-session state and correctly attributed completed-session proof
+- [`progress.md`](./progress.md) contains `## Napkin Evidence` for the most recently closed session, linking [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) or explicitly stating `No durable napkin update.`
+- any session closed before satisfying exit criteria is explicitly marked `Superseded`
 - the next numbered placeholder is already active before the finished session is closed
 - relevant Tier 1 docs and generated artifacts reflect the shipped state
 

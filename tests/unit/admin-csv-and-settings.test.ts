@@ -51,8 +51,6 @@ describe('admin csv payload mappers', () => {
         paymentProvider: 'payfast',
         paymentStatus: 'completed',
         amountCents: 10000,
-        feeCents: 300,
-        netCents: 9700,
         charityCents: 0,
         paymentRef: 'PF-1',
         createdAt: new Date('2026-02-01T00:00:00.000Z'),
@@ -68,9 +66,8 @@ describe('admin csv payload mappers', () => {
         type: 'karri_card',
         status: 'pending',
         grossCents: 10000,
-        feeCents: 300,
         charityCents: 0,
-        netCents: 9700,
+        netCents: 10000,
         payoutEmail: 'host@gifta.co.za',
         hostEmail: 'host@gifta.co.za',
         charityId: null,
@@ -115,6 +112,9 @@ describe('admin csv payload mappers', () => {
     ]);
 
     expect(contributionRows[0].contributor_name).toBe('');
+    expect(contributionRows[0]).not.toHaveProperty('fee_cents');
+    expect(contributionRows[0]).not.toHaveProperty('net_cents');
+    expect(payoutRows[0]).not.toHaveProperty('fee_cents');
     expect(payoutRows[0].completed_at_iso).toBe('');
     expect(charityRows[0].total_boards).toBe(3);
     expect(hostRows[0].name).toBe('');
@@ -133,7 +133,7 @@ describe('admin settings dataset', () => {
       const settings = getAdminPlatformSettingsDataset();
 
       expect(settings.brand).toBe('Gifta');
-      expect(settings.feeConfiguration.percentageBps).toBe(300);
+      expect(settings).not.toHaveProperty('feeConfiguration');
       expect(settings.charityConfiguration.splitModes).toEqual(['percentage', 'threshold']);
       expect(settings.writePathGates.bankEnabled).toBe(true);
       expect(settings.writePathGates.charityEnabled).toBe(false);

@@ -40,9 +40,8 @@ describe('admin payout export route', () => {
         type: 'karri_card',
         status: 'pending',
         gross_cents: item.id === 'p-1' ? 10000 : 12000,
-        fee_cents: item.id === 'p-1' ? 300 : 360,
         charity_cents: 0,
-        net_cents: item.id === 'p-1' ? 9700 : 11640,
+        net_cents: item.id === 'p-1' ? 10000 : 12000,
         payout_email: 'host@gifta.co.za',
         host_email: 'host@gifta.co.za',
         charity_id: '',
@@ -74,10 +73,10 @@ describe('admin payout export route', () => {
     const body = await response.text();
 
     expect(body).toContain(
-      'id,dream_board_id,dream_board_slug,child_name,type,status,gross_cents,fee_cents,charity_cents,net_cents,payout_email,host_email,charity_id,charity_name,created_at_iso,completed_at_iso',
+      'id,dream_board_id,dream_board_slug,child_name,type,status,gross_cents,charity_cents,net_cents,payout_email,host_email,charity_id,charity_name,created_at_iso,completed_at_iso',
     );
-    expect(body).toContain('p-1,db-1,maya,Maya,karri_card,pending,10000,300,0,9700');
-    expect(body).toContain('p-2,db-2,luca,Luca,karri_card,pending,12000,360,0,11640');
+    expect(body).toContain('p-1,db-1,maya,Maya,karri_card,pending,10000,0,10000');
+    expect(body).toContain('p-2,db-2,luca,Luca,karri_card,pending,12000,0,12000');
 
     expect(parseAdminPayoutFilters).toHaveBeenCalledTimes(1);
     expect(listAdminPayouts).toHaveBeenCalledTimes(2);

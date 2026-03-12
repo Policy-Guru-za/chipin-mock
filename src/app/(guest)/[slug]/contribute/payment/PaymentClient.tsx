@@ -19,7 +19,6 @@ import {
   type ContributeFlowData,
 } from '@/lib/contributions/flow-storage';
 import { trackPaymentRedirectStarted } from '@/lib/analytics/metrics';
-import { calculateFee } from '@/lib/payments/fees';
 import type { PaymentProvider } from '@/lib/payments';
 import { PAYMENT_TRUST_COPY } from '@/lib/payments/copy';
 import { savePaymentAttemptData } from '@/lib/payments/recovery';
@@ -114,8 +113,7 @@ export function PaymentClient({
     }
   }, [flowData, router, slug]);
 
-  const feeCents = useMemo(() => (flowData ? calculateFee(flowData.amountCents) : 0), [flowData]);
-  const totalCents = (flowData?.amountCents ?? 0) + feeCents;
+  const totalCents = useMemo(() => flowData?.amountCents ?? 0, [flowData]);
   const hasProviderOptions = availableProviders.length > 0;
   const canSubmit =
     !!flowData && hasProviderOptions && availableProviders.includes(paymentProvider) && !isSubmitting;
@@ -232,7 +230,7 @@ export function PaymentClient({
         </div>
       </fieldset>
 
-      <PaymentSummary contributionCents={flowData.amountCents} feeCents={feeCents} totalCents={totalCents} />
+      <PaymentSummary contributionCents={flowData.amountCents} totalCents={totalCents} />
 
       {snapscanQr ? (
         <SnapScanPanel

@@ -22,6 +22,7 @@ export const serializeContribution = (record: ContributionApiRecord) => ({
   contributor_name: record.contributorName,
   message: record.message,
   amount_cents: record.amountCents,
+  // Legacy compatibility fields retained for partner integrations.
   fee_cents: record.feeCents,
   net_cents: record.netCents ?? record.amountCents - record.feeCents,
   charity_cents: record.charityCents ?? null,

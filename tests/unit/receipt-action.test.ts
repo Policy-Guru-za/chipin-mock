@@ -112,11 +112,19 @@ describe('requestReceiptAction', () => {
     const result = await requestReceiptAction('contribution-1', 'AVA@example.com');
 
     expect(result).toEqual({ success: true });
+    const [emailPayload, options] = sendEmailMock.mock.calls[0];
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
         to: 'ava@example.com',
         subject: "Your contribution receipt for Maya's Dreamboard",
       }),
+      expect.objectContaining({
+        idempotencyKey: expect.stringMatching(/^receipt:contribution-1:ava@example.com:/),
+      })
+    );
+    expect(emailPayload.text).toMatch(/Contribution paid: R\s*100/);
+    expect(emailPayload.text).not.toContain('Processing fee');
+    expect(options).toEqual(
       expect.objectContaining({
         idempotencyKey: expect.stringMatching(/^receipt:contribution-1:ava@example.com:/),
       })

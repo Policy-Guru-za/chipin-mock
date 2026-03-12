@@ -56,3 +56,10 @@
 - PayFast reconciliation supports dry-run and only mutates when provider data yields a unique exact match
 - admin payout detail no longer presents the incomplete documents surface
 - this spec is marked `Done`, a new `05_session-placeholder` exists, and [`../progress.md`](../progress.md) attributes proof through this completed spec at handoff
+
+## Final State
+
+- Status: Superseded
+- Exit Criteria State: not-satisfied
+- Successor Slot: 05
+- Notes: Stage 1 completed and stopped at Gate A; follow-on product work was captured under spec 05 instead of finishing this spec’s original exit criteria.

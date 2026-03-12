@@ -50,16 +50,6 @@ const columns: AdminDataColumn<AdminContributionDataset>[] = [
     render: (item) => <span>{formatZar(item.amountCents)}</span>,
   },
   {
-    key: 'fee',
-    header: 'Fee',
-    render: (item) => <span className="text-gray-500">{formatZar(item.feeCents)}</span>,
-  },
-  {
-    key: 'net',
-    header: 'Net',
-    render: (item) => <span>{formatZar(item.netCents)}</span>,
-  },
-  {
     key: 'status',
     header: 'Status',
     render: (item) => <StatusBadge status={item.paymentStatus} />,

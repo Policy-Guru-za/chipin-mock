@@ -42,8 +42,8 @@ export default async function AdminDashboardPage() {
         />
         <AdminStatsCard label="Contributors" value={String(dataset.totalContributors)} />
         <AdminStatsCard
-          label="Fees retained"
-          value={formatZar(dataset.totalFeesRetainedCents)}
+          label="Contributions"
+          value={String(dataset.totalContributions)}
           variant="success"
         />
       </div>

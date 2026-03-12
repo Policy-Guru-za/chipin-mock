@@ -41,7 +41,7 @@ This repository is in a good execution state and a mixed documentation state.
 ### Payments and payouts
 
 - Incoming payments: PayFast, Ozow, SnapScan
-- Fee model: contributor pays `amount + fee`; goal progress uses `amount_cents`
+- Fee model: active checkout charges `amount_cents` only; historical records may still retain non-zero `fee_cents`; goal progress uses `amount_cents`
 - Gift payout methods: `karri_card`, `bank`
 - Optional charity payout rows when charity is enabled
 - Close path is explicit via `POST /api/v1/dream-boards/[id]/close`

@@ -14,7 +14,7 @@ Before a substantial review, read in this order:
 1. [`../../AGENTS.md`](../../AGENTS.md)
 2. [`../../progress.md`](../../progress.md)
 3. [`../../spec/00_overview.md`](../../spec/00_overview.md)
-4. resolve the review target spec from [`../../progress.md`](../../progress.md): use `Current Spec` unless it is `NN_session-placeholder`, then use `Last Completed Spec`
+4. resolve the review target spec from [`../../progress.md`](../../progress.md): use `Current Spec` unless it is `NN_session-placeholder`, then use `Last Session Spec`
 5. [`../DOCUMENT_CONTROL_MATRIX.md`](../DOCUMENT_CONTROL_MATRIX.md)
 6. [`../Platform-Spec-Docs/CANONICAL.md`](../Platform-Spec-Docs/CANONICAL.md)
 7. [`../forensic-audit/REPORT.md`](../forensic-audit/REPORT.md)
@@ -25,7 +25,7 @@ Then read only the current subsystem docs that match the review scope. Do not de
 
 If the current session lacks an active spec or current progress ledger, report that as operational drift.
 
-If `Current Spec` is `NN_session-placeholder`, treat it as a valid successor placeholder only when `Last Completed Spec` cleanly owns the proof for the most recent finished session. Report drift only when substantive work is happening under a placeholder without a renamed session spec and without valid completed-spec linkage.
+If `Current Spec` is `NN_session-placeholder`, treat it as a valid successor placeholder only when `Last Session Spec` cleanly owns the most recent closed session and `Last Completed Spec` still owns the latest `Done` proof. Report drift when placeholder rollover lacks valid terminal-spec linkage.
 
 ## Review Defaults
 
@@ -49,7 +49,7 @@ Review the relevant parts of this checklist for the scope. Do not claim a subsys
 ### Execution Hygiene
 
 - active numbered spec exists for the current session
-- [`progress.md`](../../progress.md) identifies current spec, current stage, blockers, next step, last completed spec, last green commands, and dogfood evidence
+- [`progress.md`](../../progress.md) identifies current spec, current stage, blockers, next step, last session spec, last completed spec, last green commands, and dogfood evidence
 - the resolved review target spec’s exit criteria and actual verification evidence line up
 
 ### Auth, Roles, Permissioning
