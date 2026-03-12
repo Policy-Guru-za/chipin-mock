@@ -1,52 +1,68 @@
 ## Workflow Orchestration
 
-### 1. Plan Mode Default
-- Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions)
-- If something goes sideways, STOP and re-plan immediately – don't keep pushing
-- Use plan mode for verification steps, not just building
-- Write detailed specs upfront to reduce ambiguity
+### Operating Loop
 
-### 2. Subagent Strategy
-- Use subagents liberally to keep main context window clean
-- Offload research, exploration, and parallel analysis to subagents
-- For complex problems, throw more compute at it via subagents
-- One task per subagent for focused execution
+1. **Discovery**
+- confirm source-of-truth docs and current repo state
+- inspect [`progress.md`](./progress.md), [`spec/00_overview.md`](./spec/00_overview.md), and the active numbered spec for the current session
+- map the task to the relevant runtime surfaces before changing code or docs
 
-### 3. Self-Improvement Loop
-- After ANY correction from the user: update `/docs/napkin/napkin.md` with the pattern
-- Write rules for yourself that prevent the same mistake
-- Ruthlessly iterate on these lessons until mistake rate drops
-- Review lessons at session start for relevant project
+2. **Spec**
+- confirm the active numbered spec in [`spec/`](./spec/)
+- if it is `spec/NN_session-placeholder.md`, rename that same numbered file in place to `spec/NN_<topic>.md` before substantive work starts
+- update [`spec/00_overview.md`](./spec/00_overview.md) and [`progress.md`](./progress.md) before coding
+- keep one active spec at a time unless the user says otherwise
 
-### 4. Verification Before Done
-- Never mark a task complete without proving it works
-- Diff behavior between main and your changes when relevant
-- Ask yourself: "Would a staff engineer approve this?"
-- Run tests, check logs, demonstrate correctness
+3. **Planning**
+- lock objective, scope, dependencies, stage plan, test gate, and exit criteria in the active spec
+- keep assumptions explicit; do not let them hide in thread history
 
-### 5. Demand Elegance (Balanced)
-- For non-trivial changes: pause and ask "is there a more elegant way?"
-- If a fix feels hacky: "Knowing everything I know now, implement the elegant solution"
-- Skip this for simple, obvious fixes – don't over-engineer
-- Challenge your own work before presenting it
+4. **Build**
+- implement one bounded stage at a time
+- keep the repo runnable after each stage
+- update [`progress.md`](./progress.md) as status, blockers, and next step change
 
-### 6. Autonomous Bug Fixing
-- When given a bug report: just fix it. Don't ask for hand-holding
-- Point at logs, errors, failing tests – then resolve them
-- Zero context switching required from the user
-- Go fix failing CI tests without being told how
+5. **Verify**
+- run the smallest gate that proves the stage
+- no red gate means no completed stage
+- for docs/process work, verify links, commands, control-matrix classification, and agent guidance drift
 
-## Task Management
+6. **Dogfood**
+- exercise the changed flow before claiming completion
+- docs/process work still needs dogfooding: use the new execution flow or playbook end to end and confirm it makes sense in practice
 
-1. **Plan First**: Write plan to `tasks/todo.md` with checkable items
-2. **Verify Plan**: Check in before starting implementation
-3. **Track Progress**: Mark items complete as you go
-4. **Explain Changes**: High-level summary at each step
-5. **Document Results**: Add review section to `tasks/todo.md`
-6. **Capture Lessons**: Update `/docs/napkin/napkin.md` after corrections
+7. **Handoff**
+- docs reflect reality
+- summary includes the completed spec id, commands run, dogfood result, blockers, remaining risk, and the next numbered placeholder
 
-## Core Principles
+### Artifact Rules
 
-- **Simplicity First**: Make every change as simple as possible. Impact minimal code.
-- **No Laziness**: Find root causes. No temporary fixes. Senior developer standards.
-- **Minimal Impact**: Changes should only touch what's necessary. Avoid introducing bugs.
+- [`progress.md`](./progress.md) is the live ledger for the active spec and the proof ledger for the most recently completed spec
+- [`spec/00_overview.md`](./spec/00_overview.md) is the ordered registry of numbered specs
+- [`spec/SPEC_TEMPLATE.md`](./spec/SPEC_TEMPLATE.md) defines the required spec structure
+- `spec/NN_<topic>.md` is the active execution spec for the current session
+- `spec/NN_session-placeholder.md` is the standing active placeholder between sessions
+- [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) is memory only
+
+When `Current Spec` is a successor placeholder, use `Last Completed Spec` as the owner of `Last Green Commands` and `Dogfood Evidence`.
+
+### Definition Of Done
+
+- relevant gate is green
+- dogfood is complete or clearly blocked with explicit evidence
+- [`progress.md`](./progress.md) contains current active-session state and correctly attributed completed-session proof
+- the next numbered placeholder is already active before the finished session is closed
+- relevant Tier 1 docs and generated artifacts reflect the shipped state
+
+### Default Heuristics
+
+Every work session uses the spec/progress system.
+
+Apply the fullest stage and gate discipline when the session touches:
+
+- multi-file work
+- behavior changes
+- auth, security, payment, payout, schema, or API-contract changes
+- major UX or routing changes
+- agent-policy or documentation-system changes
+- anything expected to take more than about 30 minutes

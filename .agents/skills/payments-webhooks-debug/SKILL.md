@@ -5,7 +5,7 @@ description: |
   webhook handling, payout execution, retries, reconciliation, or contract
   drift in the money-moving parts of Gifta.
 author: Codex
-version: 1.0.0
+version: 1.2.0
 date: 2026-03-12
 ---
 
@@ -14,11 +14,14 @@ date: 2026-03-12
 ## Read First
 
 1. [`../../../AGENTS.md`](../../../AGENTS.md)
-2. [`../../../docs/Platform-Spec-Docs/CANONICAL.md`](../../../docs/Platform-Spec-Docs/CANONICAL.md)
-3. [`../../../docs/Platform-Spec-Docs/PAYMENTS.md`](../../../docs/Platform-Spec-Docs/PAYMENTS.md)
-4. [`../../../docs/Platform-Spec-Docs/INTEGRATIONS.md`](../../../docs/Platform-Spec-Docs/INTEGRATIONS.md)
-5. [`../../../docs/Platform-Spec-Docs/KARRI.md`](../../../docs/Platform-Spec-Docs/KARRI.md)
-6. [`../../../docs/Platform-Spec-Docs/SECURITY.md`](../../../docs/Platform-Spec-Docs/SECURITY.md)
+2. [`../../../progress.md`](../../../progress.md)
+3. [`../../../spec/00_overview.md`](../../../spec/00_overview.md)
+4. the active numbered spec in [`../../../spec/`](../../../spec/) for the current session
+5. [`../../../docs/Platform-Spec-Docs/CANONICAL.md`](../../../docs/Platform-Spec-Docs/CANONICAL.md)
+6. [`../../../docs/Platform-Spec-Docs/PAYMENTS.md`](../../../docs/Platform-Spec-Docs/PAYMENTS.md)
+7. [`../../../docs/Platform-Spec-Docs/INTEGRATIONS.md`](../../../docs/Platform-Spec-Docs/INTEGRATIONS.md)
+8. [`../../../docs/Platform-Spec-Docs/KARRI.md`](../../../docs/Platform-Spec-Docs/KARRI.md)
+9. [`../../../docs/Platform-Spec-Docs/SECURITY.md`](../../../docs/Platform-Spec-Docs/SECURITY.md)
 
 ## Focus Areas
 
@@ -31,11 +34,13 @@ date: 2026-03-12
 
 ## Workflow
 
-1. Map the exact flow first: route -> service -> DB write -> downstream event/webhook.
-2. Verify auth and trust boundaries on every involved route.
-3. Inspect status transitions and retry counters before changing logic.
-4. Prefer targeted tests and exact webhook/payment fixtures over broad guesses.
-5. Call out contract mismatches between runtime code, generated OpenAPI, and docs.
+1. For every payment or webhook session, keep the active numbered spec and [`../../../progress.md`](../../../progress.md) current.
+2. If the active spec is `NN_session-placeholder`, rename that same numbered file in place before substantive investigation or changes begin.
+3. Map the exact flow first: route -> service -> DB write -> downstream event/webhook.
+4. Verify auth and trust boundaries on every involved route.
+5. Inspect status transitions and retry counters before changing logic.
+6. Prefer targeted tests and exact webhook/payment fixtures over broad guesses.
+7. Call out contract mismatches between runtime code, generated OpenAPI, docs, and current execution evidence.
 
 ## Verification
 

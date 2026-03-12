@@ -5,6 +5,7 @@
 |------|--------|----------------|-------------------|
 | 2026-03-12 | self | New doc-audit classifier compared absolute file paths against repo-relative control-matrix rules, so the first sync failed immediately on `AGENTS.md` | In repo tooling that classifies paths, normalize with `path.relative(process.cwd(), filePath)` before rule lookup or reporting |
 | 2026-03-12 | self | Tried grouped `find` parentheses inside a `node execSync` shell string without escaping them, and `/bin/sh` rejected the command before the real audit ran | For shell-invoked `find` expressions inside scripts, escape grouping parentheses or avoid shell grouping entirely by traversing with Node FS APIs |
+| 2026-03-12 | user | Repo process drifted because `tasks/todo.md` had become a mixed tracker/history doc and agent instructions were no longer converging on one execution system | For every Gifta work session, use `progress.md` plus numbered specs under `spec/`; keep `tasks/todo.md` historical only |
 | 2026-02-20 | user | Assumed the preferred avatar simplification was compact-only, but preference is desktop pill retained with initials + smaller chevron and no visible name | For avatar refinements, lock desktop/mobile variant preference explicitly before implementation and treat desktop/landing pill visuals as a separate contract from mobile compact |
 | 2026-02-20 | user | Unicode initials regression: avatar parsing used ASCII-only `[A-Z0-9]`, dropping accented/non-Latin letters | Use Unicode property escapes (`\\p{L}\\p{N}` with `u` flag) for display initials so Clerk names render correctly across locales |
 | 2026-02-20 | self | `UserAvatarMenu` first-name derivation split on whitespace, which over-normalized Clerk `firstName` and masked CSS-content escaping behavior for edge-case characters | Treat `user.firstName` as the source of truth (trim only), and handle safety in a dedicated CSS content encoder instead of semantic splitting |
@@ -102,6 +103,7 @@
 ## User Preferences
 - Start with required doc read order before implementation.
 - Use `pnpm` for all script gates.
+- For every work session, use `progress.md` plus numbered specs under `spec/`; do not revive `tasks/todo.md` as the live tracker.
 - For current Dreamboard refactor work, prioritize main `/{slug}` content UI changes; keep shared header/footer unchanged unless explicitly requested.
 - For UI refactors, keep scope to main user-facing content and maintain a reusable AI playbook under `docs/UI-refactors/` that can drive future refactors from HTML + screenshot + URL inputs.
 
@@ -128,6 +130,7 @@
 - For implementation-plan docs, lock repo execution constraints up front (`pnpm`, main-only strategy, Conventional Commits) and explicitly include generated-artifact sync rules when source contracts (like `src/lib/api/openapi.ts`) are edited.
 - For large doc-governance sweeps, drive control-matrix generation and status-banner sync from one shared classification module so 100+ docs stay consistent.
 - When adding agent-facing Markdown under hidden directories like `.agents/`, remember that `pnpm docs:audit` still scans them; add control-matrix classification in the same change.
+- For every repo work session, keep one active numbered spec, rename `NN_session-placeholder` in place at session start, and create the next numbered placeholder before handoff.
 - For Axiom/Vercel log triage, default to `format=tabular`, alias dotted fields (`path=['request.path']`, `status=['request.statusCode']`, `deployment=['vercel.deploymentId']`), and extract rows with `jq -r '.tables[0].columns | transpose[] | @tsv'`.
 - For Axiom incidents, start broad (project + path + time window), then pivot to single `request.id` trace; this is fastest to separate edge/lambda/log events.
 

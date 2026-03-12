@@ -2,7 +2,7 @@
 
 > **Status:** Current workspace reference  
 > **Last reviewed:** March 12, 2026  
-> **Scope:** As-built repo state, including current uncommitted documentation work
+> **Scope:** As-built repo state, including current uncommitted work
 
 ## Start Here
 
@@ -15,7 +15,15 @@ Read in this order:
 5. [`docs/forensic-audit/REPORT.md`](./docs/forensic-audit/REPORT.md)
 6. [`docs/agent-playbooks/code_review.md`](./docs/agent-playbooks/code_review.md) when the task is a review or audit
 
-If docs disagree, use the current workspace code plus [`docs/Platform-Spec-Docs/CANONICAL.md`](./docs/Platform-Spec-Docs/CANONICAL.md). Historical and reference-only docs are labeled in the control matrix and, where required, inside the files themselves.
+For every work session, then read:
+
+1. [`progress.md`](./progress.md)
+2. [`spec/00_overview.md`](./spec/00_overview.md)
+3. the active numbered spec listed there
+
+If `Current Spec` is `NN_session-placeholder`, treat it as the standing next-session placeholder and use `Last Completed Spec` in [`progress.md`](./progress.md) when you need the proof for the most recently finished session.
+
+If docs disagree, use current workspace code plus [`docs/Platform-Spec-Docs/CANONICAL.md`](./docs/Platform-Spec-Docs/CANONICAL.md). Historical and reference-only docs are labeled in the control matrix and, where required, inside the files themselves.
 
 ## Product Summary
 
@@ -50,6 +58,14 @@ Gifta is a Next.js application for birthday gifting around a single Dreamboard:
 - Root edge hook is [`proxy.ts`](./proxy.ts), not the removed legacy root-middleware file
 - Current workspace baseline includes user WIP under `docs/UI-refactors/Avatar-refactor/` and `docs/Demo-Mode/screenshots/`
 
+## Active Work System
+
+- [`progress.md`](./progress.md): live ledger for the active spec and proof ledger for the most recently completed spec
+- [`spec/00_overview.md`](./spec/00_overview.md): ordered spec registry
+- [`spec/SPEC_TEMPLATE.md`](./spec/SPEC_TEMPLATE.md): required execution-spec shape
+- `spec/NN_<topic>.md`: active execution spec for the current session
+- `spec/NN_session-placeholder.md`: standing active placeholder between sessions; rename it in place at session start
+
 ## Key Commands
 
 ```bash
@@ -69,7 +85,9 @@ pnpm docs:audit
 - [`docs/Platform-Spec-Docs/CANONICAL.md`](./docs/Platform-Spec-Docs/CANONICAL.md): current runtime/product authority
 - [`docs/Platform-Spec-Docs/API.md`](./docs/Platform-Spec-Docs/API.md): human API companion to OpenAPI
 - [`docs/forensic-audit/REPORT.md`](./docs/forensic-audit/REPORT.md): current-state assessment
-- [`docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md`](./docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md): current UX v2 control doc
+- [`progress.md`](./progress.md): live execution ledger for the current session
+- [`progress.md`](./progress.md) also records `Last Completed Spec`, `Last Green Commands`, and `Dogfood Evidence` for the most recent finished session during handoff
+- [`spec/00_overview.md`](./spec/00_overview.md): active numbered-spec registry
 - [`docs/agent-playbooks/code_review.md`](./docs/agent-playbooks/code_review.md): canonical review contract for this repo
 
 ### Tier 2
@@ -80,6 +98,7 @@ Tier 2 docs remain useful, but many are non-authoritative plans, evidence packs,
 
 - Repo-scoped Codex config lives at [`.codex/config.toml`](./.codex/config.toml); it narrows file mutation to this repo while keeping network access enabled.
 - Repo-local reusable skills live under [`.agents/skills/`](./.agents/skills/).
+- Use the spec/progress system for every work session before inventing ad hoc trackers.
 
 ## Verification Baseline
 

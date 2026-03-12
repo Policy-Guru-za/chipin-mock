@@ -10,6 +10,7 @@ import {
   classifyDoc,
   repoRelative,
 } from './control-matrix.mjs';
+import { collectExecutionArtifactErrors } from './execution-artifact-audit.mjs';
 
 const repoRoot = process.cwd();
 const args = new Set(process.argv.slice(2));
@@ -18,6 +19,43 @@ const shouldSync = args.has('--sync');
 const DOC_CONTROL_PATH = path.join(repoRoot, 'docs', 'DOCUMENT_CONTROL_MATRIX.md');
 const DOC_GLOBS_EXCLUDE = new Set(['node_modules', '.git', 'coverage', 'output']);
 const BANNER_PREFIX = '> **Document Status:**';
+const AGENT_GUIDANCE_RULES = [
+  {
+    test: /^AGENTS\.md$/,
+    required: ['progress.md', 'spec/00_overview.md'],
+    banned: [/tasks\/todo\.md/g],
+  },
+  {
+    test: /^README\.md$/,
+    required: ['progress.md', 'spec/00_overview.md'],
+    banned: [/tasks\/todo\.md/g],
+  },
+  {
+    test: /^workflow-orchestration\.md$/,
+    required: ['progress.md', 'spec/00_overview.md'],
+    banned: [/tasks\/todo\.md/g],
+  },
+  {
+    test: /^TESTING\.md$/,
+    required: ['progress.md'],
+    banned: [/tasks\/todo\.md/g],
+  },
+  {
+    test: /^docs\/agent-playbooks\/code_review\.md$/,
+    required: ['progress.md', 'spec/00_overview.md'],
+    banned: [/tasks\/todo\.md/g],
+  },
+  {
+    test: /^docs\/napkin\/SKILL\.md$/,
+    required: ['progress.md', 'spec/'],
+    banned: [/tasks\/todo\.md/g],
+  },
+  {
+    test: /^\.agents\/skills\/[^/]+\/SKILL\.md$/,
+    required: ['progress.md', 'spec/00_overview.md'],
+    banned: [/tasks\/todo\.md/g],
+  },
+];
 
 const collectDocs = (dir) => {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -175,7 +213,7 @@ if (shouldSync) {
   fs.writeFileSync(DOC_CONTROL_PATH, `${renderMatrix(syncedDocs)}\n`);
 }
 
-const errors = [];
+const errors = collectExecutionArtifactErrors({ repoRoot, repoRelative });
 
 const matrixText = fs.existsSync(DOC_CONTROL_PATH) ? fs.readFileSync(DOC_CONTROL_PATH, 'utf8') : '';
 const expectedMatrix = `${renderMatrix(docsWithMetadata)}\n`;
@@ -215,6 +253,21 @@ for (const { fullPath, path: filePath, metadata } of docsWithMetadata) {
         errors.push(`${filePath}: contains banned active-doc token (${check.label}).`);
       }
       check.pattern.lastIndex = 0;
+    }
+  }
+
+  const guidanceRule = AGENT_GUIDANCE_RULES.find((rule) => rule.test.test(filePath));
+  if (guidanceRule) {
+    for (const token of guidanceRule.required) {
+      if (!text.includes(token)) {
+        errors.push(`${filePath}: missing required execution-system token (${token}).`);
+      }
+    }
+    for (const pattern of guidanceRule.banned) {
+      if (pattern.test(text)) {
+        errors.push(`${filePath}: contains deprecated execution guidance (${pattern}).`);
+      }
+      pattern.lastIndex = 0;
     }
   }
 }

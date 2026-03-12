@@ -33,27 +33,25 @@ const exactEntries = {
   'AGENTS.md': {
     tier: 'Tier 1',
     status: 'current-operational',
-    sourceOfTruth:
-      '`package.json`, `docs/Platform-Spec-Docs/CANONICAL.md`, `docs/forensic-audit/WORKSPACE_BASELINE_2026-03-12.md`, `workflow-orchestration.md`',
+    sourceOfTruth: '`package.json`, `docs/Platform-Spec-Docs/CANONICAL.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md`',
     supersededBy: '',
   },
   'README.md': {
     tier: 'Tier 1',
     status: 'current-operational',
-    sourceOfTruth:
-      '`AGENTS.md`, `docs/Platform-Spec-Docs/CANONICAL.md`, `docs/forensic-audit/REPORT.md`, `package.json`',
+    sourceOfTruth: '`AGENTS.md`, `progress.md`, `spec/00_overview.md`, `docs/Platform-Spec-Docs/CANONICAL.md`, `package.json`',
     supersededBy: '',
   },
   'TESTING.md': {
     tier: 'Tier 1',
     status: 'current-operational',
-    sourceOfTruth: '`package.json`, `vitest.config.ts`, `tests/`',
+    sourceOfTruth: '`package.json`, `vitest.config.ts`, `tests/`, `progress.md`, `spec/SPEC_TEMPLATE.md`',
     supersededBy: '',
   },
   'BACKLOG.md': {
     tier: 'Tier 1',
     status: 'current-operational',
-    sourceOfTruth: '`docs/forensic-audit/REPORT.md`, `docs/Platform-Spec-Docs/CANONICAL.md`, `src/`',
+    sourceOfTruth: '`docs/forensic-audit/REPORT.md`, `docs/Platform-Spec-Docs/CANONICAL.md`, `src/`, `progress.md`',
     supersededBy: '',
   },
   'CHANGELOG.md': {
@@ -66,14 +64,33 @@ const exactEntries = {
   'workflow-orchestration.md': {
     tier: 'Tier 1',
     status: 'current-operational',
-    sourceOfTruth: '`AGENTS.md`, `docs/napkin/SKILL.md`, `tasks/todo.md`',
+    sourceOfTruth: '`AGENTS.md`, `progress.md`, `spec/00_overview.md`, `spec/SPEC_TEMPLATE.md`',
+    supersededBy: '',
+  },
+  'progress.md': {
+    tier: 'Tier 1',
+    status: 'current-operational',
+    sourceOfTruth:
+      '`AGENTS.md`, `workflow-orchestration.md`, `spec/00_overview.md`, `active numbered spec`, `most recent done spec`, `git status`',
+    supersededBy: '',
+  },
+  'spec/00_overview.md': {
+    tier: 'Tier 1',
+    status: 'current-operational',
+    sourceOfTruth: '`AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/NN_*.md`',
+    supersededBy: '',
+  },
+  'spec/SPEC_TEMPLATE.md': {
+    tier: 'Tier 1',
+    status: 'current-operational',
+    sourceOfTruth: '`AGENTS.md`, `workflow-orchestration.md`, `spec/00_overview.md`',
     supersededBy: '',
   },
   'tasks/todo.md': {
-    tier: 'Tier 1',
-    status: 'current-operational',
-    sourceOfTruth: '`current working session`, `workflow-orchestration.md`',
-    supersededBy: '',
+    tier: 'Tier 2',
+    status: 'historical-evidence',
+    sourceOfTruth: '`progress.md`, `spec/00_overview.md`, `workflow-orchestration.md`',
+    supersededBy: '`progress.md`, `spec/00_overview.md`',
   },
   'docs/DOCUMENT_CONTROL_MATRIX.md': {
     tier: 'Tier 1',
@@ -84,14 +101,13 @@ const exactEntries = {
   'docs/agent-playbooks/code_review.md': {
     tier: 'Tier 1',
     status: 'current-operational',
-    sourceOfTruth:
-      '`AGENTS.md`, `README.md`, `docs/Platform-Spec-Docs/CANONICAL.md`, `TESTING.md`',
+    sourceOfTruth: '`AGENTS.md`, `progress.md`, `spec/00_overview.md`, `docs/Platform-Spec-Docs/CANONICAL.md`, `TESTING.md`',
     supersededBy: '',
   },
   'docs/napkin/SKILL.md': {
     tier: 'Tier 1',
     status: 'current-operational',
-    sourceOfTruth: '`docs/napkin/napkin.md`, `workflow-orchestration.md`',
+    sourceOfTruth: '`docs/napkin/napkin.md`, `AGENTS.md`, `workflow-orchestration.md`',
     supersededBy: '',
   },
   'docs/napkin/napkin.md': {
@@ -224,9 +240,7 @@ const exactEntries = {
       '`docs/implementation-docs/GIFTA_UX_V2_AGENT_EXECUTION_CONTRACT.md`, `docs/implementation-docs/GIFTA_UX_V2_DECISION_REGISTER.md`, `docs/Platform-Spec-Docs/CANONICAL.md`',
     supersededBy: '',
   },
-  'docs/UI-refactors/AI-UI-REFACTOR-PLAYBOOK.md': referenceMeta(
-    '`docs/Platform-Spec-Docs/UX.md`'
-  ),
+  'docs/UI-refactors/AI-UI-REFACTOR-PLAYBOOK.md': referenceMeta('`docs/Platform-Spec-Docs/UX.md`'),
 };
 
 const patternEntries = [
@@ -235,8 +249,16 @@ const patternEntries = [
     meta: {
       tier: 'Tier 1',
       status: 'current-operational',
-      sourceOfTruth:
-        '`AGENTS.md`, `docs/agent-playbooks/code_review.md`, `docs/Platform-Spec-Docs/CANONICAL.md`',
+      sourceOfTruth: '`AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md`, `docs/agent-playbooks/code_review.md`',
+      supersededBy: '',
+    },
+  },
+  {
+    test: /^spec\/\d{2}_[^/]+\.md$/,
+    meta: {
+      tier: 'Tier 1',
+      status: 'current-operational',
+      sourceOfTruth: '`AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md`',
       supersededBy: '',
     },
   },

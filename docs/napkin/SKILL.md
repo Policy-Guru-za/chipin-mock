@@ -69,6 +69,9 @@ it whenever you learn something worth recording:
 The napkin is a living document. Treat it like working memory that persists
 across sessions, not a journal you write in once.
 
+The napkin is not a progress tracker. In this repo, current session state
+lives in `progress.md` and numbered specs under `spec/`.
+
 ## What to Log
 
 Log anything that would change your behaviour if you read it next session:
