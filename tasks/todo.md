@@ -1,5 +1,32 @@
 # Task Todo
 
+## Plan (Workspace-State Documentation Audit and Sync)
+- [x] Add document governance scaffolding (`docs/DOCUMENT_CONTROL_MATRIX.md`, `scripts/docs/audit.mjs`, `pnpm docs:audit`).
+- [x] Freeze the March 12, 2026 workspace baseline in forensic docs.
+- [x] Refresh Tier 1 docs to current workspace truth.
+- [x] Label non-authoritative Tier 2 docs and fix repo-owned markdown navigation.
+- [x] Regenerate OpenAPI artifact and run verification gates.
+- [x] Capture review notes and remaining risks.
+
+## Review (Workspace-State Documentation Audit and Sync)
+- Added shared doc-governance tooling:
+- `scripts/docs/control-matrix.mjs`
+- `scripts/docs/audit.mjs`
+- `pnpm docs:audit`
+- Generated `docs/DOCUMENT_CONTROL_MATRIX.md` for all `143` repo-owned markdown files.
+- Added non-authoritative status banners across Tier 2 reference, historical-plan, and historical-evidence docs.
+- Added current baseline capture in `docs/forensic-audit/WORKSPACE_BASELINE_2026-03-12.md`.
+- Rewrote Tier 1 root docs and core platform/forensic/control docs to align with current workspace truth.
+- Regenerated `public/v1/openapi.json` from `src/lib/api/openapi.ts`.
+- Verification:
+- `pnpm openapi:generate` (pass)
+- `pnpm docs:audit` (pass)
+- `pnpm lint` (pass; existing warnings only)
+- `pnpm typecheck` (pass)
+- `pnpm test` (pass; `192` files / `978` tests)
+- Remaining known runtime risk:
+- Karri pending retry bookkeeping bug in `src/lib/integrations/karri-batch.ts` remains tracked in `BACKLOG.md`.
+
 ## Plan (Host Validation Fix)
 - [x] Add shared runtime base URL resolver with trusted host/protocol validation.
 - [x] Replace duplicated base URL logic in guest metadata pages and OG route.

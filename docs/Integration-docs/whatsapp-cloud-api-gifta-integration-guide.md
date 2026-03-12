@@ -1,3 +1,6 @@
+> **Document Status:** Reference only. Reviewed March 12, 2026.
+> Useful context only. Do not use this file as the source of truth for current runtime behavior or agent policy.
+> Canonical replacement: `docs/Platform-Spec-Docs/INTEGRATIONS.md`.
 # WhatsApp Cloud API — Complete Integration Reference for Gifta
 
 > **Purpose**: This document is the single source of truth for implementing WhatsApp messaging into the Gifta application. It is written for an AI coding agent and contains every technical detail needed to build a production-ready WhatsApp integration using Meta's official Cloud API.

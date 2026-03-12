@@ -1,7 +1,7 @@
 # Gifta Canonical Spec (Source of Truth)
 
-> **Version:** 2.0.2
-> **Last Updated:** February 13, 2026
+> **Version:** 2.0.3
+> **Last Updated:** March 12, 2026
 > **Status:** Authoritative
 > **Supersedes:** v1.1.1 (January 21, 2026)
 
@@ -19,6 +19,7 @@ This document reflects current runtime behavior in `src/` and `drizzle/migration
 
 | Version | Date | Summary |
 |---------|------|---------|
+| 2.0.3 | 2026-03-12 | Workspace-state documentation sync: confirmed generated OpenAPI host is `https://api.gifta.co.za/v1`, confirmed root request hook is `proxy.ts`, and aligned current doc governance to the March 12 workspace baseline. |
 | 2.0.2 | 2026-02-13 | Charity onboarding simplification: create flow requires public-facing fields only (`name`, `description`, `category`, `logo_url`); operational fields (`website`, contacts, bank JSON) are optional and editable later. Added admin URL draft-autofill policy and clarified charity monthly settlement as manual reconciliation over close-created payout ledger rows. |
 | 2.0.1 | 2026-02-11 | Runtime alignment pass: corrected goal/net semantics, close-path ownership, payout automation scope, reminder schema/dispatch details, and UI rollout status. |
 | 2.0.0 | 2026-02-07 | Major update for UX v2: multi-payout (Karri + bank), charity domain, 5-step host flow, fee semantics clarification, new data model fields, payout engine architecture, reminder system. Aligned with Decision Register D-001 through D-010. |
@@ -101,10 +102,18 @@ Decision Register D-004 (LOCKED): transparent fee model.
 ### Auth and Session Storage
 
 - Clerk handles host and admin authentication and session state.
+- Root request hook is `proxy.ts`; auth enforcement is handled in route/layout/server wrappers, not in the removed legacy root-middleware file.
 - Guest/contributor routes are fully public (no auth required).
 - No magic link tokens or session storage in Vercel KV.
 - API key authentication (separate from Clerk) protects partner V1 API routes.
 - Internal job routes are protected by `INTERNAL_JOB_SECRET` bearer token.
+
+### API Surface
+
+- Generated OpenAPI host: `https://api.gifta.co.za/v1`
+- Local OpenAPI host: `http://localhost:3000/v1`
+- Partner API key prefixes remain `cpk_live_` / `cpk_test_`
+- Outgoing webhook signing headers remain `X-ChipIn-Signature` / `X-ChipIn-Event-Id`
 
 ### Branding
 

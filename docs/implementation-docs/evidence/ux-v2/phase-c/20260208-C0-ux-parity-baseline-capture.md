@@ -1,3 +1,6 @@
+> **Document Status:** Historical evidence. Reviewed March 12, 2026.
+> Preserve as execution record. Do not use this file as the source of truth for current runtime behavior or agent policy.
+> Canonical replacement: `docs/forensic-audit/REPORT.md`.
 # C0 UX Parity Baseline Capture (Phase C)
 
 Date (UTC): 2026-02-08T10:35:00Z

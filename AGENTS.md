@@ -2,29 +2,55 @@
 
 Owner: Ryan Laubscher (@laup30, Ryan@redcliffebay.com)
 
-## How to read this repo
+## Source of Truth Order
 
-- Source of truth for runtime behavior: `src/` + `drizzle/migrations/` + `package.json`
-- Product/spec docs: `docs/Platform-Spec-Docs/` (start at `CANONICAL.md`)
-- Current-state audit notes: `docs/forensic-audit/REPORT.md` + `docs/forensic-audit/STATE.md`
+1. [`docs/DOCUMENT_CONTROL_MATRIX.md`](./docs/DOCUMENT_CONTROL_MATRIX.md)
+2. [`docs/Platform-Spec-Docs/CANONICAL.md`](./docs/Platform-Spec-Docs/CANONICAL.md)
+3. Current workspace code in `src/`, `drizzle/migrations/`, and `public/v1/openapi.json`
+4. [`docs/forensic-audit/WORKSPACE_BASELINE_2026-03-12.md`](./docs/forensic-audit/WORKSPACE_BASELINE_2026-03-12.md)
+5. [`docs/forensic-audit/REPORT.md`](./docs/forensic-audit/REPORT.md)
 
-If docs and code disagree, update the docs to match the code (or clearly label the doc as historical).
+If a doc is marked non-authoritative in the control matrix, do not treat it as current runtime or agent policy.
 
-## Stack (as implemented)
+## Current Stack
 
-- Framework: Next.js `16.1.4` (App Router)
+- Framework: Next.js `16.1.4`
 - UI: React `19.2.3`
-- Language: TypeScript (strict)
-- DB: Postgres (Neon); ORM: Drizzle
-- Auth: Clerk (`@clerk/nextjs`)
-- Payments (inbound): PayFast, Ozow, SnapScan
-- Payout: Karri Card (sole payout type in code)
+- Language: TypeScript strict mode
+- DB: PostgreSQL via Neon + Drizzle
+- Auth: Clerk
 - Storage: Vercel Blob
-- Cache/rate limits: Vercel KV (with dev fallback in some paths)
-- AI images: Google Gemini image generation (`GEMINI_API_KEY`)
-- Observability: Sentry (+ optional OpenTelemetry/Axiom env wiring)
+- Cache / rate limits: Vercel KV with local fallback paths
+- Payments: PayFast, Ozow, SnapScan
+- Payouts: Karri Card, bank, optional charity ledger rows
+- Observability: Sentry, optional OpenTelemetry / Axiom
 
-## Commands (pnpm only)
+## First-Read Workflow
+
+1. Read `docs/napkin/SKILL.md`
+2. Read `docs/napkin/napkin.md`
+3. Read this file
+4. Read `workflow-orchestration.md`
+5. Read the control matrix before trusting any other repo doc
+
+## Repository Rules
+
+- Package manager: `pnpm` only
+- Keep changes small and reviewable
+- Never discard user changes in the dirty tree
+- Update docs in the same change set when behavior or agent guidance changes
+- Prefer current runtime truth over legacy plan prose
+- Use [`proxy.ts`](./proxy.ts) as the current root request hook reference; do not reintroduce legacy root-middleware guidance unless that file exists again
+
+## Runtime Notes
+
+- Product name: `Gifta`
+- User-facing product term: `Dreamboard`
+- Public API host in generated OpenAPI: `https://api.gifta.co.za/v1`
+- API key prefixes remain legacy `cpk_live_` / `cpk_test_`
+- Outgoing webhook headers remain legacy `X-ChipIn-Signature` / `X-ChipIn-Event-Id`
+
+## Commands
 
 ```bash
 pnpm dev
@@ -34,22 +60,14 @@ pnpm test
 pnpm test:coverage
 pnpm knip
 pnpm openapi:generate
+pnpm docs:audit
 pnpm db:seed
 pnpm drizzle:generate
 pnpm drizzle:push
 ```
 
-## Environment
+## Documentation Hygiene
 
-- Copy `.env.example` → `.env.local` for local development.
-- Sandbox flags are granular (`MOCK_PAYMENTS`, `MOCK_PAYMENT_WEBHOOKS`, `MOCK_KARRI`, `MOCK_SENTRY`).
-- Internal jobs are protected by `INTERNAL_JOB_SECRET` and must be triggered by an external scheduler (nothing in-repo runs cron).
-
-## Repo conventions
-
-- Do this first: *Always* read /docs/napkin/SKILL.md before you start any new session. Follow the instructions in this document.
-- Before any codebase refactor, new feature creation, or other meaningful codebase alteration, always read and follow `/Users/ryanlaubscher/Projects/gifta-codex-5.3/workflow-orchestration.md`.
-- This application only uses the single-word term 'Dreamboard'. Ensure user-facing copy never uses alternate spacing for this term.
-- Keep changes small and reviewable.
-- Prefer updating docs that make product guarantees (CANONICAL/SPEC/UX/JOURNEYS/PAYMENTS/DATA/SECURITY/ARCHITECTURE) over duplicating truth elsewhere.
-- When you discover a code-vs-doc mismatch that you’re not fixing in code, add a short “Known issue” note to the relevant doc and a follow-up in `BACKLOG.md`.
+- Tier 1 docs can change implementation or agent behavior; keep them current.
+- Tier 2 docs may be current references or non-authoritative historical material; the control matrix decides which.
+- If you discover drift you are not fixing in code, update the relevant Tier 1 doc and add a follow-up item to [`BACKLOG.md`](./BACKLOG.md).

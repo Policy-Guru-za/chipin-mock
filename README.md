@@ -1,176 +1,83 @@
-# Gifta Technical Documentation
+# Gifta
 
-> **Version:** 2.0.0  
-> **Last Updated:** February 2026  
-> **Status:** Platform Simplification In Progress
+> **Status:** Current workspace reference  
+> **Last reviewed:** March 12, 2026  
+> **Scope:** As-built repo state, including current uncommitted documentation work
 
----
+## Start Here
 
-## Quick Start for AI Coding Agents
+Read in this order:
 
-**Read [`AGENTS.md`](./AGENTS.md) first.** It contains:
-- Build order and phased implementation
-- Code standards and patterns
-- Key implementation details
-- File structure requirements
-- Frontend aesthetics guidelines (NO "AI slop")
+1. [`AGENTS.md`](./AGENTS.md)
+2. [`docs/DOCUMENT_CONTROL_MATRIX.md`](./docs/DOCUMENT_CONTROL_MATRIX.md)
+3. [`docs/Platform-Spec-Docs/CANONICAL.md`](./docs/Platform-Spec-Docs/CANONICAL.md)
+4. [`docs/forensic-audit/WORKSPACE_BASELINE_2026-03-12.md`](./docs/forensic-audit/WORKSPACE_BASELINE_2026-03-12.md)
+5. [`docs/forensic-audit/REPORT.md`](./docs/forensic-audit/REPORT.md)
 
-**Read [`docs/implementation-docs/chipin-simplification-spec.md`](./docs/implementation-docs/chipin-simplification-spec.md)** for the current implementation specification.
+If docs disagree, use the current workspace code plus [`docs/Platform-Spec-Docs/CANONICAL.md`](./docs/Platform-Spec-Docs/CANONICAL.md). Historical and reference-only docs are labeled in the control matrix and, where required, inside the files themselves.
 
----
+## Product Summary
 
-## What We're Building
+Gifta is a Next.js application for birthday gifting around a single Dreamboard:
 
-**Gifta** is a social coordination tool for birthday gifting where:
-1. Parent creates a "Dreamboard" describing ONE dream gift (AI generates artwork)
-2. Shares link with party guests via WhatsApp
-3. Guests contribute money toward the gift (see % funded + totals raised vs goal)
-4. When pot closes, funds are credited to the parent's Karri Card
+- Host creates a Dreamboard for one child and one gift.
+- Guests chip in through a public mobile-web flow.
+- Payments use PayFast, Ozow, or SnapScan.
+- Gift payout supports Karri Card and bank transfer; charity payouts are tracked separately when enabled.
+- Host/admin auth uses Clerk.
 
-**Tagline:** *Friends chip in together to turn birthday clutter into one dream gift.*
+## Current Stack
 
-**Branding note:** the product/app is **Gifta**. Some partner-facing technical surfaces still use legacy naming (e.g. `api.chipin.co.za`, `cpk_*` API keys) until cutover.
-
-**Core Philosophy:**
-- We are in the **pooling business**, not the fulfillment business
-- Money flows from contributors to Karri Card — we never hold funds
-- Immediate debit from contributor, daily batch credit to host
-
----
-
-## Documentation Index
-
-### Core Documents
-
-| Document | Description | Read When |
-|----------|-------------|-----------|
-| [`docs/Platform-Spec-Docs/CANONICAL.md`](./docs/Platform-Spec-Docs/CANONICAL.md) | Source of truth (resolves conflicts) | **Read first after AGENTS** |
-| [`docs/Platform-Spec-Docs/SPEC.md`](./docs/Platform-Spec-Docs/SPEC.md) | Product requirements, features, non-features | Understanding what to build |
-| [`docs/Platform-Spec-Docs/ARCHITECTURE.md`](./docs/Platform-Spec-Docs/ARCHITECTURE.md) | System design, tech stack, deployment | Planning infrastructure |
-| [`docs/Platform-Spec-Docs/JOURNEYS.md`](./docs/Platform-Spec-Docs/JOURNEYS.md) | User flows with screen mockups | Building UI flows |
-| [`docs/Platform-Spec-Docs/DATA.md`](./docs/Platform-Spec-Docs/DATA.md) | Database schema, Drizzle models | Setting up database |
-| [`docs/Platform-Spec-Docs/API.md`](./docs/Platform-Spec-Docs/API.md) | Public API specification | Building API endpoints |
-| [`docs/Platform-Spec-Docs/PAYMENTS.md`](./docs/Platform-Spec-Docs/PAYMENTS.md) | Payment provider integration | Integrating PayFast/Ozow/SnapScan |
-| [`docs/Platform-Spec-Docs/INTEGRATIONS.md`](./docs/Platform-Spec-Docs/INTEGRATIONS.md) | Third-party services overview | External integrations |
-| [`docs/Platform-Spec-Docs/UX.md`](./docs/Platform-Spec-Docs/UX.md) | Design system, components, screens | Building UI |
-| [`docs/Platform-Spec-Docs/SECURITY.md`](./docs/Platform-Spec-Docs/SECURITY.md) | Security & POPIA requirements | Security implementation |
-| [`docs/Platform-Spec-Docs/NFR-OPERATIONS.md`](./docs/Platform-Spec-Docs/NFR-OPERATIONS.md) | Non-functional requirements | SLOs + ops |
-| [`AGENTS.md`](./AGENTS.md) | AI coding agent instructions | **READ FIRST** |
-
-### OpenAPI
-
-- File: `public/v1/openapi.json`
-- Local: `http://localhost:3000/v1/openapi.json`
-- Production: `https://api.chipin.co.za/v1/openapi.json`
-
-### Integration Specs
-
-| Document | Status | Description |
-|----------|--------|-------------|
-| [`docs/Platform-Spec-Docs/KARRI.md`](./docs/Platform-Spec-Docs/KARRI.md) | P0 - Core | Karri Card payout (sole payout method) |
-
-### Implementation Docs
-
-| Document | Description |
+| Layer | Current implementation |
 | --- | --- |
-| [`docs/implementation-docs/SANDBOX_MODE_IMPLEMENTATION.md`](./docs/implementation-docs/SANDBOX_MODE_IMPLEMENTATION.md) | Sandbox mode feature flag spec and rollout plan. |
-| [`docs/MIGRATION.md`](./docs/MIGRATION.md) | Migration guide for `DEMO_MODE` → `MOCK_*` flags. |
-
----
-
-## Tech Stack Summary
-
-| Layer | Technology |
-|-------|------------|
-| Framework | Next.js 16.1.4 (App Router) |
-| UI | React 19.2.3 |
-| Language | TypeScript (strict) |
-| Database | Neon (PostgreSQL) |
-| ORM | Drizzle |
-| Styling | Tailwind CSS (customized) |
-| Components | shadcn/ui (customized) |
-| Hosting | Vercel |
-| Payments (Inbound) | PayFast, Ozow, SnapScan |
-| Payout | Karri Card (sole method) |
-| Email | Resend |
-| Notifications | WhatsApp Business API |
-| AI Image Generation | Google Gemini (image generation via Generative Language API) |
+| Framework | Next.js `16.1.4` |
+| UI | React `19.2.3` |
+| Language | TypeScript strict mode |
+| Database | PostgreSQL on Neon via Drizzle |
+| Auth | Clerk |
 | Storage | Vercel Blob |
-| Cache | Vercel KV |
+| Cache / rate limits | Vercel KV with local fallback in some paths |
+| Payments | PayFast, Ozow, SnapScan |
+| Payouts | Karri Card, bank, charity ledger rows |
+| Observability | Sentry, optional OpenTelemetry, optional Axiom wiring |
 
----
+## Workspace Facts That Matter
 
-## MVP Scope
+- Public OpenAPI host: `https://api.gifta.co.za/v1`
+- API keys still use the legacy `cpk_live_` / `cpk_test_` prefixes
+- Webhook signing headers still use the legacy `X-ChipIn-*` names
+- Root edge hook is [`proxy.ts`](./proxy.ts), not the removed legacy root-middleware file
+- Current workspace baseline includes user WIP under `docs/UI-refactors/Avatar-refactor/` and `docs/Demo-Mode/screenshots/`
 
-### In Scope
-- ✅ Dreamboard creation with manual gift name + AI-generated artwork
-- ✅ Clerk authentication (prebuilt sign-in/sign-up)
-- ✅ Guest contribution via PayFast, Ozow (EFT), SnapScan (QR)
-- ✅ Karri Card as sole payout method
-- ✅ Progress tracking (% + totals for guests; host sees full details)
-- ✅ WhatsApp notifications (contribution alerts, payout confirmation)
-- ✅ Email notifications
-- ✅ Daily batch Karri Card credits
-- ✅ Public Partner API (API keys, scopes, rate limiting)
-
-### Out of Scope (Post-MVP)
-- ❌ Multiple gifts per Dreamboard
-- ❌ Native mobile apps
-- ❌ Desktop-optimized layouts (mobile-first serves all)
-
----
-
-## Key Design Decisions
-
-1. **One gift, not a registry** — Simplicity over flexibility
-2. **Mobile web, not native app** — Zero download friction for guests
-3. **Manual gift definition + AI artwork** — Parent describes gift, AI illustrates
-4. **Karri Card only** — Single payout method, no fulfillment complexity
-5. **We expose APIs** — Partners integrate with us, not reverse
-6. **Immediate debit, daily batch credit** — We never hold funds
-7. **No "AI slop" UI** — Distinctive, opinionated design
-
----
-
-## Getting Started
+## Key Commands
 
 ```bash
-# 1. Clone and install
-git clone <repo>
-cd chipin
 pnpm install
-
-# 2. Set up environment
-cp .env.example .env.local
-# Fill in environment variables
-
-# 3. Set up database
-pnpm drizzle:generate
-pnpm drizzle:push
-
-# 4. Run development server
 pnpm dev
-```
-
-## Useful Commands
-
-```bash
-# Lint / types / tests
 pnpm lint
 pnpm typecheck
 pnpm test
-
-# Load testing
-pnpm test:load
+pnpm openapi:generate
+pnpm docs:audit
 ```
 
----
+## Documentation Map
 
-## Questions?
+### Tier 1
 
-If requirements are unclear:
-1. Check the specific document
-2. Follow the principle of simplicity
-3. When in doubt, implement the minimal version
+- [`docs/Platform-Spec-Docs/CANONICAL.md`](./docs/Platform-Spec-Docs/CANONICAL.md): current runtime/product authority
+- [`docs/Platform-Spec-Docs/API.md`](./docs/Platform-Spec-Docs/API.md): human API companion to OpenAPI
+- [`docs/forensic-audit/REPORT.md`](./docs/forensic-audit/REPORT.md): current-state assessment
+- [`docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md`](./docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md): current UX v2 control doc
 
-**Goal:** Working MVP, not perfect system. Ship, then iterate.
+### Tier 2
+
+Tier 2 docs remain useful, but many are non-authoritative plans, evidence packs, vendor references, or design artifacts. Use the control matrix before treating any of them as current implementation truth.
+
+## Verification Baseline
+
+Verified on March 12, 2026:
+
+- `pnpm lint`: pass with existing warnings only
+- `pnpm typecheck`: pass
+- `pnpm test`: pass (`192` files / `978` tests)

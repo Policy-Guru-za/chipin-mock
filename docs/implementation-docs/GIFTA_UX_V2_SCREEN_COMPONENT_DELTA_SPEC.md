@@ -1,3 +1,6 @@
+> **Document Status:** Historical plan. Reviewed March 12, 2026.
+> Preserve as planning context. Do not use this file as the source of truth for current runtime behavior or agent policy.
+> Canonical replacement: `docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md`.
 # Gifta UX v2 Screen and Component Delta Spec
 
 ## Purpose

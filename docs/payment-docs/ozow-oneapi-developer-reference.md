@@ -1,3 +1,6 @@
+> **Document Status:** Reference only. Reviewed March 12, 2026.
+> Useful context only. Do not use this file as the source of truth for current runtime behavior or agent policy.
+> Canonical replacement: `docs/Platform-Spec-Docs/PAYMENTS.md`.
 # Ozow One API Developer Reference (Integration-Focused)
 
 ## 1. Scope and Audience

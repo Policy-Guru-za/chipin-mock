@@ -1,3 +1,6 @@
+> **Document Status:** Reference only. Reviewed March 12, 2026.
+> Useful context only. Do not use this file as the source of truth for current runtime behavior or agent policy.
+> Canonical replacement: `docs/Platform-Spec-Docs/UX.md`.
 # Create Wizard UI Refactor — Implementation Plan
 
 > **Scope**: Pure UI/UX refactor of Steps 1–6 of the Dreamboard creation wizard.

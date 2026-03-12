@@ -3,6 +3,8 @@
 ## Corrections
 | Date | Source | What Went Wrong | What To Do Instead |
 |------|--------|----------------|-------------------|
+| 2026-03-12 | self | New doc-audit classifier compared absolute file paths against repo-relative control-matrix rules, so the first sync failed immediately on `AGENTS.md` | In repo tooling that classifies paths, normalize with `path.relative(process.cwd(), filePath)` before rule lookup or reporting |
+| 2026-03-12 | self | Tried grouped `find` parentheses inside a `node execSync` shell string without escaping them, and `/bin/sh` rejected the command before the real audit ran | For shell-invoked `find` expressions inside scripts, escape grouping parentheses or avoid shell grouping entirely by traversing with Node FS APIs |
 | 2026-02-20 | user | Assumed the preferred avatar simplification was compact-only, but preference is desktop pill retained with initials + smaller chevron and no visible name | For avatar refinements, lock desktop/mobile variant preference explicitly before implementation and treat desktop/landing pill visuals as a separate contract from mobile compact |
 | 2026-02-20 | user | Unicode initials regression: avatar parsing used ASCII-only `[A-Z0-9]`, dropping accented/non-Latin letters | Use Unicode property escapes (`\\p{L}\\p{N}` with `u` flag) for display initials so Clerk names render correctly across locales |
 | 2026-02-20 | self | `UserAvatarMenu` first-name derivation split on whitespace, which over-normalized Clerk `firstName` and masked CSS-content escaping behavior for edge-case characters | Treat `user.firstName` as the source of truth (trim only), and handle safety in a dedicated CSS content encoder instead of semantic splitting |
@@ -124,6 +126,7 @@
 - For C9 pre-flight rollback validation (C0-05), always include three explicit confirmations in evidence: Vercel rollback location path, exact UX toggle-off vars, and pre-rollback evidence capture list.
 - For admin CSV exports, use shared header lists and always emit header-only CSV for empty datasets to keep download behavior deterministic.
 - For implementation-plan docs, lock repo execution constraints up front (`pnpm`, main-only strategy, Conventional Commits) and explicitly include generated-artifact sync rules when source contracts (like `src/lib/api/openapi.ts`) are edited.
+- For large doc-governance sweeps, drive control-matrix generation and status-banner sync from one shared classification module so 100+ docs stay consistent.
 - For Axiom/Vercel log triage, default to `format=tabular`, alias dotted fields (`path=['request.path']`, `status=['request.statusCode']`, `deployment=['vercel.deploymentId']`), and extract rows with `jq -r '.tables[0].columns | transpose[] | @tsv'`.
 - For Axiom incidents, start broad (project + path + time window), then pivot to single `request.id` trace; this is fastest to separate edge/lambda/log events.
 

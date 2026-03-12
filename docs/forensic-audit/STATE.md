@@ -1,102 +1,54 @@
-# Forensic Audit State (compaction-safe)
+# Forensic Audit State
 
-Last updated: 2026-02-05
+Last updated: March 12, 2026
 
-Purpose: single source of truth for the ongoing “forensic + docs drift” review. After any Codex “compact conversation”, resume by re-opening this file and continuing from **Next actions**.
+## Purpose
 
-## Resume protocol (after compaction)
+Single operational state file for the current documentation and workspace audit.
 
-1) Open `docs/forensic-audit/STATE.md`
-2) Continue from **Next actions**
-3) Use **Findings register** IDs when discussing changes
-4) Update “Last updated” + statuses as work completes
+Read with:
 
-## Progress
+1. [`docs/forensic-audit/WORKSPACE_BASELINE_2026-03-12.md`](./WORKSPACE_BASELINE_2026-03-12.md)
+2. [`docs/forensic-audit/DOC-DRIFT.md`](./DOC-DRIFT.md)
+3. [`docs/forensic-audit/REPORT.md`](./REPORT.md)
 
-- ✅ Repo structure + config inventory (broad pass)
-- ✅ Runtime flows + route inventory (guest/host/admin/partner/internal)
-- ✅ Data model + migrations + jobs/integrations (broad pass)
-- ✅ Security/ops/observability/test posture (broad pass)
-- ⏳ Docs vs code drift matrix (in progress)
-- ⏳ Final forensic report (pending)
+## Baseline
 
-## Known key code locations (fast resume)
+- Workspace truth = current files on disk, not committed `main` only
+- Branch = `main`
+- HEAD = `9699e62`
+- Current gate status:
+  - `pnpm lint`: pass with existing warnings only
+  - `pnpm typecheck`: pass
+  - `pnpm test`: pass (`192` files / `978` tests)
 
-- Guest pages:
-  - `src/app/(guest)/[slug]/page.tsx`
-  - `src/app/(guest)/[slug]/contribute/page.tsx`
-  - `src/app/(guest)/[slug]/thanks/page.tsx`
-  - `src/app/(guest)/[slug]/payment-failed/page.tsx`
-- Contribution create + fee calc:
-  - `src/app/api/internal/contributions/create/route.ts`
-  - `src/lib/payments/fees.ts`
-  - `src/components/forms/ContributionFormParts.tsx`
-- Provider webhooks + partner webhook dispatch:
-  - `src/app/api/webhooks/payfast/route.ts`
-  - `src/app/api/webhooks/ozow/route.ts`
-  - `src/app/api/webhooks/snapscan/route.ts`
-  - `src/lib/webhooks/dispatcher.ts`
-  - `src/lib/webhooks/types.ts`
-- Partner API pot close:
-  - `src/app/api/v1/dream-boards/[id]/close/route.ts`
-- Payouts + Karri:
-  - `src/lib/payouts/service.ts`
-  - `src/lib/payouts/queries.ts`
-  - `src/lib/integrations/karri-batch.ts`
-- DB + views:
-  - `src/lib/db/schema.ts`
-  - `drizzle/migrations/*` (notably view definitions)
-- Auth / middleware:
-  - `middleware.ts`
-  - `src/lib/auth/*` (Clerk integration points)
+## Confirmed Runtime Facts
 
-## Findings register (status: needs-confirmation | confirmed)
+- Root request hook is [`proxy.ts`](../../proxy.ts); it adds `x-request-id` and is not the auth gate.
+- Host and admin auth are handled through Clerk wrappers and layout / route-level guards.
+- Public OpenAPI host is `https://api.gifta.co.za/v1`.
+- API keys still use `cpk_live_` / `cpk_test_`.
+- Outgoing webhook headers still use `X-ChipIn-*`.
+- Guest progress surfaces show percentage plus Rand totals; individual contribution amounts stay private.
+- Dreamboards close explicitly through the partner API; no in-repo auto-close scheduler exists.
 
-| ID | Status | Area | Summary | Evidence pointers | Doc impact |
-|---:|:--|:--|:--|:--|:--|
-| F-001 | confirmed | Guest UX | Guest pages display ZAR amounts; docs claim “% only” | guest page shows `formatZar(view.raisedCents) of formatZar(view.goalCents)` | CANONICAL/SPEC/JOURNEYS/UX/README |
-| F-002 | confirmed | Lifecycle | “Auto-close on party date” asserted in docs; repo has no auto-close job | only explicit close is partner API `POST /api/v1/dream-boards/[id]/close` | CANONICAL/SPEC/JOURNEYS/ARCHITECTURE |
-| F-003 | confirmed | Webhooks | Event catalog supports many events; runtime emits only `contribution.received` + `pot.funded` | payfast/ozow/snapscan webhooks emit these only | API/INTEGRATIONS/ARCHITECTURE |
-| F-004 | confirmed | Karri batch | `pending` result resets attempts counter (likely infinite retries) | `markQueuePending(entry.id, entry.attempts)` after increment | KARRI/runbooks |
-| F-005 | confirmed | Payments | Fee semantics inconsistent: checkout charges `amount + fee` but `net_cents = amount - fee` and “raised” sums `net_cents` | `fees.ts`, contribution create route, `schema.ts` + queries | PAYMENTS/DATA/UX/JOURNEYS |
-| F-006 | confirmed | Seed | Seed inserts raw card number (should be encrypted) + wrong webhook event type/payload shape | `seed.ts` uses `karriCardNumber: '5234...'`, eventType `dream_board.created` | demo/reset docs |
-| F-007 | confirmed | Branding | App metadata is “Gifta”; some docs used legacy “ChipIn” naming | `src/app/layout.tsx` metadata title/OG | README/CANONICAL/UX/API |
+## Findings Register
 
-## Evidence anchors (line refs)
+| ID | Status | Area | Summary | Primary evidence |
+| --- | --- | --- | --- | --- |
+| F-001 | current | Documentation drift | Root and platform docs had stale links, stale API/domain references, and stale auth-entrypoint references | [`README.md`](../../README.md), [`docs/Platform-Spec-Docs/API.md`](../Platform-Spec-Docs/API.md), [`docs/Platform-Spec-Docs/ARCHITECTURE.md`](../Platform-Spec-Docs/ARCHITECTURE.md) |
+| F-002 | current | Auth / routing docs | Older forensic docs still described the removed root-middleware file; runtime now uses [`proxy.ts`](../../proxy.ts) and route/layout guards | [`proxy.ts`](../../proxy.ts), `src/app/(admin)/layout.tsx` |
+| F-003 | current | Doc governance gap | Repo lacked a durable control matrix and repeatable doc-audit command | [`docs/DOCUMENT_CONTROL_MATRIX.md`](../DOCUMENT_CONTROL_MATRIX.md), [`scripts/docs/audit.mjs`](../../scripts/docs/audit.mjs) |
+| F-004 | known issue | Karri automation | Pending Karri responses still reset the queue attempt counter to the prior value | [`src/lib/integrations/karri-batch.ts`](../../src/lib/integrations/karri-batch.ts) |
 
-- F-001:
-  - `src/app/(guest)/[slug]/page.tsx` (GoalProgressCard): line 68
-  - `src/app/(guest)/[slug]/thanks/page.tsx` (progress summary): line 49
-- F-002:
-  - `src/app/api/v1/dream-boards/[id]/close/route.ts`: close request reason includes `party_date_reached`; status change is API-triggered only.
-  - `src/lib/db/schema.ts`: `partyDate` comment “serves as pot close date”; no matching scheduler in repo.
-- F-003:
-  - `src/lib/webhooks/types.ts`: catalog includes `dreamboard.*`, `pot.closed`, `payout.*`.
-  - `src/app/api/webhooks/payfast/route.ts`: emits `contribution.received` + `pot.funded` only (same for ozow/snapscan).
-- F-004:
-  - `src/lib/integrations/karri-batch.ts`: lines 126–129 reset attempts on `pending`.
-- F-005:
-  - `src/lib/payments/fees.ts`: total = amount + fee.
-  - `src/app/api/internal/contributions/create/route.ts`: `feeCents = total - contribution`.
-  - `src/lib/db/schema.ts`: `net_cents = amount - fee`.
-  - `src/lib/db/queries.ts`: `raised_cents = SUM(contributions.netCents)`.
-- F-006:
-  - `src/lib/db/seed.ts`: raw card numbers + eventType `dream_board.created`.
-- F-007:
-  - `src/app/layout.tsx`: metadata title “Gifta…”, OG `gifta.co.za`, `og-image.png`.
+## Current Audit Focus
 
-## Clarifications needed (blocking correctness)
+1. Keep Tier 1 docs aligned with runtime and OpenAPI.
+2. Mark non-authoritative Tier 2 docs explicitly.
+3. Keep link integrity and stale-token checks enforced through `pnpm docs:audit`.
 
-1) Guest privacy: should guests see exact `raised/goal` ZAR amounts, or only % funded?
-2) Pot closure: should pots auto-close on `party_date` (and via what scheduler), or stay manual/partner-triggered?
-3) Fee semantics: is the platform fee an add-on (payer pays amount+fee) or deducted from contribution/payout? (This defines `net_cents`, “raised”, and payout totals.)
+## Next Actions
 
-## Next actions (do these, in order)
-
-1) Confirm F-001..F-007 with direct file quotes/line refs and mark `confirmed`.
-2) Produce `docs/forensic-audit/DOC-DRIFT.md`:
-   - For every tracked doc (`git ls-files '*.md'`), mark: Update required yes/no.
-   - For each “yes”: exact mismatched claims + precise change list.
-3) Produce `docs/forensic-audit/REPORT.md`:
-   - Multi-section architecture overview (routes, data model, payments, webhooks, payouts, jobs, auth, ops).
-   - Risk register + prioritized remediation plan.
+1. Finish the Tier 1 rewrite pass.
+2. Sync status banners and generate the control matrix.
+3. Run `pnpm openapi:generate`, `pnpm docs:audit`, `pnpm lint`, `pnpm typecheck`, and `pnpm test`.

@@ -1,36 +1,43 @@
 # Testing
 
-## Quick Commands
+> **Status:** Current operational guide  
+> **Last reviewed:** March 12, 2026
 
-- Unit tests: `pnpm test`
-- Coverage: `pnpm test:coverage`
-- Dead code / unused deps: `pnpm knip`
-- Coverage gate runs in CI (`.github/workflows/ci.yml`).
+## Standard Gates
 
-## Coverage Thresholds
+```bash
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm openapi:generate
+pnpm docs:audit
+```
 
-Vitest enforces global thresholds (currently 60% for lines/functions/branches/statements). These are configured in `vitest.config.ts`.
+## Additional Useful Commands
 
-## Coverage Exclusions (Principled)
+```bash
+pnpm test:coverage
+pnpm knip
+pnpm test:payments
+pnpm test:webhooks
+pnpm test:payouts
+```
 
-The following files are excluded from coverage and must remain purely declarative or integration-only:
+## Coverage Notes
 
-- `src/lib/db/schema.ts` — declarative schema definitions.
-- `src/lib/db/queries.ts` — integration query builders that require a live DB.
+- Vitest enforces global coverage thresholds from `vitest.config.ts`.
+- `src/lib/db/schema.ts` and `src/lib/db/queries.ts` stay excluded because they are declarative or integration-heavy surfaces.
+- If pure logic is added beside query builders, move it into a helper module and cover it directly.
 
-If you add pure helpers to query logic, move them into a separate helper module (e.g., `queries.helpers.ts`) and cover them with unit tests.
+## Current Baseline
 
-## Guidance for New Exclusions
+Verified on March 12, 2026:
 
-Any new exclusion must include a one-line rationale in this document (or in `vitest.config.ts` with a reference here) explaining why it is declarative/generated or integration-only.
+- `pnpm lint`: pass with existing warnings only
+- `pnpm typecheck`: pass
+- `pnpm test`: pass (`192` files / `978` tests)
 
-## Integration Tests
+## Notes
 
-Integration tests live under `tests/integration` and exercise route handlers at the request/response boundary. They must remain deterministic (no external network calls).
-
-## Health Endpoints
-
-- `/health/live`: liveness check (always 200, no dependency checks).
-- `/health/ready`: readiness check (200 when configured dependencies are healthy; 503 with structured details otherwise).
-
-Readiness adapters must return `{ ok: boolean; detail?: string }` and never throw.
+- `pnpm test -- <path>` still executes the full Vitest suite in this repo; do not assume file-level isolation.
+- Regenerate OpenAPI before verifying spec-contract tests when `src/lib/api/openapi.ts` changes.

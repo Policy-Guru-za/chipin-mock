@@ -1,3 +1,6 @@
+> **Document Status:** Historical evidence. Reviewed March 12, 2026.
+> Preserve as execution record. Do not use this file as the source of truth for current runtime behavior or agent policy.
+> Canonical replacement: `docs/forensic-audit/REPORT.md`.
 # Phase B - B2 Runtime Gating and Feature Controls Evidence
 
 Timestamp (UTC): 2026-02-07T17:56:30Z

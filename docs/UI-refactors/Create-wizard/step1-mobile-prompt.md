@@ -1,3 +1,6 @@
+> **Document Status:** Reference only. Reviewed March 12, 2026.
+> Useful context only. Do not use this file as the source of truth for current runtime behavior or agent policy.
+> Canonical replacement: `docs/Platform-Spec-Docs/UX.md`.
 # Step 1 Mobile Layout — Single-Card Compact Photo
 
 > **Operating rules**: Follow the guardrails and verification gates in `docs/UI-refactors/AI-UI-REFACTOR-PLAYBOOK.md`. Use its §9 handoff template for your delivery notes.

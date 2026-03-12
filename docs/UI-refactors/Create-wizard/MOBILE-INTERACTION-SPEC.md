@@ -1,3 +1,6 @@
+> **Document Status:** Reference only. Reviewed March 12, 2026.
+> Useful context only. Do not use this file as the source of truth for current runtime behavior or agent policy.
+> Canonical replacement: `docs/Platform-Spec-Docs/UX.md`.
 # Create Wizard — Mobile Interaction Spec
 
 > **Purpose**: Defines the interaction behaviours that go beyond visual styling — draft persistence, error/retry model, back-button/refresh handling, and analytics events. These behaviours were identified as missing in the adversarial mobile UX assessment and are now required for implementation.

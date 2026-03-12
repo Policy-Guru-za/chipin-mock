@@ -1,3 +1,6 @@
+> **Document Status:** Reference only. Reviewed March 12, 2026.
+> Useful context only. Do not use this file as the source of truth for current runtime behavior or agent policy.
+> Canonical replacement: `docs/Platform-Spec-Docs/PAYMENTS.md`.
 # SnapScan docs: known gaps / uncertainties
 
 Grouped questions an integrator typically needs answered, based on what is *not* specified in the canonical SnapScan developer docs.
