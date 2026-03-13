@@ -21,7 +21,7 @@ export async function publishDreamBoardAction(
 
   const session = await requireHostAuth();
   const draft = await getHostCreateDreamBoardDraft(session.hostId);
-  const parsed = hostCreateDreamBoardDraftSchema.safeParse(draft);
+  const parsed = hostCreateDreamBoardDraftSchema.strip().safeParse(draft);
 
   if (!parsed.success) {
     return {

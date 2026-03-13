@@ -2,7 +2,7 @@
 
 ## Current Spec
 
-- `17_session-placeholder`
+- `18_session-placeholder`
 
 ## Current Stage
 
@@ -10,8 +10,8 @@
 
 ## Status
 
-- Closed [`spec/16_dreamboard-pivot-hardening.md`](./spec/16_dreamboard-pivot-hardening.md) as `Done` after hardening first-party Dreamboard create boundaries, resetting active defaults to voucher/zero-fee/charity-off, and containing admin/telemetry leakage.
-- Activated [`spec/17_session-placeholder.md`](./spec/17_session-placeholder.md) as the standing next-session placeholder.
+- Closed [`spec/17_draft-strict-parsing-fix.md`](./spec/17_draft-strict-parsing-fix.md) as `Done` after fixing the P1 strict-parsing rejection of persisted host-create drafts at the review and publish consumption sites.
+- Activated [`spec/18_session-placeholder.md`](./spec/18_session-placeholder.md) as the standing next-session placeholder.
 
 ## Blockers
 
@@ -19,30 +19,29 @@
 
 ## Next Step
 
-- Rename `spec/17_session-placeholder.md` in place when the next bounded Gifta session begins.
+- Rename `spec/18_session-placeholder.md` in place when the next bounded Gifta session begins.
 
 ## Last Session Spec
 
-- `16_dreamboard-pivot-hardening`
+- `17_draft-strict-parsing-fix`
 
 ## Last Completed Spec
 
-- `16_dreamboard-pivot-hardening`
+- `17_draft-strict-parsing-fix`
 
 ## Last Green Commands
 
-- `pnpm openapi:generate`
-- `pnpm docs:audit -- --sync`
-- `pnpm docs:audit`
-- `pnpm lint`
-- `pnpm typecheck`
-- `pnpm test`
+- `pnpm lint` (0 errors, 105 pre-existing warnings)
+- `pnpm typecheck` (clean)
+- `pnpm test` — environment-blocked: sandbox is `aarch64` but `node_modules` lacks `@rollup/rollup-linux-arm64-gnu`; Zod `.strip()` behavior verified independently via `node -e`
 
 ## Dogfood Evidence
 
-- Exercised the Dreamboard pivot hardening through focused create-flow, webhook, close-path, dashboard, public, thank-you, admin-settings, telemetry, and draft-normalization regressions.
-- Verified the full gate passed: `pnpm docs:audit -- --sync`, `pnpm docs:audit`, `pnpm lint`, `pnpm typecheck`, and `pnpm test`.
+- Verified Zod `.strip()` on a `.strict()` schema independently: strict rejects unknown keys, `.strip()` accepts and removes them while preserving known fields.
+- Confirmed both `page.tsx` and `actions.ts` now use `.strip().safeParse()`.
+- New test cases prove: (1) strict schema rejects persisted fields, (2) stripped schema accepts and removes them.
+- Lint green, typecheck green. Test suite environment-blocked (rollup platform binary), not code-blocked.
 
 ## Napkin Evidence
 
-- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with the execution-audit terminal-state rule: `Done` specs must keep `Successor Slot: none`.
+- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with Spec 17 learning: use `.strip().safeParse()` at KV consumption sites; keep `.strict()` on canonical schema; always test with real persisted shape.

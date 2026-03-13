@@ -247,3 +247,6 @@ JSON
 ## C10 Learnings (2026-03-13)
 - When a feature is removed from the active public contract, update all three layers together: strict request validation, serializer/query filtering, and generated OpenAPI. Removing only one layer leaves ghost behavior.
 - Capability-off defaults need explicit env opt-in in historical regression tests; otherwise valid legacy math/view-model coverage silently flips to `null` and looks like a runtime regression.
+
+## Spec 17 Learnings (2026-03-13)
+- When a Zod `.strict()` schema is used at a KV/storage consumption site, the persisted object may carry metadata fields (`updatedAt`, `photoFilename`) that the form-validation schema does not declare. Use `.strip().safeParse()` at consumption sites to strip metadata while keeping `.strict()` on the canonical schema for input validation. Always test with the real persisted shape, not a hand-built minimal mock.

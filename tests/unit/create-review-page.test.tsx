@@ -26,6 +26,7 @@ vi.mock('@/lib/dream-boards/draft', () => ({
 vi.mock('@/lib/dream-boards/schema', () => ({
   hostCreateDreamBoardDraftSchema: {
     safeParse: mocks.safeParse,
+    strip: () => ({ safeParse: mocks.safeParse }),
   },
 }));
 

@@ -1,4 +1,4 @@
-# 17_session-placeholder
+# 18_session-placeholder
 
 ## Objective
 
@@ -25,7 +25,7 @@
 
 1. Stage 1 — rename this placeholder in place and restate the next session objective.
 2. Stage 2 — define the bounded implementation and verification slices for that session.
-3. Stage 3 — execute, verify, dogfood, and hand off into `18_session-placeholder`.
+3. Stage 3 — execute, verify, dogfood, and hand off into `19_session-placeholder`.
 
 ## Test Gate
 
@@ -41,4 +41,4 @@
 - Status: Active
 - Exit Criteria State: pending
 - Successor Slot: none
-- Notes: Standing placeholder activated after spec 16 completed.
+- Notes: Standing placeholder activated after spec 17 completed.

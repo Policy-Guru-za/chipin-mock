@@ -51,4 +51,33 @@ describe('hostCreateDreamBoardDraftSchema', () => {
 
     expect(parsed.success).toBe(false);
   });
+
+  it('strict schema rejects persisted metadata fields (photoFilename, updatedAt)', () => {
+    const draftWithPersistedFields = {
+      ...validDraft,
+      photoFilename: 'child-photo-abc123.jpg',
+      updatedAt: '2026-03-13T10:00:00.000Z',
+    };
+
+    const strictResult = hostCreateDreamBoardDraftSchema.safeParse(draftWithPersistedFields);
+    expect(strictResult.success).toBe(false);
+  });
+
+  it('stripped schema accepts drafts with persisted metadata fields', () => {
+    const draftWithPersistedFields = {
+      ...validDraft,
+      photoFilename: 'child-photo-abc123.jpg',
+      updatedAt: '2026-03-13T10:00:00.000Z',
+    };
+
+    const strippedResult = hostCreateDreamBoardDraftSchema
+      .strip()
+      .safeParse(draftWithPersistedFields);
+    expect(strippedResult.success).toBe(true);
+    if (strippedResult.success) {
+      expect(strippedResult.data).not.toHaveProperty('photoFilename');
+      expect(strippedResult.data).not.toHaveProperty('updatedAt');
+      expect(strippedResult.data.childName).toBe('Maya');
+    }
+  });
 });

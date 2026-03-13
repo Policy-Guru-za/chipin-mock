@@ -141,6 +141,8 @@ Use the fullest stage, gate, and dogfood discipline when the session touches:
 - major UX or multi-file UI changes
 - agent-policy or documentation-system changes
 
+Don't ever be lazy - if you can do it, do not ask me to do it (example: asking me to "Run pnpm test on your local machine to confirm the new test cases pass")
+
 ## Build Loop
 
 1. Confirm the active numbered spec or rename the active placeholder in place.

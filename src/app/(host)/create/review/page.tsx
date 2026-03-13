@@ -17,7 +17,7 @@ export default async function CreateReviewPage() {
     redirect(view.redirectTo);
   }
 
-  const parsed = hostCreateDreamBoardDraftSchema.safeParse(draft);
+  const parsed = hostCreateDreamBoardDraftSchema.strip().safeParse(draft);
   if (!parsed.success) {
     redirect('/create');
   }
