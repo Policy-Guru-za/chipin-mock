@@ -38,7 +38,7 @@
 ## External Systems
 
 - Payments: PayFast, Ozow, SnapScan
-- Payouts: default host-created boards use `takealot_voucher`; legacy/API-managed paths may still use Karri Card or bank, with charity payout rows when enabled
+- Payouts: default host-created boards use `takealot_voucher`; `karri_card` writes are off by default and gated by `UX_V2_ENABLE_KARRI_WRITE_PATH`; bank writes remain gated by `UX_V2_ENABLE_BANK_WRITE_PATH`; charity payout rows may also exist when enabled
 - Storage: Vercel Blob
 - Cache / rate limiting: Vercel KV with development fallback in some paths
 - Email: Resend

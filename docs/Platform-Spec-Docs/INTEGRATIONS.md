@@ -18,7 +18,8 @@
 
 ### Payouts
 
-- Karri Card automation and queue processing
+- Takealot voucher placeholder for the standard Dreamboard path
+- Karri Card queue processing and automation for gated legacy or partner flows
 - Bank payout tracking in the payout engine
 
 ### Messaging / Email
@@ -44,6 +45,7 @@ Derived from [`src/lib/config/feature-flags.ts`](../../src/lib/config/feature-fl
 - `MOCK_PAYMENTS`
 - `MOCK_PAYMENT_WEBHOOKS`
 - `MOCK_KARRI`
+- `UX_V2_ENABLE_KARRI_WRITE_PATH`
 - `MOCK_SENTRY`
 - `UX_V2_ENABLE_BANK_WRITE_PATH`
 - `UX_V2_ENABLE_CHARITY_WRITE_PATH`
@@ -52,4 +54,5 @@ Derived from [`src/lib/config/feature-flags.ts`](../../src/lib/config/feature-fl
 ## Notes
 
 - Current docs must reference `MOCK_*` flags, not the removed `DEMO_MODE` control path.
+- Karri credentials are required only when `UX_V2_ENABLE_KARRI_WRITE_PATH=true` or `KARRI_AUTOMATION_ENABLED=true`, unless `MOCK_KARRI=true`.
 - Charity URL autofill currently uses Anthropic env wiring in `.env.example`.

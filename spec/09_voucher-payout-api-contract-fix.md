@@ -55,4 +55,4 @@
 - Status: Done
 - Exit Criteria State: satisfied
 - Successor Slot: none
-- Notes: Patched payout recipient serialization and `PayoutRecipientData`/generated OpenAPI to expose voucher fulfilment contact data, added regression coverage for both payout list/detail read paths, and closed with [`./10_session-placeholder.md`](./10_session-placeholder.md) active for the next bounded session.
+- Notes: Patched payout recipient serialization and `PayoutRecipientData`/generated OpenAPI to expose voucher fulfilment contact data, added regression coverage for both payout list/detail read paths, and handed off into the successor slot now represented by [`./10_karri-default-path-decoupling.md`](./10_karri-default-path-decoupling.md).

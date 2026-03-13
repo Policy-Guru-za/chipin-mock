@@ -32,7 +32,7 @@ Gifta is a Next.js application for birthday gifting around a single Dreamboard:
 - Host creates a Dreamboard for one child and one gift.
 - Guests chip in through a public mobile-web flow.
 - Payments use PayFast, Ozow, or SnapScan.
-- Gift payout supports Karri Card and bank transfer; charity payouts are tracked separately when enabled.
+- Standard Dreamboard payout uses a Takealot voucher placeholder; Karri Card and bank remain gated legacy or partner payout modes, and charity payouts are tracked separately when enabled.
 - Host/admin auth uses Clerk.
 
 ## Current Stack
@@ -47,7 +47,7 @@ Gifta is a Next.js application for birthday gifting around a single Dreamboard:
 | Storage | Vercel Blob |
 | Cache / rate limits | Vercel KV with local fallback in some paths |
 | Payments | PayFast, Ozow, SnapScan |
-| Payouts | Karri Card, bank, charity ledger rows |
+| Payouts | Takealot voucher placeholder, Karri Card, bank, charity ledger rows |
 | Observability | Sentry, optional OpenTelemetry, optional Axiom wiring |
 
 ## Workspace Facts That Matter

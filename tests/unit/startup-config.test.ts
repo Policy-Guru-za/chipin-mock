@@ -81,12 +81,63 @@ describe('startup config validation', () => {
     process.env.NODE_ENV = 'production';
     process.env.MOCK_PAYMENTS = 'true';
     process.env.MOCK_KARRI = 'false';
+    process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
     process.env.KARRI_BASE_URL = '';
     process.env.KARRI_API_KEY = '';
 
     const { assertStartupConfig } = await loadModule();
 
     expect(() => assertStartupConfig()).toThrow(/Karri configuration incomplete/);
+  });
+
+  it('throws when karri write path is enabled without card encryption key', async () => {
+    setBaseEnv();
+    clearPaymentEnv();
+    process.env.NODE_ENV = 'production';
+    process.env.MOCK_PAYMENTS = 'true';
+    process.env.MOCK_KARRI = 'false';
+    process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
+    process.env.KARRI_AUTOMATION_ENABLED = 'false';
+    process.env.KARRI_BASE_URL = 'https://karri.test';
+    process.env.KARRI_API_KEY = 'token';
+    delete process.env.CARD_DATA_ENCRYPTION_KEY;
+
+    const { assertStartupConfig } = await loadModule();
+
+    expect(() => assertStartupConfig()).toThrow(/CARD_DATA_ENCRYPTION_KEY/);
+  });
+
+  it('does not require karri config when karri write path and automation are disabled', async () => {
+    setBaseEnv();
+    clearPaymentEnv();
+    process.env.NODE_ENV = 'production';
+    process.env.MOCK_PAYMENTS = 'true';
+    process.env.MOCK_KARRI = 'false';
+    process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'false';
+    process.env.KARRI_AUTOMATION_ENABLED = 'false';
+    process.env.KARRI_BASE_URL = '';
+    process.env.KARRI_API_KEY = '';
+
+    const { assertStartupConfig } = await loadModule();
+
+    expect(() => assertStartupConfig()).not.toThrow();
+  });
+
+  it('does not require live karri config in mock mode when karri write path is enabled', async () => {
+    setBaseEnv();
+    clearPaymentEnv();
+    process.env.NODE_ENV = 'production';
+    process.env.MOCK_PAYMENTS = 'true';
+    process.env.MOCK_KARRI = 'true';
+    process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
+    process.env.KARRI_AUTOMATION_ENABLED = 'false';
+    process.env.KARRI_BASE_URL = '';
+    process.env.KARRI_API_KEY = '';
+    delete process.env.CARD_DATA_ENCRYPTION_KEY;
+
+    const { assertStartupConfig } = await loadModule();
+
+    expect(() => assertStartupConfig()).not.toThrow();
   });
 
   it('warns instead of throwing in development', async () => {

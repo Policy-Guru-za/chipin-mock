@@ -1,6 +1,10 @@
 import { jsonError } from '@/lib/api/response';
 import { verifyKarriCard } from '@/lib/integrations/karri';
 import { log } from '@/lib/observability/logger';
+import {
+  isKarriAutomationEnabled,
+  isKarriWritePathEnabled,
+} from '@/lib/ux-v2/write-path-gates';
 
 const normalizeCardNumber = (value?: string | null) =>
   value ? value.replace(/\s+/g, '').replace(/-/g, '') : null;
@@ -10,6 +14,18 @@ export const verifyKarriCardForApi = async (params: {
   requestId: string;
   headers: Headers;
 }) => {
+  if (!isKarriWritePathEnabled()) {
+    return {
+      ok: false as const,
+      response: jsonError({
+        error: { code: 'unsupported_operation', message: 'Karri payout method is not enabled' },
+        status: 422,
+        requestId: params.requestId,
+        headers: params.headers,
+      }),
+    };
+  }
+
   const normalizedCardNumber = normalizeCardNumber(params.cardNumber);
   if (!normalizedCardNumber) {
     return {
@@ -23,7 +39,7 @@ export const verifyKarriCardForApi = async (params: {
     };
   }
 
-  if (process.env.KARRI_AUTOMATION_ENABLED !== 'true') {
+  if (!isKarriAutomationEnabled()) {
     return { ok: true as const, cardNumber: normalizedCardNumber };
   }
 

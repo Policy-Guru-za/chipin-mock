@@ -16,23 +16,28 @@ describe('health checks', () => {
     kvMocks.kvAdapter.get.mockReset();
   });
 
-  it('returns disabled when Karri automation is off', async () => {
+  it('returns disabled when karri write path and automation are off', async () => {
+    process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'false';
     process.env.KARRI_AUTOMATION_ENABLED = 'false';
     const result = await checkKarriAutomation();
     expect(result.ok).toBe(true);
     expect(result.detail).toBe('disabled');
   });
 
-  it('flags missing Karri configuration when enabled', async () => {
-    process.env.KARRI_AUTOMATION_ENABLED = 'true';
+  it('flags missing karri configuration when write path is enabled', async () => {
+    process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
+    process.env.KARRI_AUTOMATION_ENABLED = 'false';
+    process.env.MOCK_KARRI = 'false';
     process.env.KARRI_BASE_URL = '';
     process.env.KARRI_API_KEY = '';
     const result = await checkKarriAutomation();
     expect(result.ok).toBe(false);
   });
 
-  it('flags missing Karri encryption key when enabled', async () => {
-    process.env.KARRI_AUTOMATION_ENABLED = 'true';
+  it('flags missing karri encryption key when write path is enabled', async () => {
+    process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
+    process.env.KARRI_AUTOMATION_ENABLED = 'false';
+    process.env.MOCK_KARRI = 'false';
     process.env.KARRI_BASE_URL = 'https://karri.test';
     process.env.KARRI_API_KEY = 'token';
     delete process.env.CARD_DATA_ENCRYPTION_KEY;
@@ -40,8 +45,22 @@ describe('health checks', () => {
     expect(result.ok).toBe(false);
   });
 
-  it('confirms Karri automation when configured', async () => {
-    process.env.KARRI_AUTOMATION_ENABLED = 'true';
+  it('reports mock when karri write path is enabled in mock mode', async () => {
+    process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
+    process.env.KARRI_AUTOMATION_ENABLED = 'false';
+    process.env.MOCK_KARRI = 'true';
+    process.env.KARRI_BASE_URL = '';
+    process.env.KARRI_API_KEY = '';
+    delete process.env.CARD_DATA_ENCRYPTION_KEY;
+    const result = await checkKarriAutomation();
+    expect(result.ok).toBe(true);
+    expect(result.detail).toBe('mock');
+  });
+
+  it('confirms karri readiness when write path is enabled and configured', async () => {
+    process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
+    process.env.KARRI_AUTOMATION_ENABLED = 'false';
+    process.env.MOCK_KARRI = 'false';
     process.env.KARRI_BASE_URL = 'https://karri.test';
     process.env.KARRI_API_KEY = 'token';
     process.env.CARD_DATA_ENCRYPTION_KEY = 'secret';

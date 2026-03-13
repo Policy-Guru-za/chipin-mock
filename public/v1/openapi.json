@@ -1108,7 +1108,7 @@
           "bank",
           "takealot_voucher"
         ],
-        "description": "UX v2 enum set. Legacy clients that assumed karri_card-only responses must handle bank and takealot_voucher values."
+        "description": "UX v2 enum set. Standard Dreamboard flows default to takealot_voucher. Karri Card is legacy or partner-only and requires UX_V2_ENABLE_KARRI_WRITE_PATH=true. Bank write path remains gated by UX_V2_ENABLE_BANK_WRITE_PATH. Legacy clients that assumed karri_card-only responses must handle bank and takealot_voucher values."
       },
       "CharitySplitType": {
         "type": "string",
@@ -1425,7 +1425,7 @@
             "maxLength": 280
           }
         },
-        "description": "Creates a dream board. Bank and charity write paths are accepted in schema but return unsupported_operation (422) until Phase B2 runtime gating is enabled."
+        "description": "Creates a dream board. Omitted payout_method defaults to takealot_voucher. Karri Card writes return unsupported_operation (422) unless UX_V2_ENABLE_KARRI_WRITE_PATH=true. Bank writes return unsupported_operation (422) until UX_V2_ENABLE_BANK_WRITE_PATH=true. Charity writes return unsupported_operation (422) until UX_V2_ENABLE_CHARITY_WRITE_PATH=true."
       },
       "DreamBoardUpdateRequest": {
         "type": "object",
@@ -1483,7 +1483,7 @@
             "minimum": 5000
           }
         },
-        "description": "Updates a dream board. Payout and charity mutation paths currently return unsupported_operation (422) until Phase B2."
+        "description": "Updates a dream board. Karri Card mutation returns unsupported_operation (422) unless UX_V2_ENABLE_KARRI_WRITE_PATH=true. Bank mutation returns unsupported_operation (422) until UX_V2_ENABLE_BANK_WRITE_PATH=true. Charity mutation returns unsupported_operation (422) until UX_V2_ENABLE_CHARITY_WRITE_PATH=true."
       },
       "DreamBoardResponse": {
         "type": "object",

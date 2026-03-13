@@ -8,6 +8,8 @@
 - `/health/live`
 - `/health/ready`
 - `/api/health`
+- `/health/ready` reports Karri as `disabled` in standard mode when both `UX_V2_ENABLE_KARRI_WRITE_PATH` and `KARRI_AUTOMATION_ENABLED` are false
+- Karri credentials are only required for readiness when the Karri write path or automation mode is enabled, unless `MOCK_KARRI=true`
 
 ## Operational Jobs
 

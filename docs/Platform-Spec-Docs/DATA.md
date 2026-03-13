@@ -27,6 +27,7 @@ Important fields:
 - `goal_cents`
 - payout method + method-specific recipient data
 - default host-create path writes `payout_method='takealot_voucher'` and clears Karri/bank fields
+- partner/API `karri_card` writes are gated by `UX_V2_ENABLE_KARRI_WRITE_PATH`; bank writes remain gated by `UX_V2_ENABLE_BANK_WRITE_PATH`
 - optional charity configuration
 - `status`
 

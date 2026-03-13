@@ -1,11 +1,33 @@
 /* eslint-disable max-lines */
 
+import { DEFAULT_HOST_CREATE_PAYOUT_METHOD } from '@/lib/dream-boards/payout-methods';
 import {
   LOCKED_CHARITY_SPLIT_MODES,
   LOCKED_PAYOUT_METHODS,
   LOCKED_PAYOUT_TYPES,
 } from '@/lib/ux-v2/decision-locks';
 import { SUPPORTED_WEBHOOK_EVENT_TYPES } from '@/lib/webhooks';
+
+const payoutMethodDescription = [
+  `UX v2 enum set. Standard Dreamboard flows default to ${DEFAULT_HOST_CREATE_PAYOUT_METHOD}.`,
+  'Karri Card is legacy or partner-only and requires UX_V2_ENABLE_KARRI_WRITE_PATH=true.',
+  'Bank write path remains gated by UX_V2_ENABLE_BANK_WRITE_PATH.',
+  'Legacy clients that assumed karri_card-only responses must handle bank and takealot_voucher values.',
+].join(' ');
+
+const dreamBoardCreateDescription = [
+  `Creates a dream board. Omitted payout_method defaults to ${DEFAULT_HOST_CREATE_PAYOUT_METHOD}.`,
+  'Karri Card writes return unsupported_operation (422) unless UX_V2_ENABLE_KARRI_WRITE_PATH=true.',
+  'Bank writes return unsupported_operation (422) until UX_V2_ENABLE_BANK_WRITE_PATH=true.',
+  'Charity writes return unsupported_operation (422) until UX_V2_ENABLE_CHARITY_WRITE_PATH=true.',
+].join(' ');
+
+const dreamBoardUpdateDescription = [
+  'Updates a dream board.',
+  'Karri Card mutation returns unsupported_operation (422) unless UX_V2_ENABLE_KARRI_WRITE_PATH=true.',
+  'Bank mutation returns unsupported_operation (422) until UX_V2_ENABLE_BANK_WRITE_PATH=true.',
+  'Charity mutation returns unsupported_operation (422) until UX_V2_ENABLE_CHARITY_WRITE_PATH=true.',
+].join(' ');
 
 export const openApiSpec = {
   openapi: '3.0.3',
@@ -1065,8 +1087,7 @@ export const openApiSpec = {
       PayoutMethod: {
         type: 'string',
         enum: LOCKED_PAYOUT_METHODS,
-        description:
-          'UX v2 enum set. Legacy clients that assumed karri_card-only responses must handle bank and takealot_voucher values.',
+        description: payoutMethodDescription,
       },
       CharitySplitType: {
         type: 'string',
@@ -1374,8 +1395,7 @@ export const openApiSpec = {
             maxLength: 280,
           },
         },
-        description:
-          'Creates a dream board. Bank and charity write paths are accepted in schema but return unsupported_operation (422) until Phase B2 runtime gating is enabled.',
+        description: dreamBoardCreateDescription,
       },
       DreamBoardUpdateRequest: {
         type: 'object',
@@ -1433,8 +1453,7 @@ export const openApiSpec = {
             minimum: 5000,
           },
         },
-        description:
-          'Updates a dream board. Payout and charity mutation paths currently return unsupported_operation (422) until Phase B2.',
+        description: dreamBoardUpdateDescription,
       },
       DreamBoardResponse: {
         type: 'object',

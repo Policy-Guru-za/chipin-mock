@@ -176,10 +176,10 @@ export function DashboardDetailClient({
   const visibleMessages = showAllMessages ? messages : messages.slice(0, 2);
   const payoutMethodNote =
     view.payoutMethod === 'bank'
-      ? 'via Bank Transfer'
+      ? 'Bank transfer details on file'
       : view.payoutMethod === 'takealot_voucher'
-        ? 'via Takealot Voucher'
-        : 'via Karri Card';
+        ? 'Voucher contact details on file'
+        : 'Legacy Karri payout details on file';
   const birthdayLabel = formatHeroDate(view.birthdayDate, {
     day: 'numeric',
     month: 'long',

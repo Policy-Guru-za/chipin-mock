@@ -2,17 +2,16 @@
 
 ## Current Spec
 
-- `10_session-placeholder`
+- `13_session-placeholder`
 
 ## Current Stage
 
-- Ready for the next session rename
+- Waiting — next bounded session not yet started
 
 ## Status
 
-- Closed [`spec/09_voucher-payout-api-contract-fix.md`](./spec/09_voucher-payout-api-contract-fix.md) as done after exposing voucher fulfilment contact data through payout read APIs and generated OpenAPI.
-- Activated [`spec/10_session-placeholder.md`](./spec/10_session-placeholder.md) as the single successor placeholder for the next bounded session.
-- Voucher payout read/list responses now publish `host_whatsapp_number` and `fulfilment_mode`, and regression coverage now locks those fields on both list and detail paths.
+- Closed [`spec/12_karri-config-readiness-alignment.md`](./spec/12_karri-config-readiness-alignment.md) as done after aligning Karri startup validation with the gated write path and teaching readiness to honor `MOCK_KARRI` under that same gate.
+- Activated [`spec/13_session-placeholder.md`](./spec/13_session-placeholder.md) as the standing next-session placeholder.
 
 ## Blockers
 
@@ -20,31 +19,27 @@
 
 ## Next Step
 
-- Rename [`spec/10_session-placeholder.md`](./spec/10_session-placeholder.md) in place to the next concrete session topic before substantive work starts.
+- Rename [`spec/13_session-placeholder.md`](./spec/13_session-placeholder.md) in place when the next bounded session topic is known, then update this ledger before coding.
 
 ## Last Session Spec
 
-- `09_voucher-payout-api-contract-fix`
+- `12_karri-config-readiness-alignment`
 
 ## Last Completed Spec
 
-- `09_voucher-payout-api-contract-fix`
+- `12_karri-config-readiness-alignment`
 
 ## Last Green Commands
 
-- `pnpm openapi:generate`
+- `pnpm exec vitest run tests/unit/startup-config.test.ts tests/unit/health-checks.test.ts`
 - `pnpm docs:audit -- --sync`
-- `pnpm docs:audit`
-- `pnpm lint`
 - `pnpm typecheck`
-- `pnpm test`
 
 ## Dogfood Evidence
 
-- Session proof is recorded under [`spec/09_voucher-payout-api-contract-fix.md`](./spec/09_voucher-payout-api-contract-fix.md), which captures the voucher payout contract patch and bounded verification state.
-- Verification dogfood succeeded: `pnpm openapi:generate`, `pnpm docs:audit -- --sync`, `pnpm docs:audit`, `pnpm lint`, `pnpm typecheck`, and `pnpm test` all passed on the completed voucher payout contract state; lint remained warning-only due existing repo debt, and the final test suite finished at `198` files / `965` tests passing.
-- Contract dogfood succeeded: generated [`public/v1/openapi.json`](./public/v1/openapi.json) now documents voucher recipient fulfilment fields, while integration coverage proves both `GET /api/v1/payouts/pending` and `GET /api/v1/payouts/[id]` serialize those fields for `takealot_voucher` payouts.
+- Verification succeeded for the completed session: `pnpm exec vitest run tests/unit/startup-config.test.ts tests/unit/health-checks.test.ts`, `pnpm docs:audit -- --sync`, and `pnpm typecheck` all passed.
+- Config-path dogfood succeeded in regression coverage: startup validation now rejects missing `CARD_DATA_ENCRYPTION_KEY` when `UX_V2_ENABLE_KARRI_WRITE_PATH=true`, and readiness now reports Karri as mocked instead of not ready when `MOCK_KARRI=true` under the same gate.
 
 ## Napkin Evidence
 
-- No durable napkin update.
+- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with the gated-provider config/readiness alignment rule.

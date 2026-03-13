@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+const ORIGINAL_KARRI_WRITE_PATH = process.env.UX_V2_ENABLE_KARRI_WRITE_PATH;
 const ORIGINAL_BANK_WRITE_PATH = process.env.UX_V2_ENABLE_BANK_WRITE_PATH;
 const ORIGINAL_CHARITY_WRITE_PATH = process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH;
 
@@ -76,6 +77,7 @@ const mockDb = () => {
 };
 
 afterEach(() => {
+  process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = ORIGINAL_KARRI_WRITE_PATH;
   process.env.UX_V2_ENABLE_BANK_WRITE_PATH = ORIGINAL_BANK_WRITE_PATH;
   process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH = ORIGINAL_CHARITY_WRITE_PATH;
 
@@ -247,6 +249,85 @@ describe('PATCH /api/v1/dream-boards/[id]', () => {
     expect(payload.error.code).toBe('unsupported_operation');
     expect(payload.error.message).toContain('Charity configuration is not yet enabled');
     expect(update).not.toHaveBeenCalled();
+  });
+
+  it('returns unsupported operation for karri payout updates when the karri write path is disabled', async () => {
+    process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'false';
+    mockAuth();
+    const update = mockDb();
+
+    mockDreamBoardUpdateQueries({
+      getDreamBoardByPublicId: vi.fn(async () => buildBoard()),
+    });
+
+    const { PATCH } = await loadHandler();
+    const response = await PATCH(
+      new Request('http://localhost/api/v1/dream-boards/board-1', {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          payout_method: 'karri_card',
+          karri_card_number: '1234567890123456',
+          karri_card_holder_name: 'Maya Parent',
+        }),
+      }),
+      { params: { id: 'board-1' } }
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(422);
+    expect(payload.error.code).toBe('unsupported_operation');
+    expect(payload.error.message).toContain('Karri payout method is not enabled');
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it('accepts karri payout updates when the karri write path toggle is enabled', async () => {
+    process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
+    mockAuth();
+    const update = mockDb();
+
+    vi.doMock('@/lib/utils/encryption', () => ({
+      encryptSensitiveValue: vi.fn((value: string) => `encrypted-${value}`),
+    }));
+
+    const getDreamBoardByPublicId = vi
+      .fn()
+      .mockResolvedValueOnce(
+        buildBoard({
+          payoutMethod: 'takealot_voucher',
+          karriCardHolderName: null,
+        })
+      )
+      .mockResolvedValueOnce(
+        buildBoard({
+          payoutMethod: 'karri_card',
+          karriCardHolderName: 'Maya Parent',
+          bankName: null,
+          bankAccountLast4: null,
+          bankBranchCode: null,
+          bankAccountHolder: null,
+        })
+      );
+    mockDreamBoardUpdateQueries({ getDreamBoardByPublicId });
+
+    const { PATCH } = await loadHandler();
+    const response = await PATCH(
+      new Request('http://localhost/api/v1/dream-boards/board-1', {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          payout_method: 'karri_card',
+          karri_card_number: '1234567890123456',
+          karri_card_holder_name: 'Maya Parent',
+        }),
+      }),
+      { params: { id: 'board-1' } }
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload.data.payout_method).toBe('karri_card');
+    expect(update).toHaveBeenCalled();
   });
 
   it('accepts bank payout updates when bank write path toggle is enabled', async () => {

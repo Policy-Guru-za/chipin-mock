@@ -466,6 +466,10 @@ export const PATCH = withApiAuth(
     }
 
     const blockReason = resolveWritePathBlockReason({
+      karriRequested:
+        parsed.data.payout_method === 'karri_card' ||
+        parsed.data.karri_card_number !== undefined ||
+        parsed.data.karri_card_holder_name !== undefined,
       bankRequested: parsed.data.payout_method === 'bank' || hasAnyBankField,
       charityRequested: parsed.data.charity_enabled !== undefined || hasAnyCharityField,
     });

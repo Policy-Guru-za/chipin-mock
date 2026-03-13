@@ -30,7 +30,7 @@ export const testimonials = [
 ];
 
 export const trustItems = [
-  { icon: '🏦', text: 'Payouts via Karri Card' },
+  { icon: '🏦', text: 'Voucher-ready fulfilment' },
   { icon: '🔒', text: 'Secure payments' },
   { icon: '📱', text: 'Share via WhatsApp' },
 ];
@@ -73,7 +73,7 @@ export const howItWorksSteps = [
     stepLabel: 'Step three',
     title: 'Gift funded!',
     description:
-      'Funds land straight on your Karri Card. Go buy the dream gift — magic made together.',
+      'Voucher details stay on file, so the host is ready when the Dreamboard closes.',
     gradientFrom: '#C4785A',
     gradientTo: '#B06A4A',
     theme: 'light' as const,

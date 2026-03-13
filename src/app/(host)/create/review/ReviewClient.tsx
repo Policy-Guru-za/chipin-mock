@@ -72,7 +72,7 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
       return `Bank transfer${draft.bankName ? ` (${draft.bankName})` : ''}${draft.bankAccountLast4 ? ` •••• ${draft.bankAccountLast4}` : ''}`;
     }
     if (draft.payoutMethod === 'karri_card') {
-      return `Karri Card${draft.karriCardHolderName ? ` (${draft.karriCardHolderName})` : ''}`;
+      return `Legacy Karri Card${draft.karriCardHolderName ? ` (${draft.karriCardHolderName})` : ''}`;
     }
 
     return `${getDreamBoardGiftPayoutLabel(draft.payoutMethod)} placeholder via ${draft.payoutEmail} and ${draft.hostWhatsAppNumber}`;

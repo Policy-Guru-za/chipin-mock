@@ -1,3 +1,5 @@
+import { isKarriConfigurationRequired } from '@/lib/ux-v2/write-path-gates';
+
 const isEnabled = (value: string | undefined): boolean => value === 'true';
 const hasValue = (value: string | undefined): boolean => Boolean(value && value.trim().length > 0);
 
@@ -120,8 +122,12 @@ export const assertStartupConfig = (): void => {
     issues.push('Missing KV_REST_API_URL or KV_REST_API_TOKEN (Vercel KV).');
   }
 
-  if (!isMockKarri()) {
-    const missingKarri = getMissingKeys(['KARRI_BASE_URL', 'KARRI_API_KEY']);
+  if (!isMockKarri() && isKarriConfigurationRequired()) {
+    const missingKarri = getMissingKeys([
+      'KARRI_BASE_URL',
+      'KARRI_API_KEY',
+      'CARD_DATA_ENCRYPTION_KEY',
+    ]);
     if (missingKarri.length > 0) {
       issues.push(`Karri configuration incomplete. Missing: ${missingKarri.join(', ')}`);
     }

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { openApiSpec } from '@/lib/api/openapi';
 import {
@@ -9,6 +9,33 @@ import {
   LOCKED_PAYOUT_METHODS,
   LOCKED_PAYOUT_TYPES,
 } from '@/lib/ux-v2/decision-locks';
+
+const ORIGINAL_ENV = {
+  UX_V2_ENABLE_KARRI_WRITE_PATH: process.env.UX_V2_ENABLE_KARRI_WRITE_PATH,
+  UX_V2_ENABLE_BANK_WRITE_PATH: process.env.UX_V2_ENABLE_BANK_WRITE_PATH,
+  UX_V2_ENABLE_CHARITY_WRITE_PATH: process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH,
+};
+
+const restoreEnvValue = (key: keyof typeof ORIGINAL_ENV, value: string | undefined) => {
+  if (value === undefined) {
+    delete process.env[key];
+    return;
+  }
+
+  process.env[key] = value;
+};
+
+const loadOpenApiSpec = async () => {
+  vi.resetModules();
+  return (await import('@/lib/api/openapi')).openApiSpec;
+};
+
+afterEach(() => {
+  restoreEnvValue('UX_V2_ENABLE_KARRI_WRITE_PATH', ORIGINAL_ENV.UX_V2_ENABLE_KARRI_WRITE_PATH);
+  restoreEnvValue('UX_V2_ENABLE_BANK_WRITE_PATH', ORIGINAL_ENV.UX_V2_ENABLE_BANK_WRITE_PATH);
+  restoreEnvValue('UX_V2_ENABLE_CHARITY_WRITE_PATH', ORIGINAL_ENV.UX_V2_ENABLE_CHARITY_WRITE_PATH);
+  vi.resetModules();
+});
 
 describe('openapi spec', () => {
   it('public spec matches the generated builder', () => {
@@ -53,5 +80,34 @@ describe('openapi spec', () => {
     expect(requiredFields).not.toContain('gift_image_url');
     expect(createRequest.properties).toHaveProperty('gift_icon_id');
     expect(createRequest.properties.gift_description.maxLength).toBe(500);
+  });
+
+  it('documents voucher-default and gated karri behavior', () => {
+    const payoutMethod = openApiSpec.components.schemas.PayoutMethod;
+    const createRequest = openApiSpec.components.schemas.DreamBoardCreateRequest;
+    const updateRequest = openApiSpec.components.schemas.DreamBoardUpdateRequest;
+
+    expect(payoutMethod.description).toContain('Standard Dreamboard flows default to takealot_voucher');
+    expect(payoutMethod.description).toContain('UX_V2_ENABLE_KARRI_WRITE_PATH=true');
+    expect(createRequest.description).toContain('Omitted payout_method defaults to takealot_voucher');
+    expect(updateRequest.description).toContain('Karri Card mutation');
+  });
+
+  it('stays deterministic when write-path flags are enabled', async () => {
+    process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
+    process.env.UX_V2_ENABLE_BANK_WRITE_PATH = 'true';
+    process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH = 'true';
+
+    const content = readFileSync(resolve(process.cwd(), 'public', 'v1', 'openapi.json'), 'utf8');
+    const json = JSON.parse(content);
+    const flagEnabledSpec = await loadOpenApiSpec();
+
+    expect(flagEnabledSpec).toEqual(json);
+    expect(flagEnabledSpec.components.schemas.PayoutMethod.description).toContain(
+      'UX_V2_ENABLE_KARRI_WRITE_PATH=true'
+    );
+    expect(flagEnabledSpec.components.schemas.PayoutMethod.description).not.toContain(
+      'enabled for this environment'
+    );
   });
 });

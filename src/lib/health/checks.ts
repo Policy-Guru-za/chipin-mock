@@ -1,7 +1,12 @@
 import { sql } from 'drizzle-orm';
 
+import { isMockKarri } from '@/lib/config/feature-flags';
 import { kvAdapter } from '@/lib/demo/kv-adapter';
 import { db } from '@/lib/db';
+import {
+  isKarriAutomationEnabled,
+  isKarriWritePathEnabled,
+} from '@/lib/ux-v2/write-path-gates';
 
 export type HealthCheckResult = {
   ok: boolean;
@@ -48,11 +53,12 @@ export const checkBlobToken = async (): Promise<HealthCheckResult> => {
   return { ok: true };
 };
 
-const isEnabledFlag = (value?: string) => value === 'true';
-
 export const checkKarriAutomation = async (): Promise<HealthCheckResult> => {
-  if (!isEnabledFlag(process.env.KARRI_AUTOMATION_ENABLED)) {
+  if (!isKarriWritePathEnabled() && !isKarriAutomationEnabled()) {
     return { ok: true, detail: 'disabled' };
+  }
+  if (isMockKarri()) {
+    return { ok: true, detail: 'mock' };
   }
   if (!process.env.KARRI_BASE_URL || !process.env.KARRI_API_KEY) {
     return { ok: false, detail: 'KARRI_BASE_URL or KARRI_API_KEY is not set' };

@@ -9,7 +9,10 @@ import { listDreamBoardsForApi } from '@/lib/db/api-queries';
 import { ensureHostForEmail, getActiveCharityById } from '@/lib/db/queries';
 import { db } from '@/lib/db';
 import { dreamBoards } from '@/lib/db/schema';
-import type { DreamBoardGiftPayoutMethod } from '@/lib/dream-boards/payout-methods';
+import {
+  DEFAULT_HOST_CREATE_PAYOUT_METHOD,
+  type DreamBoardGiftPayoutMethod,
+} from '@/lib/dream-boards/payout-methods';
 import {
   isBankAccountNumberValid,
   isPartyDateWithinRange,
@@ -75,7 +78,7 @@ const createSchema = z
       });
     }
 
-    const payoutMethod = value.payout_method ?? 'karri_card';
+    const payoutMethod = value.payout_method ?? DEFAULT_HOST_CREATE_PAYOUT_METHOD;
     const hasAnyBankField =
       value.bank_name !== undefined ||
       value.bank_account_number !== undefined ||
@@ -449,7 +452,11 @@ export const POST = withApiAuth('dreamboards:write', async (request: NextRequest
     });
   }
 
-  const payoutMethod = parsed.data.payout_method ?? 'karri_card';
+  const payoutMethod = parsed.data.payout_method ?? DEFAULT_HOST_CREATE_PAYOUT_METHOD;
+  const isKarriWriteRequested =
+    payoutMethod === 'karri_card' ||
+    parsed.data.karri_card_number !== undefined ||
+    parsed.data.karri_card_holder_name !== undefined;
   const isBankWriteRequested =
     payoutMethod === 'bank' ||
     parsed.data.bank_name !== undefined ||
@@ -479,6 +486,7 @@ export const POST = withApiAuth('dreamboards:write', async (request: NextRequest
   }
 
   const blockReason = resolveWritePathBlockReason({
+    karriRequested: isKarriWriteRequested,
     bankRequested: isBankWriteRequested,
     charityRequested: isCharityWriteRequested,
   });

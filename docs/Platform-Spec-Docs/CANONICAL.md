@@ -1,6 +1,6 @@
 # Gifta Canonical Spec (Source of Truth)
 
-> **Version:** 2.0.5
+> **Version:** 2.0.6
 > **Last Updated:** March 12, 2026
 > **Status:** Authoritative
 > **Supersedes:** v1.1.1 (January 21, 2026)
@@ -19,6 +19,7 @@ This document reflects current runtime behavior in `src/` and `drizzle/migration
 
 | Version | Date | Summary |
 |---------|------|---------|
+| 2.0.6 | 2026-03-12 | Karri default-path decoupling: standard Dreamboard runtime no longer depends on Karri config, public API `karri_card` writes are gated by `UX_V2_ENABLE_KARRI_WRITE_PATH`, and readiness reports Karri as disabled unless write-path or automation mode is enabled. |
 | 2.0.5 | 2026-03-12 | Dreamboard create-flow pivot: default host creation is now `child -> gift -> dates -> voucher -> review`, charity is removed from the active host path, and new host-created boards use `takealot_voucher` as the real payout-method runtime truth. |
 | 2.0.4 | 2026-03-12 | Dreamboard fee removal: active checkout is now fee-free, contributor/admin/host fee copy removed from active surfaces, and fee-related contract fields are retained as deprecated compatibility fields only. |
 | 2.0.3 | 2026-03-12 | Workspace-state documentation sync: confirmed generated OpenAPI host is `https://api.gifta.co.za/v1`, confirmed root request hook is `proxy.ts`, and aligned current doc governance to the March 12 workspace baseline. |
@@ -53,12 +54,13 @@ This document reflects current runtime behavior in `src/` and `drizzle/migration
   - Karri Card fields: `karri_card_number`, `karri_card_holder_name`.
   - Bank fields: `bank_name`, `bank_account_number_encrypted`, `bank_account_last4`, `bank_branch_code`, `bank_account_holder`.
   - Active host create flow writes `takealot_voucher` only. Karri/bank remain valid for legacy records and partner/API-managed paths.
+  - Partner API Karri writes are blocked unless `UX_V2_ENABLE_KARRI_WRITE_PATH=true`.
   - Partner API bank writes are still gated by `UX_V2_ENABLE_BANK_WRITE_PATH`.
 - **Payout types:** `karri_card`, `bank`, `takealot_voucher`, `charity` (Decision Register D-002, LOCKED).
   - A single Dreamboard may produce multiple payout rows: one gift payout (type matches `payout_method`) and optionally one charity payout (type = `charity`).
   - Uniqueness constraint: one payout per `(dream_board_id, type)`.
   - Dreamboard transitions to `paid_out` only when all required payout rows for that board are `completed`.
-- **Current runtime state:** payout row creation supports `karri_card`, `bank`, `takealot_voucher`, and `charity` based on board configuration and contribution totals. Automated execution is implemented for `karri_card` only (`KARRI_AUTOMATION_ENABLED`); bank, `takealot_voucher`, and charity payouts currently require manual completion.
+- **Current runtime state:** payout row creation supports `karri_card`, `bank`, `takealot_voucher`, and `charity` based on board configuration and contribution totals. Standard Dreamboard mode defaults to `takealot_voucher`; `karri_card` writes are disabled unless `UX_V2_ENABLE_KARRI_WRITE_PATH=true`. Automated execution is implemented for `karri_card` only (`KARRI_AUTOMATION_ENABLED`); bank, `takealot_voucher`, and charity payouts currently require manual completion.
 
 ### Charity Model
 
@@ -113,6 +115,7 @@ Decision Register D-004 (LOCKED): fee-free active checkout with legacy fee compa
 - No magic link tokens or session storage in Vercel KV.
 - API key authentication (separate from Clerk) protects partner V1 API routes.
 - Internal job routes are protected by `INTERNAL_JOB_SECRET` bearer token.
+- Karri credentials are required at startup/readiness only when `UX_V2_ENABLE_KARRI_WRITE_PATH=true` or `KARRI_AUTOMATION_ENABLED=true`, unless `MOCK_KARRI=true`.
 
 ### API Surface
 
@@ -291,7 +294,7 @@ UX v2 delivery status in runtime:
 - **Schema:** expanded schema is live (bank payout fields, charity split fields, reminder retry/WhatsApp fields, expanded enums).
 - **Host UX flow:** 5-step create flow (`/create/child` → `/create/voucher` → `/create/review`) and dashboard/admin surfaces are live.
 - **Default host payout path:** newly created host Dreamboards use `takealot_voucher`; legacy compatibility routes still exist for `/create/giving-back` and `/create/payout`, but they redirect into `/create/voucher`.
-- **Partner API write gates:** bank and charity writes remain feature-flagged (`UX_V2_ENABLE_BANK_WRITE_PATH`, `UX_V2_ENABLE_CHARITY_WRITE_PATH`).
+- **Partner API write gates:** `karri_card`, bank, and charity writes remain feature-flagged (`UX_V2_ENABLE_KARRI_WRITE_PATH`, `UX_V2_ENABLE_BANK_WRITE_PATH`, `UX_V2_ENABLE_CHARITY_WRITE_PATH`).
 - **Payout execution:** automated execution is Karri-only; bank/`takealot_voucher`/charity payouts remain manual completion paths.
 
 ---

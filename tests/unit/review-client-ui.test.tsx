@@ -111,7 +111,7 @@ describe('ReviewClient', () => {
     ).toBeInTheDocument();
   });
 
-  it('still renders fallback summary copy for Karri Card drafts', () => {
+  it('still renders legacy summary copy for Karri Card drafts', () => {
     const publishAction = async (
       _state: PublishState,
       _formData: FormData
@@ -124,7 +124,7 @@ describe('ReviewClient', () => {
 
     render(<ReviewClient draft={karriDraft} publishAction={publishAction} />);
 
-    expect(screen.getByText('Karri Card (Max Charter)')).toBeInTheDocument();
+    expect(screen.getByText('Legacy Karri Card (Max Charter)')).toBeInTheDocument();
   });
 
   it('still renders fallback summary copy for bank drafts', () => {
