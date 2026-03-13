@@ -33,14 +33,14 @@
 
 - `pnpm lint` (0 errors, 105 pre-existing warnings)
 - `pnpm typecheck` (clean)
-- `pnpm test` — environment-blocked: sandbox is `aarch64` but `node_modules` lacks `@rollup/rollup-linux-arm64-gnu`; Zod `.strip()` behavior verified independently via `node -e`
+- `pnpm test` (195 test files, 930 tests passed)
 
 ## Dogfood Evidence
 
-- Verified Zod `.strip()` on a `.strict()` schema independently: strict rejects unknown keys, `.strip()` accepts and removes them while preserving known fields.
-- Confirmed both `page.tsx` and `actions.ts` now use `.strip().safeParse()`.
-- New test cases prove: (1) strict schema rejects persisted fields, (2) stripped schema accepts and removes them.
-- Lint green, typecheck green. Test suite environment-blocked (rollup platform binary), not code-blocked.
+- Full gate green: lint, typecheck, and test all passing.
+- Confirmed both `page.tsx` and `actions.ts` use `.strip().safeParse()`.
+- Updated `create-review-page.test.tsx` schema mock to expose `.strip()` matching the new runtime call chain.
+- New schema test cases prove: (1) strict schema rejects persisted fields, (2) stripped schema accepts and removes them.
 
 ## Napkin Evidence
 
