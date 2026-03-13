@@ -124,22 +124,19 @@ describe('admin csv payload mappers', () => {
 describe('admin settings dataset', () => {
   it('exposes locked and runtime config values', () => {
     const originalBank = process.env.UX_V2_ENABLE_BANK_WRITE_PATH;
-    const originalCharity = process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH;
 
     try {
       process.env.UX_V2_ENABLE_BANK_WRITE_PATH = 'true';
-      process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH = 'false';
 
       const settings = getAdminPlatformSettingsDataset();
 
       expect(settings.brand).toBe('Gifta');
       expect(settings).not.toHaveProperty('feeConfiguration');
-      expect(settings.charityConfiguration.splitModes).toEqual(['percentage', 'threshold']);
+      expect(settings).not.toHaveProperty('charityConfiguration');
       expect(settings.writePathGates.bankEnabled).toBe(true);
-      expect(settings.writePathGates.charityEnabled).toBe(false);
+      expect(settings.writePathGates).not.toHaveProperty('charityEnabled');
     } finally {
       process.env.UX_V2_ENABLE_BANK_WRITE_PATH = originalBank;
-      process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH = originalCharity;
     }
   });
 });

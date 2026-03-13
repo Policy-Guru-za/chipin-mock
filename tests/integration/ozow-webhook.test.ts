@@ -37,7 +37,7 @@ describe('Ozow webhook integration', () => {
       id: 'contrib-1',
       dreamBoardId: 'board-1',
       amountCents: 5000,
-      feeCents: 250,
+      feeCents: 0,
       paymentStatus: 'pending',
     };
 
@@ -71,7 +71,7 @@ describe('Ozow webhook integration', () => {
           data: {
             merchantReference: 'OZOW-123',
             status: 'PAID',
-            amount: { value: 52.5 },
+            amount: { value: 50 },
           },
         })),
       };

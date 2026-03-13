@@ -196,13 +196,8 @@ export type AdminPlatformSettingsDataset = {
     minContributionCents: number;
     maxContributionCents: number;
   };
-  charityConfiguration: {
-    splitModes: ReadonlyArray<'percentage' | 'threshold'>;
-    monthlyPayoutCadence: string;
-  };
   writePathGates: {
     bankEnabled: boolean;
-    charityEnabled: boolean;
   };
 };
 

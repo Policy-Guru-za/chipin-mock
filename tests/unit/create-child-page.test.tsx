@@ -7,7 +7,7 @@ import '@testing-library/jest-dom/vitest';
 
 const mocks = vi.hoisted(() => ({
   requireHostAuth: vi.fn(),
-  getDreamBoardDraft: vi.fn(),
+  getHostCreateDreamBoardDraft: vi.fn(),
   buildCreateFlowViewModel: vi.fn(),
   saveChildDetailsAction: vi.fn(),
 }));
@@ -17,7 +17,7 @@ vi.mock('@/lib/auth/clerk-wrappers', () => ({
 }));
 
 vi.mock('@/lib/dream-boards/draft', () => ({
-  getDreamBoardDraft: mocks.getDreamBoardDraft,
+  getHostCreateDreamBoardDraft: mocks.getHostCreateDreamBoardDraft,
 }));
 
 vi.mock('@/lib/host/create-view-model', () => ({
@@ -57,7 +57,7 @@ vi.mock('@/app/(host)/create/child/ChildStepForm', () => ({
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.requireHostAuth.mockResolvedValue({ hostId: 'host-1' });
-  mocks.getDreamBoardDraft.mockResolvedValue(null);
+  mocks.getHostCreateDreamBoardDraft.mockResolvedValue(null);
   mocks.buildCreateFlowViewModel.mockReturnValue({
     stepLabel: 'The child',
     title: 'Child details',
@@ -84,7 +84,7 @@ describe('Create Child Page', () => {
   });
 
   it('passes existing photo URL to ChildStepForm when draft exists', async () => {
-    mocks.getDreamBoardDraft.mockResolvedValue({
+    mocks.getHostCreateDreamBoardDraft.mockResolvedValue({
       childPhotoUrl: 'https://example.com/photo.jpg',
       childName: 'Mia',
       childAge: 4,
@@ -110,7 +110,7 @@ describe('Create Child Page', () => {
   });
 
   it('prefills default child values from draft and passes action', async () => {
-    mocks.getDreamBoardDraft.mockResolvedValue({
+    mocks.getHostCreateDreamBoardDraft.mockResolvedValue({
       childName: 'Mia',
       childAge: 4,
     });

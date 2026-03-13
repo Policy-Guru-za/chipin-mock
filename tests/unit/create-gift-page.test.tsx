@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   requireHostAuth: vi.fn(),
-  getDreamBoardDraft: vi.fn(),
+  getHostCreateDreamBoardDraft: vi.fn(),
   saveManualGiftAction: vi.fn(),
   buildCreateFlowViewModel: vi.fn(),
 }));
@@ -19,7 +19,7 @@ vi.mock('@/lib/auth/clerk-wrappers', () => ({
 }));
 
 vi.mock('@/lib/dream-boards/draft', () => ({
-  getDreamBoardDraft: mocks.getDreamBoardDraft,
+  getHostCreateDreamBoardDraft: mocks.getHostCreateDreamBoardDraft,
 }));
 
 vi.mock('@/app/(host)/create/gift/actions', () => ({
@@ -83,7 +83,7 @@ beforeEach(() => {
   vi.clearAllMocks();
 
   mocks.requireHostAuth.mockResolvedValue({ hostId: 'host-1' });
-  mocks.getDreamBoardDraft.mockResolvedValue({
+  mocks.getHostCreateDreamBoardDraft.mockResolvedValue({
     childName: 'Maya',
     childAge: 7,
     giftName: '',
@@ -122,7 +122,7 @@ describe('Create Gift Page', () => {
   });
 
   it('prefills gift name from draft', async () => {
-    mocks.getDreamBoardDraft.mockResolvedValue({
+    mocks.getHostCreateDreamBoardDraft.mockResolvedValue({
       childName: 'Maya',
       childAge: 7,
       giftName: 'LEGO Millennium Falcon',
@@ -135,7 +135,7 @@ describe('Create Gift Page', () => {
   });
 
   it('prefills message from draft', async () => {
-    mocks.getDreamBoardDraft.mockResolvedValue({
+    mocks.getHostCreateDreamBoardDraft.mockResolvedValue({
       childName: 'Maya',
       childAge: 7,
       giftName: '',

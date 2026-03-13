@@ -2,16 +2,16 @@
 
 ## Current Spec
 
-- `16_dreamboard-pivot-hardening`
+- `17_session-placeholder`
 
 ## Current Stage
 
-- Stage 1 — active Dreamboard create boundary hardening
+- Placeholder — awaiting next session activation
 
 ## Status
 
-- Activated [`spec/16_dreamboard-pivot-hardening.md`](./spec/16_dreamboard-pivot-hardening.md) for the approved Dreamboard pivot hardening session.
-- Inspecting first-party create/runtime/admin/test defaults to remove active-product charity and legacy payout leakage while preserving explicit compatibility paths.
+- Closed [`spec/16_dreamboard-pivot-hardening.md`](./spec/16_dreamboard-pivot-hardening.md) as `Done` after hardening first-party Dreamboard create boundaries, resetting active defaults to voucher/zero-fee/charity-off, and containing admin/telemetry leakage.
+- Activated [`spec/17_session-placeholder.md`](./spec/17_session-placeholder.md) as the standing next-session placeholder.
 
 ## Blockers
 
@@ -19,15 +19,15 @@
 
 ## Next Step
 
-- Tighten first-party Dreamboard create draft, review, publish, and default fixture boundaries around voucher-only active flows.
+- Rename `spec/17_session-placeholder.md` in place when the next bounded Gifta session begins.
 
 ## Last Session Spec
 
-- `15_dreamboard-truth-cleanup-follow-up`
+- `16_dreamboard-pivot-hardening`
 
 ## Last Completed Spec
 
-- `15_dreamboard-truth-cleanup-follow-up`
+- `16_dreamboard-pivot-hardening`
 
 ## Last Green Commands
 
@@ -40,9 +40,9 @@
 
 ## Dogfood Evidence
 
-- Exercised the Dreamboard truth cleanup through focused regressions covering landing/public/thank-you/host/admin/API slices and a final full `pnpm test` pass.
-- Verified direct `/admin/charities` access remains available for historical support while the active admin sidebar omits charity navigation.
+- Exercised the Dreamboard pivot hardening through focused create-flow, webhook, close-path, dashboard, public, thank-you, admin-settings, telemetry, and draft-normalization regressions.
+- Verified the full gate passed: `pnpm docs:audit -- --sync`, `pnpm docs:audit`, `pnpm lint`, `pnpm typecheck`, and `pnpm test`.
 
 ## Napkin Evidence
 
-- No durable napkin update.
+- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with the execution-audit terminal-state rule: `Done` specs must keep `Successor Slot: none`.

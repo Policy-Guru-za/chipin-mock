@@ -19,10 +19,8 @@ import { charities, contributions, dreamBoards, hosts, payouts } from '@/lib/db/
 import {
   LOCKED_ACCESSIBILITY_BASELINE,
   LOCKED_BRAND_STRING,
-  LOCKED_CHARITY_PAYOUT_POLICY,
-  LOCKED_CHARITY_SPLIT_MODES,
 } from '@/lib/ux-v2/decision-locks';
-import { isBankWritePathEnabled, isCharityWritePathEnabled } from '@/lib/ux-v2/write-path-gates';
+import { isBankWritePathEnabled } from '@/lib/ux-v2/write-path-gates';
 
 import type {
   AdminCharityDataset,
@@ -852,12 +850,7 @@ export const getAdminPlatformSettingsDataset = (): AdminPlatformSettingsDataset 
     minContributionCents: 2000,
     maxContributionCents: 1000000,
   },
-  charityConfiguration: {
-    splitModes: LOCKED_CHARITY_SPLIT_MODES,
-    monthlyPayoutCadence: LOCKED_CHARITY_PAYOUT_POLICY.cadence,
-  },
   writePathGates: {
     bankEnabled: isBankWritePathEnabled(),
-    charityEnabled: isCharityWritePathEnabled(),
   },
 });

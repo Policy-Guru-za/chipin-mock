@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   requireHostAuth: vi.fn(),
-  getDreamBoardDraft: vi.fn(),
+  getHostCreateDreamBoardDraft: vi.fn(),
   buildCreateFlowViewModel: vi.fn(),
   saveDatesAction: vi.fn(),
 }));
@@ -19,7 +19,7 @@ vi.mock('@/lib/auth/clerk-wrappers', () => ({
 }));
 
 vi.mock('@/lib/dream-boards/draft', () => ({
-  getDreamBoardDraft: mocks.getDreamBoardDraft,
+  getHostCreateDreamBoardDraft: mocks.getHostCreateDreamBoardDraft,
 }));
 
 vi.mock('@/lib/host/create-view-model', () => ({
@@ -76,7 +76,7 @@ beforeEach(() => {
     stepLabel: 'The dates',
     title: 'Dates',
   });
-  mocks.getDreamBoardDraft.mockResolvedValue({
+  mocks.getHostCreateDreamBoardDraft.mockResolvedValue({
     childName: 'Maya',
     childAge: 7,
     birthdayDate: '2026-06-15',
@@ -100,7 +100,7 @@ describe('Create Dates Page', () => {
   });
 
   it('passes draft birthday date to DatesForm', async () => {
-    mocks.getDreamBoardDraft.mockResolvedValue({
+    mocks.getHostCreateDreamBoardDraft.mockResolvedValue({
       childName: 'Maya',
       childAge: 7,
       birthdayDate: '2026-06-15',
@@ -114,7 +114,7 @@ describe('Create Dates Page', () => {
   });
 
   it('passes childName and childAge to DatesForm', async () => {
-    mocks.getDreamBoardDraft.mockResolvedValue({
+    mocks.getHostCreateDreamBoardDraft.mockResolvedValue({
       childName: 'Maya',
       childAge: 7,
       birthdayDate: '2026-06-15',
@@ -140,7 +140,7 @@ describe('Create Dates Page', () => {
   });
 
   it('computes defaultNoPartyPlanned as false when party is configured', async () => {
-    mocks.getDreamBoardDraft.mockResolvedValue({
+    mocks.getHostCreateDreamBoardDraft.mockResolvedValue({
       childName: 'Maya',
       childAge: 7,
       birthdayDate: '2026-06-15',
@@ -154,7 +154,7 @@ describe('Create Dates Page', () => {
   });
 
   it('computes defaultNoPartyPlanned as true when all dates match and no party time is set', async () => {
-    mocks.getDreamBoardDraft.mockResolvedValue({
+    mocks.getHostCreateDreamBoardDraft.mockResolvedValue({
       childName: 'Maya',
       childAge: 7,
       birthdayDate: '2026-06-15',
@@ -168,7 +168,7 @@ describe('Create Dates Page', () => {
   });
 
   it('keeps defaultNoPartyPlanned false when campaign close differs from birthday', async () => {
-    mocks.getDreamBoardDraft.mockResolvedValue({
+    mocks.getHostCreateDreamBoardDraft.mockResolvedValue({
       childName: 'Maya',
       childAge: 7,
       birthdayDate: '2026-06-15',

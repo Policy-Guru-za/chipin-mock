@@ -39,12 +39,15 @@ describe('saveDatesAction', () => {
       throw new Error(`REDIRECT:${url}`);
     });
     const requireHostAuth = vi.fn(async () => ({ hostId: 'host-1' }));
-    const getDreamBoardDraft = vi.fn(async () => makeDraft());
-    const updateDreamBoardDraft = vi.fn(async () => undefined);
+    const getHostCreateDreamBoardDraft = vi.fn(async () => makeDraft());
+    const updateHostCreateDreamBoardDraft = vi.fn(async () => undefined);
 
     vi.doMock('next/navigation', () => ({ redirect: redirectMock }));
     vi.doMock('@/lib/auth/clerk-wrappers', () => ({ requireHostAuth }));
-    vi.doMock('@/lib/dream-boards/draft', () => ({ getDreamBoardDraft, updateDreamBoardDraft }));
+    vi.doMock('@/lib/dream-boards/draft', () => ({
+      getHostCreateDreamBoardDraft,
+      updateHostCreateDreamBoardDraft,
+    }));
 
     const { saveDatesAction } = await loadModule();
     const formData = new FormData();
@@ -53,7 +56,7 @@ describe('saveDatesAction', () => {
     formData.set('campaignEndDate', addDays(22));
 
     await expect(saveDatesAction(formData)).rejects.toThrow('REDIRECT:/create/voucher');
-    expect(updateDreamBoardDraft).toHaveBeenCalledWith('host-1', {
+    expect(updateHostCreateDreamBoardDraft).toHaveBeenCalledWith('host-1', {
       birthdayDate: addDays(20),
       partyDate: addDays(22),
       campaignEndDate: addDays(22),
@@ -69,8 +72,8 @@ describe('saveDatesAction', () => {
     vi.doMock('next/navigation', () => ({ redirect: redirectMock }));
     vi.doMock('@/lib/auth/clerk-wrappers', () => ({ requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })) }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () => makeDraft()),
-      updateDreamBoardDraft: vi.fn(async () => undefined),
+      getHostCreateDreamBoardDraft: vi.fn(async () => makeDraft()),
+      updateHostCreateDreamBoardDraft: vi.fn(async () => undefined),
     }));
 
     const { saveDatesAction } = await loadModule();
@@ -90,8 +93,8 @@ describe('saveDatesAction', () => {
     vi.doMock('next/navigation', () => ({ redirect: redirectMock }));
     vi.doMock('@/lib/auth/clerk-wrappers', () => ({ requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })) }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () => makeDraft()),
-      updateDreamBoardDraft: vi.fn(async () => undefined),
+      getHostCreateDreamBoardDraft: vi.fn(async () => makeDraft()),
+      updateHostCreateDreamBoardDraft: vi.fn(async () => undefined),
     }));
 
     const { saveDatesAction } = await loadModule();
@@ -111,8 +114,8 @@ describe('saveDatesAction', () => {
     vi.doMock('next/navigation', () => ({ redirect: redirectMock }));
     vi.doMock('@/lib/auth/clerk-wrappers', () => ({ requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })) }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () => makeDraft()),
-      updateDreamBoardDraft: vi.fn(async () => undefined),
+      getHostCreateDreamBoardDraft: vi.fn(async () => makeDraft()),
+      updateHostCreateDreamBoardDraft: vi.fn(async () => undefined),
     }));
 
     const { saveDatesAction } = await loadModule();
@@ -132,8 +135,8 @@ describe('saveDatesAction', () => {
     vi.doMock('next/navigation', () => ({ redirect: redirectMock }));
     vi.doMock('@/lib/auth/clerk-wrappers', () => ({ requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })) }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () => makeDraft()),
-      updateDreamBoardDraft: vi.fn(async () => undefined),
+      getHostCreateDreamBoardDraft: vi.fn(async () => makeDraft()),
+      updateHostCreateDreamBoardDraft: vi.fn(async () => undefined),
     }));
 
     const { saveDatesAction } = await loadModule();
@@ -149,13 +152,13 @@ describe('saveDatesAction', () => {
     const redirectMock = vi.fn((url: string) => {
       throw new Error(`REDIRECT:${url}`);
     });
-    const updateDreamBoardDraft = vi.fn(async () => undefined);
+    const updateHostCreateDreamBoardDraft = vi.fn(async () => undefined);
 
     vi.doMock('next/navigation', () => ({ redirect: redirectMock }));
     vi.doMock('@/lib/auth/clerk-wrappers', () => ({ requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })) }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () => makeDraft()),
-      updateDreamBoardDraft,
+      getHostCreateDreamBoardDraft: vi.fn(async () => makeDraft()),
+      updateHostCreateDreamBoardDraft,
     }));
 
     const { saveDatesAction } = await loadModule();
@@ -164,7 +167,7 @@ describe('saveDatesAction', () => {
     formData.set('noPartyPlanned', 'on');
 
     await expect(saveDatesAction(formData)).rejects.toThrow('REDIRECT:/create/voucher');
-    expect(updateDreamBoardDraft).toHaveBeenCalledWith('host-1', {
+    expect(updateHostCreateDreamBoardDraft).toHaveBeenCalledWith('host-1', {
       birthdayDate: addDays(20),
       partyDate: addDays(20),
       campaignEndDate: addDays(20),
@@ -176,14 +179,14 @@ describe('saveDatesAction', () => {
     const redirectMock = vi.fn((url: string) => {
       throw new Error(`REDIRECT:${url}`);
     });
-    const updateDreamBoardDraft = vi.fn(async () => undefined);
+    const updateHostCreateDreamBoardDraft = vi.fn(async () => undefined);
     const partyDateTimeDate = addDays(30);
 
     vi.doMock('next/navigation', () => ({ redirect: redirectMock }));
     vi.doMock('@/lib/auth/clerk-wrappers', () => ({ requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })) }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () => makeDraft()),
-      updateDreamBoardDraft,
+      getHostCreateDreamBoardDraft: vi.fn(async () => makeDraft()),
+      updateHostCreateDreamBoardDraft,
     }));
 
     const { saveDatesAction } = await loadModule();
@@ -194,7 +197,7 @@ describe('saveDatesAction', () => {
     formData.set('partyDateTimeDate', partyDateTimeDate);
 
     await expect(saveDatesAction(formData)).rejects.toThrow('REDIRECT:/create/voucher');
-    expect(updateDreamBoardDraft).toHaveBeenCalledWith('host-1', {
+    expect(updateHostCreateDreamBoardDraft).toHaveBeenCalledWith('host-1', {
       birthdayDate: addDays(20),
       partyDate: addDays(22),
       campaignEndDate: addDays(22),
@@ -210,8 +213,8 @@ describe('saveDatesAction', () => {
     vi.doMock('next/navigation', () => ({ redirect: redirectMock }));
     vi.doMock('@/lib/auth/clerk-wrappers', () => ({ requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })) }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () => makeDraft()),
-      updateDreamBoardDraft: vi.fn(async () => undefined),
+      getHostCreateDreamBoardDraft: vi.fn(async () => makeDraft()),
+      updateHostCreateDreamBoardDraft: vi.fn(async () => undefined),
     }));
 
     const { saveDatesAction } = await loadModule();
@@ -235,8 +238,8 @@ describe('saveDatesAction', () => {
     vi.doMock('next/navigation', () => ({ redirect: redirectMock }));
     vi.doMock('@/lib/auth/clerk-wrappers', () => ({ requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })) }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () => makeDraft()),
-      updateDreamBoardDraft: vi.fn(async () => undefined),
+      getHostCreateDreamBoardDraft: vi.fn(async () => makeDraft()),
+      updateHostCreateDreamBoardDraft: vi.fn(async () => undefined),
     }));
 
     const { saveDatesAction } = await loadModule();

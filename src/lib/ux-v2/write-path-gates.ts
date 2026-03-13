@@ -6,8 +6,8 @@ export const isKarriWritePathEnabled = (): boolean =>
 export const isBankWritePathEnabled = (): boolean =>
   isEnabled(process.env.UX_V2_ENABLE_BANK_WRITE_PATH);
 
-export const isCharityWritePathEnabled = (): boolean =>
-  isEnabled(process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH);
+// Legacy no-op: active Dreamboard flows no longer support charity configuration writes.
+export const isCharityWritePathEnabled = (): boolean => false;
 
 export const isKarriAutomationEnabled = (): boolean =>
   isEnabled(process.env.KARRI_AUTOMATION_ENABLED);

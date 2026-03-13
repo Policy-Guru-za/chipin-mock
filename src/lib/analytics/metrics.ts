@@ -181,12 +181,10 @@ export function trackHostCreateFailed(step: string, failureCode: string): void {
 export function trackHostCreatePublished(params: {
   dreamBoardId: string;
   payoutMethod: string;
-  charityEnabled: boolean;
 }): void {
   trackMetric('host_create_published', {
     dream_board_id: params.dreamBoardId,
     payout_method: params.payoutMethod,
-    charity_enabled: params.charityEnabled,
   });
 }
 

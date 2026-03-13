@@ -41,8 +41,8 @@ describe('GET /api/v1/dream-boards/[id]/contributions', () => {
         contributorName: 'Lebo',
         message: 'Happy birthday',
         amountCents: 20000,
-        feeCents: 600,
-        netCents: 19400,
+        feeCents: 0,
+        netCents: 20000,
         paymentStatus: 'completed',
         createdAt: new Date('2026-01-02T10:00:00.000Z'),
       },
@@ -52,8 +52,8 @@ describe('GET /api/v1/dream-boards/[id]/contributions', () => {
         contributorName: 'Sam',
         message: null,
         amountCents: 30000,
-        feeCents: 900,
-        netCents: 29100,
+        feeCents: 0,
+        netCents: 30000,
         paymentStatus: 'completed',
         createdAt: new Date('2026-01-01T10:00:00.000Z'),
       },
@@ -74,6 +74,8 @@ describe('GET /api/v1/dream-boards/[id]/contributions', () => {
     expect(response.status).toBe(200);
     expect(payload.data).toHaveLength(1);
     expect(payload.data[0]).not.toHaveProperty('charity_cents');
+    expect(payload.data[0].fee_cents).toBe(0);
+    expect(payload.data[0].net_cents).toBe(20000);
     expect(payload.pagination.has_more).toBe(true);
     expect(listContributionsForApi).toHaveBeenCalledWith(
       expect.objectContaining({ partnerId: 'partner-1', dreamBoardId: 'board-1' })

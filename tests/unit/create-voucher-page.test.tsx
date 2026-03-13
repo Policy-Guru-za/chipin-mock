@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   requireHostAuth: vi.fn(),
-  getDreamBoardDraft: vi.fn(),
+  getHostCreateDreamBoardDraft: vi.fn(),
   buildCreateFlowViewModel: vi.fn(),
   saveVoucherAction: vi.fn(),
   redirect: vi.fn(),
@@ -20,7 +20,7 @@ vi.mock('@/lib/auth/clerk-wrappers', () => ({
 }));
 
 vi.mock('@/lib/dream-boards/draft', () => ({
-  getDreamBoardDraft: mocks.getDreamBoardDraft,
+  getHostCreateDreamBoardDraft: mocks.getHostCreateDreamBoardDraft,
 }));
 
 vi.mock('@/lib/host/create-view-model', () => ({
@@ -77,7 +77,7 @@ beforeEach(() => {
     title: 'Voucher',
     subtitle: 'Set up voucher contact details',
   });
-  mocks.getDreamBoardDraft.mockResolvedValue(makeDraft());
+  mocks.getHostCreateDreamBoardDraft.mockResolvedValue(makeDraft());
 });
 
 async function renderPage(sp: Record<string, string> = {}) {
@@ -123,7 +123,7 @@ describe('Create Voucher Page', () => {
     mocks.redirect.mockImplementation(() => {
       throw new Error('NEXT_REDIRECT');
     });
-    mocks.getDreamBoardDraft.mockResolvedValue(null);
+    mocks.getHostCreateDreamBoardDraft.mockResolvedValue(null);
     mocks.buildCreateFlowViewModel.mockReturnValue({
       redirectTo: null,
       stepLabel: 'Voucher details',

@@ -9,7 +9,7 @@ import {
   resolveWizardError,
 } from '@/components/create-wizard';
 import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
-import { getDreamBoardDraft } from '@/lib/dream-boards/draft';
+import { getHostCreateDreamBoardDraft } from '@/lib/dream-boards/draft';
 import {
   buildCreateFlowViewModel,
   CREATE_FLOW_TOTAL_STEPS,
@@ -61,7 +61,7 @@ export default async function CreateDatesPage({
   searchParams?: Promise<DatesSearchParams>;
 }) {
   const session = await requireHostAuth();
-  const draft = await getDreamBoardDraft(session.hostId);
+  const draft = await getHostCreateDreamBoardDraft(session.hostId);
   const view = buildCreateFlowViewModel({ step: 'dates', draft });
   if (view.redirectTo) {
     redirect(view.redirectTo);

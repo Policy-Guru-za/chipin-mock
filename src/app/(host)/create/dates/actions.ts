@@ -2,7 +2,10 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
-import { getDreamBoardDraft, updateDreamBoardDraft } from '@/lib/dream-boards/draft';
+import {
+  getHostCreateDreamBoardDraft,
+  updateHostCreateDreamBoardDraft,
+} from '@/lib/dream-boards/draft';
 import {
   isBirthdayDateValid,
   isCampaignEndDateValid,
@@ -88,7 +91,7 @@ export async function saveDatesAction(formData: FormData) {
   'use server';
 
   const session = await requireHostAuth();
-  const draft = await getDreamBoardDraft(session.hostId);
+  const draft = await getHostCreateDreamBoardDraft(session.hostId);
   const view = buildCreateFlowViewModel({ step: 'dates', draft });
   if (view.redirectTo) {
     redirect(view.redirectTo);
@@ -154,7 +157,7 @@ export async function saveDatesAction(formData: FormData) {
     partyDateTime = parsedPartyDateTime;
   }
 
-  await updateDreamBoardDraft(session.hostId, {
+  await updateHostCreateDreamBoardDraft(session.hostId, {
     birthdayDate,
     partyDate,
     campaignEndDate,

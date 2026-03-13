@@ -1,4 +1,4 @@
-import type { DreamBoardDraft } from '@/lib/dream-boards/draft';
+import type { HostCreateDreamBoardDraft } from '@/lib/dream-boards/draft';
 import { DEFAULT_HOST_CREATE_PAYOUT_METHOD } from '@/lib/dream-boards/payout-methods';
 
 export const CREATE_FLOW_TOTAL_STEPS = 5 as const;
@@ -51,7 +51,7 @@ const getStepSubtitle = (step: CreateFlowStep, childName?: string) => {
   return undefined;
 };
 
-const buildGiftPreview = (draft?: DreamBoardDraft): GiftPreview | undefined => {
+const buildGiftPreview = (draft?: HostCreateDreamBoardDraft): GiftPreview | undefined => {
   if (!draft?.giftName || !draft?.giftImageUrl) return undefined;
 
   return {
@@ -61,20 +61,20 @@ const buildGiftPreview = (draft?: DreamBoardDraft): GiftPreview | undefined => {
   };
 };
 
-const getGiftTitle = (draft?: DreamBoardDraft) => {
+const getGiftTitle = (draft?: HostCreateDreamBoardDraft) => {
   return draft?.giftName;
 };
 
-const isChildComplete = (draft?: DreamBoardDraft | null) =>
+const isChildComplete = (draft?: HostCreateDreamBoardDraft | null) =>
   [draft?.childName, draft?.childPhotoUrl, draft?.childAge].every(Boolean);
 
-const isGiftComplete = (draft?: DreamBoardDraft | null) =>
+const isGiftComplete = (draft?: HostCreateDreamBoardDraft | null) =>
   [draft?.giftName, draft?.giftImageUrl].every(Boolean);
 
-const isDatesComplete = (draft?: DreamBoardDraft | null) =>
+const isDatesComplete = (draft?: HostCreateDreamBoardDraft | null) =>
   Boolean(draft?.birthdayDate && draft?.partyDate && draft?.campaignEndDate);
 
-const isVoucherComplete = (draft?: DreamBoardDraft | null) =>
+const isVoucherComplete = (draft?: HostCreateDreamBoardDraft | null) =>
   Boolean(
     draft?.payoutEmail &&
       draft?.hostWhatsAppNumber &&
@@ -82,7 +82,7 @@ const isVoucherComplete = (draft?: DreamBoardDraft | null) =>
         DEFAULT_HOST_CREATE_PAYOUT_METHOD
   );
 
-const getCompletionState = (draft?: DreamBoardDraft | null) => ({
+const getCompletionState = (draft?: HostCreateDreamBoardDraft | null) => ({
   childComplete: isChildComplete(draft),
   giftComplete: isGiftComplete(draft),
   datesComplete: isDatesComplete(draft),
@@ -113,7 +113,7 @@ const getRedirectTarget = (
 
 export const buildCreateFlowViewModel = (params: {
   step: CreateFlowStep;
-  draft?: DreamBoardDraft | null;
+  draft?: HostCreateDreamBoardDraft | null;
 }): CreateFlowViewModel => {
   const { step, draft } = params;
   const completion = getCompletionState(draft);

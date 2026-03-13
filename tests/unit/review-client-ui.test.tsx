@@ -47,7 +47,6 @@ const draft = {
   campaignEndDate: '2026-02-28',
   giftName: 'PlayStation II',
   giftImageUrl: 'https://images.example/playstation.jpg',
-  payoutMethod: 'takealot_voucher' as const,
   payoutEmail: 'parent@example.com',
   hostWhatsAppNumber: '+27821234567',
 };
@@ -109,39 +108,6 @@ describe('ReviewClient', () => {
         'Takealot Voucher placeholder via parent@example.com and +27821234567'
       )
     ).toBeInTheDocument();
-  });
-
-  it('still renders legacy summary copy for Karri Card drafts', () => {
-    const publishAction = async (
-      _state: PublishState,
-      _formData: FormData
-    ): Promise<PublishState> => ({ status: 'preview' });
-    const karriDraft = {
-      ...draft,
-      payoutMethod: 'karri_card' as const,
-      karriCardHolderName: 'Max Charter',
-    };
-
-    render(<ReviewClient draft={karriDraft} publishAction={publishAction} />);
-
-    expect(screen.getByText('Legacy Karri Card (Max Charter)')).toBeInTheDocument();
-  });
-
-  it('still renders fallback summary copy for bank drafts', () => {
-    const publishAction = async (
-      _state: PublishState,
-      _formData: FormData
-    ): Promise<PublishState> => ({ status: 'preview' });
-    const bankDraft = {
-      ...draft,
-      payoutMethod: 'bank' as const,
-      bankName: 'FNB',
-      bankAccountLast4: '4567',
-    };
-
-    render(<ReviewClient draft={bankDraft} publishAction={publishAction} />);
-
-    expect(screen.getByText(/Bank transfer \(FNB\)/)).toBeInTheDocument();
   });
 
   it('does not show a charity edit link in the default flow', () => {

@@ -27,7 +27,7 @@
 - [`../docs/DOCUMENT_CONTROL_MATRIX.md`](../docs/DOCUMENT_CONTROL_MATRIX.md)
 - [`../src/lib/dream-boards/draft.ts`](../src/lib/dream-boards/draft.ts)
 - [`../src/lib/dream-boards/schema.ts`](../src/lib/dream-boards/schema.ts)
-- [`../src/app/(host)/create/review/actions.ts`](../src/app/(host)/create/review/actions.ts)
+- `src/app/(host)/create/review/actions.ts`
 - [`../src/lib/admin/service.ts`](../src/lib/admin/service.ts)
 - [`../src/lib/payouts/service.ts`](../src/lib/payouts/service.ts)
 
@@ -51,7 +51,7 @@
 
 ## Final State
 
-- Status: Active
-- Exit Criteria State: pending
+- Status: Done
+- Exit Criteria State: satisfied
 - Successor Slot: none
-- Notes: Bounded hardening session for Dreamboard pivot containment after specs 13–15 removed the active charity/Karri/fee product assumptions from the main runtime path.
+- Notes: Completed voucher-only first-party host-create boundary hardening, deactivated charity write-path leakage in admin/telemetry, reset active-flow fixtures to zero-fee voucher defaults, preserved explicit legacy compatibility coverage, and verified with the full docs/lint/typecheck/test gate.

@@ -34,8 +34,8 @@ describe('saveManualGiftAction', () => {
       requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })),
     }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () => baseDraft()),
-      updateDreamBoardDraft,
+      getHostCreateDreamBoardDraft: vi.fn(async () => baseDraft()),
+      updateHostCreateDreamBoardDraft: updateDreamBoardDraft,
     }));
 
     const { saveManualGiftAction } = await loadActionsModule();
@@ -66,8 +66,8 @@ describe('saveManualGiftAction', () => {
       requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })),
     }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () => baseDraft()),
-      updateDreamBoardDraft,
+      getHostCreateDreamBoardDraft: vi.fn(async () => baseDraft()),
+      updateHostCreateDreamBoardDraft: updateDreamBoardDraft,
     }));
 
     const { saveManualGiftAction } = await loadActionsModule();
@@ -90,8 +90,8 @@ describe('saveManualGiftAction', () => {
       requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })),
     }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () => baseDraft()),
-      updateDreamBoardDraft,
+      getHostCreateDreamBoardDraft: vi.fn(async () => baseDraft()),
+      updateHostCreateDreamBoardDraft: updateDreamBoardDraft,
     }));
 
     const { saveManualGiftAction } = await loadActionsModule();
@@ -122,8 +122,8 @@ describe('saveManualGiftAction', () => {
       requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })),
     }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () => ({ updatedAt: '2026-01-01T00:00:00.000Z' })),
-      updateDreamBoardDraft,
+      getHostCreateDreamBoardDraft: vi.fn(async () => ({ updatedAt: '2026-01-01T00:00:00.000Z' })),
+      updateHostCreateDreamBoardDraft: updateDreamBoardDraft,
     }));
 
     const { saveManualGiftAction } = await loadActionsModule();
@@ -146,7 +146,7 @@ describe('CreateGiftPage', () => {
       requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })),
     }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () =>
+      getHostCreateDreamBoardDraft: vi.fn(async () =>
         baseDraft({
           giftName: 'Scooter',
           message: 'Thanks everyone!',

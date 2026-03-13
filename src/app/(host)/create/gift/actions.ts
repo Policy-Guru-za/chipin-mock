@@ -2,7 +2,10 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
-import { getDreamBoardDraft, updateDreamBoardDraft } from '@/lib/dream-boards/draft';
+import {
+  getHostCreateDreamBoardDraft,
+  updateHostCreateDreamBoardDraft,
+} from '@/lib/dream-boards/draft';
 import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
 
 const manualGiftSchema = z.object({
@@ -22,7 +25,7 @@ export async function saveManualGiftAction(formData: FormData) {
   'use server';
 
   const session = await requireHostAuth();
-  const draft = await getDreamBoardDraft(session.hostId);
+  const draft = await getHostCreateDreamBoardDraft(session.hostId);
   const view = buildCreateFlowViewModel({ step: 'gift', draft });
   if (view.redirectTo) {
     redirect(view.redirectTo);
@@ -41,7 +44,7 @@ export async function saveManualGiftAction(formData: FormData) {
     redirect('/create/gift?error=invalid');
   }
 
-  await updateDreamBoardDraft(session.hostId, {
+  await updateHostCreateDreamBoardDraft(session.hostId, {
     giftName: result.data.giftName.trim(),
     giftDescription: undefined,
     giftIconId: undefined,

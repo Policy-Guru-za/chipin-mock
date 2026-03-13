@@ -14,7 +14,6 @@ const ALLOWED_PROPERTY_KEYS = new Set([
   'payout_id',
   'payout_type',
   'payout_method',
-  'charity_enabled',
   'dreamBoardId',
   'amountCents',
   'paymentMethod',

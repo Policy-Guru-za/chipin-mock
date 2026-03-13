@@ -5,7 +5,10 @@ import { z } from 'zod';
 
 import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
 import { isMockSentry } from '@/lib/config/feature-flags';
-import { getDreamBoardDraft, saveDreamBoardDraft } from '@/lib/dream-boards/draft';
+import {
+  getHostCreateDreamBoardDraft,
+  saveHostCreateDreamBoardDraft,
+} from '@/lib/dream-boards/draft';
 import { deleteChildPhoto, UploadChildPhotoError, uploadChildPhoto } from '@/lib/integrations/blob';
 import { log } from '@/lib/observability/logger';
 import * as Sentry from '@sentry/nextjs';
@@ -31,7 +34,7 @@ export async function saveChildDetailsAction(formData: FormData) {
   }
 
   const hasNewPhoto = photo instanceof File && photo.size > 0;
-  const existingDraft = await getDreamBoardDraft(session.hostId);
+  const existingDraft = await getHostCreateDreamBoardDraft(session.hostId);
 
   if (!hasNewPhoto && !existingDraft?.childPhotoUrl) {
     redirect('/create/child?error=photo');
@@ -44,14 +47,14 @@ export async function saveChildDetailsAction(formData: FormData) {
       if (existingDraft?.childPhotoUrl) {
         await deleteChildPhoto(existingDraft.childPhotoUrl);
       }
-      await saveDreamBoardDraft(session.hostId, {
+      await saveHostCreateDreamBoardDraft(session.hostId, {
         childName: result.data.childName,
         childAge: result.data.childAge,
         childPhotoUrl: upload.url,
         photoFilename: upload.filename,
       });
     } else {
-      await saveDreamBoardDraft(session.hostId, {
+      await saveHostCreateDreamBoardDraft(session.hostId, {
         childName: result.data.childName,
         childAge: result.data.childAge,
       });

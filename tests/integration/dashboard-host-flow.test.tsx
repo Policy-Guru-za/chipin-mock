@@ -67,8 +67,8 @@ const boardDetailRow = {
   message: 'A dream gift',
   status: 'closed',
   goalCents: 50000,
-  payoutMethod: 'karri_card' as const,
-  karriCardHolderName: 'Maya Parent',
+  payoutMethod: 'takealot_voucher' as const,
+  karriCardHolderName: null,
   bankAccountHolder: null,
   payoutEmail: 'parent@example.com',
   charityEnabled: false,
@@ -77,7 +77,7 @@ const boardDetailRow = {
   charityPercentageBps: null,
   charityThresholdCents: null,
   totalRaisedCents: 50000,
-  totalFeeCents: 1500,
+  totalFeeCents: 0,
   totalCharityCents: 0,
   contributionCount: 2,
   messageCount: 1,
@@ -174,7 +174,7 @@ describe('host dashboard flow', () => {
     const quickActionsHeading = screen.getByRole('heading', { name: /quick actions/i });
     expect(quickActionsHeading).toHaveClass('text-[16px]');
     expect(quickActionsHeading).not.toHaveClass('text-[28px]');
-    const payoutHeading = screen.getByRole('heading', { name: /payout details/i });
+    const payoutHeading = screen.getByRole('heading', { name: /voucher details/i });
     expect(payoutHeading).toHaveClass('text-[16px]');
     expect(payoutHeading).not.toHaveClass('text-[24px]');
     expect(screen.getByRole('button', { name: /download birthday messages/i })).toBeInTheDocument();
@@ -206,7 +206,8 @@ describe('host dashboard flow', () => {
     expect(screen.getByText(/Financial Summary/i)).toBeInTheDocument();
     expect(screen.getByText(/Total Raised/i)).toBeInTheDocument();
     expect(screen.queryByText(/Gifta Fee/i)).not.toBeInTheDocument();
-    expect(screen.getByText(/R\s*500/)).toBeInTheDocument();
+    expect(screen.getByText(/Your Voucher Value/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/R\s*500/).length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: /download birthday messages/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /download contributor list/i })).toBeInTheDocument();
   });

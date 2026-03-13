@@ -38,7 +38,7 @@ describe('savePayoutAction', () => {
       requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })),
     }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () =>
+      getHostCreateDreamBoardDraft: vi.fn(async () =>
         makeDraft({
           charityEnabled: true,
           charityId: '00000000-0000-4000-8000-000000000001',
@@ -52,7 +52,7 @@ describe('savePayoutAction', () => {
           bankAccountHolder: 'Maya Parent',
         })
       ),
-      updateDreamBoardDraft,
+      updateHostCreateDreamBoardDraft: updateDreamBoardDraft,
     }));
 
     const { savePayoutAction } = await loadModule();
@@ -65,18 +65,6 @@ describe('savePayoutAction', () => {
       payoutMethod: 'takealot_voucher',
       payoutEmail: 'parent@example.com',
       hostWhatsAppNumber: '+27821234567',
-      karriCardNumberEncrypted: undefined,
-      karriCardHolderName: undefined,
-      bankName: undefined,
-      bankAccountNumberEncrypted: undefined,
-      bankAccountLast4: undefined,
-      bankBranchCode: undefined,
-      bankAccountHolder: undefined,
-      charityEnabled: false,
-      charityId: undefined,
-      charitySplitType: undefined,
-      charityPercentageBps: undefined,
-      charityThresholdCents: undefined,
     });
   });
 
@@ -90,8 +78,8 @@ describe('savePayoutAction', () => {
       requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })),
     }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () => makeDraft()),
-      updateDreamBoardDraft: vi.fn(async () => undefined),
+      getHostCreateDreamBoardDraft: vi.fn(async () => makeDraft()),
+      updateHostCreateDreamBoardDraft: vi.fn(async () => undefined),
     }));
 
     const { savePayoutAction } = await loadModule();
@@ -113,8 +101,8 @@ describe('savePayoutAction', () => {
       requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })),
     }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () => makeDraft()),
-      updateDreamBoardDraft: vi.fn(async () => undefined),
+      getHostCreateDreamBoardDraft: vi.fn(async () => makeDraft()),
+      updateHostCreateDreamBoardDraft: vi.fn(async () => undefined),
     }));
 
     const { savePayoutAction } = await loadModule();
@@ -137,14 +125,14 @@ describe('savePayoutAction', () => {
       requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })),
     }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () =>
+      getHostCreateDreamBoardDraft: vi.fn(async () =>
         makeDraft({
           birthdayDate: undefined,
           partyDate: undefined,
           campaignEndDate: undefined,
         })
       ),
-      updateDreamBoardDraft: vi.fn(async () => undefined),
+      updateHostCreateDreamBoardDraft: vi.fn(async () => undefined),
     }));
 
     const { savePayoutAction } = await loadModule();

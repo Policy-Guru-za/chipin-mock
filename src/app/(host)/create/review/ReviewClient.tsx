@@ -14,10 +14,6 @@ import {
 } from '@/components/create-wizard';
 import { ConfettiTrigger } from '@/components/effects/ConfettiTrigger';
 import { formatBirthdayPartyLine } from '@/lib/dream-boards/party-visibility';
-import {
-  getDreamBoardGiftPayoutLabel,
-  type DreamBoardGiftPayoutMethod,
-} from '@/lib/dream-boards/payout-methods';
 import { CREATE_FLOW_TOTAL_STEPS } from '@/lib/host/create-view-model';
 import { parseDateOnly } from '@/lib/utils/date';
 
@@ -31,12 +27,8 @@ type ReviewDraftData = {
   campaignEndDate: string;
   giftName: string;
   giftImageUrl: string;
-  payoutMethod: DreamBoardGiftPayoutMethod;
   payoutEmail: string;
   hostWhatsAppNumber: string;
-  karriCardHolderName?: string;
-  bankName?: string;
-  bankAccountLast4?: string;
 };
 
 export type PublishState = {
@@ -67,16 +59,10 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
   const [copied, setCopied] = useState(false);
   const published = state.status === 'published';
   const shareUrl = state.shareUrl;
-  const voucherSummary = useMemo(() => {
-    if (draft.payoutMethod === 'bank') {
-      return `Bank transfer${draft.bankName ? ` (${draft.bankName})` : ''}${draft.bankAccountLast4 ? ` •••• ${draft.bankAccountLast4}` : ''}`;
-    }
-    if (draft.payoutMethod === 'karri_card') {
-      return `Legacy Karri Card${draft.karriCardHolderName ? ` (${draft.karriCardHolderName})` : ''}`;
-    }
-
-    return `${getDreamBoardGiftPayoutLabel(draft.payoutMethod)} placeholder via ${draft.payoutEmail} and ${draft.hostWhatsAppNumber}`;
-  }, [draft]);
+  const voucherSummary = useMemo(
+    () => `Takealot Voucher placeholder via ${draft.payoutEmail} and ${draft.hostWhatsAppNumber}`,
+    [draft.hostWhatsAppNumber, draft.payoutEmail]
+  );
   const partyDateTimeSummary = formatBirthdayPartyLine({
     birthdayDate: draft.birthdayDate,
     partyDate: draft.partyDate,

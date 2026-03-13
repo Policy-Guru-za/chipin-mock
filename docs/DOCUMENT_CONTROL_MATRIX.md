@@ -182,7 +182,8 @@ This matrix is generated from `scripts/docs/control-matrix.mjs`. Run `pnpm docs:
 | `spec/13_charity-product-disablement.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `spec/14_legacy-charity-admin-access.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `spec/15_dreamboard-truth-cleanup-follow-up.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/16_session-placeholder.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/16_dreamboard-pivot-hardening.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/17_session-placeholder.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `spec/SPEC_TEMPLATE.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `tasks/todo.md` | Tier 2 | historical-evidence | Ryan Laubscher | `progress.md`, `spec/00_overview.md`, `workflow-orchestration.md` | 2026-03-12 | `progress.md`, `spec/00_overview.md` |
 | `TESTING.md` | Tier 1 | current-operational | Ryan Laubscher | `package.json`, `vitest.config.ts`, `tests/`, `progress.md`, `spec/SPEC_TEMPLATE.md` | 2026-03-12 | — |

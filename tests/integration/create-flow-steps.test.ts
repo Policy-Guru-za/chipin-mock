@@ -27,6 +27,70 @@ const expectRedirect = async (promise: Promise<unknown>, expected: string) => {
   await expect(promise).rejects.toThrow(`REDIRECT:${expected}`);
 };
 
+const normalizeStoredDraft = (draft: Record<string, unknown>) => ({
+  ...draft,
+  payoutMethod: 'takealot_voucher',
+  karriCardNumberEncrypted: undefined,
+  karriCardHolderName: undefined,
+  bankName: undefined,
+  bankAccountNumberEncrypted: undefined,
+  bankAccountLast4: undefined,
+  bankBranchCode: undefined,
+  bankAccountHolder: undefined,
+  charityEnabled: false,
+  charityId: undefined,
+  charitySplitType: undefined,
+  charityPercentageBps: undefined,
+  charityThresholdCents: undefined,
+});
+
+const toHostCreateDraft = (draft: Record<string, unknown> | null | undefined) => {
+  if (!draft) return null;
+
+  const {
+    childName,
+    childAge,
+    birthdayDate,
+    partyDate,
+    partyDateTime,
+    campaignEndDate,
+    childPhotoUrl,
+    photoFilename,
+    giftName,
+    giftDescription,
+    giftIconId,
+    giftImageUrl,
+    giftImagePrompt,
+    goalCents,
+    payoutEmail,
+    hostWhatsAppNumber,
+    message,
+    updatedAt,
+  } = draft;
+
+  return {
+    childName,
+    childAge,
+    birthdayDate,
+    partyDate,
+    partyDateTime,
+    campaignEndDate,
+    childPhotoUrl,
+    photoFilename,
+    giftName,
+    giftDescription,
+    giftIconId,
+    giftImageUrl,
+    giftImagePrompt,
+    goalCents,
+    payoutMethod: 'takealot_voucher',
+    payoutEmail,
+    hostWhatsAppNumber,
+    message,
+    updatedAt,
+  };
+};
+
 const loadActions = async (store: DraftRecord) => {
   vi.resetModules();
 
@@ -40,17 +104,20 @@ const loadActions = async (store: DraftRecord) => {
     requireHostAuth: vi.fn(async () => ({ hostId })),
   }));
 
+  const writeDraft = vi.fn(async (id: string, draft: Record<string, unknown>) => {
+    const existing = store[id] ?? {};
+    store[id] = normalizeStoredDraft({
+      ...existing,
+      ...draft,
+      updatedAt: new Date().toISOString(),
+    });
+    return store[id];
+  });
+
   vi.doMock('@/lib/dream-boards/draft', () => ({
-    getDreamBoardDraft: vi.fn(async (id: string) => store[id] ?? null),
-    updateDreamBoardDraft: vi.fn(async (id: string, draft: Record<string, unknown>) => {
-      const existing = store[id] ?? {};
-      store[id] = {
-        ...existing,
-        ...draft,
-        updatedAt: new Date().toISOString(),
-      };
-      return store[id];
-    }),
+    getHostCreateDreamBoardDraft: vi.fn(async (id: string) => toHostCreateDraft(store[id] ?? null)),
+    updateHostCreateDreamBoardDraft: writeDraft,
+    updateDreamBoardDraft: writeDraft,
   }));
 
   const datesModule = await import('@/app/(host)/create/dates/actions');

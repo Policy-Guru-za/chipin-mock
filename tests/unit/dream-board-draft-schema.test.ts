@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { dreamBoardDraftSchema } from '@/lib/dream-boards/schema';
+import { hostCreateDreamBoardDraftSchema } from '@/lib/dream-boards/schema';
 
 const validDraft = {
   childName: 'Maya',
@@ -16,21 +16,19 @@ const validDraft = {
   giftImageUrl: '/icons/gifts/ballet.png',
   giftImagePrompt: undefined,
   goalCents: 25000,
-  payoutMethod: 'karri_card' as const,
+  payoutMethod: 'takealot_voucher' as const,
   payoutEmail: 'parent@example.com',
-  karriCardNumberEncrypted: 'enc-card',
-  karriCardHolderName: 'Maya Parent',
   hostWhatsAppNumber: '+27821234567',
 };
 
-describe('dreamBoardDraftSchema', () => {
+describe('hostCreateDreamBoardDraftSchema', () => {
   it('accepts icon paths and optional short descriptions', () => {
-    const parsed = dreamBoardDraftSchema.safeParse(validDraft);
+    const parsed = hostCreateDreamBoardDraftSchema.safeParse(validDraft);
     expect(parsed.success).toBe(true);
   });
 
   it('rejects non-icon gift image paths', () => {
-    const parsed = dreamBoardDraftSchema.safeParse({
+    const parsed = hostCreateDreamBoardDraftSchema.safeParse({
       ...validDraft,
       giftImageUrl: 'https://images.example/gift.jpg',
     });
@@ -38,10 +36,19 @@ describe('dreamBoardDraftSchema', () => {
   });
 
   it('accepts null partyDateTime when omitted from dates step', () => {
-    const parsed = dreamBoardDraftSchema.safeParse({
+    const parsed = hostCreateDreamBoardDraftSchema.safeParse({
       ...validDraft,
       partyDateTime: null,
     });
     expect(parsed.success).toBe(true);
+  });
+
+  it('rejects legacy payout residue in the active host-create schema', () => {
+    const parsed = hostCreateDreamBoardDraftSchema.safeParse({
+      ...validDraft,
+      karriCardNumberEncrypted: 'enc-card',
+    });
+
+    expect(parsed.success).toBe(false);
   });
 });

@@ -31,7 +31,6 @@ describe('ux v2 write path gates', () => {
   it('returns explicit karri block reason when karri path is disabled', () => {
     process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'false';
     process.env.UX_V2_ENABLE_BANK_WRITE_PATH = 'true';
-    process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH = 'true';
 
     expect(
       resolveWritePathBlockReason({
@@ -45,7 +44,6 @@ describe('ux v2 write path gates', () => {
   it('returns explicit bank block reason when bank path is disabled', () => {
     process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
     process.env.UX_V2_ENABLE_BANK_WRITE_PATH = 'false';
-    process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH = 'true';
 
     expect(
       resolveWritePathBlockReason({
@@ -56,10 +54,10 @@ describe('ux v2 write path gates', () => {
     ).toBe('Bank payout method is not yet enabled');
   });
 
-  it('returns explicit charity block reason when charity path is disabled', () => {
+  it('keeps charity write path blocked even when the legacy flag is enabled', () => {
     process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
     process.env.UX_V2_ENABLE_BANK_WRITE_PATH = 'true';
-    process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH = 'false';
+    process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH = 'true';
 
     expect(
       resolveWritePathBlockReason({
@@ -73,13 +71,12 @@ describe('ux v2 write path gates', () => {
   it('allows write paths when requested paths are enabled', () => {
     process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
     process.env.UX_V2_ENABLE_BANK_WRITE_PATH = 'true';
-    process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH = 'true';
 
     expect(
       resolveWritePathBlockReason({
         karriRequested: true,
         bankRequested: true,
-        charityRequested: true,
+        charityRequested: false,
       })
     ).toBeNull();
   });

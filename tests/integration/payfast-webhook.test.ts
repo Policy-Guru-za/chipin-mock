@@ -81,7 +81,7 @@ describe('PayFast webhook integration - success', () => {
       id: 'contrib-1',
       dreamBoardId: 'board-1',
       amountCents: 5000,
-      feeCents: 250,
+      feeCents: 0,
       paymentStatus: 'pending',
     };
 
@@ -89,7 +89,7 @@ describe('PayFast webhook integration - success', () => {
     const updateContributionStatus = vi.fn(async () => undefined);
     const markDreamBoardFundedIfNeeded = vi.fn(async () => false);
     const getDreamBoardNotificationContext = vi.fn(async () => null);
-    const completeContributionWithResolvedCharity = vi.fn(async () => 525);
+    const completeContributionWithResolvedCharity = vi.fn(async () => null);
     const emitWebhookEventForPartner = vi.fn(async () => ['evt-1']);
 
     vi.doMock('@/lib/db/queries', () => ({
@@ -121,7 +121,7 @@ describe('PayFast webhook integration - success', () => {
       ['pf_payment_id', 'pf-456'],
       ['payment_status', 'COMPLETE'],
       ['timestamp', new Date().toISOString()],
-      ['amount_gross', '52.50'],
+      ['amount_gross', '50.00'],
     ];
 
     const rawBody = buildItnBody(fields, process.env.PAYFAST_PASSPHRASE);

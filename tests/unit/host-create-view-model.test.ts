@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import type { DreamBoardDraft } from '@/lib/dream-boards/draft';
+import type { HostCreateDreamBoardDraft } from '@/lib/dream-boards/draft';
 import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
 
-const baseDraft: DreamBoardDraft = {
+const baseDraft: HostCreateDreamBoardDraft = {
   childName: 'Maya',
   childAge: 7,
   childPhotoUrl: 'https://example.com/child.jpg',
@@ -94,7 +94,7 @@ describe('buildCreateFlowViewModel', () => {
     expect(
       buildCreateFlowViewModel({
         step: 'review',
-        draft: { ...baseDraft, payoutMethod: 'bank' },
+        draft: { ...baseDraft, payoutEmail: undefined },
       }).redirectTo
     ).toBe('/create/voucher');
   });

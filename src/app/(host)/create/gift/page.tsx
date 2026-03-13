@@ -14,7 +14,7 @@ import {
   resolveWizardError,
 } from '@/components/create-wizard';
 import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
-import { getDreamBoardDraft } from '@/lib/dream-boards/draft';
+import { getHostCreateDreamBoardDraft } from '@/lib/dream-boards/draft';
 import {
   buildCreateFlowViewModel,
   CREATE_FLOW_TOTAL_STEPS,
@@ -28,10 +28,10 @@ const giftErrorMessages: Record<string, string> = {
   invalid: 'Please complete all required fields.',
 };
 
-const resolveDefaultGiftName = (draft?: Awaited<ReturnType<typeof getDreamBoardDraft>>) =>
+const resolveDefaultGiftName = (draft?: Awaited<ReturnType<typeof getHostCreateDreamBoardDraft>>) =>
   draft?.giftName ?? '';
 
-const resolveDefaultMessage = (draft?: Awaited<ReturnType<typeof getDreamBoardDraft>>) =>
+const resolveDefaultMessage = (draft?: Awaited<ReturnType<typeof getHostCreateDreamBoardDraft>>) =>
   draft?.message ?? '';
 
 export default async function CreateGiftPage({
@@ -40,7 +40,7 @@ export default async function CreateGiftPage({
   searchParams?: Promise<GiftSearchParams>;
 }) {
   const session = await requireHostAuth();
-  const draft = await getDreamBoardDraft(session.hostId);
+  const draft = await getHostCreateDreamBoardDraft(session.hostId);
   const view = buildCreateFlowViewModel({ step: 'gift', draft });
   if (view.redirectTo) {
     redirect(view.redirectTo);

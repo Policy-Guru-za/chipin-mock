@@ -47,7 +47,7 @@ describe('SnapScan webhook integration - success', () => {
       id: 'contrib-1',
       dreamBoardId: 'board-1',
       amountCents: 5000,
-      feeCents: 250,
+      feeCents: 0,
       paymentStatus: 'pending',
     };
 
@@ -72,7 +72,7 @@ describe('SnapScan webhook integration - success', () => {
     const payload = {
       id: 'SNAP-123',
       status: 'COMPLETED',
-      amount: 5250,
+      amount: 5000,
       timestamp: new Date().toISOString(),
     };
     const rawBody = new URLSearchParams({

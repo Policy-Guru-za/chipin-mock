@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   requireHostAuth: vi.fn(),
-  getDreamBoardDraft: vi.fn(),
+  getHostCreateDreamBoardDraft: vi.fn(),
   safeParse: vi.fn(),
   buildCreateFlowViewModel: vi.fn(),
   publishDreamBoardAction: vi.fn(),
@@ -20,11 +20,11 @@ vi.mock('@/lib/auth/clerk-wrappers', () => ({
 }));
 
 vi.mock('@/lib/dream-boards/draft', () => ({
-  getDreamBoardDraft: mocks.getDreamBoardDraft,
+  getHostCreateDreamBoardDraft: mocks.getHostCreateDreamBoardDraft,
 }));
 
 vi.mock('@/lib/dream-boards/schema', () => ({
-  dreamBoardDraftSchema: {
+  hostCreateDreamBoardDraftSchema: {
     safeParse: mocks.safeParse,
   },
 }));
@@ -61,7 +61,8 @@ vi.mock('@/app/(host)/create/review/ReviewClient', () => ({
     <div
       data-testid="review-client"
       data-child-name={String((props.draft as Record<string, unknown>).childName)}
-      data-payout-method={String((props.draft as Record<string, unknown>).payoutMethod)}
+      data-payout-email={String((props.draft as Record<string, unknown>).payoutEmail)}
+      data-host-whatsapp-number={String((props.draft as Record<string, unknown>).hostWhatsAppNumber)}
     />
   ),
 }));
@@ -122,11 +123,9 @@ const validDraft = {
   campaignEndDate: '2026-06-12',
   giftName: 'Scooter',
   giftImageUrl: '/icons/gifts/scooter.png',
-  payoutMethod: 'karri_card' as const,
+  payoutMethod: 'takealot_voucher' as const,
   payoutEmail: 'parent@example.com',
   hostWhatsAppNumber: '+27821234567',
-  karriCardHolderName: 'Maya Parent',
-  charityEnabled: false,
 };
 
 afterEach(() => {
@@ -141,7 +140,7 @@ beforeEach(() => {
     title: 'Review',
     subtitle: 'Review',
   });
-  mocks.getDreamBoardDraft.mockResolvedValue(validDraft);
+  mocks.getHostCreateDreamBoardDraft.mockResolvedValue(validDraft);
   mocks.safeParse.mockReturnValue({ success: true, data: validDraft });
 });
 
@@ -157,21 +156,25 @@ describe('Create Review Page', () => {
     expect(html).toContain('data-child-name="Maya"');
   });
 
-  it('passes karri_card payout method from draft', async () => {
+  it('passes voucher contact details from draft', async () => {
     const html = await renderPage();
-    expect(html).toContain('data-payout-method="karri_card"');
+    expect(html).toContain('data-payout-email="parent@example.com"');
+    expect(html).toContain('data-host-whatsapp-number="+27821234567"');
   });
 
-  it('passes bank payout method when draft has bank', async () => {
-    const bankDraft = {
+  it('redirects to /create when active draft schema validation fails', async () => {
+    mocks.redirect.mockImplementation(() => {
+      throw new Error('NEXT_REDIRECT');
+    });
+    const invalidDraft = {
       ...validDraft,
-      payoutMethod: 'bank' as const,
+      bankName: 'FNB',
     };
-    mocks.getDreamBoardDraft.mockResolvedValue(bankDraft);
-    mocks.safeParse.mockReturnValue({ success: true, data: bankDraft });
+    mocks.getHostCreateDreamBoardDraft.mockResolvedValue(invalidDraft);
+    mocks.safeParse.mockReturnValue({ success: false, error: { issues: [] } });
 
-    const html = await renderPage();
-    expect(html).toContain('data-payout-method="bank"');
+    await expect(renderPage()).rejects.toThrow('NEXT_REDIRECT');
+    expect(mocks.redirect).toHaveBeenCalledWith('/create');
   });
 
   it('redirects when view.redirectTo is set', async () => {
@@ -203,7 +206,7 @@ describe('Create Review Page', () => {
     mocks.redirect.mockImplementation(() => {
       throw new Error('NEXT_REDIRECT');
     });
-    mocks.getDreamBoardDraft.mockResolvedValue(null);
+    mocks.getHostCreateDreamBoardDraft.mockResolvedValue(null);
     mocks.safeParse.mockReturnValue({ success: false, error: { issues: [] } });
 
     await expect(renderPage()).rejects.toThrow('NEXT_REDIRECT');

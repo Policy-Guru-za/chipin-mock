@@ -28,7 +28,7 @@ describe('CreateDreamBoardPage fresh-start routing (unauthenticated)', () => {
       getClerkUrls: () => ({ signInUrl: '/sign-in' }),
     }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () => null),
+      getHostCreateDreamBoardDraft: vi.fn(async () => null),
       clearDreamBoardDraft: vi.fn(async () => undefined),
     }));
     vi.doMock('@/lib/integrations/blob', () => ({ deleteChildPhoto: vi.fn(async () => undefined) }));
@@ -50,7 +50,7 @@ describe('CreateDreamBoardPage fresh-start routing (unauthenticated)', () => {
       getClerkUrls: () => ({ signInUrl: '/sign-in?flow=host' }),
     }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () => null),
+      getHostCreateDreamBoardDraft: vi.fn(async () => null),
       clearDreamBoardDraft: vi.fn(async () => undefined),
     }));
     vi.doMock('@/lib/integrations/blob', () => ({ deleteChildPhoto: vi.fn(async () => undefined) }));
@@ -69,7 +69,7 @@ describe('CreateDreamBoardPage fresh-start routing (authenticated)', () => {
     const redirectMock = vi.fn((url: string) => {
       throw new Error(`REDIRECT:${url}`);
     });
-    const getDreamBoardDraft = vi.fn(async () => null);
+    const getHostCreateDreamBoardDraft = vi.fn(async () => null);
     const clearDreamBoardDraft = vi.fn(async () => undefined);
     const deleteChildPhoto = vi.fn(async () => undefined);
 
@@ -81,7 +81,7 @@ describe('CreateDreamBoardPage fresh-start routing (authenticated)', () => {
       getClerkUrls: () => ({ signInUrl: '/sign-in' }),
     }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft,
+      getHostCreateDreamBoardDraft,
       clearDreamBoardDraft,
     }));
     vi.doMock('@/lib/integrations/blob', () => ({ deleteChildPhoto }));
@@ -90,7 +90,7 @@ describe('CreateDreamBoardPage fresh-start routing (authenticated)', () => {
     const { default: CreateDreamBoardPage } = await loadPage();
 
     await expect(CreateDreamBoardPage()).rejects.toThrow('REDIRECT:/create/child');
-    expect(getDreamBoardDraft).toHaveBeenCalledWith('host-1');
+    expect(getHostCreateDreamBoardDraft).toHaveBeenCalledWith('host-1');
     expect(deleteChildPhoto).not.toHaveBeenCalled();
     expect(clearDreamBoardDraft).toHaveBeenCalledWith('host-1');
   });
@@ -99,7 +99,9 @@ describe('CreateDreamBoardPage fresh-start routing (authenticated)', () => {
     const redirectMock = vi.fn((url: string) => {
       throw new Error(`REDIRECT:${url}`);
     });
-    const getDreamBoardDraft = vi.fn(async () => ({ childPhotoUrl: 'https://blob.example/child.jpg' }));
+    const getHostCreateDreamBoardDraft = vi.fn(async () => ({
+      childPhotoUrl: 'https://blob.example/child.jpg',
+    }));
     const clearDreamBoardDraft = vi.fn(async () => undefined);
     const deleteChildPhoto = vi.fn(async () => undefined);
 
@@ -111,7 +113,7 @@ describe('CreateDreamBoardPage fresh-start routing (authenticated)', () => {
       getClerkUrls: () => ({ signInUrl: '/sign-in' }),
     }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft,
+      getHostCreateDreamBoardDraft,
       clearDreamBoardDraft,
     }));
     vi.doMock('@/lib/integrations/blob', () => ({ deleteChildPhoto }));
@@ -131,7 +133,7 @@ describe('CreateDreamBoardPage fresh-start routing (authenticated)', () => {
     const redirectMock = vi.fn((url: string) => {
       throw new Error(`REDIRECT:${url}`);
     });
-    const getDreamBoardDraft = vi.fn(async () => {
+    const getHostCreateDreamBoardDraft = vi.fn(async () => {
       throw new Error('kv read failed');
     });
     const clearDreamBoardDraft = vi.fn(async () => undefined);
@@ -146,7 +148,7 @@ describe('CreateDreamBoardPage fresh-start routing (authenticated)', () => {
       getClerkUrls: () => ({ signInUrl: '/sign-in' }),
     }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft,
+      getHostCreateDreamBoardDraft,
       clearDreamBoardDraft,
     }));
     vi.doMock('@/lib/integrations/blob', () => ({ deleteChildPhoto }));
@@ -186,7 +188,9 @@ describe('CreateDreamBoardPage fresh-start routing (authenticated failures)', ()
       getClerkUrls: () => ({ signInUrl: '/sign-in' }),
     }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () => ({ childPhotoUrl: 'https://blob.example/child.jpg' })),
+      getHostCreateDreamBoardDraft: vi.fn(async () => ({
+        childPhotoUrl: 'https://blob.example/child.jpg',
+      })),
       clearDreamBoardDraft,
     }));
     vi.doMock('@/lib/integrations/blob', () => ({ deleteChildPhoto }));
@@ -223,7 +227,9 @@ describe('CreateDreamBoardPage fresh-start routing (authenticated failures)', ()
       getClerkUrls: () => ({ signInUrl: '/sign-in' }),
     }));
     vi.doMock('@/lib/dream-boards/draft', () => ({
-      getDreamBoardDraft: vi.fn(async () => ({ childPhotoUrl: 'https://blob.example/child.jpg' })),
+      getHostCreateDreamBoardDraft: vi.fn(async () => ({
+        childPhotoUrl: 'https://blob.example/child.jpg',
+      })),
       clearDreamBoardDraft,
     }));
     vi.doMock('@/lib/integrations/blob', () => ({ deleteChildPhoto }));

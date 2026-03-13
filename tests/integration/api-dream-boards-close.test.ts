@@ -28,7 +28,7 @@ const buildBoard = (overrides: Record<string, unknown> = {}) => ({
   giftImageUrl: '/icons/gifts/train.png',
   giftImagePrompt: 'A bright train set',
   goalCents: 35000,
-  payoutMethod: 'karri_card',
+  payoutMethod: 'takealot_voucher',
   message: 'Make it happen',
   status: 'active',
   createdAt: new Date('2026-01-10T10:00:00.000Z'),
@@ -175,7 +175,7 @@ describe('POST /api/v1/dream-boards/[id]/close', () => {
     mockAuth();
     const update = mockDb();
 
-    const board = buildBoard({ status: 'active', payoutMethod: 'karri_card' });
+    const board = buildBoard({ status: 'active', payoutMethod: 'takealot_voucher' });
     const closed = buildBoard({ status: 'closed', raisedCents: 20000 });
     const getDreamBoardByPublicId = vi
       .fn()
@@ -184,14 +184,14 @@ describe('POST /api/v1/dream-boards/[id]/close', () => {
 
     const createPayoutsForDreamBoard = vi.fn(async () => ({
       created: [
-        { id: 'payout-gift', type: 'karri_card' },
+        { id: 'payout-gift', type: 'takealot_voucher' },
         { id: 'payout-charity', type: 'charity' },
       ],
     }));
     const listPayoutsForDreamBoard = vi.fn(async () => [
       {
         id: 'payout-gift',
-        type: 'karri_card',
+        type: 'takealot_voucher',
         status: 'pending',
         netCents: 16200,
       },
@@ -228,7 +228,7 @@ describe('POST /api/v1/dream-boards/[id]/close', () => {
       expect.objectContaining({ dreamBoardId: 'board-1' })
     );
     expect(payload.data.payouts).toEqual([
-      expect.objectContaining({ type: 'karri_card', net_cents: 16200 }),
+      expect.objectContaining({ type: 'takealot_voucher', net_cents: 16200 }),
     ]);
   });
 

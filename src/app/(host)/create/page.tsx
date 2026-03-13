@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 
 import { getClerkUrls } from '@/lib/auth/clerk-config';
 import { getHostAuth } from '@/lib/auth/clerk-wrappers';
-import { clearDreamBoardDraft, getDreamBoardDraft } from '@/lib/dream-boards/draft';
+import { clearDreamBoardDraft, getHostCreateDreamBoardDraft } from '@/lib/dream-boards/draft';
 import { deleteChildPhoto } from '@/lib/integrations/blob';
 import { log } from '@/lib/observability/logger';
 const buildRedirectUrl = (baseUrl: string, redirectUrl: string) =>
@@ -13,7 +13,7 @@ export default async function CreateDreamBoardPage() {
   if (auth) {
     let existingPhotoUrl: string | undefined;
     try {
-      const existingDraft = await getDreamBoardDraft(auth.hostId);
+      const existingDraft = await getHostCreateDreamBoardDraft(auth.hostId);
       existingPhotoUrl = existingDraft?.childPhotoUrl;
     } catch (error) {
       log('warn', 'create_fresh_start_draft_read_failed', {

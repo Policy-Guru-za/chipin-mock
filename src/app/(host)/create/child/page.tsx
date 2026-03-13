@@ -8,7 +8,7 @@ import {
   resolveWizardError,
 } from '@/components/create-wizard';
 import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
-import { getDreamBoardDraft } from '@/lib/dream-boards/draft';
+import { getHostCreateDreamBoardDraft } from '@/lib/dream-boards/draft';
 import {
   buildCreateFlowViewModel,
   CREATE_FLOW_TOTAL_STEPS,
@@ -31,7 +31,7 @@ export default async function CreateChildPage({
   searchParams?: Promise<ChildSearchParams>;
 }) {
   const session = await requireHostAuth();
-  const draft = await getDreamBoardDraft(session.hostId);
+  const draft = await getHostCreateDreamBoardDraft(session.hostId);
   const resolvedSearchParams = await searchParams;
   const error = resolvedSearchParams?.error;
   const errorMessage = resolveWizardError(error, childErrorMessages, {
