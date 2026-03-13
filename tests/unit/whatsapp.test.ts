@@ -44,7 +44,7 @@ afterEach(() => {
 });
 
 describe('whatsapp integration', () => {
-  it('sends a dream board link template using modern WA_* env vars', async () => {
+  it('sends a Dreamboard link template using modern WA_* env vars', async () => {
     const fetchMock = vi.fn(async () => ({
       ok: true,
       text: async () => JSON.stringify({ messages: [{ id: 'wamid-1' }] }),

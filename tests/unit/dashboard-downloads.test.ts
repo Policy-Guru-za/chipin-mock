@@ -47,7 +47,7 @@ describe('internal download routes', () => {
     expect(response.status).toBe(401);
   });
 
-  it('returns 404 when dream board is missing', async () => {
+  it('returns 404 when a Dreamboard is missing', async () => {
     authMocks.getInternalHostAuth.mockResolvedValue({ hostId: 'host-1', email: 'host@example.com' });
     queryMocks.getDreamBoardHostAccessById.mockResolvedValue(null);
 

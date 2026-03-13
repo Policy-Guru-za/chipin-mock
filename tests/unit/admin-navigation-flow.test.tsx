@@ -4,6 +4,8 @@ import { NextRequest } from 'next/server';
 afterEach(() => {
   vi.unmock('next/navigation');
   vi.unmock('@/lib/auth/clerk-wrappers');
+  vi.unmock('@/lib/admin');
+  vi.unstubAllEnvs();
   vi.clearAllMocks();
   vi.resetModules();
 });
@@ -54,5 +56,29 @@ describe('admin legacy payouts redirects', () => {
     expect(response.headers.get('location')).toBe(
       'https://gifta.local/admin/payouts/export?status=pending',
     );
+  });
+
+  it('keeps /admin/charities directly reachable for historical support', async () => {
+    vi.doMock('next/navigation', () => ({ redirect: vi.fn() }));
+    vi.doMock('@/lib/admin', () => ({
+      listAdminCharities: vi.fn(async () => ({
+        items: [],
+        totalCount: 0,
+        nextCursor: null,
+      })),
+      parseAdminCharityFilters: vi.fn(() => ({})),
+    }));
+
+    const pageModule = await import('@/app/(admin)/admin/charities/page');
+    const adminModule = await import('@/lib/admin');
+    const navigationModule = await import('next/navigation');
+
+    const view = await pageModule.default({
+      searchParams: Promise.resolve({}),
+    });
+
+    expect(navigationModule.redirect).not.toHaveBeenCalled();
+    expect(adminModule.listAdminCharities).toHaveBeenCalledTimes(1);
+    expect(view).toBeTruthy();
   });
 });

@@ -1,7 +1,7 @@
 # Gifta Canonical Spec (Source of Truth)
 
-> **Version:** 2.0.6
-> **Last Updated:** March 12, 2026
+> **Version:** 2.0.7
+> **Last Updated:** March 13, 2026
 > **Status:** Authoritative
 > **Supersedes:** v1.1.1 (January 21, 2026)
 
@@ -19,6 +19,7 @@ This document reflects current runtime behavior in `src/` and `drizzle/migration
 
 | Version | Date | Summary |
 |---------|------|---------|
+| 2.0.7 | 2026-03-13 | Charity product disablement: active Dreamboard host, guest, thank-you, dashboard, landing, admin navigation, and public Dreamboard API/OpenAPI surfaces no longer expose charity; historical charity data remains for ops/admin reconciliation only. |
 | 2.0.6 | 2026-03-12 | Karri default-path decoupling: standard Dreamboard runtime no longer depends on Karri config, public API `karri_card` writes are gated by `UX_V2_ENABLE_KARRI_WRITE_PATH`, and readiness reports Karri as disabled unless write-path or automation mode is enabled. |
 | 2.0.5 | 2026-03-12 | Dreamboard create-flow pivot: default host creation is now `child -> gift -> dates -> voucher -> review`, charity is removed from the active host path, and new host-created boards use `takealot_voucher` as the real payout-method runtime truth. |
 | 2.0.4 | 2026-03-12 | Dreamboard fee removal: active checkout is now fee-free, contributor/admin/host fee copy removed from active surfaces, and fee-related contract fields are retained as deprecated compatibility fields only. |
@@ -60,23 +61,24 @@ This document reflects current runtime behavior in `src/` and `drizzle/migration
   - A single Dreamboard may produce multiple payout rows: one gift payout (type matches `payout_method`) and optionally one charity payout (type = `charity`).
   - Uniqueness constraint: one payout per `(dream_board_id, type)`.
   - Dreamboard transitions to `paid_out` only when all required payout rows for that board are `completed`.
-- **Current runtime state:** payout row creation supports `karri_card`, `bank`, `takealot_voucher`, and `charity` based on board configuration and contribution totals. Standard Dreamboard mode defaults to `takealot_voucher`; `karri_card` writes are disabled unless `UX_V2_ENABLE_KARRI_WRITE_PATH=true`. Automated execution is implemented for `karri_card` only (`KARRI_AUTOMATION_ENABLED`); bank, `takealot_voucher`, and charity payouts currently require manual completion.
+- **Current runtime state:** active Dreamboard product flows create no new charity allocation. Historical boards can still carry existing charity totals, and payout planning can still create historical charity payout rows where those legacy allocations already exist. Standard Dreamboard mode defaults to `takealot_voucher`; `karri_card` writes are disabled unless `UX_V2_ENABLE_KARRI_WRITE_PATH=true`. Automated execution is implemented for `karri_card` only (`KARRI_AUTOMATION_ENABLED`); bank, `takealot_voucher`, and historical charity payouts currently require manual completion.
+- **Public partner payout contract:** `PayoutType` is gift-only (`karri_card | bank | takealot_voucher`); charity payout rows are filtered out of public API responses.
 
 ### Charity Model
 
-- **Optional feature:** charity remains in the data model, admin catalog, and partner/API surfaces, but it is removed from the active default host create flow.
-- **Default host create path:** new host-created Dreamboards publish with `charity_enabled = false`; the active wizard does not surface charity selection.
-- **When disabled:** `charity_enabled = false`; all charity config fields must be NULL.
-- **When enabled:** host selects an active charity and configures a split mode.
-- **Split modes** (Decision Register D-003, LOCKED):
+- **Active product state:** charity is disabled for the live Dreamboard product. Host create, public Dreamboard pages, thank-you pages, host dashboard views, landing pages, and the public Dreamboard API/OpenAPI do not expose charity.
+- **Persistence policy:** new host-created Dreamboards publish with `charity_enabled = false`; active product writes clear all charity config fields to NULL.
+- **Contribution policy:** active product contribution completion writes `charity_cents = null`, so no new charity allocation is created in the default environment.
+- **Historical scope retained:** charity remains in the schema, ledger math, admin data, and payout engine so historical charity-enabled Dreamboards can still reconcile correctly.
+- **Legacy split modes** (Decision Register D-003, LOCKED; historical/internal only):
   - `percentage`: a percentage (5%–50%, stored as basis points 500–5000 in `charity_percentage_bps`) of each contribution is allocated to charity.
   - `threshold`: a fixed total amount (minimum R50, stored in `charity_threshold_cents`) is allocated to charity; once the threshold is met, subsequent contributions go entirely to the gift.
 - **Charity entity:** managed by admin; must be `is_active = true` to be selectable.
   - Create-time required fields: `name`, `description`, `category`, `logo_url`.
   - Optional operational fields (editable later): `website`, `contact_name`, `contact_email`, `bank_details_encrypted`.
 - **Charity payout cadence:** close-based charity payout rows remain the accounting source; monthly settlement is a manual ops reconciliation/disbursement process over that ledger (Decision Register D-008, LOCKED).
-- **Validation:** incomplete charity configuration is rejected at both API and database constraint levels.
-- **Runtime gate:** partner API charity writes are blocked unless `UX_V2_ENABLE_CHARITY_WRITE_PATH=true`.
+- **Validation:** active Dreamboard public API request bodies reject charity fields entirely; database constraints still protect historical/internal charity configuration integrity.
+- **Legacy flag note:** `UX_V2_ENABLE_CHARITY_WRITE_PATH` remains as legacy code-path configuration, but active Dreamboard public contract routes do not surface charity writes.
 
 ### Fee Semantics
 
@@ -95,8 +97,8 @@ Decision Register D-004 (LOCKED): fee-free active checkout with legacy fee compa
 ### Public vs Private Display
 
 - **Public guest view:** percentage and totals raised vs goal are displayed. Individual contribution amounts are not displayed publicly (only aggregate progress).
-- **Host view:** exact amounts, contributor details, payout totals, charity allocation breakdown (if enabled).
-- **Funded state:** guest view remains gift-focused. If charity is enabled, the public board shows the charity name and a brief description but does not expose split percentages or allocation details.
+- **Host view:** exact amounts, contributor details, and payout totals are displayed; active product host UI does not show charity allocation breakdown.
+- **Funded state:** guest view remains gift-focused with no charity panel in active product.
 - **Closed state:** contributors see "This Dreamboard has closed" with a thank-you message. CTA is disabled.
 
 ### Payments
@@ -121,6 +123,7 @@ Decision Register D-004 (LOCKED): fee-free active checkout with legacy fee compa
 
 - Generated OpenAPI host: `https://api.gifta.co.za/v1`
 - Local OpenAPI host: `http://localhost:3000/v1`
+- Active Dreamboard public contract omits charity fields from Dreamboard and contribution payloads, and filters charity payout rows from payout responses.
 - Partner API key prefixes remain `cpk_live_` / `cpk_test_`
 - Outgoing webhook signing headers remain `X-ChipIn-Signature` / `X-ChipIn-Event-Id`
 
@@ -174,6 +177,7 @@ Payout:
 - Constraint: when method = `takealot_voucher`, all Karri/bank fields must be NULL.
 
 Charity:
+- Schema retained for historical/internal use; active product writes clear these fields and public Dreamboard APIs omit them.
 - `charity_enabled` (boolean, not null, default false)
 - `charity_id` (FK to charities, nullable — required when enabled)
 - `charity_split_type` = `percentage | threshold` (enum, nullable — required when enabled)
@@ -198,7 +202,7 @@ Timestamps:
 - `amount_cents` (integer, not null, minimum 2000 = R20) — the gift amount chosen by the contributor.
 - `fee_cents` (integer, not null) — legacy compatibility field; new rows write `0`.
 - `net_cents` (generated column: `amount_cents - fee_cents`) — legacy contribution compatibility field; equals `amount_cents` for new rows and does not drive goal progress.
-- `charity_cents` (integer, nullable) — portion allocated to charity from this contribution.
+- `charity_cents` (integer, nullable) — historical/internal charity allocation; active product writes `null`.
 - `payment_provider` = `payfast | ozow | snapscan` (enum, not null)
 - `payment_ref` (not null, unique with provider), `payment_status` = `pending | processing | completed | failed | refunded`
 - `payment_error_message` (nullable)
@@ -209,6 +213,7 @@ Timestamps:
 
 - `id` (UUID, PK), `partner_id` (FK), `dream_board_id` (FK)
 - `type` = `karri_card | bank | takealot_voucher | charity` (enum, not null)
+- Public partner API serializes gift payout types only and filters out `charity` rows.
 - `gross_cents`, `fee_cents`, `charity_cents` (default 0), `net_cents` (all integer, not null)
   - `fee_cents` remains available for historical payout rows; new fee-free contribution history will typically produce `0`.
 - Constraint: `gross_cents >= net_cents`, `charity_cents >= 0`, `net_cents >= 0`
@@ -222,6 +227,7 @@ Timestamps:
 
 - `id` (UUID, PK), `payout_id` (FK), `dream_board_id` (FK)
 - `type` = `gift | charity` (enum, not null)
+- Historical/internal payout item typing remains unchanged even though active product hides charity.
 - `amount_cents` (integer, not null, >= 0)
 - `metadata` (JSONB, nullable)
 - `created_at`
@@ -256,9 +262,9 @@ Timestamps:
 
 ### Charity Allocation
 
-- When `charity_enabled = true` and `charity_split_type = 'percentage'`: each completed contribution allocates `amount_cents * (charity_percentage_bps / 10000)` cents to charity.
-- When `charity_enabled = true` and `charity_split_type = 'threshold'`: contributions allocate to charity until the cumulative charity total reaches `charity_threshold_cents`; subsequent contributions allocate nothing to charity.
-- When `charity_enabled = false`: no charity allocation; all contribution value goes to the gift goal.
+- Historical legacy rule: when `charity_enabled = true` and `charity_split_type = 'percentage'`, each completed contribution allocates `amount_cents * (charity_percentage_bps / 10000)` cents to charity.
+- Historical legacy rule: when `charity_enabled = true` and `charity_split_type = 'threshold'`, contributions allocate to charity until the cumulative charity total reaches `charity_threshold_cents`; subsequent contributions allocate nothing to charity.
+- Active product rule: charity allocation is disabled, so all new contribution value goes to the gift goal.
 
 ### Close Conditions
 
@@ -269,13 +275,13 @@ Timestamps:
 
 ### Payout Lifecycle
 
-- On board close, the payout engine creates payout rows: one gift payout (type matches `payout_method`) and, if charity allocation > 0, one charity payout (type = `charity`).
+- On board close, the payout engine creates one gift payout row (type matches `payout_method`) and may create a historical charity payout row (type = `charity`) only when legacy charity allocation already exists.
 - **Gift payout calculation:** `gross_cents = raised_cents`; `fee_cents = platform_fee_cents`; `net_cents = raised_cents - platform_fee_cents - charity_total_cents`.
   - `platform_fee_cents` may be non-zero for legacy contribution history but is `0` for newly created fee-free contributions.
 - **Charity payout calculation:** `gross_cents = charity_total_cents`; `net_cents = charity_total_cents` (no additional fee on charity payouts).
 - **Payout state machine:** `pending` → `processing` → `completed` or `failed`. Failed payouts may be retried (`failed` → `processing`).
 - **Board `paid_out` transition:** the Dreamboard status moves to `paid_out` only when all required payout rows for that board have status `completed`.
-- **Current runtime:** `karri_card` payouts can be processed automatically via Karri queue/automation. Bank, `takealot_voucher`, and charity payout rows are created and tracked but not auto-executed.
+- **Current runtime:** `karri_card` payouts can be processed automatically via Karri queue/automation. Bank, `takealot_voucher`, and historical charity payout rows are created and tracked but not auto-executed.
 
 ### Reminder System
 
@@ -294,8 +300,8 @@ UX v2 delivery status in runtime:
 - **Schema:** expanded schema is live (bank payout fields, charity split fields, reminder retry/WhatsApp fields, expanded enums).
 - **Host UX flow:** 5-step create flow (`/create/child` → `/create/voucher` → `/create/review`) and dashboard/admin surfaces are live.
 - **Default host payout path:** newly created host Dreamboards use `takealot_voucher`; legacy compatibility routes still exist for `/create/giving-back` and `/create/payout`, but they redirect into `/create/voucher`.
-- **Partner API write gates:** `karri_card`, bank, and charity writes remain feature-flagged (`UX_V2_ENABLE_KARRI_WRITE_PATH`, `UX_V2_ENABLE_BANK_WRITE_PATH`, `UX_V2_ENABLE_CHARITY_WRITE_PATH`).
-- **Payout execution:** automated execution is Karri-only; bank/`takealot_voucher`/charity payouts remain manual completion paths.
+- **Partner API write gates:** `karri_card` and bank writes remain feature-flagged (`UX_V2_ENABLE_KARRI_WRITE_PATH`, `UX_V2_ENABLE_BANK_WRITE_PATH`). Active Dreamboard public contract routes do not expose charity writes.
+- **Payout execution:** automated execution is Karri-only; bank/`takealot_voucher`/historical charity payouts remain manual completion paths.
 
 ---
 

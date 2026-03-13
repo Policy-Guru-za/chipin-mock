@@ -44,7 +44,7 @@
         "tags": [
           "Dreamboards"
         ],
-        "summary": "List dream boards",
+        "summary": "List Dreamboards",
         "parameters": [
           {
             "name": "status",
@@ -73,7 +73,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Dream boards list",
+            "description": "Dreamboards list",
             "headers": {
               "X-RateLimit-Limit": {
                 "$ref": "#/components/headers/RateLimitLimit"
@@ -114,7 +114,7 @@
         "tags": [
           "Dreamboards"
         ],
-        "summary": "Create a dream board",
+        "summary": "Create a Dreamboard",
         "requestBody": {
           "required": true,
           "content": {
@@ -127,7 +127,7 @@
         },
         "responses": {
           "201": {
-            "description": "Dream board created",
+            "description": "Dreamboard created",
             "headers": {
               "X-RateLimit-Limit": {
                 "$ref": "#/components/headers/RateLimitLimit"
@@ -176,7 +176,7 @@
         "tags": [
           "Dreamboards"
         ],
-        "summary": "Get a dream board",
+        "summary": "Get a Dreamboard",
         "parameters": [
           {
             "$ref": "#/components/parameters/DreamBoardId"
@@ -184,7 +184,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Dream board",
+            "description": "Dreamboard",
             "headers": {
               "X-RateLimit-Limit": {
                 "$ref": "#/components/headers/RateLimitLimit"
@@ -228,7 +228,7 @@
         "tags": [
           "Dreamboards"
         ],
-        "summary": "Update a dream board",
+        "summary": "Update a Dreamboard",
         "parameters": [
           {
             "$ref": "#/components/parameters/DreamBoardId"
@@ -246,7 +246,7 @@
         },
         "responses": {
           "200": {
-            "description": "Dream board updated",
+            "description": "Dreamboard updated",
             "headers": {
               "X-RateLimit-Limit": {
                 "$ref": "#/components/headers/RateLimitLimit"
@@ -298,7 +298,7 @@
         "tags": [
           "Contributions"
         ],
-        "summary": "List contributions for a dream board",
+        "summary": "List contributions for a Dreamboard",
         "parameters": [
           {
             "$ref": "#/components/parameters/DreamBoardId"
@@ -850,7 +850,7 @@
           "pattern": "^[a-zA-Z0-9-]+$",
           "maxLength": 100
         },
-        "description": "Public dream board identifier."
+        "description": "Public Dreamboard identifier."
       },
       "ContributionId": {
         "name": "id",
@@ -1110,13 +1110,6 @@
         ],
         "description": "UX v2 enum set. Standard Dreamboard flows default to takealot_voucher. Karri Card is legacy or partner-only and requires UX_V2_ENABLE_KARRI_WRITE_PATH=true. Bank write path remains gated by UX_V2_ENABLE_BANK_WRITE_PATH. Legacy clients that assumed karri_card-only responses must handle bank and takealot_voucher values."
       },
-      "CharitySplitType": {
-        "type": "string",
-        "enum": [
-          "percentage",
-          "threshold"
-        ]
-      },
       "DisplayMode": {
         "type": "string",
         "enum": [
@@ -1170,11 +1163,6 @@
           "bank_branch_code",
           "bank_account_holder",
           "payout_email",
-          "charity_enabled",
-          "charity_id",
-          "charity_split_type",
-          "charity_percentage_bps",
-          "charity_threshold_cents",
           "goal_cents",
           "raised_cents",
           "message",
@@ -1251,30 +1239,6 @@
           "payout_email": {
             "type": "string",
             "format": "email"
-          },
-          "charity_enabled": {
-            "type": "boolean"
-          },
-          "charity_id": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "charity_split_type": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CharitySplitType"
-              }
-            ],
-            "nullable": true
-          },
-          "charity_percentage_bps": {
-            "type": "integer",
-            "nullable": true
-          },
-          "charity_threshold_cents": {
-            "type": "integer",
-            "nullable": true
           },
           "goal_cents": {
             "type": "integer"
@@ -1401,31 +1365,12 @@
           "bank_account_holder": {
             "type": "string"
           },
-          "charity_enabled": {
-            "type": "boolean"
-          },
-          "charity_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "charity_split_type": {
-            "$ref": "#/components/schemas/CharitySplitType"
-          },
-          "charity_percentage_bps": {
-            "type": "integer",
-            "minimum": 500,
-            "maximum": 5000
-          },
-          "charity_threshold_cents": {
-            "type": "integer",
-            "minimum": 5000
-          },
           "message": {
             "type": "string",
             "maxLength": 280
           }
         },
-        "description": "Creates a dream board. Omitted payout_method defaults to takealot_voucher. Karri Card writes return unsupported_operation (422) unless UX_V2_ENABLE_KARRI_WRITE_PATH=true. Bank writes return unsupported_operation (422) until UX_V2_ENABLE_BANK_WRITE_PATH=true. Charity writes return unsupported_operation (422) until UX_V2_ENABLE_CHARITY_WRITE_PATH=true."
+        "description": "Creates a Dreamboard. Omitted payout_method defaults to takealot_voucher. Karri Card writes return unsupported_operation (422) unless UX_V2_ENABLE_KARRI_WRITE_PATH=true. Bank writes return unsupported_operation (422) until UX_V2_ENABLE_BANK_WRITE_PATH=true."
       },
       "DreamBoardUpdateRequest": {
         "type": "object",
@@ -1462,28 +1407,9 @@
           },
           "bank_account_holder": {
             "type": "string"
-          },
-          "charity_enabled": {
-            "type": "boolean"
-          },
-          "charity_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "charity_split_type": {
-            "$ref": "#/components/schemas/CharitySplitType"
-          },
-          "charity_percentage_bps": {
-            "type": "integer",
-            "minimum": 500,
-            "maximum": 5000
-          },
-          "charity_threshold_cents": {
-            "type": "integer",
-            "minimum": 5000
           }
         },
-        "description": "Updates a dream board. Karri Card mutation returns unsupported_operation (422) unless UX_V2_ENABLE_KARRI_WRITE_PATH=true. Bank mutation returns unsupported_operation (422) until UX_V2_ENABLE_BANK_WRITE_PATH=true. Charity mutation returns unsupported_operation (422) until UX_V2_ENABLE_CHARITY_WRITE_PATH=true."
+        "description": "Updates a Dreamboard. Karri Card mutation returns unsupported_operation (422) unless UX_V2_ENABLE_KARRI_WRITE_PATH=true. Bank mutation returns unsupported_operation (422) until UX_V2_ENABLE_BANK_WRITE_PATH=true."
       },
       "DreamBoardResponse": {
         "type": "object",
@@ -1540,7 +1466,6 @@
           "amount_cents",
           "fee_cents",
           "net_cents",
-          "charity_cents",
           "payment_status",
           "created_at"
         ],
@@ -1572,10 +1497,6 @@
             "type": "integer",
             "deprecated": true,
             "description": "Legacy field retained for backward compatibility. New contributions are fee-free, so this now matches amount_cents."
-          },
-          "charity_cents": {
-            "type": "integer",
-            "nullable": true
           },
           "payment_status": {
             "$ref": "#/components/schemas/ContributionStatus"
@@ -1628,10 +1549,9 @@
         "enum": [
           "karri_card",
           "bank",
-          "takealot_voucher",
-          "charity"
+          "takealot_voucher"
         ],
-        "description": "UX v2 enum set. Legacy clients that assumed karri_card-only payout types must handle bank, takealot_voucher, and charity."
+        "description": "UX v2 enum set. Legacy clients that assumed karri_card-only payout types must handle bank and takealot_voucher."
       },
       "PayoutStatus": {
         "type": "string",
@@ -1684,31 +1604,6 @@
             "type": "string",
             "nullable": true
           },
-          "charity_id": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "charity_name": {
-            "type": "string",
-            "nullable": true
-          },
-          "charity_split_type": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CharitySplitType"
-              }
-            ],
-            "nullable": true
-          },
-          "charity_percentage_bps": {
-            "type": "integer",
-            "nullable": true
-          },
-          "charity_threshold_cents": {
-            "type": "integer",
-            "nullable": true
-          },
           "gift_data": {
             "$ref": "#/components/schemas/GiftData",
             "nullable": true
@@ -1731,7 +1626,6 @@
           "type",
           "gross_cents",
           "fee_cents",
-          "charity_cents",
           "net_cents",
           "status",
           "created_at"
@@ -1754,9 +1648,6 @@
             "type": "integer",
             "deprecated": true,
             "description": "Legacy field retained for backward compatibility with historical payout rows that were created before checkout became fee-free."
-          },
-          "charity_cents": {
-            "type": "integer"
           },
           "net_cents": {
             "type": "integer"

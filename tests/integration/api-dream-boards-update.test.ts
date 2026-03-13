@@ -160,6 +160,7 @@ describe('PATCH /api/v1/dream-boards/[id]', () => {
 
     expect(response.status).toBe(200);
     expect(payload.data.message).toBe('Updated message');
+    expect(payload.data).not.toHaveProperty('charity_enabled');
     expect(update).toHaveBeenCalled();
   });
 
@@ -195,11 +196,11 @@ describe('PATCH /api/v1/dream-boards/[id]', () => {
     expect(update).not.toHaveBeenCalled();
   });
 
-  it('returns validation errors for incomplete charity update payloads', async () => {
+  it('rejects charity fields because the public update contract no longer supports them', async () => {
     mockAuth();
     const update = mockDb();
 
-    mockDreamBoardUpdateQueries({
+    const { getActiveCharityById } = mockDreamBoardUpdateQueries({
       getDreamBoardByPublicId: vi.fn(async () => buildBoard()),
     });
 
@@ -220,14 +221,16 @@ describe('PATCH /api/v1/dream-boards/[id]', () => {
 
     expect(response.status).toBe(400);
     expect(payload.error.code).toBe('validation_error');
+    expect(getActiveCharityById).not.toHaveBeenCalled();
     expect(update).not.toHaveBeenCalled();
   });
 
-  it('returns unsupported operation when charity toggle is provided before B2', async () => {
+  it('still rejects charity fields when the legacy charity write flag is enabled', async () => {
+    process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH = 'true';
     mockAuth();
     const update = mockDb();
 
-    mockDreamBoardUpdateQueries({
+    const { getActiveCharityById } = mockDreamBoardUpdateQueries({
       getDreamBoardByPublicId: vi.fn(async () => buildBoard()),
     });
 
@@ -237,7 +240,10 @@ describe('PATCH /api/v1/dream-boards/[id]', () => {
         method: 'PATCH',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
-          charity_enabled: false,
+          charity_enabled: true,
+          charity_id: '00000000-0000-4000-8000-000000000001',
+          charity_split_type: 'percentage',
+          charity_percentage_bps: 1000,
         }),
       }),
       { params: { id: 'board-1' } }
@@ -245,9 +251,9 @@ describe('PATCH /api/v1/dream-boards/[id]', () => {
 
     const payload = await response.json();
 
-    expect(response.status).toBe(422);
-    expect(payload.error.code).toBe('unsupported_operation');
-    expect(payload.error.message).toContain('Charity configuration is not yet enabled');
+    expect(response.status).toBe(400);
+    expect(payload.error.code).toBe('validation_error');
+    expect(getActiveCharityById).not.toHaveBeenCalled();
     expect(update).not.toHaveBeenCalled();
   });
 
@@ -374,77 +380,6 @@ describe('PATCH /api/v1/dream-boards/[id]', () => {
     expect(response.status).toBe(200);
     expect(payload.data.payout_method).toBe('bank');
     expect(update).toHaveBeenCalled();
-  });
-
-  it('accepts charity updates when charity write path toggle is enabled', async () => {
-    process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH = 'true';
-    mockAuth();
-    const update = mockDb();
-
-    const getDreamBoardByPublicId = vi
-      .fn()
-      .mockResolvedValueOnce(buildBoard())
-      .mockResolvedValueOnce(
-        buildBoard({
-          charityEnabled: true,
-          charityId: '00000000-0000-4000-8000-000000000001',
-          charitySplitType: 'percentage',
-          charityPercentageBps: 1000,
-          charityThresholdCents: null,
-        })
-      );
-    mockDreamBoardUpdateQueries({ getDreamBoardByPublicId });
-
-    const { PATCH } = await loadHandler();
-    const response = await PATCH(
-      new Request('http://localhost/api/v1/dream-boards/board-1', {
-        method: 'PATCH',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          charity_enabled: true,
-          charity_id: '00000000-0000-4000-8000-000000000001',
-          charity_split_type: 'percentage',
-          charity_percentage_bps: 1000,
-        }),
-      }),
-      { params: { id: 'board-1' } }
-    );
-    const payload = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(payload.data.charity_enabled).toBe(true);
-    expect(update).toHaveBeenCalled();
-  });
-
-  it('rejects inactive charity ids when charity write path toggle is enabled', async () => {
-    process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH = 'true';
-    mockAuth();
-    const update = mockDb();
-
-    const getDreamBoardByPublicId = vi.fn(async () => buildBoard());
-    const getActiveCharityById = vi.fn(async () => null);
-    mockDreamBoardUpdateQueries({ getDreamBoardByPublicId, getActiveCharityById });
-
-    const { PATCH } = await loadHandler();
-    const response = await PATCH(
-      new Request('http://localhost/api/v1/dream-boards/board-1', {
-        method: 'PATCH',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          charity_enabled: true,
-          charity_id: '00000000-0000-4000-8000-000000000099',
-          charity_split_type: 'percentage',
-          charity_percentage_bps: 1000,
-        }),
-      }),
-      { params: { id: 'board-1' } }
-    );
-    const payload = await response.json();
-
-    expect(response.status).toBe(400);
-    expect(payload.error.code).toBe('validation_error');
-    expect(payload.error.message).toContain('active charity');
-    expect(update).not.toHaveBeenCalled();
   });
 
   it('rejects bank update payloads that include karri fields', async () => {

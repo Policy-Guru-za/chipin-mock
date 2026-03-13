@@ -21,11 +21,6 @@ type DreamBoardApiRecord = {
   bankBranchCode?: string | null;
   bankAccountHolder?: string | null;
   payoutEmail?: string | null;
-  charityEnabled?: boolean | null;
-  charityId?: string | null;
-  charitySplitType?: 'percentage' | 'threshold' | null;
-  charityPercentageBps?: number | null;
-  charityThresholdCents?: number | null;
   goalCents: number;
   raisedCents: number;
   message: string | null;
@@ -79,11 +74,6 @@ export const serializeDreamBoard = (board: DreamBoardApiRecord, baseUrl: string)
     bank_branch_code: board.bankBranchCode ?? null,
     bank_account_holder: board.bankAccountHolder ?? null,
     payout_email: board.payoutEmail ?? '',
-    charity_enabled: board.charityEnabled ?? false,
-    charity_id: board.charityId ?? null,
-    charity_split_type: board.charitySplitType ?? null,
-    charity_percentage_bps: board.charityPercentageBps ?? null,
-    charity_threshold_cents: board.charityThresholdCents ?? null,
     goal_cents: board.goalCents,
     raised_cents: board.raisedCents,
     message: board.message,

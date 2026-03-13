@@ -44,26 +44,12 @@ export default async function AdminSettingsPage() {
       </article>
 
       <article className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-        <h2 className="font-display text-xl font-bold text-text">Charity and write-path controls</h2>
+        <h2 className="font-display text-xl font-bold text-text">Write-path controls</h2>
         <dl className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div>
-            <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-gray-500">Split modes</dt>
-            <dd className="text-sm text-text">{settings.charityConfiguration.splitModes.join(', ')}</dd>
-          </div>
-          <div>
-            <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-gray-500">Payout cadence</dt>
-            <dd className="text-sm text-text">{settings.charityConfiguration.monthlyPayoutCadence}</dd>
-          </div>
           <div>
             <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-gray-500">Bank write path</dt>
             <dd className="pt-1">
               <StatusBadge status={settings.writePathGates.bankEnabled ? 'active' : 'inactive'} />
-            </dd>
-          </div>
-          <div>
-            <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-gray-500">Charity write path</dt>
-            <dd className="pt-1">
-              <StatusBadge status={settings.writePathGates.charityEnabled ? 'active' : 'inactive'} />
             </dd>
           </div>
         </dl>

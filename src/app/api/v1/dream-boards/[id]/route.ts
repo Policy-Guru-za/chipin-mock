@@ -6,10 +6,10 @@ import { serializeDreamBoard } from '@/lib/api/dream-boards';
 import { parseBody, withApiAuth, validatePublicId } from '@/lib/api/route-utils';
 import { jsonError, jsonSuccess } from '@/lib/api/response';
 import { db } from '@/lib/db';
-import { getActiveCharityById, getDreamBoardByPublicId } from '@/lib/db/queries';
+import { getDreamBoardByPublicId } from '@/lib/db/queries';
 import { dreamBoards } from '@/lib/db/schema';
 import { isBankAccountNumberValid, isPartyDateWithinRange } from '@/lib/dream-boards/validation';
-import { LOCKED_CHARITY_SPLIT_MODES, LOCKED_PAYOUT_METHODS } from '@/lib/ux-v2/decision-locks';
+import { LOCKED_PAYOUT_METHODS } from '@/lib/ux-v2/decision-locks';
 import { resolveWritePathBlockReason } from '@/lib/ux-v2/write-path-gates';
 import { formatDateOnly, parseDateOnly } from '@/lib/utils/date';
 import { encryptSensitiveValue } from '@/lib/utils/encryption';
@@ -34,12 +34,8 @@ const updateSchema = z
     bank_account_number: z.string().min(6).max(20).optional(),
     bank_branch_code: z.string().min(2).max(20).optional(),
     bank_account_holder: z.string().min(2).max(120).optional(),
-    charity_enabled: z.boolean().optional(),
-    charity_id: z.string().uuid().optional(),
-    charity_split_type: z.enum(LOCKED_CHARITY_SPLIT_MODES).optional(),
-    charity_percentage_bps: z.number().int().min(500).max(5000).optional(),
-    charity_threshold_cents: z.number().int().min(5000).optional(),
   })
+  .strict()
   .superRefine((value, ctx) => {
     const hasAnyUpdate =
       value.message !== undefined ||
@@ -51,12 +47,7 @@ const updateSchema = z
       value.bank_name !== undefined ||
       value.bank_account_number !== undefined ||
       value.bank_branch_code !== undefined ||
-      value.bank_account_holder !== undefined ||
-      value.charity_enabled !== undefined ||
-      value.charity_id !== undefined ||
-      value.charity_split_type !== undefined ||
-      value.charity_percentage_bps !== undefined ||
-      value.charity_threshold_cents !== undefined;
+      value.bank_account_holder !== undefined;
 
     if (!hasAnyUpdate) {
       ctx.addIssue({
@@ -168,75 +159,6 @@ const updateSchema = z
         message: 'payout_method is required when karri card fields are provided',
       });
     }
-
-    const charityEnabled = value.charity_enabled === true;
-    const hasAnyCharityField =
-      value.charity_id !== undefined ||
-      value.charity_split_type !== undefined ||
-      value.charity_percentage_bps !== undefined ||
-      value.charity_threshold_cents !== undefined;
-
-    if (!charityEnabled && hasAnyCharityField) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['charity_enabled'],
-        message: 'Charity fields require charity_enabled=true',
-      });
-      return;
-    }
-
-    if (!charityEnabled) {
-      return;
-    }
-
-    if (!value.charity_id) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['charity_id'],
-        message: 'Charity is required when charity is enabled',
-      });
-    }
-
-    if (!value.charity_split_type) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['charity_split_type'],
-        message: 'Charity split type is required when charity is enabled',
-      });
-      return;
-    }
-
-    if (value.charity_split_type === 'percentage' && value.charity_percentage_bps === undefined) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['charity_percentage_bps'],
-        message: 'Charity percentage bps is required for percentage split',
-      });
-    }
-
-    if (value.charity_split_type === 'percentage' && value.charity_threshold_cents !== undefined) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['charity_threshold_cents'],
-        message: 'Charity threshold cents must be omitted for percentage split',
-      });
-    }
-
-    if (value.charity_split_type === 'threshold' && value.charity_threshold_cents === undefined) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['charity_threshold_cents'],
-        message: 'Charity threshold cents is required for threshold split',
-      });
-    }
-
-    if (value.charity_split_type === 'threshold' && value.charity_percentage_bps !== undefined) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['charity_percentage_bps'],
-        message: 'Charity percentage bps must be omitted for threshold split',
-      });
-    }
   });
 
 const allowedStatusTransitions: Record<DreamBoardStatus, DreamBoardStatus[]> = {
@@ -317,7 +239,7 @@ const resolveStatusUpdate = (params: {
     return {
       ok: false as const,
       response: buildConflict(
-        'Use the close endpoint to close a dream board',
+        'Use the close endpoint to close a Dreamboard',
         params.requestId,
         params.headers
       ),
@@ -391,14 +313,14 @@ export const GET = withApiAuth(
     const idCheck = validatePublicId(params.id, {
       requestId,
       headers: rateLimitHeaders,
-      message: 'Invalid dream board identifier',
+      message: 'Invalid Dreamboard identifier',
     });
     if (!idCheck.ok) return idCheck.response;
 
     const board = await getDreamBoardByPublicId(params.id, context.apiKey.partnerId);
     if (!board) {
       return jsonError({
-        error: { code: 'not_found', message: 'Dream board not found' },
+        error: { code: 'not_found', message: 'Dreamboard not found' },
         status: 404,
         requestId,
         headers: rateLimitHeaders,
@@ -409,7 +331,7 @@ export const GET = withApiAuth(
     const payload = serializeDreamBoard(board, baseUrl);
     if (!payload) {
       return jsonError({
-        error: { code: 'internal_error', message: 'Unable to serialize dream board' },
+        error: { code: 'internal_error', message: 'Unable to serialize Dreamboard' },
         status: 500,
         requestId,
         headers: rateLimitHeaders,
@@ -428,14 +350,14 @@ export const PATCH = withApiAuth(
     const idCheck = validatePublicId(params.id, {
       requestId,
       headers: rateLimitHeaders,
-      message: 'Invalid dream board identifier',
+      message: 'Invalid Dreamboard identifier',
     });
     if (!idCheck.ok) return idCheck.response;
 
     const parsed = await parseBody(request, updateSchema, {
       requestId,
       headers: rateLimitHeaders,
-      message: 'Invalid dream board update payload',
+      message: 'Invalid Dreamboard update payload',
     });
     if (!parsed.ok) return parsed.response;
 
@@ -444,34 +366,13 @@ export const PATCH = withApiAuth(
       parsed.data.bank_account_number !== undefined ||
       parsed.data.bank_branch_code !== undefined ||
       parsed.data.bank_account_holder !== undefined;
-    const hasAnyCharityField =
-      parsed.data.charity_id !== undefined ||
-      parsed.data.charity_split_type !== undefined ||
-      parsed.data.charity_percentage_bps !== undefined ||
-      parsed.data.charity_threshold_cents !== undefined;
-
-    if (parsed.data.charity_enabled === true && parsed.data.charity_id) {
-      const charity = await getActiveCharityById(parsed.data.charity_id);
-      if (!charity) {
-        return jsonError({
-          error: {
-            code: 'validation_error',
-            message: 'charity_id must reference an active charity',
-          },
-          status: 400,
-          requestId,
-          headers: rateLimitHeaders,
-        });
-      }
-    }
-
     const blockReason = resolveWritePathBlockReason({
       karriRequested:
         parsed.data.payout_method === 'karri_card' ||
         parsed.data.karri_card_number !== undefined ||
         parsed.data.karri_card_holder_name !== undefined,
       bankRequested: parsed.data.payout_method === 'bank' || hasAnyBankField,
-      charityRequested: parsed.data.charity_enabled !== undefined || hasAnyCharityField,
+      charityRequested: false,
     });
 
     if (blockReason) {
@@ -489,7 +390,7 @@ export const PATCH = withApiAuth(
     const board = await getDreamBoardByPublicId(params.id, context.apiKey.partnerId);
     if (!board) {
       return jsonError({
-        error: { code: 'not_found', message: 'Dream board not found' },
+        error: { code: 'not_found', message: 'Dreamboard not found' },
         status: 404,
         requestId,
         headers: rateLimitHeaders,
@@ -497,7 +398,7 @@ export const PATCH = withApiAuth(
     }
 
     if (isImmutableStatus(board.status)) {
-      return buildConflict('Dream board can no longer be updated', requestId, rateLimitHeaders);
+      return buildConflict('Dreamboard can no longer be updated', requestId, rateLimitHeaders);
     }
 
     const updateResult = buildUpdatePayload({
@@ -570,22 +471,6 @@ export const PATCH = withApiAuth(
       updates.bankAccountHolder = null;
     }
 
-    if (parsed.data.charity_enabled === true) {
-      updates.charityEnabled = true;
-      updates.charityId = parsed.data.charity_id ?? null;
-      updates.charitySplitType = parsed.data.charity_split_type ?? null;
-      updates.charityPercentageBps = parsed.data.charity_percentage_bps ?? null;
-      updates.charityThresholdCents = parsed.data.charity_threshold_cents ?? null;
-    }
-
-    if (parsed.data.charity_enabled === false) {
-      updates.charityEnabled = false;
-      updates.charityId = null;
-      updates.charitySplitType = null;
-      updates.charityPercentageBps = null;
-      updates.charityThresholdCents = null;
-    }
-
     if (Object.keys(updates).length > 0) {
       await db
         .update(dreamBoards)
@@ -598,7 +483,7 @@ export const PATCH = withApiAuth(
     const updated = await getDreamBoardByPublicId(params.id, context.apiKey.partnerId);
     if (!updated) {
       return jsonError({
-        error: { code: 'internal_error', message: 'Unable to load updated dream board' },
+        error: { code: 'internal_error', message: 'Unable to load updated Dreamboard' },
         status: 500,
         requestId,
         headers: rateLimitHeaders,
@@ -609,7 +494,7 @@ export const PATCH = withApiAuth(
     const payload = serializeDreamBoard(updated, baseUrl);
     if (!payload) {
       return jsonError({
-        error: { code: 'internal_error', message: 'Unable to serialize dream board' },
+        error: { code: 'internal_error', message: 'Unable to serialize Dreamboard' },
         status: 500,
         requestId,
         headers: rateLimitHeaders,

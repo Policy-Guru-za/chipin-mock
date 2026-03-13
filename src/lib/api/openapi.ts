@@ -1,11 +1,10 @@
 /* eslint-disable max-lines */
 
-import { DEFAULT_HOST_CREATE_PAYOUT_METHOD } from '@/lib/dream-boards/payout-methods';
 import {
-  LOCKED_CHARITY_SPLIT_MODES,
-  LOCKED_PAYOUT_METHODS,
-  LOCKED_PAYOUT_TYPES,
-} from '@/lib/ux-v2/decision-locks';
+  DEFAULT_HOST_CREATE_PAYOUT_METHOD,
+  DREAMBOARD_GIFT_PAYOUT_METHODS,
+} from '@/lib/dream-boards/payout-methods';
+import { LOCKED_PAYOUT_METHODS } from '@/lib/ux-v2/decision-locks';
 import { SUPPORTED_WEBHOOK_EVENT_TYPES } from '@/lib/webhooks';
 
 const payoutMethodDescription = [
@@ -16,17 +15,15 @@ const payoutMethodDescription = [
 ].join(' ');
 
 const dreamBoardCreateDescription = [
-  `Creates a dream board. Omitted payout_method defaults to ${DEFAULT_HOST_CREATE_PAYOUT_METHOD}.`,
+  `Creates a Dreamboard. Omitted payout_method defaults to ${DEFAULT_HOST_CREATE_PAYOUT_METHOD}.`,
   'Karri Card writes return unsupported_operation (422) unless UX_V2_ENABLE_KARRI_WRITE_PATH=true.',
   'Bank writes return unsupported_operation (422) until UX_V2_ENABLE_BANK_WRITE_PATH=true.',
-  'Charity writes return unsupported_operation (422) until UX_V2_ENABLE_CHARITY_WRITE_PATH=true.',
 ].join(' ');
 
 const dreamBoardUpdateDescription = [
-  'Updates a dream board.',
+  'Updates a Dreamboard.',
   'Karri Card mutation returns unsupported_operation (422) unless UX_V2_ENABLE_KARRI_WRITE_PATH=true.',
   'Bank mutation returns unsupported_operation (422) until UX_V2_ENABLE_BANK_WRITE_PATH=true.',
-  'Charity mutation returns unsupported_operation (422) until UX_V2_ENABLE_CHARITY_WRITE_PATH=true.',
 ].join(' ');
 
 export const openApiSpec = {
@@ -73,7 +70,7 @@ export const openApiSpec = {
     '/dream-boards': {
       get: {
         tags: ['Dreamboards'],
-        summary: 'List dream boards',
+        summary: 'List Dreamboards',
         parameters: [
           {
             name: 'status',
@@ -102,7 +99,7 @@ export const openApiSpec = {
         ],
         responses: {
           '200': {
-            description: 'Dream boards list',
+            description: 'Dreamboards list',
             headers: {
               'X-RateLimit-Limit': {
                 $ref: '#/components/headers/RateLimitLimit',
@@ -141,7 +138,7 @@ export const openApiSpec = {
       },
       post: {
         tags: ['Dreamboards'],
-        summary: 'Create a dream board',
+        summary: 'Create a Dreamboard',
         requestBody: {
           required: true,
           content: {
@@ -154,7 +151,7 @@ export const openApiSpec = {
         },
         responses: {
           '201': {
-            description: 'Dream board created',
+            description: 'Dreamboard created',
             headers: {
               'X-RateLimit-Limit': {
                 $ref: '#/components/headers/RateLimitLimit',
@@ -201,7 +198,7 @@ export const openApiSpec = {
     '/dream-boards/{id}': {
       get: {
         tags: ['Dreamboards'],
-        summary: 'Get a dream board',
+        summary: 'Get a Dreamboard',
         parameters: [
           {
             $ref: '#/components/parameters/DreamBoardId',
@@ -209,7 +206,7 @@ export const openApiSpec = {
         ],
         responses: {
           '200': {
-            description: 'Dream board',
+            description: 'Dreamboard',
             headers: {
               'X-RateLimit-Limit': {
                 $ref: '#/components/headers/RateLimitLimit',
@@ -251,7 +248,7 @@ export const openApiSpec = {
       },
       patch: {
         tags: ['Dreamboards'],
-        summary: 'Update a dream board',
+        summary: 'Update a Dreamboard',
         parameters: [
           {
             $ref: '#/components/parameters/DreamBoardId',
@@ -269,7 +266,7 @@ export const openApiSpec = {
         },
         responses: {
           '200': {
-            description: 'Dream board updated',
+            description: 'Dreamboard updated',
             headers: {
               'X-RateLimit-Limit': {
                 $ref: '#/components/headers/RateLimitLimit',
@@ -319,7 +316,7 @@ export const openApiSpec = {
     '/dream-boards/{id}/contributions': {
       get: {
         tags: ['Contributions'],
-        summary: 'List contributions for a dream board',
+        summary: 'List contributions for a Dreamboard',
         parameters: [
           {
             $ref: '#/components/parameters/DreamBoardId',
@@ -855,7 +852,7 @@ export const openApiSpec = {
           pattern: '^[a-zA-Z0-9-]+$',
           maxLength: 100,
         },
-        description: 'Public dream board identifier.',
+        description: 'Public Dreamboard identifier.',
       },
       ContributionId: {
         name: 'id',
@@ -1089,10 +1086,6 @@ export const openApiSpec = {
         enum: LOCKED_PAYOUT_METHODS,
         description: payoutMethodDescription,
       },
-      CharitySplitType: {
-        type: 'string',
-        enum: LOCKED_CHARITY_SPLIT_MODES,
-      },
       DisplayMode: {
         type: 'string',
         enum: ['gift'],
@@ -1142,11 +1135,6 @@ export const openApiSpec = {
           'bank_branch_code',
           'bank_account_holder',
           'payout_email',
-          'charity_enabled',
-          'charity_id',
-          'charity_split_type',
-          'charity_percentage_bps',
-          'charity_threshold_cents',
           'goal_cents',
           'raised_cents',
           'message',
@@ -1223,26 +1211,6 @@ export const openApiSpec = {
           payout_email: {
             type: 'string',
             format: 'email',
-          },
-          charity_enabled: {
-            type: 'boolean',
-          },
-          charity_id: {
-            type: 'string',
-            format: 'uuid',
-            nullable: true,
-          },
-          charity_split_type: {
-            allOf: [{ $ref: '#/components/schemas/CharitySplitType' }],
-            nullable: true,
-          },
-          charity_percentage_bps: {
-            type: 'integer',
-            nullable: true,
-          },
-          charity_threshold_cents: {
-            type: 'integer',
-            nullable: true,
           },
           goal_cents: {
             type: 'integer',
@@ -1371,25 +1339,6 @@ export const openApiSpec = {
           bank_account_holder: {
             type: 'string',
           },
-          charity_enabled: {
-            type: 'boolean',
-          },
-          charity_id: {
-            type: 'string',
-            format: 'uuid',
-          },
-          charity_split_type: {
-            $ref: '#/components/schemas/CharitySplitType',
-          },
-          charity_percentage_bps: {
-            type: 'integer',
-            minimum: 500,
-            maximum: 5000,
-          },
-          charity_threshold_cents: {
-            type: 'integer',
-            minimum: 5000,
-          },
           message: {
             type: 'string',
             maxLength: 280,
@@ -1432,25 +1381,6 @@ export const openApiSpec = {
           },
           bank_account_holder: {
             type: 'string',
-          },
-          charity_enabled: {
-            type: 'boolean',
-          },
-          charity_id: {
-            type: 'string',
-            format: 'uuid',
-          },
-          charity_split_type: {
-            $ref: '#/components/schemas/CharitySplitType',
-          },
-          charity_percentage_bps: {
-            type: 'integer',
-            minimum: 500,
-            maximum: 5000,
-          },
-          charity_threshold_cents: {
-            type: 'integer',
-            minimum: 5000,
           },
         },
         description: dreamBoardUpdateDescription,
@@ -1497,7 +1427,6 @@ export const openApiSpec = {
           'amount_cents',
           'fee_cents',
           'net_cents',
-          'charity_cents',
           'payment_status',
           'created_at',
         ],
@@ -1531,10 +1460,6 @@ export const openApiSpec = {
             deprecated: true,
             description:
               'Legacy field retained for backward compatibility. New contributions are fee-free, so this now matches amount_cents.',
-          },
-          charity_cents: {
-            type: 'integer',
-            nullable: true,
           },
           payment_status: {
             $ref: '#/components/schemas/ContributionStatus',
@@ -1577,9 +1502,9 @@ export const openApiSpec = {
       },
       PayoutType: {
         type: 'string',
-        enum: LOCKED_PAYOUT_TYPES,
+        enum: DREAMBOARD_GIFT_PAYOUT_METHODS,
         description:
-          'UX v2 enum set. Legacy clients that assumed karri_card-only payout types must handle bank, takealot_voucher, and charity.',
+          'UX v2 enum set. Legacy clients that assumed karri_card-only payout types must handle bank and takealot_voucher.',
       },
       PayoutStatus: {
         type: 'string',
@@ -1628,27 +1553,6 @@ export const openApiSpec = {
             type: 'string',
             nullable: true,
           },
-          charity_id: {
-            type: 'string',
-            format: 'uuid',
-            nullable: true,
-          },
-          charity_name: {
-            type: 'string',
-            nullable: true,
-          },
-          charity_split_type: {
-            allOf: [{ $ref: '#/components/schemas/CharitySplitType' }],
-            nullable: true,
-          },
-          charity_percentage_bps: {
-            type: 'integer',
-            nullable: true,
-          },
-          charity_threshold_cents: {
-            type: 'integer',
-            nullable: true,
-          },
           gift_data: {
             $ref: '#/components/schemas/GiftData',
             nullable: true,
@@ -1671,7 +1575,6 @@ export const openApiSpec = {
           'type',
           'gross_cents',
           'fee_cents',
-          'charity_cents',
           'net_cents',
           'status',
           'created_at',
@@ -1695,9 +1598,6 @@ export const openApiSpec = {
             deprecated: true,
             description:
               'Legacy field retained for backward compatibility with historical payout rows that were created before checkout became fee-free.',
-          },
-          charity_cents: {
-            type: 'integer',
           },
           net_cents: {
             type: 'integer',

@@ -2,16 +2,16 @@
 
 ## Current Spec
 
-- `13_session-placeholder`
+- `16_dreamboard-pivot-hardening`
 
 ## Current Stage
 
-- Waiting — next bounded session not yet started
+- Stage 1 — active Dreamboard create boundary hardening
 
 ## Status
 
-- Closed [`spec/12_karri-config-readiness-alignment.md`](./spec/12_karri-config-readiness-alignment.md) as done after aligning Karri startup validation with the gated write path and teaching readiness to honor `MOCK_KARRI` under that same gate.
-- Activated [`spec/13_session-placeholder.md`](./spec/13_session-placeholder.md) as the standing next-session placeholder.
+- Activated [`spec/16_dreamboard-pivot-hardening.md`](./spec/16_dreamboard-pivot-hardening.md) for the approved Dreamboard pivot hardening session.
+- Inspecting first-party create/runtime/admin/test defaults to remove active-product charity and legacy payout leakage while preserving explicit compatibility paths.
 
 ## Blockers
 
@@ -19,27 +19,30 @@
 
 ## Next Step
 
-- Rename [`spec/13_session-placeholder.md`](./spec/13_session-placeholder.md) in place when the next bounded session topic is known, then update this ledger before coding.
+- Tighten first-party Dreamboard create draft, review, publish, and default fixture boundaries around voucher-only active flows.
 
 ## Last Session Spec
 
-- `12_karri-config-readiness-alignment`
+- `15_dreamboard-truth-cleanup-follow-up`
 
 ## Last Completed Spec
 
-- `12_karri-config-readiness-alignment`
+- `15_dreamboard-truth-cleanup-follow-up`
 
 ## Last Green Commands
 
-- `pnpm exec vitest run tests/unit/startup-config.test.ts tests/unit/health-checks.test.ts`
+- `pnpm openapi:generate`
 - `pnpm docs:audit -- --sync`
+- `pnpm docs:audit`
+- `pnpm lint`
 - `pnpm typecheck`
+- `pnpm test`
 
 ## Dogfood Evidence
 
-- Verification succeeded for the completed session: `pnpm exec vitest run tests/unit/startup-config.test.ts tests/unit/health-checks.test.ts`, `pnpm docs:audit -- --sync`, and `pnpm typecheck` all passed.
-- Config-path dogfood succeeded in regression coverage: startup validation now rejects missing `CARD_DATA_ENCRYPTION_KEY` when `UX_V2_ENABLE_KARRI_WRITE_PATH=true`, and readiness now reports Karri as mocked instead of not ready when `MOCK_KARRI=true` under the same gate.
+- Exercised the Dreamboard truth cleanup through focused regressions covering landing/public/thank-you/host/admin/API slices and a final full `pnpm test` pass.
+- Verified direct `/admin/charities` access remains available for historical support while the active admin sidebar omits charity navigation.
 
 ## Napkin Evidence
 
-- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with the gated-provider config/readiness alignment rule.
+- No durable napkin update.

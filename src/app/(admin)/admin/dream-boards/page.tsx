@@ -134,18 +134,12 @@ export default async function AdminDreamBoardsPage({
             type: 'text',
             placeholder: 'Child or gift name',
           },
-          {
-            key: 'charity_enabled',
-            label: 'Charity enabled',
-            type: 'boolean',
-          },
         ]}
         values={pickFilterValues(urlParams, [
           'status',
           'created_from',
           'created_to',
           'search',
-          'charity_enabled',
         ])}
       />
 
@@ -153,8 +147,8 @@ export default async function AdminDreamBoardsPage({
         columns={columns}
         data={page.items}
         keyExtractor={(item) => item.id}
-        caption="Dream boards admin table"
-        emptyMessage="No dream boards match the current filters."
+        caption="Dreamboards admin table"
+        emptyMessage="No Dreamboards match the current filters."
       />
 
       <AdminPagination

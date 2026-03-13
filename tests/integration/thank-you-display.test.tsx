@@ -105,6 +105,7 @@ describe('thank-you display integration', () => {
   afterEach(() => {
     cleanup();
     vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
     localStorage.clear();
   });
 
@@ -134,28 +135,9 @@ describe('thank-you display integration', () => {
     expect(screen.getByText('Thank you, Friend!')).toBeInTheDocument();
   });
 
-  it('renders charity impact section when board has charity enabled', () => {
+  it('does not render the legacy charity impact section', () => {
     const view = buildThankYouViewModel({
-      board: makeBoard({
-        charityEnabled: true,
-        charityName: 'Ikamva Youth',
-        charitySplitType: 'percentage',
-        charityPercentageBps: 2000,
-      }),
-      contribution: makeContribution({ amountCents: 10000, charityCents: 2000 }),
-    });
-
-    render(
-      <ThankYouClient view={view} slug="maya-birthday" requestReceiptAction={async () => ({ success: true })} />
-    );
-
-    expect(screen.getAllByText(/Ikamva Youth/).length).toBeGreaterThan(0);
-    expect(screen.getByText(/of your contribution will support Ikamva Youth/)).toBeInTheDocument();
-  });
-
-  it('hides charity impact section when board has no charity', () => {
-    const view = buildThankYouViewModel({
-      board: makeBoard({ charityEnabled: false }),
+      board: makeBoard({ charityEnabled: true, charityName: 'Ikamva Youth' }),
       contribution: makeContribution(),
     });
 

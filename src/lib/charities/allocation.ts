@@ -2,6 +2,7 @@ import { and, eq, ne, sql } from 'drizzle-orm';
 
 import { db } from '@/lib/db';
 import { contributions, dreamBoards } from '@/lib/db/schema';
+import { isCharityProductEnabled } from '@/lib/charities/product-capability';
 import { LOCKED_CHARITY_SPLIT_MODES } from '@/lib/ux-v2/decision-locks';
 
 export const calculatePercentageCharityCents = (params: {
@@ -42,12 +43,12 @@ export const resolveCharityCentsFromContext = (
   context: ContributionCharityContext,
   alreadyAllocatedCents: number
 ): number | null => {
-  if (!context.charityEnabled) {
-    return null;
-  }
-
   if (context.paymentStatus === 'completed' && context.existingCharityCents !== null) {
     return context.existingCharityCents;
+  }
+
+  if (!isCharityProductEnabled() || !context.charityEnabled) {
+    return null;
   }
 
   if (!context.charityId || !context.charitySplitType) {

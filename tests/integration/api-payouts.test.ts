@@ -98,7 +98,7 @@ describe('GET /api/v1/payouts/pending', () => {
     expect(markApiKeyUsed).toHaveBeenCalledWith('api-key-3');
   });
 
-  it('accepts charity payout type filters', async () => {
+  it('rejects charity payout type filters from the public contract', async () => {
     mockAuth();
 
     const listPendingPayoutsForApi = vi.fn(async () => []);
@@ -111,11 +111,11 @@ describe('GET /api/v1/payouts/pending', () => {
     const response = await GET(
       new Request('http://localhost/api/v1/payouts/pending?type=charity')
     );
+    const payload = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(listPendingPayoutsForApi).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'charity' })
-    );
+    expect(response.status).toBe(400);
+    expect(payload.error.code).toBe('validation_error');
+    expect(listPendingPayoutsForApi).not.toHaveBeenCalled();
   });
 });
 

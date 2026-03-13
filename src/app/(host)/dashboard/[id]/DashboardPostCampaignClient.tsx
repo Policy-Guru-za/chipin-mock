@@ -136,12 +136,6 @@ export function DashboardPostCampaignClient({
             <span>Total Raised</span>
             <span className="font-semibold">{view.raisedLabel}</span>
           </div>
-          {view.charityEnabled ? (
-            <div className="flex items-center justify-between text-text-muted">
-              <span>Charity contribution</span>
-              <span>-{view.charityLabel}</span>
-            </div>
-          ) : null}
           <hr className="border-border" />
           <div className="rounded-lg bg-primary-50 px-4 py-3">
             <div className="flex items-center justify-between">
@@ -174,9 +168,7 @@ export function DashboardPostCampaignClient({
                     />
                     <span className={payoutColor.textClass}>{payout.statusLabel}</span>
                   </div>
-                  <p className="mt-2 font-warmth-sans text-xs text-text-muted">
-                    {payout.type === 'charity' ? 'via Charity' : `via ${view.payoutMethodLabel}`}
-                  </p>
+                  <p className="mt-2 font-warmth-sans text-xs text-text-muted">{`via ${view.payoutMethodLabel}`}</p>
                   {payout.externalRef ? (
                     <p className="font-warmth-sans text-xs text-text-muted">Ref: {payout.externalRef}</p>
                   ) : null}

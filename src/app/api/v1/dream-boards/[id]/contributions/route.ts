@@ -22,14 +22,14 @@ export const GET = withApiAuth(
     const idCheck = validatePublicId(params.id, {
       requestId,
       headers: rateLimitHeaders,
-      message: 'Invalid dream board identifier',
+      message: 'Invalid Dreamboard identifier',
     });
     if (!idCheck.ok) return idCheck.response;
 
     const board = await getDreamBoardByPublicId(params.id, context.apiKey.partnerId);
     if (!board) {
       return jsonError({
-        error: { code: 'not_found', message: 'Dream board not found' },
+        error: { code: 'not_found', message: 'Dreamboard not found' },
         status: 404,
         requestId,
         headers: rateLimitHeaders,

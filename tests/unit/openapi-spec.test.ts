@@ -5,7 +5,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { openApiSpec } from '@/lib/api/openapi';
 import {
-  LOCKED_CHARITY_SPLIT_MODES,
   LOCKED_PAYOUT_METHODS,
   LOCKED_PAYOUT_TYPES,
 } from '@/lib/ux-v2/decision-locks';
@@ -14,6 +13,7 @@ const ORIGINAL_ENV = {
   UX_V2_ENABLE_KARRI_WRITE_PATH: process.env.UX_V2_ENABLE_KARRI_WRITE_PATH,
   UX_V2_ENABLE_BANK_WRITE_PATH: process.env.UX_V2_ENABLE_BANK_WRITE_PATH,
   UX_V2_ENABLE_CHARITY_WRITE_PATH: process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH,
+  UX_V2_ENABLE_CHARITY_PRODUCT: process.env.UX_V2_ENABLE_CHARITY_PRODUCT,
 };
 
 const restoreEnvValue = (key: keyof typeof ORIGINAL_ENV, value: string | undefined) => {
@@ -34,6 +34,7 @@ afterEach(() => {
   restoreEnvValue('UX_V2_ENABLE_KARRI_WRITE_PATH', ORIGINAL_ENV.UX_V2_ENABLE_KARRI_WRITE_PATH);
   restoreEnvValue('UX_V2_ENABLE_BANK_WRITE_PATH', ORIGINAL_ENV.UX_V2_ENABLE_BANK_WRITE_PATH);
   restoreEnvValue('UX_V2_ENABLE_CHARITY_WRITE_PATH', ORIGINAL_ENV.UX_V2_ENABLE_CHARITY_WRITE_PATH);
+  restoreEnvValue('UX_V2_ENABLE_CHARITY_PRODUCT', ORIGINAL_ENV.UX_V2_ENABLE_CHARITY_PRODUCT);
   vi.resetModules();
 });
 
@@ -44,24 +45,24 @@ describe('openapi spec', () => {
     expect(json).toEqual(openApiSpec);
   });
 
-  it('matches locked enum values for payout and charity schemas', () => {
+  it('matches locked enum values for the public payout schemas', () => {
     expect(openApiSpec.components.schemas.PayoutMethod.enum).toEqual(LOCKED_PAYOUT_METHODS);
-    expect(openApiSpec.components.schemas.PayoutType.enum).toEqual(LOCKED_PAYOUT_TYPES);
-    expect(openApiSpec.components.schemas.CharitySplitType.enum).toEqual(
-      LOCKED_CHARITY_SPLIT_MODES
-    );
+    expect(openApiSpec.components.schemas.PayoutType.enum).toEqual(LOCKED_PAYOUT_METHODS);
+    expect(openApiSpec.components.schemas.PayoutType.enum).not.toEqual(LOCKED_PAYOUT_TYPES);
   });
 
-  it('documents dream board bank and charity contract fields', () => {
+  it('documents Dreamboard bank contract fields and omits charity fields', () => {
     const createRequest = openApiSpec.components.schemas.DreamBoardCreateRequest;
     const updateRequest = openApiSpec.components.schemas.DreamBoardUpdateRequest;
 
     expect(createRequest.properties).toHaveProperty('payout_method');
     expect(createRequest.properties).toHaveProperty('bank_account_number');
-    expect(createRequest.properties).toHaveProperty('charity_enabled');
+    expect(createRequest.properties).not.toHaveProperty('charity_enabled');
     expect(updateRequest.properties).toHaveProperty('payout_method');
     expect(updateRequest.properties).toHaveProperty('bank_account_number');
-    expect(updateRequest.properties).toHaveProperty('charity_enabled');
+    expect(updateRequest.properties).not.toHaveProperty('charity_enabled');
+    expect(openApiSpec.components.schemas.DreamBoard.properties).not.toHaveProperty('charity_enabled');
+    expect(openApiSpec.components.schemas.Contribution.properties).not.toHaveProperty('charity_cents');
   });
 
   it('documents voucher fulfilment contact fields on payout recipient data', () => {
@@ -97,6 +98,7 @@ describe('openapi spec', () => {
     process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
     process.env.UX_V2_ENABLE_BANK_WRITE_PATH = 'true';
     process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH = 'true';
+    process.env.UX_V2_ENABLE_CHARITY_PRODUCT = 'true';
 
     const content = readFileSync(resolve(process.cwd(), 'public', 'v1', 'openapi.json'), 'utf8');
     const json = JSON.parse(content);
@@ -108,6 +110,9 @@ describe('openapi spec', () => {
     );
     expect(flagEnabledSpec.components.schemas.PayoutMethod.description).not.toContain(
       'enabled for this environment'
+    );
+    expect(flagEnabledSpec.components.schemas.DreamBoardCreateRequest.properties).not.toHaveProperty(
+      'charity_enabled'
     );
   });
 });

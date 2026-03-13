@@ -10,7 +10,7 @@ import {
 } from '@/lib/admin';
 
 describe('admin csv payload mappers', () => {
-  it('maps dream board rows to csv schema', () => {
+  it('maps Dreamboard rows to csv schema', () => {
     const rows = toAdminDreamBoardCsvRows([
       {
         id: 'db-1',

@@ -16,6 +16,18 @@ const closeSchema = z.object({
   reason: z.enum(['manual', 'party_date_reached', 'goal_reached']),
 });
 
+const serializePublicPayouts = (
+  payouts: Array<{ id: string; type: string; status: string; netCents: number }>
+) =>
+  payouts
+    .filter((payout) => payout.type !== 'charity')
+    .map((payout) => ({
+      id: payout.id,
+      type: payout.type,
+      status: payout.status,
+      net_cents: payout.netCents,
+    }));
+
 export const POST = withApiAuth(
   'dreamboards:write',
   async (request: NextRequest, context, params: { id: string }) => {
@@ -24,7 +36,7 @@ export const POST = withApiAuth(
     const idCheck = validatePublicId(params.id, {
       requestId,
       headers: rateLimitHeaders,
-      message: 'Invalid dream board identifier',
+      message: 'Invalid Dreamboard identifier',
     });
     if (!idCheck.ok) return idCheck.response;
 
@@ -39,7 +51,7 @@ export const POST = withApiAuth(
     const board = await getDreamBoardByPublicId(params.id, context.apiKey.partnerId);
     if (!board) {
       return jsonError({
-        error: { code: 'not_found', message: 'Dream board not found' },
+        error: { code: 'not_found', message: 'Dreamboard not found' },
         status: 404,
         requestId,
         headers: rateLimitHeaders,
@@ -48,7 +60,7 @@ export const POST = withApiAuth(
 
     if (['cancelled', 'expired'].includes(board.status)) {
       return jsonError({
-        error: { code: 'conflict', message: 'Dream board cannot be closed' },
+        error: { code: 'conflict', message: 'Dreamboard cannot be closed' },
         status: 409,
         requestId,
         headers: rateLimitHeaders,
@@ -57,7 +69,7 @@ export const POST = withApiAuth(
 
     if (board.status === 'draft') {
       return jsonError({
-        error: { code: 'conflict', message: 'Dream board is not active yet' },
+        error: { code: 'conflict', message: 'Dreamboard is not active yet' },
         status: 409,
         requestId,
         headers: rateLimitHeaders,
@@ -71,12 +83,7 @@ export const POST = withApiAuth(
           id: board.id,
           status: board.status,
           raised_cents: board.raisedCents,
-          payouts: payouts.map((payout) => ({
-            id: payout.id,
-            type: payout.type,
-            status: payout.status,
-            net_cents: payout.netCents,
-          })),
+          payouts: serializePublicPayouts(payouts),
         },
         requestId,
         headers: rateLimitHeaders,
@@ -117,7 +124,7 @@ export const POST = withApiAuth(
     const updated = await getDreamBoardByPublicId(params.id, context.apiKey.partnerId);
     if (!updated) {
       return jsonError({
-        error: { code: 'internal_error', message: 'Unable to load dream board' },
+        error: { code: 'internal_error', message: 'Unable to load Dreamboard' },
         status: 500,
         requestId,
         headers: rateLimitHeaders,
@@ -130,12 +137,7 @@ export const POST = withApiAuth(
         id: updated.id,
         status: updated.status,
         raised_cents: updated.raisedCents,
-        payouts: payouts.map((payout) => ({
-          id: payout.id,
-          type: payout.type,
-          status: payout.status,
-          net_cents: payout.netCents,
-        })),
+        payouts: serializePublicPayouts(payouts),
       },
       requestId,
       headers: rateLimitHeaders,

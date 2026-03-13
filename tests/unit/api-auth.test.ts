@@ -56,7 +56,7 @@ describe('requireApiKey', () => {
     }
   });
 
-  it('accepts normalized dream board scope', async () => {
+  it('accepts normalized Dreamboard scope', async () => {
     const getApiKeyByHash = vi.fn(async () => ({
       id: 'api-key-2',
       partnerId: 'partner-1',

@@ -29,11 +29,6 @@ export type GuestViewModel = {
   displayTitle: string;
   displaySubtitle: string;
   displayImage: string;
-  charityEnabled: boolean;
-  charityName: string | null;
-  charityDescription: string | null;
-  charityLogoUrl: string | null;
-  charityAllocationLabel: string | null;
   timeRemainingMessage: string;
   timeRemainingUrgency: TimeRemainingUrgency;
   isActive: boolean;
@@ -58,11 +53,6 @@ export type ThankYouViewModel = {
   contributorName: string | null;
   isAnonymous: boolean;
   contributionAmountCents: number;
-  charityEnabled: boolean;
-  charityName: string | null;
-  charityDescription: string | null;
-  charityLogoUrl: string | null;
-  charityAmountCents: number | null;
   childName: string;
   contributionId: string | null;
   contributorEmail: string | null;
@@ -208,37 +198,6 @@ const getTimeRemainingInfo = (params: { board: DreamBoardRecord; now: Date }) =>
   };
 };
 
-const getCharityAllocationLabel = (board: DreamBoardRecord) => {
-  if (!board.charityEnabled || !board.charityName) {
-    return null;
-  }
-
-  if (board.charitySplitType === 'percentage' && board.charityPercentageBps) {
-    return `${Math.round(board.charityPercentageBps / 100)}% of contributions support ${board.charityName}`;
-  }
-
-  if (board.charitySplitType === 'threshold' && board.charityThresholdCents) {
-    return `Up to R${Math.round(board.charityThresholdCents / 100).toLocaleString('en-ZA')} will go to ${board.charityName}`;
-  }
-
-  return null;
-};
-
-const getThankYouCharityAmountCents = (params: {
-  board: DreamBoardRecord;
-  contribution?: ContributionRecord | null;
-}) => {
-  if (!params.board.charityEnabled || !params.contribution) {
-    return null;
-  }
-
-  if (typeof params.contribution.charityCents === 'number') {
-    return params.contribution.charityCents;
-  }
-
-  return null;
-};
-
 export const buildGuestViewModel = (
   board: DreamBoardRecord,
   options: GuestViewModelOptions = {}
@@ -273,11 +232,6 @@ export const buildGuestViewModel = (
     displayTitle,
     displaySubtitle,
     displayImage,
-    charityEnabled: board.charityEnabled,
-    charityName: board.charityName ?? null,
-    charityDescription: board.charityDescription ?? null,
-    charityLogoUrl: board.charityLogoUrl ?? null,
-    charityAllocationLabel: getCharityAllocationLabel(board),
     timeRemainingMessage: timeRemaining.message,
     timeRemainingUrgency: timeRemaining.urgency,
     isActive,
@@ -316,11 +270,6 @@ export const buildThankYouViewModel = (params: {
       ? params.contribution.isAnonymous || !params.contribution.contributorName
       : false,
     contributionAmountCents: params.contribution?.amountCents ?? 0,
-    charityEnabled: params.board.charityEnabled,
-    charityName: params.board.charityName ?? null,
-    charityDescription: params.board.charityDescription ?? null,
-    charityLogoUrl: params.board.charityLogoUrl ?? null,
-    charityAmountCents: getThankYouCharityAmountCents(params),
     childName: params.board.childName,
     contributionId: params.contribution?.id ?? null,
     contributorEmail: params.contribution?.contributorEmail ?? null,

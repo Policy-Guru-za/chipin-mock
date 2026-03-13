@@ -33,7 +33,7 @@ export async function seedDatabase() {
   const [host] = await db
     .insert(hosts)
     .values({
-      email: 'lerato@chipin.co.za',
+      email: 'lerato@gifta.co.za',
       name: 'Lerato Mahlangu',
     })
     .returning({ id: hosts.id });
@@ -57,14 +57,12 @@ export async function seedDatabase() {
       giftImageUrl: '/icons/gifts/train.png',
       giftImagePrompt: null,
       goalCents: 35000,
-      // v2.0: Karri Card is sole payout method
-      payoutMethod: 'karri_card',
-      karriCardNumber: '5234123456781234',
-      karriCardHolderName: 'Maya Mahlangu',
+      // v2.0+: Voucher-first active payout path
+      payoutMethod: 'takealot_voucher',
       hostWhatsAppNumber: '+27821234567',
       message: "Let's make Maya's birthday magical.",
       status: 'active',
-      payoutEmail: 'lerato@chipin.co.za',
+      payoutEmail: 'lerato@gifta.co.za',
     })
     .returning({ id: dreamBoards.id });
 
@@ -80,20 +78,24 @@ export async function seedDatabase() {
     paymentStatus: 'completed',
   });
 
-  // v2.0: Karri Card is sole payout type
+  // v2.0+: Voucher payout row for the active seeded flow
   const [payout] = await db
     .insert(payouts)
     .values({
       partnerId: DEFAULT_PARTNER_ID,
       dreamBoardId: dreamBoard.id,
-      type: 'karri_card',
+      type: 'takealot_voucher',
       grossCents: 5000,
       feeCents: 0,
       netCents: 5000,
       recipientData: {
-        email: 'lerato@chipin.co.za',
-        karriCardNumber: '5234123456781234',
-        karriCardHolderName: 'Maya Mahlangu',
+        email: 'lerato@gifta.co.za',
+        payoutMethod: 'takealot_voucher',
+        hostWhatsAppNumber: '+27821234567',
+        childName: 'Maya',
+        giftName: 'Wooden Train Set',
+        giftImageUrl: '/icons/gifts/train.png',
+        fulfilmentMode: 'manual_placeholder',
       },
       status: 'pending',
     })

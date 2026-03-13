@@ -11,7 +11,8 @@ describe('auth-aware navigation and user avatar menu', () => {
     const marketingPage = readSource('src/app/(marketing)/page.tsx');
 
     expect(marketingPage).toContain('getClerkConfigStatus().isEnabled');
-    expect(marketingPage).toContain('<LandingPage isClerkEnabled={isClerkEnabled} />');
+    expect(marketingPage).toContain('<LandingPage');
+    expect(marketingPage).toContain('isClerkEnabled={isClerkEnabled}');
     expect(landingNav).toContain('SignedOut');
     expect(landingNav).toContain('SignedIn');
     expect(landingNav).toContain('href="/sign-in"');

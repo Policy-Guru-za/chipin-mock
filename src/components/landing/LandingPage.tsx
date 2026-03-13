@@ -10,7 +10,6 @@ import {
   LandingTestimonial,
   LandingCTA,
   LandingHowItWorks,
-  LandingGivingBack,
   LandingFooter,
 } from './index';
 
@@ -71,8 +70,6 @@ export function LandingPage({ isClerkEnabled = false }: LandingPageProps) {
       </div>
 
       <LandingHowItWorks />
-
-      <LandingGivingBack />
 
       {/* Closing CTA — contract: copy-matrix-compliance + colour-contrast */}
       <section className="px-6 py-14 md:px-10 md:py-20">

@@ -4,7 +4,6 @@ import Link from 'next/link';
 import type { FormEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
-import { CharitableGivingCard } from '@/components/dream-board/CharitableGivingCard';
 import { ConfettiTrigger } from '@/components/effects/ConfettiTrigger';
 import { Button } from '@/components/ui/button';
 import type { ThankYouViewModel } from '@/lib/dream-boards/view-model';
@@ -82,10 +81,6 @@ export function ThankYouClient({ view, slug, requestReceiptAction }: ThankYouCli
     window.setTimeout(() => setReceiptFeedback(''), 5000);
   };
 
-  const charityImpactCopy =
-    view.charityAmountCents && view.charityName
-      ? `${formatZar(view.charityAmountCents)} of your contribution will support ${view.charityName}. Thank you for giving twice! 💚`
-      : null;
   const showReceiptSection = Boolean(view.contributionId && view.isContributionCompleted);
 
   return (
@@ -109,16 +104,6 @@ export function ThankYouClient({ view, slug, requestReceiptAction }: ThankYouCli
             <p className="text-sm text-gray-600">{view.childName}&apos;s parents have been notified. 💝</p>
           ) : null}
         </header>
-
-        {view.charityEnabled && view.charityName && charityImpactCopy ? (
-          <CharitableGivingCard
-            charityName={view.charityName}
-            charityDescription={view.charityDescription}
-            charityLogoUrl={view.charityLogoUrl}
-            allocationLabel={charityImpactCopy}
-            impactCopy={charityImpactCopy}
-          />
-        ) : null}
 
         {showReceiptSection ? (
           <section aria-label="Receipt capture" className="space-y-3 rounded-2xl bg-subtle p-4 text-left">

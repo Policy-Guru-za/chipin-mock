@@ -171,7 +171,7 @@ describe('POST /api/v1/dream-boards/[id]/close', () => {
     expect(createPayoutsForDreamBoard).toHaveBeenCalled();
   });
 
-  it('returns gift and charity payouts for charity-enabled boards', async () => {
+  it('filters charity payouts out of the public close response', async () => {
     mockAuth();
     const update = mockDb();
 
@@ -227,12 +227,9 @@ describe('POST /api/v1/dream-boards/[id]/close', () => {
     expect(createPayoutsForDreamBoard).toHaveBeenCalledWith(
       expect.objectContaining({ dreamBoardId: 'board-1' })
     );
-    expect(payload.data.payouts).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ type: 'karri_card', net_cents: 16200 }),
-        expect.objectContaining({ type: 'charity', net_cents: 3000 }),
-      ])
-    );
+    expect(payload.data.payouts).toEqual([
+      expect.objectContaining({ type: 'karri_card', net_cents: 16200 }),
+    ]);
   });
 
   it('returns bank payout rows for bank payout boards', async () => {

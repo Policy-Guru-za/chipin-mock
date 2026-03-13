@@ -242,3 +242,7 @@ JSON
 - C-R2/C-R3/C-R4 prep quality depends on concrete healthy/unhealthy definitions and threshold values in the checklist itself, not only in the runbook/prompt.
 - C9A handoff payload is strongest when it includes exact C9B operator steps, rollback triggers, and explicit pending sections for human-run fields.
 - C9B live deploy/smoke cannot be executed from this workspace if `vercel` CLI is missing; record blocker explicitly in C9 evidence instead of implying execution happened.
+
+## C10 Learnings (2026-03-13)
+- When a feature is removed from the active public contract, update all three layers together: strict request validation, serializer/query filtering, and generated OpenAPI. Removing only one layer leaves ghost behavior.
+- Capability-off defaults need explicit env opt-in in historical regression tests; otherwise valid legacy math/view-model coverage silently flips to `null` and looks like a runtime regression.

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const dbMock = vi.hoisted(() => ({
   select: vi.fn(),
@@ -42,6 +42,10 @@ const makeSumQuery = (total: number) => {
 describe('charity allocation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it('calculates percentage allocations with deterministic rounding', () => {
@@ -119,6 +123,8 @@ describe('charity allocation', () => {
   });
 
   it('resolves threshold allocations using prior completed board allocations', async () => {
+    vi.stubEnv('UX_V2_ENABLE_CHARITY_PRODUCT', 'true');
+
     dbMock.select
       .mockReturnValueOnce(
         makeContextQuery({
@@ -171,7 +177,13 @@ describe('charity allocation completion', () => {
     vi.clearAllMocks();
   });
 
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it('completes contributions atomically with advisory locking', async () => {
+    vi.stubEnv('UX_V2_ENABLE_CHARITY_PRODUCT', 'true');
+
     const updateWhere = vi.fn(async () => undefined);
     const updateSet = vi.fn(() => ({ where: updateWhere }));
     const tx = {

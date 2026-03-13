@@ -12,7 +12,7 @@ import {
 import { encodeCursor } from '@/lib/api/pagination';
 
 describe('admin query param parsers', () => {
-  it('parses dream board filters with cursor and limits', () => {
+  it('parses Dreamboard filters with cursor and limits', () => {
     const cursor = encodeCursor({ createdAt: new Date('2026-02-01T00:00:00.000Z'), id: 'db-1' });
     const params = new URLSearchParams({
       limit: '120',

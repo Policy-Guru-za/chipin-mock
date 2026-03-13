@@ -7,7 +7,6 @@ type PayoutApiRecord = {
   type: string;
   grossCents: number;
   feeCents: number;
-  charityCents?: number;
   netCents: number;
   recipientData: unknown;
   status: string;
@@ -53,15 +52,6 @@ const serializeRecipientBasics = (record: Record<string, unknown>) => {
   if (typeof record.bankAccountHolder === 'string') {
     payload.bank_account_holder = record.bankAccountHolder;
   }
-  if (typeof record.charityId === 'string') payload.charity_id = record.charityId;
-  if (typeof record.charityName === 'string') payload.charity_name = record.charityName;
-  if (typeof record.charitySplitType === 'string') payload.charity_split_type = record.charitySplitType;
-  if (typeof record.charityPercentageBps === 'number') {
-    payload.charity_percentage_bps = record.charityPercentageBps;
-  }
-  if (typeof record.charityThresholdCents === 'number') {
-    payload.charity_threshold_cents = record.charityThresholdCents;
-  }
   return payload;
 };
 
@@ -104,7 +94,6 @@ export const serializePayout = (record: PayoutApiRecord) => ({
   gross_cents: record.grossCents,
   // Legacy compatibility field retained for historical payout rows.
   fee_cents: record.feeCents,
-  charity_cents: record.charityCents ?? 0,
   net_cents: record.netCents,
   recipient_data: serializeRecipientData(record.recipientData),
   status: record.status,

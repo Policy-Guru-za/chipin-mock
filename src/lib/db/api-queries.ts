@@ -1,4 +1,4 @@
-import { and, desc, eq, lt, or, sql, type SQL } from 'drizzle-orm';
+import { and, desc, eq, lt, ne, or, sql, type SQL } from 'drizzle-orm';
 
 import type { PaginationCursor } from '@/lib/api/pagination';
 import type { WebhookEventType } from '@/lib/webhooks';
@@ -32,11 +32,6 @@ const dreamBoardApiFields = {
   bankBranchCode: dreamBoards.bankBranchCode,
   bankAccountHolder: dreamBoards.bankAccountHolder,
   payoutEmail: dreamBoards.payoutEmail,
-  charityEnabled: dreamBoards.charityEnabled,
-  charityId: dreamBoards.charityId,
-  charitySplitType: dreamBoards.charitySplitType,
-  charityPercentageBps: dreamBoards.charityPercentageBps,
-  charityThresholdCents: dreamBoards.charityThresholdCents,
   message: dreamBoards.message,
   status: dreamBoards.status,
   createdAt: dreamBoards.createdAt,
@@ -130,7 +125,6 @@ export const listContributionsForApi = async (params: {
       amountCents: contributions.amountCents,
       feeCents: contributions.feeCents,
       netCents: contributions.netCents,
-      charityCents: contributions.charityCents,
       paymentStatus: contributions.paymentStatus,
       createdAt: contributions.createdAt,
     })
@@ -150,7 +144,6 @@ export const getContributionForApi = async (params: { id: string; partnerId: str
       amountCents: contributions.amountCents,
       feeCents: contributions.feeCents,
       netCents: contributions.netCents,
-      charityCents: contributions.charityCents,
       paymentStatus: contributions.paymentStatus,
       createdAt: contributions.createdAt,
     })
@@ -170,6 +163,7 @@ export const listPendingPayoutsForApi = async (params: {
   const conditions: SQL[] = [
     eq(payouts.partnerId, params.partnerId),
     eq(payouts.status, 'pending'),
+    ne(payouts.type, 'charity'),
   ];
   if (params.type) {
     conditions.push(eq(payouts.type, params.type as PayoutType));
@@ -191,7 +185,6 @@ export const listPendingPayoutsForApi = async (params: {
       type: payouts.type,
       grossCents: payouts.grossCents,
       feeCents: payouts.feeCents,
-      charityCents: payouts.charityCents,
       netCents: payouts.netCents,
       recipientData: payouts.recipientData,
       status: payouts.status,
@@ -214,7 +207,6 @@ export const getPayoutForApi = async (params: { id: string; partnerId: string })
       type: payouts.type,
       grossCents: payouts.grossCents,
       feeCents: payouts.feeCents,
-      charityCents: payouts.charityCents,
       netCents: payouts.netCents,
       recipientData: payouts.recipientData,
       status: payouts.status,
@@ -224,7 +216,13 @@ export const getPayoutForApi = async (params: { id: string; partnerId: string })
       completedAt: payouts.completedAt,
     })
     .from(payouts)
-    .where(and(eq(payouts.id, params.id), eq(payouts.partnerId, params.partnerId)))
+    .where(
+      and(
+        eq(payouts.id, params.id),
+        eq(payouts.partnerId, params.partnerId),
+        ne(payouts.type, 'charity')
+      )
+    )
     .limit(1);
 
   return payout ?? null;

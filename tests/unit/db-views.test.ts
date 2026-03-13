@@ -13,7 +13,7 @@ describe('db views', () => {
     vi.clearAllMocks();
   });
 
-  it('returns board row when dream board exists', async () => {
+  it('returns board row when a Dreamboard exists', async () => {
     const row = {
       id: 'db_1',
       slug: 'maya-board',
@@ -42,7 +42,7 @@ describe('db views', () => {
     expect(dbMock.execute).toHaveBeenCalledTimes(1);
   });
 
-  it('returns null when dream board view has no rows', async () => {
+  it('returns null when the Dreamboard view has no rows', async () => {
     dbMock.execute.mockResolvedValueOnce({ rows: [] });
 
     const result = await getDreamBoardWithTotals('missing');
@@ -50,7 +50,7 @@ describe('db views', () => {
     expect(result).toBeNull();
   });
 
-  it('fetches expiring dream boards using default limit', async () => {
+  it('fetches expiring Dreamboards using the default limit', async () => {
     const rows = [
       {
         id: 'db_2',

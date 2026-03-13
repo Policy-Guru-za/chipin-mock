@@ -10,7 +10,6 @@ import {
   CogIcon,
   DashboardIcon,
   GiftIcon,
-  HeartIcon,
   MenuIcon,
   WalletIcon,
   XIcon,
@@ -21,12 +20,11 @@ type AdminSidebarProps = {
   userEmail: string;
 };
 
-const navItems = [
+const baseNavItems = [
   { href: '/admin', label: 'Dashboard', Icon: DashboardIcon },
   { href: '/admin/dream-boards', label: 'Dreamboards', Icon: GiftIcon },
   { href: '/admin/contributions', label: 'Contributions', Icon: WalletIcon },
   { href: '/admin/payouts', label: 'Payout queue', Icon: BanknotesIcon },
-  { href: '/admin/charities', label: 'Charity management', Icon: HeartIcon },
   { href: '/admin/reports', label: 'Financial reports', Icon: ChartBarIcon },
   { href: '/admin/settings', label: 'Settings', Icon: CogIcon },
 ];
@@ -34,7 +32,17 @@ const navItems = [
 const isActive = (pathname: string, href: string) =>
   href === '/admin' ? pathname === '/admin' : pathname.startsWith(href);
 
-const NavContent = ({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) => (
+type NavItem = (typeof baseNavItems)[number];
+
+const NavContent = ({
+  pathname,
+  navItems,
+  onNavigate,
+}: {
+  pathname: string;
+  navItems: NavItem[];
+  onNavigate?: () => void;
+}) => (
   <nav aria-label="Admin navigation" className="mt-4">
     <ul className="space-y-2">
       {navItems.map((item) => {
@@ -68,6 +76,7 @@ export function AdminSidebar({ userEmail }: AdminSidebarProps) {
 
   const normalizedPathname = useMemo(() => pathname || '/admin', [pathname]);
   const isOpen = openForPath === normalizedPathname;
+  const navItems = useMemo(() => baseNavItems, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -84,7 +93,7 @@ export function AdminSidebar({ userEmail }: AdminSidebarProps) {
     <>
       <aside className="hidden h-screen w-60 shrink-0 border-r border-gray-200 bg-white px-4 py-6 lg:fixed lg:inset-y-0 lg:left-0 lg:block">
         <p className="font-display text-lg font-bold text-teal-600">Gifta Admin</p>
-        <NavContent pathname={normalizedPathname} />
+        <NavContent pathname={normalizedPathname} navItems={navItems} />
         <p className="mt-6 truncate text-xs text-gray-500">{userEmail}</p>
       </aside>
 
@@ -131,7 +140,11 @@ export function AdminSidebar({ userEmail }: AdminSidebarProps) {
                 <XIcon />
               </button>
             </div>
-            <NavContent pathname={normalizedPathname} onNavigate={() => setOpenForPath(null)} />
+            <NavContent
+              pathname={normalizedPathname}
+              navItems={navItems}
+              onNavigate={() => setOpenForPath(null)}
+            />
           </aside>
         </div>
       ) : null}

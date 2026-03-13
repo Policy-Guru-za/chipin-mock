@@ -86,7 +86,7 @@ export default async function AdminContributionsPage({
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-bold text-text">Contributions</h1>
-          <p className="text-sm text-gray-500">Contribution ledger across all dream boards.</p>
+          <p className="text-sm text-gray-500">Contribution ledger across all Dreamboards.</p>
         </div>
         <Button asChild variant="outline" size="sm">
           <Link href={buildHref('/admin/contributions/export', exportParams)}>Export CSV</Link>

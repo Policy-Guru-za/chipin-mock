@@ -25,7 +25,7 @@ export default async function AdminReportsPage({
     <section className="space-y-4">
       <header>
         <h1 className="font-display text-2xl font-bold text-text">Financial reports</h1>
-        <p className="text-sm text-gray-500">Downloadable finance and charity reconciliation views.</p>
+        <p className="text-sm text-gray-500">Downloadable finance views and historical reconciliation data.</p>
       </header>
 
       <ReportsClient

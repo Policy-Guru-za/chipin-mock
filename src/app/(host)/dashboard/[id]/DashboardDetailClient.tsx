@@ -292,12 +292,6 @@ export function DashboardDetailClient({
                       ) : null}
                     </div>
                   ) : null}
-                  {view.givingBackLabel ? (
-                    <p className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-plum-soft bg-plum-wash px-4 py-1 font-warmth-sans text-[12px] font-semibold text-plum">
-                      <span aria-hidden="true">💜</span>
-                      {view.givingBackLabel}
-                    </p>
-                  ) : null}
                 </div>
               </div>
               <span

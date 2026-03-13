@@ -4,7 +4,6 @@ import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { cache } from 'react';
 
-import { CharitableGivingCard } from '@/components/dream-board/CharitableGivingCard';
 import { ContributorDisplay } from '@/components/dream-board/ContributorDisplay';
 import {
   buildDreamboardCtaStateMessage,
@@ -121,14 +120,6 @@ export default async function DreamBoardPage({
       <div className="mx-auto mt-6 grid w-full max-w-[1040px] grid-cols-1 gap-6 px-4 sm:px-6 min-[840px]:grid-cols-[minmax(0,1fr)_360px] min-[840px]:items-start">
         <div className="space-y-6">
           <GiftCard view={view} />
-          {view.charityEnabled && view.charityName && view.charityAllocationLabel ? (
-            <CharitableGivingCard
-              charityName={view.charityName}
-              charityDescription={view.charityDescription}
-              charityLogoUrl={view.charityLogoUrl}
-              allocationLabel={view.charityAllocationLabel}
-            />
-          ) : null}
         </div>
 
         <div className="space-y-6 min-[840px]:sticky min-[840px]:top-8">

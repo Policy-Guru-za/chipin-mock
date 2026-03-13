@@ -46,7 +46,6 @@ export interface DashboardCardViewModel {
   timeLabel: string;
   statusVariant: DashboardStatusVariant;
   isComplete: boolean;
-  charityEnabled: boolean;
 }
 
 export interface PayoutSummary {
@@ -84,8 +83,6 @@ export interface DashboardDetailViewModel {
   totalFeeCents: number;
   totalCharityCents: number;
   netPayoutCents: number;
-  feeLabel: string;
-  charityLabel: string;
   payoutLabel: string;
   contributionCount: number;
   messageCount: number;
@@ -95,9 +92,6 @@ export interface DashboardDetailViewModel {
   payoutMethodLabel: string;
   payoutRecipientDisplay: string;
   payouts: PayoutSummary[];
-  charityEnabled: boolean;
-  charityName: string | null;
-  givingBackLabel: string | null;
   shareUrl: string;
   publicUrl: string;
   isComplete: boolean;
@@ -194,19 +188,6 @@ const resolveGiftInfo = (board: {
     giftDescription: null,
   });
 
-const getGivingBackLabel = (board: HostDashboardDetailRow) => {
-  if (
-    !board.charityEnabled ||
-    board.charitySplitType !== 'percentage' ||
-    typeof board.charityPercentageBps !== 'number' ||
-    !board.charityName
-  ) {
-    return null;
-  }
-
-  return `${Math.round(board.charityPercentageBps / 100)}% to ${board.charityName}`;
-};
-
 export const buildFinancialBreakdown = (
   raisedCents: number,
   feeCents: number,
@@ -215,8 +196,6 @@ export const buildFinancialBreakdown = (
   const netPayoutCents = Math.max(0, raisedCents - feeCents - charityCents);
   return {
     netPayoutCents,
-    feeLabel: formatZar(feeCents),
-    charityLabel: formatZar(charityCents),
     payoutLabel: formatZar(netPayoutCents),
   };
 };
@@ -280,7 +259,6 @@ export const buildDashboardCardViewModel = (
     timeLabel,
     statusVariant: getStatusVariant(board.status),
     isComplete,
-    charityEnabled: board.charityEnabled,
   };
 };
 
@@ -289,9 +267,10 @@ export const buildDashboardDetailViewModel = (
   payouts: HostPayoutRow[],
   options: { baseUrl: string }
 ): DashboardDetailViewModel => {
+  const visiblePayouts = payouts.filter((payout) => payout.type !== 'charity');
   const raisedCents = board.totalRaisedCents;
   const { daysRemaining, timeLabel } = resolveTime(board.campaignEndDate ?? board.partyDate);
-  const { netPayoutCents, feeLabel, charityLabel, payoutLabel } = buildFinancialBreakdown(
+  const { netPayoutCents, payoutLabel } = buildFinancialBreakdown(
     raisedCents,
     board.totalFeeCents,
     board.totalCharityCents
@@ -334,8 +313,6 @@ export const buildDashboardDetailViewModel = (
     totalFeeCents: board.totalFeeCents,
     totalCharityCents: board.totalCharityCents,
     netPayoutCents,
-    feeLabel,
-    charityLabel,
     payoutLabel,
     contributionCount: board.contributionCount,
     messageCount: board.messageCount,
@@ -344,10 +321,7 @@ export const buildDashboardDetailViewModel = (
     payoutMethod: board.payoutMethod,
     payoutMethodLabel,
     payoutRecipientDisplay,
-    payouts: payouts.map(buildPayoutSummary),
-    charityEnabled: board.charityEnabled,
-    charityName: board.charityName,
-    givingBackLabel: getGivingBackLabel(board),
+    payouts: visiblePayouts.map(buildPayoutSummary),
     shareUrl: `${options.baseUrl}/${board.slug}`,
     publicUrl: `${options.baseUrl}/${board.slug}`,
     isComplete,

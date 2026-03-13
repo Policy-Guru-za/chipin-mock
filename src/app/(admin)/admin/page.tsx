@@ -36,7 +36,7 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <AdminStatsCard label="Total GMV" value={formatZar(dataset.grossMerchandiseValueCents)} />
         <AdminStatsCard
-          label="Dream boards"
+          label="Dreamboards"
           value={String(dataset.totalBoards)}
           subtitle={`${dataset.activeBoards} active`}
         />
@@ -77,7 +77,7 @@ export default async function AdminDashboardPage() {
             <Link href="/admin/payouts">View payouts</Link>
           </Button>
           <Button asChild variant="outline" size="sm">
-            <Link href="/admin/dream-boards">View dream boards</Link>
+            <Link href="/admin/dream-boards">View Dreamboards</Link>
           </Button>
           <Button asChild variant="outline" size="sm">
             <Link href="/admin/reports">Export reports</Link>

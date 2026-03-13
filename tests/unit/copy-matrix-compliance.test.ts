@@ -126,6 +126,36 @@ describe('copy matrix compliance', () => {
     expect(page).not.toContain('Create your free Dreamboard');
   });
 
+  it('does not wire legacy charity promo surfaces into marketing', () => {
+    const marketingPage = readSource('src/app/(marketing)/page.tsx');
+    const landingPage = readSource('src/components/landing/LandingPage.tsx');
+    const landingIndex = readSource('src/components/landing/index.ts');
+    const landingContent = readSource('src/components/landing/content.ts');
+
+    expect(marketingPage).not.toContain('showGivingBack');
+    expect(landingPage).not.toContain('LandingGivingBack');
+    expect(landingIndex).not.toContain('LandingGivingBack');
+    expect(landingContent).not.toContain('givingBack');
+  });
+
+  it('blocks split Dream Board terminology in active UI and partner API text', () => {
+    const files = [
+      'src/app/(admin)/admin/page.tsx',
+      'src/app/(admin)/admin/dream-boards/page.tsx',
+      'src/app/(admin)/admin/contributions/page.tsx',
+      'src/lib/api/openapi.ts',
+      'src/app/api/v1/dream-boards/route.ts',
+      'src/app/api/v1/dream-boards/[id]/route.ts',
+      'src/app/api/v1/dream-boards/[id]/close/route.ts',
+      'src/app/api/v1/dream-boards/[id]/contributions/route.ts',
+    ];
+
+    for (const file of files) {
+      const source = readSource(file);
+      expect(source).not.toMatch(/\b[Dd]ream boards?\b/);
+    }
+  });
+
   it('uses Create Dreamboard CTA in host review', () => {
     const review = readSource('src/app/(host)/create/review/ReviewClient.tsx');
 

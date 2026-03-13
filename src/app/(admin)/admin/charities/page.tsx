@@ -24,10 +24,17 @@ export default async function AdminCharitiesPage({
 
   return (
     <section className="space-y-4">
+      <div className="rounded-r-lg border-l-4 border-amber-400 bg-amber-50 p-4 text-sm text-amber-900">
+        Historical charity records stay available here for reconciliation and settlement support.
+        Charity onboarding remains off for the active Dreamboard product, so this page is direct-access only.
+      </div>
+
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold text-text">Charity management</h1>
-          <p className="text-sm text-gray-500">Create, edit, and activate partner charities.</p>
+          <h1 className="font-display text-2xl font-bold text-text">Charity records</h1>
+          <p className="text-sm text-gray-500">
+            Historical charity contacts and reconciliation details.
+          </p>
         </div>
         <Button asChild variant="outline" size="sm">
           <Link href={buildHref('/admin/charities/export', exportParams)}>Export CSV</Link>

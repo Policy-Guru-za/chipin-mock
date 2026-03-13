@@ -5,7 +5,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
-import { CharitableGivingCard } from '@/components/dream-board/CharitableGivingCard';
 import {
   buildDreamboardCtaStateMessage,
   DreamboardCtaCard,
@@ -117,14 +116,6 @@ function PublicBoardHarness({
           hasBirthdayParty={hasPartyOutput}
         />
       ) : null}
-      {view.charityEnabled && view.charityName && view.charityAllocationLabel ? (
-        <CharitableGivingCard
-          charityName={view.charityName}
-          charityDescription={view.charityDescription}
-          charityLogoUrl={view.charityLogoUrl}
-          allocationLabel={view.charityAllocationLabel}
-        />
-      ) : null}
     </div>
   );
 }
@@ -145,27 +136,7 @@ describe('public board display integration', () => {
   afterEach(() => {
     cleanup();
     vi.unstubAllGlobals();
-  });
-
-  it('renders charity section when enabled', () => {
-    const board = makeBoard({
-      charityEnabled: true,
-      charityName: 'Ikamva Youth',
-      charitySplitType: 'percentage',
-      charityPercentageBps: 2500,
-      contributionCount: 5,
-    });
-    render(<PublicBoardHarness board={board} contributors={makeContributors(5)} />);
-
-    expect(screen.getByText('Ikamva Youth')).toBeInTheDocument();
-    expect(screen.getByText('25% of contributions support Ikamva Youth')).toBeInTheDocument();
-  });
-
-  it('hides charity section when disabled', () => {
-    const board = makeBoard({ charityEnabled: false, contributionCount: 5 });
-    render(<PublicBoardHarness board={board} contributors={makeContributors(5)} />);
-
-    expect(screen.queryByText('Ikamva Youth')).not.toBeInTheDocument();
+    vi.unstubAllEnvs();
   });
 
   it('shows empty contributor state for zero contributors', () => {

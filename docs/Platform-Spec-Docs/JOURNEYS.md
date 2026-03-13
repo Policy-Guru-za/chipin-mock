@@ -1,7 +1,7 @@
 # Journeys
 
 > **Status:** Current reference  
-> **Last reviewed:** March 12, 2026
+> **Last reviewed:** March 13, 2026
 
 ## Host Journey
 
@@ -18,6 +18,7 @@ Current create flow:
 Legacy compatibility routes `/create/giving-back` and `/create/payout` redirect to `/create/voucher`; they are not active wizard steps.
 
 Hosts then manage boards from `/dashboard` and `/dashboard/[id]`.
+Active host product UI does not surface charity summaries or controls.
 
 ## Guest Journey
 
@@ -32,6 +33,7 @@ Current display rules:
 
 - guests see percentage plus aggregate Rand progress
 - guests do not see individual contribution amounts
+- guests do not see charity panels or charity impact copy in the active product
 - host viewing own public board gets a dashboard shortcut banner
 
 ## Admin Journey
@@ -43,10 +45,11 @@ Current admin pages:
 - `/admin`
 - `/admin/dream-boards`
 - `/admin/contributions`
-- `/admin/charities`
 - `/admin/payouts`
 - `/admin/reports`
 - `/admin/settings`
+
+Historical charity reconciliation remains available through ops/admin data paths, but the charity records page is not part of the active admin navigation.
 
 ## Lifecycle Notes
 

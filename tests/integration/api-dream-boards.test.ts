@@ -74,7 +74,7 @@ describe('GET /api/v1/dream-boards/[id] auth', () => {
 });
 
 describe('GET /api/v1/dream-boards/[id] responses - missing', () => {
-  it('returns not found when dream board is missing', async () => {
+  it('returns not found when a Dreamboard is missing', async () => {
     mockAuth({
       ok: true,
       context: {
@@ -99,7 +99,7 @@ describe('GET /api/v1/dream-boards/[id] responses - missing', () => {
     expect(payload.error.code).toBe('not_found');
   });
 
-  it('returns not found when dream board belongs to another partner', async () => {
+  it('returns not found when a Dreamboard belongs to another partner', async () => {
     mockAuth({
       ok: true,
       context: {
@@ -157,7 +157,7 @@ describe('GET /api/v1/dream-boards/[id] responses - validation', () => {
 });
 
 describe('GET /api/v1/dream-boards/[id] responses - payloads', () => {
-  it('returns a serialized dream board payload', async () => {
+  it('returns a serialized Dreamboard payload', async () => {
     mockAuth({
       ok: true,
       context: {

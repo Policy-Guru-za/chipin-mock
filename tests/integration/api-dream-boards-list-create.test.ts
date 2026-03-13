@@ -85,7 +85,7 @@ afterEach(() => {
 });
 
 describe('GET /api/v1/dream-boards', () => {
-  it('returns paginated dream boards', async () => {
+  it('returns paginated Dreamboards', async () => {
     mockAuth();
 
     const listDreamBoardsForApi = vi.fn(async () => [
@@ -137,7 +137,7 @@ describe('GET /api/v1/dream-boards', () => {
 });
 
 describe('POST /api/v1/dream-boards', () => {
-  it('creates a voucher-default dream board when payout_method is omitted', async () => {
+  it('creates a voucher-default Dreamboard when payout_method is omitted', async () => {
     mockAuth();
 
     const markApiKeyUsed = vi.fn(async () => undefined);
@@ -182,6 +182,7 @@ describe('POST /api/v1/dream-boards', () => {
     expect(payload.data.gift_data.gift_icon_id).toBe('train');
     expect(payload.data.gift_data.gift_image_url).toBe('http://localhost:3000/icons/gifts/train.png');
     expect(payload.data.payout_method).toBe('takealot_voucher');
+    expect(payload.data).not.toHaveProperty('charity_enabled');
     expect(encryptSensitiveValue).not.toHaveBeenCalled();
     expect(values).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -189,6 +190,11 @@ describe('POST /api/v1/dream-boards', () => {
         karriCardNumber: null,
         karriCardHolderName: null,
         bankName: null,
+        charityEnabled: false,
+        charityId: null,
+        charitySplitType: null,
+        charityPercentageBps: null,
+        charityThresholdCents: null,
       })
     );
     expect(markApiKeyUsed).toHaveBeenCalledWith('api-key-1');
@@ -283,175 +289,11 @@ describe('POST /api/v1/dream-boards', () => {
     expect(markApiKeyUsed).not.toHaveBeenCalled();
   });
 
-  it('rejects charity percentage split without percentage bps', async () => {
+  it('rejects charity fields because the public create contract no longer supports them', async () => {
     mockAuth();
 
     const markApiKeyUsed = vi.fn(async () => undefined);
-    mockDreamBoardWriteQueries({ markApiKeyUsed });
-
-    const insert = vi.fn();
-    vi.doMock('@/lib/db', () => ({ db: { insert } }));
-    vi.doMock('@/lib/utils/encryption', () => ({
-      encryptSensitiveValue: vi.fn(() => 'encrypted-card'),
-    }));
-
-    const { POST } = await loadHandler();
-    const response = await POST(
-      new Request('http://localhost/api/v1/dream-boards', {
-        method: 'POST',
-        body: JSON.stringify({
-          child_name: 'Maya',
-          child_photo_url: 'https://images.example/photo.jpg',
-          party_date: tomorrowDateOnly(),
-          gift_name: 'Train set',
-          gift_icon_id: 'train',
-          goal_cents: 35000,
-          payout_email: 'parent@example.com',
-          host_whatsapp_number: '+27821234567',
-          charity_enabled: true,
-          charity_id: '00000000-0000-4000-8000-000000000001',
-          charity_split_type: 'percentage',
-        }),
-      })
-    );
-
-    const payload = await response.json();
-
-    expect(response.status).toBe(400);
-    expect(payload.error.code).toBe('validation_error');
-    expect(insert).not.toHaveBeenCalled();
-    expect(markApiKeyUsed).not.toHaveBeenCalled();
-  });
-
-  it('rejects charity threshold split without threshold cents', async () => {
-    mockAuth();
-
-    const markApiKeyUsed = vi.fn(async () => undefined);
-    mockDreamBoardWriteQueries({ markApiKeyUsed });
-
-    const insert = vi.fn();
-    vi.doMock('@/lib/db', () => ({ db: { insert } }));
-    vi.doMock('@/lib/utils/encryption', () => ({
-      encryptSensitiveValue: vi.fn(() => 'encrypted-card'),
-    }));
-
-    const { POST } = await loadHandler();
-    const response = await POST(
-      new Request('http://localhost/api/v1/dream-boards', {
-        method: 'POST',
-        body: JSON.stringify({
-          child_name: 'Maya',
-          child_photo_url: 'https://images.example/photo.jpg',
-          party_date: tomorrowDateOnly(),
-          gift_name: 'Train set',
-          gift_icon_id: 'train',
-          goal_cents: 35000,
-          payout_email: 'parent@example.com',
-          host_whatsapp_number: '+27821234567',
-          charity_enabled: true,
-          charity_id: '00000000-0000-4000-8000-000000000001',
-          charity_split_type: 'threshold',
-        }),
-      })
-    );
-
-    const payload = await response.json();
-
-    expect(response.status).toBe(400);
-    expect(payload.error.code).toBe('validation_error');
-    expect(insert).not.toHaveBeenCalled();
-    expect(markApiKeyUsed).not.toHaveBeenCalled();
-  });
-
-  it('rejects percentage split payloads that also include threshold cents', async () => {
-    mockAuth();
-
-    const markApiKeyUsed = vi.fn(async () => undefined);
-    mockDreamBoardWriteQueries({ markApiKeyUsed });
-
-    const insert = vi.fn();
-    vi.doMock('@/lib/db', () => ({ db: { insert } }));
-    vi.doMock('@/lib/utils/encryption', () => ({
-      encryptSensitiveValue: vi.fn(() => 'encrypted-card'),
-    }));
-
-    const { POST } = await loadHandler();
-    const response = await POST(
-      new Request('http://localhost/api/v1/dream-boards', {
-        method: 'POST',
-        body: JSON.stringify({
-          child_name: 'Maya',
-          child_photo_url: 'https://images.example/photo.jpg',
-          party_date: tomorrowDateOnly(),
-          gift_name: 'Train set',
-          gift_icon_id: 'train',
-          goal_cents: 35000,
-          payout_email: 'parent@example.com',
-          host_whatsapp_number: '+27821234567',
-          charity_enabled: true,
-          charity_id: '00000000-0000-4000-8000-000000000001',
-          charity_split_type: 'percentage',
-          charity_percentage_bps: 1000,
-          charity_threshold_cents: 10000,
-        }),
-      })
-    );
-
-    const payload = await response.json();
-
-    expect(response.status).toBe(400);
-    expect(payload.error.code).toBe('validation_error');
-    expect(insert).not.toHaveBeenCalled();
-    expect(markApiKeyUsed).not.toHaveBeenCalled();
-  });
-
-  it('rejects threshold split payloads that also include percentage bps', async () => {
-    mockAuth();
-
-    const markApiKeyUsed = vi.fn(async () => undefined);
-    mockDreamBoardWriteQueries({ markApiKeyUsed });
-
-    const insert = vi.fn();
-    vi.doMock('@/lib/db', () => ({ db: { insert } }));
-    vi.doMock('@/lib/utils/encryption', () => ({
-      encryptSensitiveValue: vi.fn(() => 'encrypted-card'),
-    }));
-
-    const { POST } = await loadHandler();
-    const response = await POST(
-      new Request('http://localhost/api/v1/dream-boards', {
-        method: 'POST',
-        body: JSON.stringify({
-          child_name: 'Maya',
-          child_photo_url: 'https://images.example/photo.jpg',
-          party_date: tomorrowDateOnly(),
-          gift_name: 'Train set',
-          gift_icon_id: 'train',
-          goal_cents: 35000,
-          payout_email: 'parent@example.com',
-          host_whatsapp_number: '+27821234567',
-          charity_enabled: true,
-          charity_id: '00000000-0000-4000-8000-000000000001',
-          charity_split_type: 'threshold',
-          charity_threshold_cents: 10000,
-          charity_percentage_bps: 1000,
-        }),
-      })
-    );
-
-    const payload = await response.json();
-
-    expect(response.status).toBe(400);
-    expect(payload.error.code).toBe('validation_error');
-    expect(insert).not.toHaveBeenCalled();
-    expect(markApiKeyUsed).not.toHaveBeenCalled();
-  });
-
-  it('returns unsupported operation for complete charity payloads before B2', async () => {
-    mockAuth();
-
-    const markApiKeyUsed = vi.fn(async () => undefined);
-    mockDreamBoardWriteQueries({ markApiKeyUsed });
+    const { getActiveCharityById } = mockDreamBoardWriteQueries({ markApiKeyUsed });
 
     const insert = vi.fn();
     vi.doMock('@/lib/db', () => ({ db: { insert } }));
@@ -482,10 +324,10 @@ describe('POST /api/v1/dream-boards', () => {
 
     const payload = await response.json();
 
-    expect(response.status).toBe(422);
-    expect(payload.error.code).toBe('unsupported_operation');
-    expect(payload.error.message).toContain('Charity configuration is not yet enabled');
+    expect(response.status).toBe(400);
+    expect(payload.error.code).toBe('validation_error');
     expect(insert).not.toHaveBeenCalled();
+    expect(getActiveCharityById).not.toHaveBeenCalled();
     expect(markApiKeyUsed).not.toHaveBeenCalled();
   });
 
@@ -608,74 +450,12 @@ describe('POST /api/v1/dream-boards', () => {
     expect(markApiKeyUsed).toHaveBeenCalledWith('api-key-1');
   });
 
-  it('accepts charity payloads when charity write path toggle is enabled', async () => {
+  it('still rejects charity fields even when the legacy charity write flag is enabled', async () => {
     process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH = 'true';
     mockAuth();
 
     const markApiKeyUsed = vi.fn(async () => undefined);
-    mockDreamBoardWriteQueries({ markApiKeyUsed });
-
-    vi.doMock('@/lib/utils/slug', () => ({ generateSlug: () => 'maya-birthday-charity' }));
-    vi.doMock('@/lib/utils/encryption', () => ({
-      encryptSensitiveValue: vi.fn(() => 'encrypted-card'),
-    }));
-
-    const returning = vi.fn(async () => [
-      {
-        id: 'board-1',
-        slug: 'maya-birthday-charity',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ]);
-    const onConflictDoNothing = vi.fn(() => ({ returning }));
-    const values = vi.fn(() => ({ onConflictDoNothing }));
-    const insert = vi.fn(() => ({ values }));
-
-    vi.doMock('@/lib/db', () => ({ db: { insert } }));
-
-    const { POST } = await loadHandler();
-    const response = await POST(
-      new Request('http://localhost/api/v1/dream-boards', {
-        method: 'POST',
-        body: JSON.stringify({
-          child_name: 'Maya',
-          child_photo_url: 'https://images.example/photo.jpg',
-          party_date: tomorrowDateOnly(),
-          gift_name: 'Train set',
-          gift_icon_id: 'train',
-          goal_cents: 35000,
-          payout_email: 'parent@example.com',
-          host_whatsapp_number: '+27821234567',
-          charity_enabled: true,
-          charity_id: '00000000-0000-4000-8000-000000000001',
-          charity_split_type: 'percentage',
-          charity_percentage_bps: 1000,
-        }),
-      })
-    );
-    const payload = await response.json();
-
-    expect(response.status).toBe(201);
-    expect(payload.data.charity_enabled).toBe(true);
-    expect(values).toHaveBeenCalledWith(
-      expect.objectContaining({
-        charityEnabled: true,
-        charityId: '00000000-0000-4000-8000-000000000001',
-        charitySplitType: 'percentage',
-        charityPercentageBps: 1000,
-        charityThresholdCents: null,
-      })
-    );
-    expect(markApiKeyUsed).toHaveBeenCalledWith('api-key-1');
-  });
-
-  it('rejects incomplete charity payloads even when charity write path is enabled', async () => {
-    process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH = 'true';
-    mockAuth();
-
-    const markApiKeyUsed = vi.fn(async () => undefined);
-    mockDreamBoardWriteQueries({ markApiKeyUsed });
+    const { getActiveCharityById } = mockDreamBoardWriteQueries({ markApiKeyUsed });
 
     const insert = vi.fn();
     vi.doMock('@/lib/db', () => ({ db: { insert } }));
@@ -707,49 +487,7 @@ describe('POST /api/v1/dream-boards', () => {
     expect(response.status).toBe(400);
     expect(payload.error.code).toBe('validation_error');
     expect(insert).not.toHaveBeenCalled();
-    expect(markApiKeyUsed).not.toHaveBeenCalled();
-  });
-
-  it('rejects inactive charity ids before gate evaluation', async () => {
-    mockAuth();
-
-    const markApiKeyUsed = vi.fn(async () => undefined);
-    const getActiveCharityById = vi.fn(async () => null);
-    mockDreamBoardWriteQueries({ markApiKeyUsed, getActiveCharityById });
-
-    const insert = vi.fn();
-    vi.doMock('@/lib/db', () => ({ db: { insert } }));
-    vi.doMock('@/lib/utils/encryption', () => ({
-      encryptSensitiveValue: vi.fn(() => 'encrypted-card'),
-    }));
-
-    const { POST } = await loadHandler();
-    const response = await POST(
-      new Request('http://localhost/api/v1/dream-boards', {
-        method: 'POST',
-        body: JSON.stringify({
-          child_name: 'Maya',
-          child_photo_url: 'https://images.example/photo.jpg',
-          party_date: tomorrowDateOnly(),
-          gift_name: 'Train set',
-          gift_icon_id: 'train',
-          goal_cents: 35000,
-          payout_email: 'parent@example.com',
-          host_whatsapp_number: '+27821234567',
-          charity_enabled: true,
-          charity_id: '00000000-0000-4000-8000-000000000099',
-          charity_split_type: 'percentage',
-          charity_percentage_bps: 1000,
-        }),
-      })
-    );
-    const payload = await response.json();
-
-    expect(response.status).toBe(400);
-    expect(payload.error.code).toBe('validation_error');
-    expect(payload.error.message).toContain('active charity');
-    expect(getActiveCharityById).toHaveBeenCalledWith('00000000-0000-4000-8000-000000000099');
-    expect(insert).not.toHaveBeenCalled();
+    expect(getActiveCharityById).not.toHaveBeenCalled();
     expect(markApiKeyUsed).not.toHaveBeenCalled();
   });
 

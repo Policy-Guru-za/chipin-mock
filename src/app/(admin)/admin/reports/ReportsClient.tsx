@@ -101,7 +101,7 @@ export function ReportsClient({
       <article className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="font-display text-xl font-bold text-text">Monthly charity reconciliation</h2>
+            <h2 className="font-display text-xl font-bold text-text">Historical charity reconciliation</h2>
             <p className="text-sm text-gray-500">
               Generated totals for {monthValue}/{reconciliation.year}.
             </p>
@@ -166,7 +166,7 @@ export function ReportsClient({
             columns={columns}
             data={reconciliation.items}
             keyExtractor={(item) => item.charityId}
-            caption="Monthly charity reconciliation table"
+            caption="Historical charity reconciliation table"
             emptyMessage="No charity payouts recorded for this period."
           />
         </div>

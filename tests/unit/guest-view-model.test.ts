@@ -130,50 +130,10 @@ describe('GuestViewModel board states', () => {
   });
 });
 
-describe('GuestViewModel charity allocation label', () => {
-  it('builds percentage allocation label', () => {
-    const view = buildGuestViewModel(
-      makeBoard({
-        charityEnabled: true,
-        charityName: 'Ikamva Youth',
-        charitySplitType: 'percentage',
-        charityPercentageBps: 2500,
-      }),
-      { now }
-    );
-
-    expect(view.charityAllocationLabel).toBe('25% of contributions support Ikamva Youth');
-  });
-
-  it('builds threshold allocation label', () => {
-    const view = buildGuestViewModel(
-      makeBoard({
-        charityEnabled: true,
-        charityName: 'Ikamva Youth',
-        charitySplitType: 'threshold',
-        charityThresholdCents: 50000,
-      }),
-      { now }
-    );
-
-    expect(view.charityAllocationLabel).toBe('Up to R500 will go to Ikamva Youth');
-  });
-
-  it('returns null allocation label when charity is disabled', () => {
-    const view = buildGuestViewModel(makeBoard({ charityEnabled: false }), { now });
-    expect(view.charityAllocationLabel).toBeNull();
-  });
-});
-
 describe('ThankYouViewModel', () => {
   it('returns personalized contributor details', () => {
     const view = buildThankYouViewModel({
-      board: makeBoard({
-        charityEnabled: true,
-        charityName: 'Ikamva Youth',
-        charitySplitType: 'percentage',
-        charityPercentageBps: 2000,
-      }),
+      board: makeBoard(),
       contribution: {
         id: 'contribution-1',
         dreamBoardId: 'board-1',
@@ -193,17 +153,12 @@ describe('ThankYouViewModel', () => {
 
     expect(view.contributorName).toBe('Ava');
     expect(view.isAnonymous).toBe(false);
-    expect(view.charityAmountCents).toBe(2000);
+    expect(view.contributionAmountCents).toBe(10000);
   });
 
-  it('handles anonymous contributor and threshold charity amount', () => {
+  it('handles anonymous contributor copy', () => {
     const view = buildThankYouViewModel({
-      board: makeBoard({
-        charityEnabled: true,
-        charityName: 'Ikamva Youth',
-        charitySplitType: 'threshold',
-        charityThresholdCents: 5000,
-      }),
+      board: makeBoard(),
       contribution: {
         id: 'contribution-2',
         dreamBoardId: 'board-1',
@@ -222,7 +177,8 @@ describe('ThankYouViewModel', () => {
     });
 
     expect(view.isAnonymous).toBe(true);
-    expect(view.charityAmountCents).toBe(1500);
+    expect(view.contributorName).toBeNull();
+    expect(view.contributionAmountCents).toBe(12000);
     expect(view.childName).toBe('Maya');
   });
 

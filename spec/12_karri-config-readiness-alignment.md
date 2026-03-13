@@ -51,4 +51,4 @@
 - Status: Done
 - Exit Criteria State: satisfied
 - Successor Slot: none
-- Notes: Patched startup validation to require `CARD_DATA_ENCRYPTION_KEY` when the Karri write path is enabled, taught readiness to short-circuit to mock mode under `MOCK_KARRI=true`, added regression coverage for both review findings, and closed with [`./13_session-placeholder.md`](./13_session-placeholder.md) active for the next bounded session.
+- Notes: Patched startup validation to require `CARD_DATA_ENCRYPTION_KEY` when the Karri write path is enabled, taught readiness to short-circuit to mock mode under `MOCK_KARRI=true`, added regression coverage for both review findings, and closed with [`./13_charity-product-disablement.md`](./13_charity-product-disablement.md) active for the next bounded session.

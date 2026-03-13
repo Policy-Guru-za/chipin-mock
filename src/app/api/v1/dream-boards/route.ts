@@ -6,7 +6,7 @@ import { encodeCursor } from '@/lib/api/pagination';
 import { parseBody, parseCursor, parseQuery, withApiAuth } from '@/lib/api/route-utils';
 import { jsonError, jsonPaginated, jsonSuccess } from '@/lib/api/response';
 import { listDreamBoardsForApi } from '@/lib/db/api-queries';
-import { ensureHostForEmail, getActiveCharityById } from '@/lib/db/queries';
+import { ensureHostForEmail } from '@/lib/db/queries';
 import { db } from '@/lib/db';
 import { dreamBoards } from '@/lib/db/schema';
 import {
@@ -19,7 +19,7 @@ import {
   SA_MOBILE_REGEX,
 } from '@/lib/dream-boards/validation';
 import { extractIconIdFromPath, getGiftIconById, isValidGiftIconId } from '@/lib/icons/gift-icons';
-import { LOCKED_CHARITY_SPLIT_MODES, LOCKED_PAYOUT_METHODS } from '@/lib/ux-v2/decision-locks';
+import { LOCKED_PAYOUT_METHODS } from '@/lib/ux-v2/decision-locks';
 import { resolveWritePathBlockReason } from '@/lib/ux-v2/write-path-gates';
 import { encryptSensitiveValue } from '@/lib/utils/encryption';
 import { generateSlug } from '@/lib/utils/slug';
@@ -60,13 +60,9 @@ const createSchema = z
     bank_account_number: z.string().min(6).max(20).optional(),
     bank_branch_code: z.string().min(2).max(20).optional(),
     bank_account_holder: z.string().min(2).max(120).optional(),
-    charity_enabled: z.boolean().optional(),
-    charity_id: z.string().uuid().optional(),
-    charity_split_type: z.enum(LOCKED_CHARITY_SPLIT_MODES).optional(),
-    charity_percentage_bps: z.number().int().min(500).max(5000).optional(),
-    charity_threshold_cents: z.number().int().min(5000).optional(),
     message: z.string().max(280).optional(),
   })
+  .strict()
   .superRefine((value, ctx) => {
     ensureDateRanges(value, ctx);
 
@@ -165,70 +161,6 @@ const createSchema = z
         });
       }
     }
-
-    const charityEnabled = value.charity_enabled === true;
-    const hasAnyCharityField =
-      value.charity_id !== undefined ||
-      value.charity_split_type !== undefined ||
-      value.charity_percentage_bps !== undefined ||
-      value.charity_threshold_cents !== undefined;
-
-    if (!charityEnabled && hasAnyCharityField) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['charity_enabled'],
-        message: 'Charity fields require charity_enabled=true',
-      });
-      return;
-    }
-
-    if (!charityEnabled) {
-      return;
-    }
-
-    if (!value.charity_id) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['charity_id'],
-        message: 'Charity is required when charity is enabled',
-      });
-    }
-    if (!value.charity_split_type) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['charity_split_type'],
-        message: 'Charity split type is required when charity is enabled',
-      });
-      return;
-    }
-    if (value.charity_split_type === 'percentage' && value.charity_percentage_bps === undefined) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['charity_percentage_bps'],
-        message: 'Charity percentage bps is required for percentage split',
-      });
-    }
-    if (value.charity_split_type === 'percentage' && value.charity_threshold_cents !== undefined) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['charity_threshold_cents'],
-        message: 'Charity threshold cents must be omitted for percentage split',
-      });
-    }
-    if (value.charity_split_type === 'threshold' && value.charity_threshold_cents === undefined) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['charity_threshold_cents'],
-        message: 'Charity threshold cents is required for threshold split',
-      });
-    }
-    if (value.charity_split_type === 'threshold' && value.charity_percentage_bps !== undefined) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['charity_percentage_bps'],
-        message: 'Charity percentage bps must be omitted for threshold split',
-      });
-    }
   });
 
 type CreatePayload = z.infer<typeof createSchema>;
@@ -284,7 +216,7 @@ const parseCreatePayload = async (request: NextRequest, requestId: string, heade
   return parseBody(request, createSchema, {
     requestId,
     headers,
-    message: 'Invalid dream board payload',
+    message: 'Invalid Dreamboard payload',
   });
 };
 
@@ -347,14 +279,11 @@ const insertDreamBoard = async (params: {
           params.payoutMethod === 'bank' ? (params.payload.bank_branch_code ?? null) : null,
         bankAccountHolder:
           params.payoutMethod === 'bank' ? (params.payload.bank_account_holder ?? null) : null,
-        charityEnabled: params.payload.charity_enabled === true,
-        charityId: params.payload.charity_enabled === true ? (params.payload.charity_id ?? null) : null,
-        charitySplitType:
-          params.payload.charity_enabled === true ? (params.payload.charity_split_type ?? null) : null,
-        charityPercentageBps:
-          params.payload.charity_enabled === true ? (params.payload.charity_percentage_bps ?? null) : null,
-        charityThresholdCents:
-          params.payload.charity_enabled === true ? (params.payload.charity_threshold_cents ?? null) : null,
+        charityEnabled: false,
+        charityId: null,
+        charitySplitType: null,
+        charityPercentageBps: null,
+        charityThresholdCents: null,
         hostWhatsAppNumber: params.payload.host_whatsapp_number,
         message: params.payload.message ?? null,
         status: 'active',
@@ -411,7 +340,7 @@ export const GET = withApiAuth('dreamboards:read', async (request: NextRequest, 
 
   if (serialized.length !== items.length) {
     return jsonError({
-      error: { code: 'internal_error', message: 'Unable to serialize dream board list' },
+      error: { code: 'internal_error', message: 'Unable to serialize Dreamboard list' },
       status: 500,
       requestId,
       headers: rateLimitHeaders,
@@ -463,32 +392,11 @@ export const POST = withApiAuth('dreamboards:write', async (request: NextRequest
     parsed.data.bank_account_number !== undefined ||
     parsed.data.bank_branch_code !== undefined ||
     parsed.data.bank_account_holder !== undefined;
-  const isCharityWriteRequested =
-    parsed.data.charity_enabled === true ||
-    parsed.data.charity_id !== undefined ||
-    parsed.data.charity_split_type !== undefined ||
-    parsed.data.charity_percentage_bps !== undefined ||
-    parsed.data.charity_threshold_cents !== undefined;
-
-  if (parsed.data.charity_enabled === true && parsed.data.charity_id) {
-    const charity = await getActiveCharityById(parsed.data.charity_id);
-    if (!charity) {
-      return jsonError({
-        error: {
-          code: 'validation_error',
-          message: 'charity_id must reference an active charity',
-        },
-        status: 400,
-        requestId,
-        headers: rateLimitHeaders,
-      });
-    }
-  }
 
   const blockReason = resolveWritePathBlockReason({
     karriRequested: isKarriWriteRequested,
     bankRequested: isBankWriteRequested,
-    charityRequested: isCharityWriteRequested,
+    charityRequested: false,
   });
   if (blockReason) {
     return jsonError({
@@ -578,18 +486,6 @@ export const POST = withApiAuth('dreamboards:write', async (request: NextRequest
       bankBranchCode: payoutMethod === 'bank' ? (parsed.data.bank_branch_code ?? null) : null,
       bankAccountHolder: payoutMethod === 'bank' ? (parsed.data.bank_account_holder ?? null) : null,
       payoutEmail: parsed.data.payout_email,
-      charityEnabled: parsed.data.charity_enabled === true,
-      charityId: parsed.data.charity_enabled === true ? (parsed.data.charity_id ?? null) : null,
-      charitySplitType:
-        parsed.data.charity_enabled === true ? (parsed.data.charity_split_type ?? null) : null,
-      charityPercentageBps:
-        parsed.data.charity_enabled === true
-          ? (parsed.data.charity_percentage_bps ?? null)
-          : null,
-      charityThresholdCents:
-        parsed.data.charity_enabled === true
-          ? (parsed.data.charity_threshold_cents ?? null)
-          : null,
       goalCents: parsed.data.goal_cents,
       raisedCents: 0,
       message: parsed.data.message ?? null,
@@ -603,7 +499,7 @@ export const POST = withApiAuth('dreamboards:write', async (request: NextRequest
 
   if (!responsePayload) {
     return jsonError({
-      error: { code: 'internal_error', message: 'Unable to serialize dream board' },
+      error: { code: 'internal_error', message: 'Unable to serialize Dreamboard' },
       status: 500,
       requestId,
       headers: rateLimitHeaders,

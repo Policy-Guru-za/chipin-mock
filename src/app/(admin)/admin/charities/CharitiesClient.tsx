@@ -14,12 +14,7 @@ import { Button } from '@/components/ui/button';
 import type { AdminCharityDataset } from '@/lib/admin';
 import { formatZar } from '@/lib/utils/money';
 
-import {
-  createCharityAction,
-  generateCharityDraftFromUrlAction,
-  toggleCharityStatusAction,
-  updateCharityAction,
-} from './actions';
+import { updateCharityAction } from './actions';
 import { formatAdminDate } from '../_lib/format';
 
 interface CharitiesClientProps {
@@ -29,10 +24,7 @@ interface CharitiesClientProps {
   currentPage: number;
 }
 
-type ModalState =
-  | { mode: 'create' }
-  | { mode: 'edit'; charity: AdminCharityDataset }
-  | null;
+type ModalState = { mode: 'edit'; charity: AdminCharityDataset } | null;
 
 export function CharitiesClient({
   charities,
@@ -42,8 +34,6 @@ export function CharitiesClient({
 }: CharitiesClientProps) {
   const router = useRouter();
   const [modalState, setModalState] = useState<ModalState>(null);
-  const [statusError, setStatusError] = useState<string | null>(null);
-  const [statusPendingId, setStatusPendingId] = useState<string | null>(null);
 
   const editSeed: CharityFormSeed | null =
     modalState && modalState.mode === 'edit'
@@ -64,21 +54,6 @@ export function CharitiesClient({
   const onSaveSuccess = () => {
     closeModal();
     router.refresh();
-  };
-
-  const toggleStatus = async (charity: AdminCharityDataset) => {
-    setStatusError(null);
-    setStatusPendingId(charity.id);
-    try {
-      const result = await toggleCharityStatusAction(charity.id, !charity.isActive);
-      if (!result.success) {
-        setStatusError(result.error ?? 'Could not update charity status.');
-        return;
-      }
-      router.refresh();
-    } finally {
-      setStatusPendingId(null);
-    }
   };
 
   const columns: AdminDataColumn<AdminCharityDataset>[] = [
@@ -134,16 +109,7 @@ export function CharitiesClient({
             variant="outline"
             onClick={() => setModalState({ mode: 'edit', charity: item })}
           >
-            Edit
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            loading={statusPendingId === item.id}
-            onClick={() => void toggleStatus(item)}
-          >
-            {item.isActive ? 'Deactivate' : 'Activate'}
+            Review details
           </Button>
         </div>
       ),
@@ -152,18 +118,9 @@ export function CharitiesClient({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-gray-500">Manage onboarding and status for platform charities.</p>
-        <Button type="button" size="sm" onClick={() => setModalState({ mode: 'create' })}>
-          Add charity
-        </Button>
-      </div>
-
-      {statusError ? (
-        <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          {statusError}
-        </p>
-      ) : null}
+      <p className="text-sm text-gray-500">
+        Review historical charity contacts, banking notes, and status context for reconciliation support.
+      </p>
 
       <AdminDataTable
         columns={columns}
@@ -182,19 +139,9 @@ export function CharitiesClient({
       />
 
       <CharityFormModal
-        isOpen={modalState?.mode === 'create'}
-        title="Add charity"
-        submitLabel="Create charity"
-        onClose={closeModal}
-        onSubmit={createCharityAction}
-        onGenerateFromUrl={generateCharityDraftFromUrlAction}
-        onSuccess={onSaveSuccess}
-      />
-
-      <CharityFormModal
         charity={editSeed}
         isOpen={modalState?.mode === 'edit'}
-        title="Edit charity"
+        title="Edit charity record"
         submitLabel="Save changes"
         onClose={closeModal}
         onSubmit={(formData) => {

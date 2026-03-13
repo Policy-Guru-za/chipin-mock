@@ -40,7 +40,7 @@ afterEach(() => {
 });
 
 describe('publishDreamBoardAction', () => {
-  it('persists draft message to the published dream board payload', async () => {
+  it('persists draft message to the published Dreamboard payload', async () => {
     const returning = vi.fn(async () => [{ id: 'board-1' }]);
     const values = vi.fn(() => ({ returning }));
     const insert = vi.fn(() => ({ values }));

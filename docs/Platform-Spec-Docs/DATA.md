@@ -1,24 +1,24 @@
 # Data Model
 
 > **Status:** Current reference  
-> **Last reviewed:** March 12, 2026  
+> **Last reviewed:** March 13, 2026  
 > **Primary source of truth:** [`src/lib/db/schema.ts`](../../src/lib/db/schema.ts)
 
 ## Core Enums
 
 - `dream_board_status`: `draft | active | funded | closed | paid_out | expired | cancelled`
 - `payout_method`: `karri_card | bank | takealot_voucher`
-- `charity_split_type`: `percentage | threshold`
+- `charity_split_type`: `percentage | threshold` (schema retained for historical/internal use)
 - `payment_status`: `pending | processing | completed | failed | refunded`
 - `payment_provider`: `payfast | ozow | snapscan`
 - `payout_status`: `pending | processing | completed | failed`
-- `payout_type`: `karri_card | bank | takealot_voucher | charity`
+- `payout_type`: `karri_card | bank | takealot_voucher | charity` (public partner API exposes gift payout types only)
 
 ## Core Tables
 
 ### `dream_boards`
 
-Stores host, child, gift, payout, charity, messaging, and lifecycle state.
+Stores host, child, gift, payout, historical charity, messaging, and lifecycle state.
 
 Important fields:
 
@@ -28,7 +28,7 @@ Important fields:
 - payout method + method-specific recipient data
 - default host-create path writes `payout_method='takealot_voucher'` and clears Karri/bank fields
 - partner/API `karri_card` writes are gated by `UX_V2_ENABLE_KARRI_WRITE_PATH`; bank writes remain gated by `UX_V2_ENABLE_BANK_WRITE_PATH`
-- optional charity configuration
+- optional historical charity configuration; active product writes clear these fields
 - `status`
 
 ### `contributions`
@@ -40,11 +40,11 @@ Important money fields:
 - `amount_cents`: contributor-selected gift amount
 - `fee_cents`: legacy compatibility field; new contribution rows write `0`
 - `net_cents`: generated legacy compatibility field for contribution payout math; new rows now match `amount_cents`
-- `charity_cents`: optional charity allocation
+- `charity_cents`: optional historical/internal charity allocation; active product writes `null`
 
 ### `payouts`
 
-Stores gift payout rows and, when applicable, charity payout rows.
+Stores gift payout rows and, when applicable, historical charity payout rows.
 
 - gift payout type matches the Dreamboard `payout_method`
 - `takealot_voucher` rows are manual placeholder fulfilment records; they are not auto-executed
@@ -55,7 +55,7 @@ Line items attached to payout records.
 
 ### `charities`
 
-Admin-managed charity catalog for optional giving-back flows.
+Admin-managed charity catalog retained for historical ops and reconciliation, not active Dreamboard product navigation.
 
 ### `contribution_reminders`
 
@@ -65,6 +65,7 @@ Reminder scheduling, retry, and WhatsApp opt-in / opt-out state.
 
 - Goal progress uses completed `amount_cents`
 - Active checkout total uses `amount_cents`
+- Active product charity allocation is disabled for new Dreamboards and new completed contributions
 - Historical rows may still carry non-zero `fee_cents`; payout calculations must continue to respect stored values
 - Contribution `net_cents` remains for backward compatibility, not goal progress
 

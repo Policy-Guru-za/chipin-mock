@@ -12,7 +12,7 @@
   - contributor list without public contribution amounts
   - contribute CTA for non-host viewers
 - Host dashboard shows detailed financial and contribution data
-- Admin surface covers dashboard, dream boards, contributions, charities, payouts, reports, and settings
+- Admin surface covers dashboard, Dreamboards, contributions, direct-access charity records, payouts, reports, and settings
 
 ## Current Design System Reality
 

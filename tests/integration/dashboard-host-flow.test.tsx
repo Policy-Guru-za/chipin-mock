@@ -131,6 +131,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
 });
 
 describe('host dashboard flow', () => {
@@ -165,8 +166,7 @@ describe('host dashboard flow', () => {
     expect(brandGiftIcon).toHaveTextContent('🎁');
     expect(screen.getByText(/11 june 2099/i)).toBeInTheDocument();
     expect(screen.getByText(/party:\s*12 june/i)).toBeInTheDocument();
-    expect(screen.getByText(/10% to reach for a dream/i)).toBeInTheDocument();
-    expect(screen.getByText(/10% to reach for a dream/i).closest('p')).toHaveClass('text-[12px]');
+    expect(screen.queryByText(/10% to reach for a dream/i)).not.toBeInTheDocument();
     expect(contributorsHeading.querySelector('span')).toHaveClass('text-[13px]');
     expect(screen.getAllByText('Ava').length).toBeGreaterThan(0);
     expect(screen.getByText('Happy birthday')).toHaveClass('text-sm');
