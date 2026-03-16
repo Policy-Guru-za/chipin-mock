@@ -71,6 +71,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.2",
     "@vitest/coverage-v8": "^4.0.17",
+    "agentation": "^2.3.3",
     "autoprefixer": "^10.4.19",
     "dotenv": "^17.2.3",
     "drizzle-kit": "^0.24.2",
