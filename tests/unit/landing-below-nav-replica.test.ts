@@ -151,6 +151,29 @@ describe('below-nav homepage replica contract', () => {
     expect(heroStyles).not.toContain('.mobileCtaSection');
   });
 
+  it('keeps the external contributor constellation desktop-only below the true desktop breakpoint', () => {
+    const hero = readSource('src/components/landing-exact/LandingHeroExact.tsx');
+    const heroStyles = readSource('src/components/landing-exact/LandingHeroExact.module.css');
+
+    expect(hero.match(/<VillageContributors/g)).toHaveLength(1);
+    expect(heroStyles).toContain('@media (max-width: 1100px)');
+    expect(heroStyles).toMatch(
+      /@media \(max-width: 1100px\) \{[\s\S]*\.heroDream \{\s*gap: clamp\(32px, 3\.5vw, 44px\);\s*padding-bottom: 72px;\s*\}/
+    );
+    expect(heroStyles).toMatch(
+      /@media \(max-width: 1100px\) \{[\s\S]*\.heroRightRail \{\s*gap: 0;\s*\}/
+    );
+    expect(heroStyles).toMatch(
+      /@media \(max-width: 1100px\) \{[\s\S]*\.villageContributors \{\s*display: none;\s*\}/
+    );
+    expect(heroStyles).not.toMatch(
+      /@media \(max-width: 1100px\) \{[\s\S]*\.scatterPerson \{\s*position: relative;/
+    );
+    expect(heroStyles).not.toMatch(
+      /@media \(max-width: 1100px\) \{[\s\S]*\.scatterBubble \{\s*display: none;/
+    );
+  });
+
   it('keeps the preserved nav seam on one shared landing breakpoint contract', () => {
     const landingPage = readSource('src/components/landing/LandingPage.tsx');
     const landingNav = readSource('src/components/landing/LandingNav.tsx');

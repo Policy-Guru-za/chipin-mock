@@ -507,20 +507,15 @@
   }
 
   .heroDream {
-    padding-bottom: 80px;
+    gap: clamp(32px, 3.5vw, 44px);
+    padding-bottom: 72px;
+  }
+
+  .heroRightRail {
+    gap: 0;
   }
 
   .villageContributors {
-    max-width: none;
-    min-height: auto;
-  }
-
-  .scatterPerson {
-    position: relative;
-    display: inline-flex;
-  }
-
-  .scatterBubble {
     display: none;
   }
 }
