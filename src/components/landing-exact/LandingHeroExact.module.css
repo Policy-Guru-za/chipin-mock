@@ -6,12 +6,13 @@
   margin: 0 auto;
   padding: 80px 80px 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
-  gap: 48px;
+  grid-template-columns: minmax(0, 1.28fr) minmax(320px, 0.82fr);
+  gap: clamp(40px, 4vw, 56px);
   align-items: center;
 }
 
 .heroText {
+  min-width: 0;
   opacity: 0;
   animation: heroFadeUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) 0.1s forwards;
 }
@@ -19,7 +20,7 @@
 .heroHeadline {
   margin: 0 0 32px;
   font-family: var(--font-editorial);
-  font-size: clamp(2.75rem, 6vw, 5.75rem);
+  font-size: clamp(2.75rem, 4.8vw, 5.25rem);
   font-weight: 400;
   letter-spacing: -1.5px;
   color: var(--landing-exact-ink);
@@ -65,10 +66,18 @@
 
 .heroVisual {
   position: relative;
+  min-width: 0;
   display: flex;
   justify-content: center;
   opacity: 0;
   animation: heroFadeUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) 0.25s forwards;
+}
+
+@media (min-width: 921px) {
+  .heroHeadlineLine1,
+  .heroHeadline em {
+    white-space: nowrap;
+  }
 }
 
 .dreamboardCard {
@@ -512,6 +521,17 @@
 
   .heroCtaSection {
     padding: 20px 40px 80px;
+  }
+}
+
+@media (max-width: 920px) {
+  .heroDream {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 36px;
+  }
+
+  .heroVisual {
+    width: 100%;
   }
 }
 

@@ -59,8 +59,19 @@ describe('below-nav homepage replica contract', () => {
     const heroStyles = readSource('src/components/landing-exact/LandingHeroExact.module.css');
 
     expect(heroStyles).toMatch(/minmax\(min\(100%, 400px\), 1fr\)/g);
-    expect(heroStyles.match(/minmax\(min\(100%, 400px\), 1fr\)/g)).toHaveLength(2);
+    expect(heroStyles.match(/minmax\(min\(100%, 400px\), 1fr\)/g)).toHaveLength(1);
     expect(heroStyles).not.toContain('minmax(400px, 1fr)');
+  });
+
+  it('locks the desktop hero headline to a wider no-wrap contract', () => {
+    const heroStyles = readSource('src/components/landing-exact/LandingHeroExact.module.css');
+
+    expect(heroStyles).toContain('grid-template-columns: minmax(0, 1.28fr) minmax(320px, 0.82fr);');
+    expect(heroStyles).toContain('font-size: clamp(2.75rem, 4.8vw, 5.25rem);');
+    expect(heroStyles).toContain('@media (min-width: 921px)');
+    expect(heroStyles).toContain('white-space: nowrap;');
+    expect(heroStyles).toContain('@media (max-width: 920px)');
+    expect(heroStyles).toContain('grid-template-columns: minmax(0, 1fr);');
   });
 
   it('keeps the preserved nav seam on one shared landing breakpoint contract', () => {
