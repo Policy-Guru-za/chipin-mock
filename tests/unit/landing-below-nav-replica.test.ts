@@ -56,6 +56,27 @@ describe('below-nav homepage replica contract', () => {
     expect(footer).toContain('Birthday gifting, simplified.');
   });
 
+  it('removes only the timeline eyebrow and tightens the section top rhythm', () => {
+    const timeline = readSource('src/components/landing-exact/LandingTimelineExact.tsx');
+    const timelineStyles = readSource('src/components/landing-exact/LandingTimelineExact.module.css');
+
+    expect(timeline).toContain('className={styles.timelineHeader}');
+    expect(timeline).toContain('Gifting, <em>together</em>');
+    expect(timeline).not.toContain('timelineHeaderEyebrow');
+    expect(timeline).not.toContain('How it works</div>');
+    expect(timelineStyles).toContain('padding: 72px 0 80px;');
+    expect(timelineStyles).toContain('scroll-margin-top: calc(var(--landing-nav-offset, 121px) + 24px);');
+    expect(timelineStyles).toContain('.timelineHeader {');
+    expect(timelineStyles).toContain('margin: 0 auto 56px;');
+    expect(timelineStyles).toContain('@media (max-width: 768px)');
+    expect(timelineStyles).toContain('padding: 56px 0 56px;');
+    expect(timelineStyles).toContain('margin-bottom: 48px;');
+    expect(timelineStyles).toContain('@media (max-width: 480px)');
+    expect(timelineStyles).toContain('padding: 44px 0 40px;');
+    expect(timelineStyles).toContain('margin-bottom: 40px;');
+    expect(timelineStyles).not.toContain('.timelineHeaderEyebrow');
+  });
+
   it('restores the prototype display and editorial font-token split for the hero', () => {
     const globals = readSource('src/app/globals.css');
     const layout = readSource('src/app/layout.tsx');

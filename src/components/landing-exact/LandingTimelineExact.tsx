@@ -84,7 +84,6 @@ export function LandingTimelineExact() {
   return (
     <section ref={sectionRef} id="how-it-works" className={styles.timelineSection}>
       <div className={styles.timelineHeader}>
-        <div className={styles.timelineHeaderEyebrow}>How it works</div>
         <h2>
           Gifting, <em>together</em>
         </h2>
