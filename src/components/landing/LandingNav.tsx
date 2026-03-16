@@ -1,5 +1,6 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import { useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { SignedIn, SignedOut } from '@clerk/nextjs';
@@ -19,6 +20,11 @@ export function LandingNav({
   setMobileMenuOpen,
   isClerkEnabled = false,
 }: LandingNavProps) {
+  const navStyle = {
+    paddingBlock: 'var(--landing-nav-padding-block)',
+    paddingInline: 'var(--landing-nav-padding-inline)',
+  } satisfies CSSProperties;
+
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -137,7 +143,10 @@ export function LandingNav({
       )}
 
       {/* Navigation */}
-      <nav className="fixed top-0 inset-x-0 flex justify-between items-center px-4 py-4 md:px-10 md:py-6 lg:px-16 lg:py-7 z-30 border-b border-black/[0.04] bg-[#FFFCF9]/95 supports-[backdrop-filter]:backdrop-blur-sm">
+      <nav
+        className="fixed top-0 inset-x-0 z-30 flex items-center justify-between border-b border-black/[0.04] bg-[#FFFCF9]/95 supports-[backdrop-filter]:backdrop-blur-sm"
+        style={navStyle}
+      >
         <Link
           href="/"
           className="flex items-center gap-2.5 no-underline"

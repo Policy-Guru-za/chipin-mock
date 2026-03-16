@@ -62,4 +62,25 @@ describe('below-nav homepage replica contract', () => {
     expect(heroStyles.match(/minmax\(min\(100%, 400px\), 1fr\)/g)).toHaveLength(2);
     expect(heroStyles).not.toContain('minmax(400px, 1fr)');
   });
+
+  it('keeps the preserved nav seam on one shared landing breakpoint contract', () => {
+    const landingPage = readSource('src/components/landing/LandingPage.tsx');
+    const landingNav = readSource('src/components/landing/LandingNav.tsx');
+    const landingChrome = readSource('src/components/landing/LandingChrome.module.css');
+    const heroStyles = readSource('src/components/landing-exact/LandingHeroExact.module.css');
+
+    expect(landingPage).toContain("className={chromeStyles.page}");
+    expect(landingPage).toContain("className={chromeStyles.navSpacer}");
+    expect(landingPage).not.toContain('h-[73px] md:h-[97px] lg:h-[121px]');
+
+    expect(landingChrome).toContain('--landing-nav-offset: 121px;');
+    expect(landingChrome).toContain('@media (max-width: 1100px)');
+    expect(landingChrome).toContain('--landing-nav-offset: 80px;');
+    expect(landingChrome).toContain('@media (max-width: 480px)');
+    expect(landingChrome).toContain('--landing-nav-offset: 72px;');
+
+    expect(landingNav).toContain("paddingBlock: 'var(--landing-nav-padding-block)'");
+    expect(landingNav).toContain("paddingInline: 'var(--landing-nav-padding-inline)'");
+    expect(heroStyles).toContain('var(--landing-nav-offset, 121px)');
+  });
 });

@@ -1,0 +1,29 @@
+.page {
+  --landing-nav-offset: 121px;
+  --landing-nav-padding-block: 28px;
+  --landing-nav-padding-inline: 64px;
+
+  min-height: 100vh;
+  background: #fffcf9;
+  font-family: var(--font-dm-sans);
+}
+
+.navSpacer {
+  height: var(--landing-nav-offset);
+}
+
+@media (max-width: 1100px) {
+  .page {
+    --landing-nav-offset: 80px;
+    --landing-nav-padding-block: 20px;
+    --landing-nav-padding-inline: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    --landing-nav-offset: 72px;
+    --landing-nav-padding-block: 16px;
+    --landing-nav-padding-inline: 16px;
+  }
+}
