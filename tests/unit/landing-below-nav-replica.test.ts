@@ -103,10 +103,11 @@ describe('below-nav homepage replica contract', () => {
     const heroStyles = readSource('src/components/landing-exact/LandingHeroExact.module.css');
 
     expect(landingPage).toContain("className={chromeStyles.page}");
-    expect(landingPage).toContain("className={chromeStyles.navSpacer}");
+    expect(landingPage).not.toContain('chromeStyles.navSpacer');
     expect(landingPage).not.toContain('h-[73px] md:h-[97px] lg:h-[121px]');
 
     expect(landingChrome).toContain('--landing-nav-offset: 121px;');
+    expect(landingChrome).not.toContain('.navSpacer');
     expect(landingChrome).toContain('@media (max-width: 1100px)');
     expect(landingChrome).toContain('--landing-nav-offset: 80px;');
     expect(landingChrome).toContain('@media (max-width: 480px)');
@@ -114,6 +115,8 @@ describe('below-nav homepage replica contract', () => {
 
     expect(landingNav).toContain("paddingBlock: 'var(--landing-nav-padding-block)'");
     expect(landingNav).toContain("paddingInline: 'var(--landing-nav-padding-inline)'");
-    expect(heroStyles).toContain('var(--landing-nav-offset, 121px)');
+    expect(heroStyles).toContain('padding: var(--landing-nav-offset, 121px) 80px 0;');
+    expect(heroStyles).toContain('align-items: start;');
+    expect(heroStyles).toContain('min-height: calc(100vh - 80px);');
   });
 });

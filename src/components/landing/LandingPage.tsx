@@ -22,7 +22,6 @@ export function LandingPage({ isClerkEnabled = false }: LandingPageProps) {
         setMobileMenuOpen={setMobileMenuOpen}
         isClerkEnabled={isClerkEnabled}
       />
-      <div aria-hidden="true" className={chromeStyles.navSpacer} />
 
       <LandingBodyExact />
       <AgentationHomepageOverlay />

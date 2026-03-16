@@ -8,10 +8,6 @@
   font-family: var(--font-dm-sans);
 }
 
-.navSpacer {
-  height: var(--landing-nav-offset);
-}
-
 @media (max-width: 1100px) {
   .page {
     --landing-nav-offset: 80px;
