@@ -30,9 +30,9 @@
 
 .heroHeadline {
   margin: 0 0 32px;
-  font-family: var(--font-editorial);
+  font-family: var(--font-libre-baskerville);
   font-size: clamp(2.75rem, 4.8vw, 5.25rem);
-  font-weight: 400;
+  font-weight: 700;
   letter-spacing: -1.5px;
   color: var(--landing-exact-ink);
 }
@@ -45,7 +45,7 @@
 .heroHeadline em {
   display: block;
   font-style: italic;
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.15;
   letter-spacing: -0.5px;
   color: var(--landing-exact-terracotta);

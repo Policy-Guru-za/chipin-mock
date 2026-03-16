@@ -86,16 +86,35 @@ describe('below-nav homepage replica contract', () => {
 
     expect(globals).toContain("--font-display: 'DM Serif Display', Georgia, serif;");
     expect(globals).toContain("--font-editorial: 'Fraunces', Georgia, serif;");
+    expect(globals).toContain("--font-libre-baskerville: 'Libre Baskerville', Georgia, serif;");
     expect(globals).toContain('--font-dm-serif: var(--font-display);');
     expect(layout).toContain("Fraunces({");
     expect(layout).toContain("DM_Serif_Display({");
+    expect(layout).toContain("Libre_Baskerville({");
     expect(layout).toContain("variable: '--font-editorial'");
     expect(layout).toContain("variable: '--font-display'");
+    expect(layout).toContain("variable: '--font-libre-baskerville'");
     expect(layout).toContain("style: ['normal', 'italic']");
     expect(tailwind).toContain("editorial: ['var(--font-editorial)', 'Georgia', 'serif']");
     expect(heroStyles).toContain('font-family: var(--font-editorial);');
     expect(legacyHero).toContain("var(--font-editorial)");
     expect(legacyHero).not.toContain("var(--font-dm-serif)");
+  });
+
+  it('scopes Libre Baskerville to the active hero headline only', () => {
+    const layout = readSource('src/app/layout.tsx');
+    const heroStyles = readSource('src/components/landing-exact/LandingHeroExact.module.css');
+
+    expect(layout).toMatch(
+      /const libreBaskerville = Libre_Baskerville\(\{[\s\S]*weight: \['400', '700'\],[\s\S]*style: \['normal', 'italic'\],[\s\S]*variable: '--font-libre-baskerville'/
+    );
+    expect(heroStyles).toMatch(
+      /\.heroHeadline \{[\s\S]*font-family: var\(--font-libre-baskerville\);[\s\S]*font-weight: 700;/
+    );
+    expect(heroStyles).toMatch(/\.heroHeadline em \{[\s\S]*font-weight: 400;/);
+    expect(heroStyles).toMatch(
+      /\.villageTestimonial::before \{[\s\S]*font-family: var\(--font-editorial\);/
+    );
   });
 
   it('keeps the hero grids mobile-safe at the 375px baseline', () => {

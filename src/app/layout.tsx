@@ -47,7 +47,8 @@ const dmSerifDisplay = DM_Serif_Display({
 
 const libreBaskerville = Libre_Baskerville({
   subsets: ['latin'],
-  weight: '400',
+  weight: ['400', '700'],
+  style: ['normal', 'italic'],
   variable: '--font-libre-baskerville',
   display: 'swap',
 });
