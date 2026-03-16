@@ -114,16 +114,35 @@ describe('copy matrix compliance', () => {
   });
 
   it('uses Dreamboard terminology on landing CTAs', () => {
-    const cta = readSource('src/components/landing/LandingCTA.tsx');
+    const hero = readSource('src/components/landing-exact/LandingHeroExact.tsx');
+    const voucherBand = readSource('src/components/landing-exact/LandingVoucherBandExact.tsx');
     const nav = readSource('src/components/landing/LandingNav.tsx');
-    const page = readSource('src/components/landing/LandingPage.tsx');
 
-    expect(cta).toContain('Create Your Free Dreamboard');
+    expect(hero).toContain('Create Your Free Dreamboard');
+    expect(voucherBand).toContain('Create Your Free Dreamboard');
     expect(nav).toContain('Create a Free Dreamboard');
-    expect(page).toContain('Create Your Free Dreamboard');
-    expect(cta).not.toContain('Create your free Dreamboard');
+    expect(hero).not.toContain('Create your free Dreamboard');
+    expect(voucherBand).not.toContain('Create your free Dreamboard');
     expect(nav).not.toContain('Create a free Dreamboard');
-    expect(page).not.toContain('Create your free Dreamboard');
+  });
+
+  it('uses real routes in the exact homepage body and footer', () => {
+    const hero = readSource('src/components/landing-exact/LandingHeroExact.tsx');
+    const footer = readSource('src/components/landing-exact/LandingFooterExact.tsx');
+    const voucherBand = readSource('src/components/landing-exact/LandingVoucherBandExact.tsx');
+
+    expect(hero).toContain('href="/create"');
+    expect(hero).not.toContain('href="#create"');
+    expect(voucherBand).toContain('href="/create"');
+    expect(voucherBand).not.toContain('href="#create"');
+    expect(footer).toContain('href="/privacy"');
+    expect(footer).toContain('href="/terms"');
+    expect(footer).toContain('href="/popia"');
+    expect(footer).toContain('href="/contact"');
+    expect(footer).not.toContain('href="#privacy"');
+    expect(footer).not.toContain('href="#terms"');
+    expect(footer).not.toContain('href="#popia"');
+    expect(footer).not.toContain('href="#contact"');
   });
 
   it('does not wire legacy charity promo surfaces into marketing', () => {

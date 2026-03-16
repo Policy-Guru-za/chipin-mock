@@ -8,6 +8,7 @@ const readSource = (path: string) => readFileSync(resolve(process.cwd(), path), 
 describe('auth-aware navigation and user avatar menu', () => {
   it('renders auth-aware controls on landing navigation', () => {
     const landingNav = readSource('src/components/landing/LandingNav.tsx');
+    const landingContent = readSource('src/components/landing/content.ts');
     const marketingPage = readSource('src/app/(marketing)/page.tsx');
 
     expect(marketingPage).toContain('getClerkConfigStatus().isEnabled');
@@ -17,6 +18,10 @@ describe('auth-aware navigation and user avatar menu', () => {
     expect(landingNav).toContain('SignedIn');
     expect(landingNav).toContain('href="/sign-in"');
     expect(landingNav).not.toContain('Login');
+    expect(landingContent).toContain('export const navLinks');
+    expect(landingContent).toContain('= [];');
+    expect(landingContent).not.toContain('How it works');
+    expect(landingContent).not.toContain('Trust & safety');
   });
 
   it('uses shared avatar menu in shared and landing navs', () => {

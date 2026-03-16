@@ -35,10 +35,7 @@ export const trustItems = [
   { icon: '📱', text: 'Share via WhatsApp' },
 ];
 
-export const navLinks = [
-  { label: 'How it works', href: '#how-it-works' },
-  { label: 'Trust & safety', href: '#trust' },
-];
+export const navLinks: Array<{ label: string; href: string }> = [];
 
 export const TIMING = {
   TESTIMONIAL_ROTATION: 5000,

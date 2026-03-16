@@ -23,16 +23,23 @@ function contrastRatio(hex1: string, hex2: string): number {
 
 describe('C7 contrast guardrails', () => {
   it('keeps restored landing and shared button classes on expected stop colours', () => {
+    const landingShell = readSource('src/components/landing-exact/LandingBodyExactShell.module.css');
+    const landingHero = readSource('src/components/landing-exact/LandingHeroExact.module.css');
     const landingNav = readSource('src/components/landing/LandingNav.tsx');
-    const landingCta = readSource('src/components/landing/LandingCTA.tsx');
-    const landingPage = readSource('src/components/landing/LandingPage.tsx');
+    const landingVoucherBand = readSource(
+      'src/components/landing-exact/LandingVoucherBandExact.module.css'
+    );
     const button = readSource('src/components/ui/button.tsx');
 
+    expect(landingShell).toContain('--landing-exact-sage-light: #6b9e88;');
+    expect(landingShell).toContain('--landing-exact-sage-dark: #5a8e78;');
     expect(landingNav).toContain('from-[#6B9E88] to-[#5A8E78]');
     expect(landingNav).toContain('text-[#777]');
     expect(landingNav).toContain('text-[#5A8E78]');
-    expect(landingCta).toContain('from-[#6B9E88] to-[#5A8E78]');
-    expect(landingPage).toContain('from-[#6B9E88] to-[#5A8E78]');
+    expect(landingHero).toContain('var(--landing-exact-sage-light)');
+    expect(landingHero).toContain('var(--landing-exact-sage-dark)');
+    expect(landingVoucherBand).toContain('var(--landing-exact-sage-light)');
+    expect(landingVoucherBand).toContain('var(--landing-exact-sage-dark)');
     expect(button).toContain('from-primary-700 to-primary-800');
     expect(button).toContain('from-accent-700 to-[#9A3412]');
   });

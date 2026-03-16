@@ -1,0 +1,665 @@
+.timelineSection {
+  position: relative;
+  z-index: 5;
+  overflow: hidden;
+  padding: 100px 0 80px;
+  background: var(--landing-exact-surface-warm);
+}
+
+.timelineHeader {
+  max-width: 600px;
+  margin: 0 auto 80px;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.timelineHeaderEyebrow {
+  margin-bottom: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--landing-exact-sage-dark);
+}
+
+.timelineHeader h2 {
+  margin: 0;
+  font-family: var(--font-dm-serif);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--landing-exact-ink-soft);
+}
+
+.timelineHeader h2 em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--landing-exact-terracotta);
+}
+
+.timelineContainer {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 80px;
+}
+
+.timelineLineContainer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 126px;
+  z-index: 1;
+  width: 4px;
+}
+
+.timelineLineBackground,
+.timelineLineFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  border-radius: 2px;
+}
+
+.timelineLineBackground {
+  height: 100%;
+  background: rgb(196 120 90 / 10%);
+}
+
+.timelineLineFill {
+  height: 0;
+  background: linear-gradient(
+    180deg,
+    var(--landing-exact-sage-light) 0%,
+    var(--landing-exact-sage-dark) 100%
+  );
+  transition: height 1.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.timelineStep,
+.timelineCoda {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.timelineStep {
+  grid-template-columns: 50px 1fr;
+  gap: 40px;
+  margin-bottom: 72px;
+}
+
+.timelineCoda {
+  grid-template-columns: 50px 1fr;
+  gap: 40px;
+  transition-delay: 0.4s;
+}
+
+.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.timelineNode,
+.codaNode {
+  position: relative;
+  z-index: 3;
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.timelineNode {
+  box-shadow: 0 4px 16px rgb(0 0 0 / 6%);
+}
+
+.timelineNodeOne,
+.timelineNodeTwo,
+.timelineNodeThree,
+.codaNode {
+  background: linear-gradient(
+    145deg,
+    var(--landing-exact-sage-light),
+    var(--landing-exact-sage-dark)
+  );
+  color: white;
+}
+
+.timelineNode svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.8;
+}
+
+.timelineContent {
+  padding-top: 4px;
+}
+
+.timelineStepLabel,
+.miniFormLabel,
+.voucherCardLabel,
+.codaUnit {
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.timelineStepLabel {
+  margin-bottom: 6px;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #999;
+}
+
+.timelineStepTitle {
+  margin-bottom: 10px;
+  font-family: var(--font-dm-serif);
+  font-size: 24px;
+  color: var(--landing-exact-ink-soft);
+}
+
+.timelineStepDescription {
+  max-width: 480px;
+  margin-bottom: 20px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #4a5d53;
+}
+
+.miniForm {
+  max-width: 360px;
+  padding: 20px;
+  border: 1px solid rgb(0 0 0 / 6%);
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 2px 12px rgb(0 0 0 / 3%);
+}
+
+.miniFormRow {
+  margin-bottom: 14px;
+}
+
+.miniFormRow:last-child {
+  margin-bottom: 0;
+}
+
+.miniFormLabel {
+  margin-bottom: 6px;
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  color: #999;
+}
+
+.miniFormInput {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  border: 1.5px solid #e5e0da;
+  border-radius: 8px;
+  background: #fdfbf9;
+  font-size: 14px;
+  color: var(--landing-exact-ink-soft);
+}
+
+.filledInput {
+  border-color: rgb(107 158 136 / 25%);
+  background: rgb(107 158 136 / 3%);
+}
+
+.miniFormPhotoRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.miniFormPhoto {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px dashed #ccc;
+  border-radius: 10px;
+  color: #ccc;
+}
+
+.miniFormPhoto svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.8;
+}
+
+.miniFormPhotoText {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.cursorBlink {
+  width: 1px;
+  height: 14px;
+  display: inline-block;
+  margin-left: 2px;
+  background: var(--landing-exact-sage);
+  animation: blink 1s step-end infinite;
+}
+
+.whatsAppBubbleContainer {
+  position: relative;
+  max-width: 380px;
+}
+
+.whatsAppChatHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 14px 14px 0 0;
+  background: #075e54;
+}
+
+.whatsAppChatAvatar {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+}
+
+.whatsAppChatName {
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+}
+
+.whatsAppChatMembers {
+  font-size: 11px;
+  color: rgb(255 255 255 / 60%);
+}
+
+.whatsAppBubble {
+  padding: 14px 16px;
+  border-radius: 0 0 16px 4px;
+  background: #dcf8c6;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 5%);
+}
+
+.whatsAppBubbleText {
+  margin-bottom: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #303030;
+}
+
+.whatsAppLinkPreview {
+  overflow: hidden;
+  border: 1px solid rgb(0 0 0 / 6%);
+  border-radius: 10px;
+  background: white;
+}
+
+.whatsAppLinkPreviewBar {
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--landing-exact-sage-light),
+    var(--landing-exact-sage)
+  );
+}
+
+.whatsAppLinkPreviewBody {
+  padding: 12px;
+}
+
+.whatsAppLinkPreviewDomain {
+  margin-bottom: 4px;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #999;
+}
+
+.whatsAppLinkPreviewTitle {
+  margin-bottom: 2px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--landing-exact-ink-soft);
+}
+
+.whatsAppLinkPreviewDescription {
+  font-size: 12px;
+  color: #777;
+}
+
+.whatsAppTime {
+  margin-top: 4px;
+  text-align: right;
+  font-size: 11px;
+  color: rgb(0 0 0 / 35%);
+}
+
+.whatsAppReactions {
+  position: absolute;
+  top: 40px;
+  right: -16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.whatsAppReaction {
+  padding: 4px 8px;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
+  font-size: 16px;
+  animation: reactionDrift 4s ease-in-out infinite;
+}
+
+.whatsAppReaction:nth-child(2) {
+  animation-delay: -1.3s;
+}
+
+.whatsAppReaction:nth-child(3) {
+  animation-delay: -2.6s;
+}
+
+.miniVoucher {
+  max-width: 300px;
+  padding: 18px 20px;
+  border: 1.5px solid rgb(74 126 102 / 12%);
+  border-radius: 14px;
+  background: linear-gradient(145deg, #fefdfb, #faf7f2);
+  box-shadow: 0 4px 16px rgb(74 126 102 / 6%);
+}
+
+.miniVoucherTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.miniVoucherBrand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-nunito);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--landing-exact-sage);
+}
+
+.miniVoucherBadge,
+.miniVoucherPartner,
+.codaContent {
+  display: flex;
+  align-items: center;
+}
+
+.miniVoucherBadge {
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgb(74 126 102 / 8%);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--landing-exact-sage);
+}
+
+.miniVoucherBadge svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.5;
+}
+
+.miniVoucherGift {
+  margin-bottom: 2px;
+  font-family: var(--font-dm-serif);
+  font-size: 16px;
+  color: var(--landing-exact-ink-soft);
+}
+
+.miniVoucherFor {
+  margin-bottom: 14px;
+  font-size: 12px;
+  color: var(--landing-exact-terracotta);
+}
+
+.miniVoucherPartner {
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid rgb(0 0 0 / 5%);
+  font-size: 11px;
+  color: #aaa;
+}
+
+.miniVoucherPartnerLogo {
+  width: auto;
+  height: 35px;
+  border-radius: 3px;
+}
+
+.codaNode {
+  box-shadow: 0 4px 16px rgb(107 158 136 / 30%);
+  font-size: 20px;
+}
+
+.codaContent {
+  gap: 16px;
+  padding: 16px 24px;
+  border: 1.5px solid rgb(107 158 136 / 12%);
+  border-radius: 16px;
+  background: white;
+}
+
+.codaStat {
+  font-family: var(--font-dm-serif);
+  font-size: 28px;
+  line-height: 1;
+  color: var(--landing-exact-sage);
+}
+
+.codaUnit {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #7a8d83;
+}
+
+.codaDivider {
+  width: 1.5px;
+  height: 32px;
+  flex-shrink: 0;
+  background: rgb(107 158 136 / 10%);
+}
+
+.codaText {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #4a5d53;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes reactionDrift {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-5px) scale(1.05);
+  }
+}
+
+@media (max-width: 1100px) {
+  .timelineContainer {
+    padding: 0 40px;
+  }
+
+  .timelineLineContainer {
+    left: 66px;
+  }
+}
+
+@media (max-width: 768px) {
+  .timelineSection {
+    padding: 64px 0 56px;
+  }
+
+  .timelineContainer {
+    padding: 0 20px;
+  }
+
+  .timelineLineContainer {
+    left: 43px;
+  }
+
+  .timelineStep,
+  .timelineCoda {
+    grid-template-columns: 40px 1fr;
+    gap: 20px;
+  }
+
+  .timelineStep {
+    margin-bottom: 52px;
+  }
+
+  .timelineNode,
+  .codaNode {
+    width: 40px;
+    height: 40px;
+  }
+
+  .timelineNode svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .timelineStepTitle {
+    font-size: 20px;
+  }
+
+  .codaNode {
+    font-size: 16px;
+  }
+
+  .codaContent {
+    padding: 14px 16px;
+  }
+
+  .codaStat {
+    font-size: 22px;
+  }
+
+  .miniForm,
+  .whatsAppBubbleContainer {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .timelineSection {
+    padding: 48px 0 40px;
+  }
+
+  .timelineHeader {
+    margin-bottom: 56px;
+  }
+
+  .timelineContainer {
+    padding: 0 16px;
+  }
+
+  .timelineLineContainer {
+    left: 34px;
+  }
+
+  .timelineStep,
+  .timelineCoda {
+    grid-template-columns: 36px 1fr;
+    gap: 16px;
+  }
+
+  .timelineStep {
+    margin-bottom: 44px;
+  }
+
+  .timelineNode,
+  .codaNode {
+    width: 36px;
+    height: 36px;
+  }
+
+  .timelineNode svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .timelineStepTitle {
+    font-size: 18px;
+  }
+
+  .miniForm {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 375px) {
+  .timelineContainer {
+    padding: 0 12px;
+  }
+
+  .timelineHeader h2 {
+    font-size: 26px;
+  }
+
+  .timelineLineContainer {
+    left: 30px;
+  }
+
+  .timelineStepDescription {
+    font-size: 14px;
+  }
+
+  .whatsAppBubbleText {
+    font-size: 13px;
+  }
+
+  .whatsAppReactions {
+    right: -6px;
+    transform: scale(0.8);
+    transform-origin: right top;
+  }
+
+  .whatsAppChatName {
+    font-size: 13px;
+  }
+
+  .miniVoucherPartnerLogo {
+    min-height: 22px;
+  }
+}

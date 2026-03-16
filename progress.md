@@ -2,46 +2,47 @@
 
 ## Current Spec
 
-- `18_session-placeholder`
+- `19_session-placeholder`
 
 ## Current Stage
 
-- Placeholder — awaiting next session activation
+- Awaiting the next session topic
 
 ## Status
 
-- Closed [`spec/17_draft-strict-parsing-fix.md`](./spec/17_draft-strict-parsing-fix.md) as `Done` after fixing the P1 strict-parsing rejection of persisted host-create drafts at the review and publish consumption sites.
-- Activated [`spec/18_session-placeholder.md`](./spec/18_session-placeholder.md) as the standing next-session placeholder.
+- Closed [`spec/18_below-nav-homepage-replica.md`](./spec/18_below-nav-homepage-replica.md) as done and activated [`spec/19_session-placeholder.md`](./spec/19_session-placeholder.md).
+- Preserved the current homepage nav/auth shell, kept the two homepage nav links removed, and replaced everything below the nav seam with the reviewed replica in isolated homepage-only components/styles/assets.
+- Added homepage regression coverage for the preserved nav/auth contract plus the new below-nav replica contract.
 
 ## Blockers
 
-- None.
+- `pnpm docs:audit` still fails on pre-existing control-matrix classification gaps in the current tree (latest first failure: `tmp/gifta-react/README.md`).
 
 ## Next Step
 
-- Rename `spec/18_session-placeholder.md` in place when the next bounded Gifta session begins.
+- Rename [`spec/19_session-placeholder.md`](./spec/19_session-placeholder.md) in place when the next session topic is known.
+- If live homepage auth dogfood is needed in a future session, rerun browser verification with real Clerk test keys instead of missing or dummy keys.
 
 ## Last Session Spec
 
-- `17_draft-strict-parsing-fix`
+- `18_below-nav-homepage-replica`
 
 ## Last Completed Spec
 
-- `17_draft-strict-parsing-fix`
+- `18_below-nav-homepage-replica`
 
 ## Last Green Commands
 
-- `pnpm lint` (0 errors, 105 pre-existing warnings)
+- `pnpm lint` (0 errors, 108 warnings)
 - `pnpm typecheck` (clean)
-- `pnpm test` (195 test files, 930 tests passed)
+- `pnpm test` (196 test files, 934 tests passed)
 
 ## Dogfood Evidence
 
-- Full gate green: lint, typecheck, and test all passing.
-- Confirmed both `page.tsx` and `actions.ts` use `.strip().safeParse()`.
-- Updated `create-review-page.test.tsx` schema mock to expose `.strip()` matching the new runtime call chain.
-- New schema test cases prove: (1) strict schema rejects persisted fields, (2) stripped schema accepts and removes them.
+- Local browser dogfood of `/` without Clerk keys returned `503 Authentication unavailable`, matching the repo's auth-unavailable middleware contract.
+- Local browser dogfood with dummy Clerk env values failed at runtime with `Publishable key not valid.`, so route-level auth-enabled homepage verification remains blocked on real Clerk test keys.
+- Safe fallback proof for Spec 18: the targeted homepage regression suite passed (`landing-below-nav-replica`, `auth-nav-user-menu`, `copy-matrix-compliance`, `colour-contrast`, `accessibility`) and the full `pnpm test` suite stayed green.
 
 ## Napkin Evidence
 
-- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with Spec 17 learning: use `.strip().safeParse()` at KV consumption sites; keep `.strict()` on canonical schema; always test with real persisted shape.
+- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with Spec 18 learning: local homepage/auth dogfood needs real Clerk test keys; dummy keys only replace the 503 middleware block with a Clerk runtime error.

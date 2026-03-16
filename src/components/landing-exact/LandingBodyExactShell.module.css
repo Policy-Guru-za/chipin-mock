@@ -1,0 +1,51 @@
+.shell {
+  --landing-exact-sage: #4a7e66;
+  --landing-exact-sage-light: #6b9e88;
+  --landing-exact-sage-dark: #5a8e78;
+  --landing-exact-amber: #c49a5c;
+  --landing-exact-terracotta: #c4785a;
+  --landing-exact-terracotta-dark: #b06a4a;
+  --landing-exact-ink: #2c2520;
+  --landing-exact-ink-soft: #3d3d3d;
+  --landing-exact-ink-faint: #666;
+  --landing-exact-surface: #fffcf9;
+  --landing-exact-surface-warm: #faf7f2;
+  --landing-exact-surface-cream: #fffbf7;
+  --landing-exact-takealot-blue: #0b79bf;
+
+  font-family: var(--font-dm-sans);
+  color: var(--landing-exact-ink-soft);
+  background: var(--landing-exact-surface);
+  overflow-x: hidden;
+}
+
+.pageWrapper {
+  position: relative;
+  min-height: 100vh;
+}
+
+.ambientShape {
+  position: absolute;
+  top: -120px;
+  right: -80px;
+  width: 720px;
+  height: 720px;
+  background: radial-gradient(
+    ellipse at 60% 40%,
+    rgb(248 218 172 / 18%) 0%,
+    rgb(248 218 172 / 6%) 50%,
+    transparent 75%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@media (max-width: 768px) {
+  .ambientShape {
+    width: 400px;
+    height: 400px;
+    top: -60px;
+    right: -60px;
+  }
+}
