@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { AgentationHomepageOverlay } from '@/components/dev/AgentationHomepageOverlay';
 import { LandingBodyExact } from '@/components/landing-exact/LandingBodyExact';
 
 import chromeStyles from './LandingChrome.module.css';
@@ -24,6 +25,7 @@ export function LandingPage({ isClerkEnabled = false }: LandingPageProps) {
       <div aria-hidden="true" className={chromeStyles.navSpacer} />
 
       <LandingBodyExact />
+      <AgentationHomepageOverlay />
     </div>
   );
 }

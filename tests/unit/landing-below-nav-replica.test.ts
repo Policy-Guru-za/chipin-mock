@@ -16,6 +16,28 @@ describe('below-nav homepage replica contract', () => {
     expect(landingPage).not.toContain('<LandingFooter />');
   });
 
+  it('keeps Agentation as a homepage-only dev overlay with manual copy flow', () => {
+    const marketingPage = readSource('src/app/(marketing)/page.tsx');
+    const landingPage = readSource('src/components/landing/LandingPage.tsx');
+    const homepageOverlay = readSource('src/components/dev/AgentationHomepageOverlay.tsx');
+    const rootLayout = readSource('src/app/layout.tsx');
+
+    expect(marketingPage).toContain('<LandingPage');
+    expect(landingPage).toContain(
+      "import { AgentationHomepageOverlay } from '@/components/dev/AgentationHomepageOverlay';"
+    );
+    expect(landingPage).toContain('<AgentationHomepageOverlay />');
+    expect(rootLayout).not.toContain('AgentationHomepageOverlay');
+
+    expect(homepageOverlay).toContain("import dynamic from 'next/dynamic';");
+    expect(homepageOverlay).toContain("import('agentation').then((mod) => mod.Agentation)");
+    expect(homepageOverlay).toContain("process.env.NODE_ENV === 'development'");
+    expect(homepageOverlay).toContain("process.env.NEXT_PUBLIC_ENABLE_AGENTATION === 'true'");
+    expect(homepageOverlay).not.toContain('endpoint=');
+    expect(homepageOverlay).not.toContain('sessionId=');
+    expect(homepageOverlay).not.toContain('webhookUrl=');
+  });
+
   it('uses the reviewed assets and exact below-nav copy anchors', () => {
     const hero = readSource('src/components/landing-exact/LandingHeroExact.tsx');
     const timeline = readSource('src/components/landing-exact/LandingTimelineExact.tsx');

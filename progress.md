@@ -2,7 +2,7 @@
 
 ## Current Spec
 
-- `23_session-placeholder`
+- `24_session-placeholder`
 
 ## Current Stage
 
@@ -10,9 +10,9 @@
 
 ## Status
 
-- Closed [`spec/22_homepage-hero-headline-nowrap.md`](./spec/22_homepage-hero-headline-nowrap.md) as done and activated [`spec/23_session-placeholder.md`](./spec/23_session-placeholder.md).
-- Replaced the desktop hero equal-column squeeze with a wider explicit text/card split, slightly reduced the desktop hero type scale, and added desktop-only no-wrap protection for the two intended headline lines.
-- Added a mobile-safe single-column fallback plus focused regression coverage so the desktop headline contract is now explicit instead of accidental.
+- Closed [`spec/23_agentation-homepage-dev-overlay.md`](./spec/23_agentation-homepage-dev-overlay.md) as done and activated [`spec/24_session-placeholder.md`](./spec/24_session-placeholder.md).
+- Added a dedicated client-only Agentation homepage wrapper, mounted it only on the landing surface, and gated it behind `NODE_ENV === 'development'` plus `NEXT_PUBLIC_ENABLE_AGENTATION === 'true'`.
+- Kept the first slice manual-only with no endpoint, session, or webhook app wiring, then added focused regression coverage for the homepage/dev-only/manual-overlay contract.
 
 ## Blockers
 
@@ -20,30 +20,32 @@
 
 ## Next Step
 
-- Rename [`spec/23_session-placeholder.md`](./spec/23_session-placeholder.md) in place when the next session topic is known.
+- Rename [`spec/24_session-placeholder.md`](./spec/24_session-placeholder.md) in place when the next session topic is known.
 
 ## Last Session Spec
 
-- `22_homepage-hero-headline-nowrap`
+- `23_agentation-homepage-dev-overlay`
 
 ## Last Completed Spec
 
-- `22_homepage-hero-headline-nowrap`
+- `23_agentation-homepage-dev-overlay`
 
 ## Last Green Commands
 
-- `pnpm docs:audit -- --sync` (passed; 176 markdown files)
-- `pnpm docs:audit` (passed; 176 markdown files)
+- `pnpm docs:audit -- --sync` (passed; 177 markdown files)
+- `pnpm docs:audit` (passed; 177 markdown files)
 - `pnpm lint` (0 errors, 108 warnings)
 - `pnpm typecheck` (clean)
-- `pnpm test` (197 test files, 941 tests passed)
+- `pnpm test` (passed; full Vitest suite green)
+- `pnpm build` (passed; existing Next/Sentry/OpenTelemetry warnings only)
 
 ## Dogfood Evidence
 
-- Local homepage hero dogfood remained blocked by the repo's auth-unavailable middleware: the existing localhost dev server on `http://localhost:3000` returned `503 Authentication unavailable` to both `curl -I` and body checks without Clerk keys.
-- Safe fallback proof for Spec 22: the hero source now encodes an explicit wider desktop text track, desktop-only no-wrap protection, and a single-column fallback below the desktop threshold; `tests/unit/landing-below-nav-replica.test.ts` locks that contract directly.
-- Full gate proof: docs audit sync, docs audit, lint, typecheck, the focused hero regression test, and the full test suite all passed after the hero headline fix.
+- Live homepage overlay dogfood remained blocked because starting a dedicated overlay-enabled dev server with `NEXT_PUBLIC_ENABLE_AGENTATION=true pnpm dev --port 3100` failed immediately: Next reported `Unable to acquire lock at .next/dev/lock, is another instance of next dev running?`.
+- The already-running localhost homepage at `http://localhost:3000` returned `200 OK`, so the marketing route was reachable, but that server's env state was not controlled in this session, so live Agentation overlay activation could not be proved there.
+- Safe fallback proof for Spec 23: `src/components/dev/AgentationHomepageOverlay.tsx` now holds the explicit dev-only + env-opt-in gate, `src/components/landing/LandingPage.tsx` mounts it only on the landing surface, and `tests/unit/landing-below-nav-replica.test.ts` locks the homepage/dev-only/manual-overlay contract.
+- Full gate proof: docs audit sync, docs audit, lint, typecheck, the focused landing regression coverage, the full test suite, and the production build all passed after the Agentation homepage overlay change.
 
 ## Napkin Evidence
 
-- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with Spec 22 learning: encode screenshot-level hero text contracts explicitly with guaranteed text width, desktop-only no-wrap, and regression coverage instead of relying on incidental column width.
+- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with Spec 23 learning: keep dev-only browser annotation tools isolated to a dedicated client wrapper, page-local mount, and explicit public env opt-in instead of treating them like harmless global chrome.
