@@ -80,8 +80,11 @@ describe('below-nav homepage replica contract', () => {
   it('keeps the hero grids mobile-safe at the 375px baseline', () => {
     const heroStyles = readSource('src/components/landing-exact/LandingHeroExact.module.css');
 
-    expect(heroStyles).toMatch(/minmax\(min\(100%, 400px\), 1fr\)/g);
-    expect(heroStyles.match(/minmax\(min\(100%, 400px\), 1fr\)/g)).toHaveLength(1);
+    expect(heroStyles).toContain('@media (max-width: 920px)');
+    expect(heroStyles).toContain('grid-template-columns: minmax(0, 1fr);');
+    expect(heroStyles).toContain('display: contents;');
+    expect(heroStyles).toContain('@media (max-width: 375px)');
+    expect(heroStyles).toContain('padding: calc(var(--landing-nav-offset, 72px) + var(--landing-hero-top-inset, 12px)) 12px 40px;');
     expect(heroStyles).not.toContain('minmax(400px, 1fr)');
   });
 
@@ -94,6 +97,37 @@ describe('below-nav homepage replica contract', () => {
     expect(heroStyles).toContain('white-space: nowrap;');
     expect(heroStyles).toContain('@media (max-width: 920px)');
     expect(heroStyles).toContain('grid-template-columns: minmax(0, 1fr);');
+  });
+
+  it('locks the hero to one semantic rail composition without duplicated desktop/mobile copies', () => {
+    const hero = readSource('src/components/landing-exact/LandingHeroExact.tsx');
+    const heroStyles = readSource('src/components/landing-exact/LandingHeroExact.module.css');
+
+    expect(hero).toContain('<div className={styles.heroLeftRail}>');
+    expect(hero).toContain('<div className={styles.heroRightRail}>');
+    expect(hero).toContain('<VillageTestimonial />');
+    expect(hero).toContain('<HeroCreateCta />');
+    expect(hero).toContain('<VillageContributors />');
+    expect(hero.match(/<VillageTestimonial/g)).toHaveLength(1);
+    expect(hero.match(/<HeroCreateCta/g)).toHaveLength(1);
+    expect(hero.match(/<VillageContributors/g)).toHaveLength(1);
+    expect(hero).not.toContain('desktopNarrative');
+    expect(hero).not.toContain('heroVisualRail');
+    expect(hero).not.toContain('desktopVisualContributors');
+    expect(hero).not.toContain('mobileVillage');
+    expect(hero).not.toContain('mobileCtaSection');
+
+    expect(heroStyles).toContain('.heroLeftRail');
+    expect(heroStyles).toContain('.heroRightRail');
+    expect(heroStyles).toContain('.heroCtaSection');
+    expect(heroStyles).toContain('@media (max-width: 920px)');
+    expect(heroStyles).toContain('display: contents;');
+    expect(heroStyles).not.toContain('.desktopNarrative');
+    expect(heroStyles).not.toContain('.heroVisualRail');
+    expect(heroStyles).not.toContain('.desktopVisualContributors');
+    expect(heroStyles).not.toContain('.heroVillage');
+    expect(heroStyles).not.toContain('.mobileVillage');
+    expect(heroStyles).not.toContain('.mobileCtaSection');
   });
 
   it('keeps the preserved nav seam on one shared landing breakpoint contract', () => {
@@ -119,7 +153,7 @@ describe('below-nav homepage replica contract', () => {
     expect(landingNav).toContain("paddingBlock: 'var(--landing-nav-padding-block)'");
     expect(landingNav).toContain("paddingInline: 'var(--landing-nav-padding-inline)'");
     expect(heroStyles).toContain(
-      'padding: calc(var(--landing-nav-offset, 121px) + var(--landing-hero-top-inset, 28px)) 80px 0;'
+      'padding: calc(var(--landing-nav-offset, 121px) + var(--landing-hero-top-inset, 28px)) 80px 120px;'
     );
     expect(heroStyles).toContain('align-items: start;');
     expect(heroStyles).toContain('min-height: calc(100vh - 80px - var(--landing-hero-top-inset, 28px));');

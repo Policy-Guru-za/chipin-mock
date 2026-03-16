@@ -2,7 +2,7 @@
 
 ## Current Spec
 
-- `26_session-placeholder`
+- `28_session-placeholder`
 
 ## Current Stage
 
@@ -10,9 +10,9 @@
 
 ## Status
 
-- Closed [`spec/25_homepage-hero-top-inset-polish.md`](./spec/25_homepage-hero-top-inset-polish.md) as done and activated [`spec/26_session-placeholder.md`](./spec/26_session-placeholder.md).
-- Added shared landing hero top-inset tokens so the first visible hero section now owns a small breathing gap beneath the fixed nav without reintroducing a blank spacer.
-- Reconciled hero height math to preserve the no-strip seam, then updated regression coverage to lock the subtle-inset contract.
+- Closed [`spec/27_homepage-hero-duplicate-rail-cleanup.md`](./spec/27_homepage-hero-duplicate-rail-cleanup.md) as done and activated [`spec/28_session-placeholder.md`](./spec/28_session-placeholder.md).
+- Replaced the homepage hero’s cloned desktop/mobile quote-stack paths with one semantic left-rail/right-rail composition so the quote, CTA, and contributors each render once while still reordering cleanly across breakpoints.
+- Updated the landing regression contract to lock the one-composition/no-duplicate hero structure and the mobile-safe breakpoint ordering that now powers the layout.
 
 ## Blockers
 
@@ -20,30 +20,31 @@
 
 ## Next Step
 
-- Rename [`spec/26_session-placeholder.md`](./spec/26_session-placeholder.md) in place when the next session topic is known.
+- Rename [`spec/28_session-placeholder.md`](./spec/28_session-placeholder.md) in place when the next session topic is known.
 
 ## Last Session Spec
 
-- `25_homepage-hero-top-inset-polish`
+- `27_homepage-hero-duplicate-rail-cleanup`
 
 ## Last Completed Spec
 
-- `25_homepage-hero-top-inset-polish`
+- `27_homepage-hero-duplicate-rail-cleanup`
 
 ## Last Green Commands
 
-- `pnpm docs:audit -- --sync` (passed; 179 markdown files)
-- `pnpm docs:audit` (passed; 179 markdown files)
+- `pnpm docs:audit -- --sync` (passed; 181 markdown files)
+- `pnpm docs:audit` (passed; 181 markdown files)
 - `pnpm lint` (0 errors, 108 warnings)
 - `pnpm typecheck` (clean)
-- `pnpm test` (197 test files, 942 tests passed)
+- `pnpm test` (197 test files, 943 tests passed)
 
 ## Dogfood Evidence
 
-- Live localhost dogfood succeeded on the already-running marketing server at `http://localhost:3000`: `agent-browser open http://localhost:3000 && agent-browser set viewport 1440 1200 && agent-browser wait 5000 && agent-browser screenshot --annotate` produced a desktop screenshot confirming the hero now sits below the nav border with visible breathing room while keeping the blank strip removed.
-- Focused regression proof: `tests/unit/landing-below-nav-replica.test.ts` now locks the shared hero top-inset tokens plus the hero-owned subtle-inset/no-strip seam contract.
-- Full gate proof: docs audit sync, docs audit, the focused landing regression test, lint, typecheck, and the full test suite all passed after the hero top-inset polish.
+- Live localhost dogfood succeeded on the already-running marketing server at `http://localhost:3000`: `agent-browser open http://localhost:3000 && agent-browser set viewport 1440 1200 && agent-browser wait --load networkidle && agent-browser screenshot output/spec27-homepage-hero-no-duplicate.png --annotate` produced a desktop screenshot confirming the duplicate lower quote/CTA copy is gone while the left-rail stack remains intact; the homepage-only Agentation overlay was active during capture and did not reintroduce duplicate hero content.
+- Screenshot proof for Spec 27 is saved at [`output/spec27-homepage-hero-no-duplicate.png`](./output/spec27-homepage-hero-no-duplicate.png).
+- Focused regression proof: `pnpm test tests/unit/landing-below-nav-replica.test.ts` passed after the runtime cleanup and now locks the one-composition/no-duplicate hero contract plus the mobile-safe breakpoint ordering.
+- Full gate proof: docs audit sync, docs audit, lint, typecheck, and the full test suite all passed after the duplicate-rail cleanup and final handoff artifact sync.
 
 ## Napkin Evidence
 
-- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with Spec 25 learning: after collapsing nav clearance into the hero, add a small section-owned inset so the seam stays clean without feeling cramped against the nav border.
+- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with Spec 27 learning: for breakpoint-specific hero composition work, keep one semantic set of narrative/visual blocks in JSX and use CSS reordering/layout overrides instead of cloning desktop/mobile copies.
