@@ -108,15 +108,20 @@ describe('below-nav homepage replica contract', () => {
 
     expect(landingChrome).toContain('--landing-nav-offset: 121px;');
     expect(landingChrome).not.toContain('.navSpacer');
+    expect(landingChrome).toContain('--landing-hero-top-inset: 28px;');
     expect(landingChrome).toContain('@media (max-width: 1100px)');
     expect(landingChrome).toContain('--landing-nav-offset: 80px;');
+    expect(landingChrome).toContain('--landing-hero-top-inset: 20px;');
     expect(landingChrome).toContain('@media (max-width: 480px)');
     expect(landingChrome).toContain('--landing-nav-offset: 72px;');
+    expect(landingChrome).toContain('--landing-hero-top-inset: 14px;');
 
     expect(landingNav).toContain("paddingBlock: 'var(--landing-nav-padding-block)'");
     expect(landingNav).toContain("paddingInline: 'var(--landing-nav-padding-inline)'");
-    expect(heroStyles).toContain('padding: var(--landing-nav-offset, 121px) 80px 0;');
+    expect(heroStyles).toContain(
+      'padding: calc(var(--landing-nav-offset, 121px) + var(--landing-hero-top-inset, 28px)) 80px 0;'
+    );
     expect(heroStyles).toContain('align-items: start;');
-    expect(heroStyles).toContain('min-height: calc(100vh - 80px);');
+    expect(heroStyles).toContain('min-height: calc(100vh - 80px - var(--landing-hero-top-inset, 28px));');
   });
 });

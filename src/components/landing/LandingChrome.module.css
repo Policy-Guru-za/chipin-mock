@@ -2,6 +2,7 @@
   --landing-nav-offset: 121px;
   --landing-nav-padding-block: 28px;
   --landing-nav-padding-inline: 64px;
+  --landing-hero-top-inset: 28px;
 
   min-height: 100vh;
   background: #fffcf9;
@@ -13,6 +14,7 @@
     --landing-nav-offset: 80px;
     --landing-nav-padding-block: 20px;
     --landing-nav-padding-inline: 24px;
+    --landing-hero-top-inset: 20px;
   }
 }
 
@@ -21,5 +23,12 @@
     --landing-nav-offset: 72px;
     --landing-nav-padding-block: 16px;
     --landing-nav-padding-inline: 16px;
+    --landing-hero-top-inset: 14px;
+  }
+}
+
+@media (max-width: 375px) {
+  .page {
+    --landing-hero-top-inset: 12px;
   }
 }

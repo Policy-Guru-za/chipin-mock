@@ -2,9 +2,9 @@
   position: relative;
   z-index: 5;
   max-width: 1400px;
-  min-height: calc(100vh - 80px);
+  min-height: calc(100vh - 80px - var(--landing-hero-top-inset, 28px));
   margin: 0 auto;
-  padding: var(--landing-nav-offset, 121px) 80px 0;
+  padding: calc(var(--landing-nav-offset, 121px) + var(--landing-hero-top-inset, 28px)) 80px 0;
   display: grid;
   grid-template-columns: minmax(0, 1.28fr) minmax(320px, 0.82fr);
   gap: clamp(40px, 4vw, 56px);
@@ -534,7 +534,7 @@
 @media (max-width: 768px) {
   .heroDream {
     min-height: auto;
-    padding: var(--landing-nav-offset, 80px) 20px 0;
+    padding: calc(var(--landing-nav-offset, 80px) + var(--landing-hero-top-inset, 20px)) 20px 0;
   }
 
   .heroHeadline {
@@ -564,7 +564,7 @@
 @media (max-width: 480px) {
   .heroDream {
     gap: 28px;
-    padding: var(--landing-nav-offset, 72px) 16px 0;
+    padding: calc(var(--landing-nav-offset, 72px) + var(--landing-hero-top-inset, 14px)) 16px 0;
   }
 
   .heroHeadline {
@@ -590,7 +590,7 @@
 @media (max-width: 375px) {
   .heroDream {
     gap: 24px;
-    padding: var(--landing-nav-offset, 72px) 12px 0;
+    padding: calc(var(--landing-nav-offset, 72px) + var(--landing-hero-top-inset, 12px)) 12px 0;
   }
 
   .heroHeadline {
