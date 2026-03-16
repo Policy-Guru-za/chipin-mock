@@ -2,7 +2,7 @@
 
 ## Current Spec
 
-- `20_session-placeholder`
+- `21_session-placeholder`
 
 ## Current Stage
 
@@ -10,9 +10,9 @@
 
 ## Status
 
-- Closed [`spec/19_control-matrix-gap-remediation.md`](./spec/19_control-matrix-gap-remediation.md) as done and activated [`spec/20_session-placeholder.md`](./spec/20_session-placeholder.md).
-- Fixed docs-audit scope so transient markdown under `tmp/` and `.reference/` no longer creates control-matrix failures.
-- Codified explicit `CLAUDE.md` retirement toward `AGENTS.md`, changed docs audit to report unsupported markdown as actionable policy errors, and added focused regression coverage for the audit helpers.
+- Closed [`spec/20_hero-font-token-cleanup.md`](./spec/20_hero-font-token-cleanup.md) as done and activated [`spec/21_session-placeholder.md`](./spec/21_session-placeholder.md).
+- Restored the prototype font-token split by moving shared display surfaces back to DM Serif Display, introducing a dedicated Fraunces editorial token, and preserving the old `--font-dm-serif` references through an alias.
+- Rewired the active homepage Hero editorial surfaces and the legacy landing Hero to the editorial token, then added focused regression coverage for the split token contract.
 
 ## Blockers
 
@@ -20,30 +20,30 @@
 
 ## Next Step
 
-- Rename [`spec/20_session-placeholder.md`](./spec/20_session-placeholder.md) in place when the next session topic is known.
+- Rename [`spec/21_session-placeholder.md`](./spec/21_session-placeholder.md) in place when the next session topic is known.
 
 ## Last Session Spec
 
-- `19_control-matrix-gap-remediation`
+- `20_hero-font-token-cleanup`
 
 ## Last Completed Spec
 
-- `19_control-matrix-gap-remediation`
+- `20_hero-font-token-cleanup`
 
 ## Last Green Commands
 
-- `pnpm docs:audit -- --sync` (passed; 173 markdown files)
-- `pnpm docs:audit` (passed; 173 markdown files)
+- `pnpm docs:audit -- --sync` (passed; 174 markdown files)
+- `pnpm docs:audit` (passed; 174 markdown files)
 - `pnpm lint` (0 errors, 108 warnings)
 - `pnpm typecheck` (clean)
-- `pnpm test` (197 test files, 938 tests passed)
+- `pnpm test` (197 test files, 939 tests passed)
 
 ## Dogfood Evidence
 
-- Dogfooded the docs-governance flow by regenerating [`docs/DOCUMENT_CONTROL_MATRIX.md`](./docs/DOCUMENT_CONTROL_MATRIX.md) with `pnpm docs:audit -- --sync` and immediately rerunning `pnpm docs:audit` clean (173 markdown files in scope).
-- Focused regression proof: `tests/unit/docs-audit.test.ts` verifies `tmp/**` and `.reference/**` are excluded, governed root docs remain classifiable, and `CLAUDE.md` now fails with an explicit retirement message.
-- Full gate proof: lint, typecheck, and the full test suite all stayed green after the docs-audit refactor.
+- Live localhost Hero dogfood was blocked in this workspace because neither the reviewed prototype server (`http://localhost:5174`) nor the app server (`http://localhost:3000`) was running.
+- Safe fallback proof for Spec 20: compared the active app font-token wiring against the reviewed prototype source in `tmp/gifta-react`, and the focused `landing-below-nav-replica` regression test now locks the shared display/editorial split plus the homepage Hero editorial token usage.
+- Full gate proof: docs audit sync, docs audit, lint, typecheck, and the full test suite all passed after the font-token cleanup.
 
 ## Napkin Evidence
 
-- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with Spec 19 learning: keep transient import folders out of docs governance scope and emit explicit retirement errors for unsupported root docs instead of generic unclassified-file throws.
+- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with Spec 20 learning: preserve the prototype split between shared display and editorial font tokens so homepage Hero parity does not depend on an overloaded `--font-display` variable.

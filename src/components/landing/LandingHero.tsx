@@ -3,7 +3,7 @@ export function LandingHero() {
     <div className="landing-hero-text animate-landing-fade-up">
       <h1
         className="text-[32px] md:text-[42px] lg:text-[54px] font-medium text-[#2D2D2D] leading-[1.15] mb-5 md:mb-7 tracking-[-0.5px]"
-        style={{ fontFamily: 'var(--font-dm-serif)' }}
+        style={{ fontFamily: 'var(--font-editorial)' }}
       >
         One dream gift.
         <br />

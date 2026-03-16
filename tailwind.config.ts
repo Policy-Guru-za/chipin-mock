@@ -74,6 +74,7 @@ const config: Config = {
       fontFamily: {
         sans: ['var(--font-primary)', 'system-ui', 'sans-serif'],
         display: ['var(--font-display)', 'Georgia', 'serif'],
+        editorial: ['var(--font-editorial)', 'Georgia', 'serif'],
         'warmth-sans': ['var(--font-dm-sans)', '-apple-system', 'sans-serif'],
         'warmth-serif': ['var(--font-libre-baskerville)', 'Georgia', 'serif'],
       },

@@ -34,6 +34,27 @@ describe('below-nav homepage replica contract', () => {
     expect(footer).toContain('Birthday gifting, simplified.');
   });
 
+  it('restores the prototype display and editorial font-token split for the hero', () => {
+    const globals = readSource('src/app/globals.css');
+    const layout = readSource('src/app/layout.tsx');
+    const tailwind = readSource('tailwind.config.ts');
+    const heroStyles = readSource('src/components/landing-exact/LandingHeroExact.module.css');
+    const legacyHero = readSource('src/components/landing/LandingHero.tsx');
+
+    expect(globals).toContain("--font-display: 'DM Serif Display', Georgia, serif;");
+    expect(globals).toContain("--font-editorial: 'Fraunces', Georgia, serif;");
+    expect(globals).toContain('--font-dm-serif: var(--font-display);');
+    expect(layout).toContain("Fraunces({");
+    expect(layout).toContain("DM_Serif_Display({");
+    expect(layout).toContain("variable: '--font-editorial'");
+    expect(layout).toContain("variable: '--font-display'");
+    expect(layout).toContain("style: ['normal', 'italic']");
+    expect(tailwind).toContain("editorial: ['var(--font-editorial)', 'Georgia', 'serif']");
+    expect(heroStyles).toContain('font-family: var(--font-editorial);');
+    expect(legacyHero).toContain("var(--font-editorial)");
+    expect(legacyHero).not.toContain("var(--font-dm-serif)");
+  });
+
   it('keeps the hero grids mobile-safe at the 375px baseline', () => {
     const heroStyles = readSource('src/components/landing-exact/LandingHeroExact.module.css');
 

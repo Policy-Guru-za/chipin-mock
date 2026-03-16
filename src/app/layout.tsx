@@ -26,7 +26,8 @@ const outfit = Outfit({
 
 const fraunces = Fraunces({
   subsets: ['latin'],
-  variable: '--font-display',
+  style: ['normal', 'italic'],
+  variable: '--font-editorial',
   display: 'swap',
 });
 
@@ -39,7 +40,8 @@ const dmSans = DM_Sans({
 const dmSerifDisplay = DM_Serif_Display({
   subsets: ['latin'],
   weight: '400',
-  variable: '--font-dm-serif',
+  style: ['normal', 'italic'],
+  variable: '--font-display',
   display: 'swap',
 });
 

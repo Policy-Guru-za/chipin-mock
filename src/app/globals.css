@@ -5,9 +5,10 @@
 :root {
   /* Typography */
   --font-primary: 'Outfit', system-ui, sans-serif;
-  --font-display: 'Fraunces', Georgia, serif;
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-editorial: 'Fraunces', Georgia, serif;
   --font-dm-sans: 'DM Sans', -apple-system, sans-serif;
-  --font-dm-serif: 'DM Serif Display', Georgia, serif;
+  --font-dm-serif: var(--font-display);
   --font-libre-baskerville: 'Libre Baskerville', Georgia, serif;
   --font-nunito: 'Nunito', sans-serif;
 
