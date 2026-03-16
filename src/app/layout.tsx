@@ -63,6 +63,10 @@ export const metadata: Metadata = {
   title: 'Gifta - Everyone Chips In. One Perfect Gift.',
   description:
     'Create a Dreamboard for your child\'s birthday. Friends and family chip in toward one meaningful gift — no more gift piles, no more guesswork.',
+  icons: {
+    icon: '/Logos/Gifta-favicon.png',
+    shortcut: '/Logos/Gifta-favicon.png',
+  },
   openGraph: {
     type: 'website',
     url: 'https://gifta.co.za',
