@@ -1,4 +1,4 @@
-# 19_session-placeholder
+# 20_session-placeholder
 
 ## Objective
 
@@ -33,7 +33,7 @@
 
 ## Exit Criteria
 
-- This file is renamed in place to `spec/19_<topic>.md` before substantive work starts.
+- This file is renamed in place to `spec/20_<topic>.md` before substantive work starts.
 - `spec/00_overview.md` and `progress.md` point at the renamed active spec for the next session.
 
 ## Final State

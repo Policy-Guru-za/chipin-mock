@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import process from 'process';
+import { pathToFileURL } from 'node:url';
 
 import {
   ACTIVE_DOC_STATUSES,
@@ -10,14 +11,9 @@ import {
   classifyDoc,
   repoRelative,
 } from './control-matrix.mjs';
+import { DOC_AUDIT_EXCLUDE_DIRS, RETIRED_DOC_ERROR_MESSAGES } from './doc-governance-policy.mjs';
 import { collectExecutionArtifactErrors } from './execution-artifact-audit.mjs';
 
-const repoRoot = process.cwd();
-const args = new Set(process.argv.slice(2));
-const shouldSync = args.has('--sync');
-
-const DOC_CONTROL_PATH = path.join(repoRoot, 'docs', 'DOCUMENT_CONTROL_MATRIX.md');
-const DOC_GLOBS_EXCLUDE = new Set(['node_modules', '.git', 'coverage', 'output']);
 const BANNER_PREFIX = '> **Document Status:**';
 const AGENT_GUIDANCE_RULES = [
   {
@@ -62,15 +58,15 @@ const AGENT_GUIDANCE_RULES = [
   },
 ];
 
-const collectDocs = (dir) => {
+export const collectDocs = (dir, { repoRoot = dir, excludedDirs = DOC_AUDIT_EXCLUDE_DIRS } = {}) => {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
   const files = [];
 
   for (const entry of entries) {
-    if (DOC_GLOBS_EXCLUDE.has(entry.name)) continue;
+    if (excludedDirs.has(entry.name)) continue;
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      files.push(...collectDocs(fullPath));
+      files.push(...collectDocs(fullPath, { repoRoot, excludedDirs }));
       continue;
     }
     if (entry.isFile() && entry.name.endsWith('.md')) {
@@ -78,7 +74,7 @@ const collectDocs = (dir) => {
     }
   }
 
-  return files.sort((a, b) => repoRelative(a).localeCompare(repoRelative(b)));
+  return files.sort((a, b) => repoRelative(a, repoRoot).localeCompare(repoRelative(b, repoRoot)));
 };
 
 const splitFrontMatter = (text) => {
@@ -111,8 +107,8 @@ const stripExistingBanner = (body) => {
   return lines.slice(index).join('\n').replace(/^\n+/, '');
 };
 
-const syncBanner = (filePath, metadata) => {
-  const banner = bannerForDoc(filePath, metadata);
+const syncBanner = (filePath, metadata, repoRoot) => {
+  const banner = bannerForDoc(filePath, metadata, { cwd: repoRoot });
   const text = fs.readFileSync(filePath, 'utf8');
   const { frontMatter, body } = splitFrontMatter(text);
   const strippedBody = stripExistingBanner(body);
@@ -188,52 +184,36 @@ const renderMatrix = (docsWithMetadata) => {
   return `${lines.join('\n')}`;
 };
 
-const withMatrixDoc = (filePaths) => {
-  if (filePaths.includes(DOC_CONTROL_PATH)) return filePaths;
-  return [...filePaths, DOC_CONTROL_PATH].sort((a, b) => repoRelative(a).localeCompare(repoRelative(b)));
+const withMatrixDoc = (filePaths, docControlPath, repoRoot) => {
+  if (filePaths.includes(docControlPath)) return filePaths;
+  return [...filePaths, docControlPath].sort((a, b) =>
+    repoRelative(a, repoRoot).localeCompare(repoRelative(b, repoRoot))
+  );
 };
 
-const docs = withMatrixDoc(collectDocs(repoRoot));
-const docsWithMetadata = docs.map((filePath) => {
-  const metadata = classifyDoc(filePath);
-  if (!metadata) {
-    throw new Error(`No control-matrix classification rule for ${repoRelative(filePath)}`);
-  }
-  return { path: repoRelative(filePath), fullPath: filePath, metadata };
-});
-
-if (shouldSync) {
+const syncDocs = (docsWithMetadata, docControlPath, repoRoot) => {
   for (const { fullPath, metadata } of docsWithMetadata) {
     if (!fs.existsSync(fullPath)) continue;
-    syncBanner(fullPath, metadata);
+    syncBanner(fullPath, metadata, repoRoot);
   }
 
-  const syncedDocs = withMatrixDoc(collectDocs(repoRoot)).map((filePath) => {
-    const metadata = classifyDoc(filePath);
-    if (!metadata) {
-      throw new Error(`No control-matrix classification rule for ${repoRelative(filePath)}`);
-    }
-    return { path: repoRelative(filePath), fullPath: filePath, metadata };
-  });
-  fs.writeFileSync(DOC_CONTROL_PATH, `${renderMatrix(syncedDocs)}\n`);
-}
+  fs.writeFileSync(docControlPath, `${renderMatrix(docsWithMetadata)}\n`);
+};
 
-const errors = collectExecutionArtifactErrors({ repoRoot, repoRelative });
+const collectMatrixSyncErrors = (docControlPath, docsWithMetadata) => {
+  const errors = [];
+  const matrixText = fs.existsSync(docControlPath) ? fs.readFileSync(docControlPath, 'utf8') : '';
+  const expectedMatrix = `${renderMatrix(docsWithMetadata)}\n`;
 
-const matrixText = fs.existsSync(DOC_CONTROL_PATH) ? fs.readFileSync(DOC_CONTROL_PATH, 'utf8') : '';
-const expectedMatrix = `${renderMatrix(docsWithMetadata)}\n`;
-if (matrixText !== expectedMatrix) {
-  errors.push(
-    'Document control matrix is out of sync. Run `pnpm docs:audit -- --sync` to regenerate it.'
-  );
-}
-
-for (const { fullPath, path: filePath, metadata } of docsWithMetadata) {
-  if (!fs.existsSync(fullPath)) {
-    errors.push(`${filePath}: file is missing from the workspace.`);
-    continue;
+  if (matrixText !== expectedMatrix) {
+    errors.push('Document control matrix is out of sync. Run `pnpm docs:audit -- --sync` to regenerate it.');
   }
-  const text = fs.readFileSync(fullPath, 'utf8');
+
+  return errors;
+};
+
+const collectBannerErrors = (filePath, metadata, text) => {
+  const errors = [];
   const hasBanner = text.includes(BANNER_PREFIX);
 
   if (NON_AUTHORITATIVE_STATUSES.has(metadata.status) && !hasBanner) {
@@ -244,6 +224,12 @@ for (const { fullPath, path: filePath, metadata } of docsWithMetadata) {
     errors.push(`${filePath}: current docs should not carry a non-authoritative status banner.`);
   }
 
+  return errors;
+};
+
+const collectLinkErrors = (filePath, fullPath, text) => {
+  const errors = [];
+
   for (const target of markdownLinkTargets(text)) {
     const resolvedTarget = resolveLink(fullPath, target);
     if (!resolvedTarget) continue;
@@ -252,37 +238,127 @@ for (const { fullPath, path: filePath, metadata } of docsWithMetadata) {
     }
   }
 
-  if (ACTIVE_DOC_STATUSES.has(metadata.status)) {
-    for (const check of CRITICAL_TOKEN_CHECKS) {
-      if (check.pattern.test(text)) {
-        errors.push(`${filePath}: contains banned active-doc token (${check.label}).`);
-      }
-      check.pattern.lastIndex = 0;
-    }
+  return errors;
+};
+
+const collectTokenErrors = (filePath, metadata, text) => {
+  if (!ACTIVE_DOC_STATUSES.has(metadata.status)) {
+    return [];
   }
 
+  const errors = [];
+  for (const check of CRITICAL_TOKEN_CHECKS) {
+    if (check.pattern.test(text)) {
+      errors.push(`${filePath}: contains banned active-doc token (${check.label}).`);
+    }
+    check.pattern.lastIndex = 0;
+  }
+
+  return errors;
+};
+
+const collectGuidanceErrors = (filePath, text) => {
   const guidanceRule = AGENT_GUIDANCE_RULES.find((rule) => rule.test.test(filePath));
-  if (guidanceRule) {
-    for (const token of guidanceRule.required) {
-      if (!text.includes(token)) {
-        errors.push(`${filePath}: missing required execution-system token (${token}).`);
-      }
-    }
-    for (const pattern of guidanceRule.banned) {
-      if (pattern.test(text)) {
-        errors.push(`${filePath}: contains deprecated execution guidance (${pattern}).`);
-      }
-      pattern.lastIndex = 0;
+  if (!guidanceRule) {
+    return [];
+  }
+
+  const errors = [];
+  for (const token of guidanceRule.required) {
+    if (!text.includes(token)) {
+      errors.push(`${filePath}: missing required execution-system token (${token}).`);
     }
   }
-}
 
-if (errors.length > 0) {
-  console.error(`docs:audit failed with ${errors.length} issue(s):`);
-  for (const error of errors) {
-    console.error(`- ${error}`);
+  for (const pattern of guidanceRule.banned) {
+    if (pattern.test(text)) {
+      errors.push(`${filePath}: contains deprecated execution guidance (${pattern}).`);
+    }
+    pattern.lastIndex = 0;
   }
-  process.exit(1);
-}
 
-console.log(`docs:audit passed for ${docsWithMetadata.length} markdown files.`);
+  return errors;
+};
+
+const collectPerDocErrors = ({ fullPath, path: filePath, metadata }) => {
+  if (!fs.existsSync(fullPath)) {
+    return [`${filePath}: file is missing from the workspace.`];
+  }
+
+  const text = fs.readFileSync(fullPath, 'utf8');
+
+  return [
+    ...collectBannerErrors(filePath, metadata, text),
+    ...collectLinkErrors(filePath, fullPath, text),
+    ...collectTokenErrors(filePath, metadata, text),
+    ...collectGuidanceErrors(filePath, text),
+  ];
+};
+
+export const collectDocsWithMetadata = (filePaths, { repoRoot = process.cwd() } = {}) => {
+  const docsWithMetadata = [];
+  const errors = [];
+
+  for (const filePath of filePaths) {
+    const normalizedPath = repoRelative(filePath, repoRoot);
+    const retiredDocError = RETIRED_DOC_ERROR_MESSAGES.get(normalizedPath);
+    if (retiredDocError) {
+      errors.push(`${normalizedPath}: ${retiredDocError}`);
+      continue;
+    }
+
+    const metadata = classifyDoc(filePath, { cwd: repoRoot });
+    if (!metadata) {
+      errors.push(
+        `${normalizedPath}: markdown file is in docs:audit scope but has no control-matrix rule. Either exclude its directory from docs governance or classify it in scripts/docs/control-matrix.mjs.`
+      );
+      continue;
+    }
+
+    docsWithMetadata.push({ path: normalizedPath, fullPath: filePath, metadata });
+  }
+
+  return { docsWithMetadata, errors };
+};
+
+export const collectDocsAuditErrors = ({ repoRoot = process.cwd(), shouldSync = false } = {}) => {
+  const docControlPath = path.join(repoRoot, 'docs', 'DOCUMENT_CONTROL_MATRIX.md');
+  const docs = withMatrixDoc(collectDocs(repoRoot, { repoRoot }), docControlPath, repoRoot);
+  const { docsWithMetadata, errors } = collectDocsWithMetadata(docs, { repoRoot });
+
+  if (shouldSync) {
+    syncDocs(docsWithMetadata, docControlPath, repoRoot);
+  }
+
+  return {
+    errors: [
+      ...errors,
+      ...collectExecutionArtifactErrors({
+        repoRoot,
+        repoRelative: (filePath) => repoRelative(filePath, repoRoot),
+      }),
+      ...collectMatrixSyncErrors(docControlPath, docsWithMetadata),
+      ...docsWithMetadata.flatMap(collectPerDocErrors),
+    ],
+    docsWithMetadata,
+  };
+};
+
+export const runDocsAudit = ({ repoRoot = process.cwd(), args = process.argv.slice(2) } = {}) => {
+  const shouldSync = new Set(args).has('--sync');
+  const { errors, docsWithMetadata } = collectDocsAuditErrors({ repoRoot, shouldSync });
+
+  if (errors.length > 0) {
+    console.error(`docs:audit failed with ${errors.length} issue(s):`);
+    for (const error of errors) {
+      console.error(`- ${error}`);
+    }
+    process.exit(1);
+  }
+
+  console.log(`docs:audit passed for ${docsWithMetadata.length} markdown files.`);
+};
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  runDocsAudit();
+}

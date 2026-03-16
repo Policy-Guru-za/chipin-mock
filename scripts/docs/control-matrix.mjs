@@ -371,13 +371,13 @@ export const CRITICAL_TOKEN_CHECKS = [
   },
 ];
 
-export const repoRelative = (filePath) => {
-  const relativePath = path.isAbsolute(filePath) ? path.relative(process.cwd(), filePath) : filePath;
+export const repoRelative = (filePath, cwd = process.cwd()) => {
+  const relativePath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
   return relativePath.split(path.sep).join('/');
 };
 
-export const classifyDoc = (filePath) => {
-  const normalizedPath = repoRelative(filePath);
+export const classifyDoc = (filePath, { cwd = process.cwd() } = {}) => {
+  const normalizedPath = repoRelative(filePath, cwd);
   const exact = exactEntries[normalizedPath];
   if (exact) {
     return {
@@ -399,10 +399,10 @@ export const classifyDoc = (filePath) => {
   return null;
 };
 
-export const bannerForDoc = (filePath, metadata) => {
+export const bannerForDoc = (filePath, metadata, { cwd = process.cwd() } = {}) => {
   if (!NON_AUTHORITATIVE_STATUSES.has(metadata.status)) return null;
 
-  const normalizedPath = repoRelative(filePath);
+  const normalizedPath = repoRelative(filePath, cwd);
   if (normalizedPath === 'docs/napkin/napkin.md') return null;
 
   const label =

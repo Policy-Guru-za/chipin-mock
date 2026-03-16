@@ -2,7 +2,7 @@
 
 ## Current Spec
 
-- `19_session-placeholder`
+- `20_session-placeholder`
 
 ## Current Stage
 
@@ -10,39 +10,40 @@
 
 ## Status
 
-- Closed [`spec/18_below-nav-homepage-replica.md`](./spec/18_below-nav-homepage-replica.md) as done and activated [`spec/19_session-placeholder.md`](./spec/19_session-placeholder.md).
-- Preserved the current homepage nav/auth shell, kept the two homepage nav links removed, and replaced everything below the nav seam with the reviewed replica in isolated homepage-only components/styles/assets.
-- Added homepage regression coverage for the preserved nav/auth contract plus the new below-nav replica contract.
+- Closed [`spec/19_control-matrix-gap-remediation.md`](./spec/19_control-matrix-gap-remediation.md) as done and activated [`spec/20_session-placeholder.md`](./spec/20_session-placeholder.md).
+- Fixed docs-audit scope so transient markdown under `tmp/` and `.reference/` no longer creates control-matrix failures.
+- Codified explicit `CLAUDE.md` retirement toward `AGENTS.md`, changed docs audit to report unsupported markdown as actionable policy errors, and added focused regression coverage for the audit helpers.
 
 ## Blockers
 
-- `pnpm docs:audit` still fails on pre-existing control-matrix classification gaps in the current tree (latest first failure: `tmp/gifta-react/README.md`).
+- None.
 
 ## Next Step
 
-- Rename [`spec/19_session-placeholder.md`](./spec/19_session-placeholder.md) in place when the next session topic is known.
-- If live homepage auth dogfood is needed in a future session, rerun browser verification with real Clerk test keys instead of missing or dummy keys.
+- Rename [`spec/20_session-placeholder.md`](./spec/20_session-placeholder.md) in place when the next session topic is known.
 
 ## Last Session Spec
 
-- `18_below-nav-homepage-replica`
+- `19_control-matrix-gap-remediation`
 
 ## Last Completed Spec
 
-- `18_below-nav-homepage-replica`
+- `19_control-matrix-gap-remediation`
 
 ## Last Green Commands
 
+- `pnpm docs:audit -- --sync` (passed; 173 markdown files)
+- `pnpm docs:audit` (passed; 173 markdown files)
 - `pnpm lint` (0 errors, 108 warnings)
 - `pnpm typecheck` (clean)
-- `pnpm test` (196 test files, 934 tests passed)
+- `pnpm test` (197 test files, 938 tests passed)
 
 ## Dogfood Evidence
 
-- Local browser dogfood of `/` without Clerk keys returned `503 Authentication unavailable`, matching the repo's auth-unavailable middleware contract.
-- Local browser dogfood with dummy Clerk env values failed at runtime with `Publishable key not valid.`, so route-level auth-enabled homepage verification remains blocked on real Clerk test keys.
-- Safe fallback proof for Spec 18: the targeted homepage regression suite passed (`landing-below-nav-replica`, `auth-nav-user-menu`, `copy-matrix-compliance`, `colour-contrast`, `accessibility`) and the full `pnpm test` suite stayed green.
+- Dogfooded the docs-governance flow by regenerating [`docs/DOCUMENT_CONTROL_MATRIX.md`](./docs/DOCUMENT_CONTROL_MATRIX.md) with `pnpm docs:audit -- --sync` and immediately rerunning `pnpm docs:audit` clean (173 markdown files in scope).
+- Focused regression proof: `tests/unit/docs-audit.test.ts` verifies `tmp/**` and `.reference/**` are excluded, governed root docs remain classifiable, and `CLAUDE.md` now fails with an explicit retirement message.
+- Full gate proof: lint, typecheck, and the full test suite all stayed green after the docs-audit refactor.
 
 ## Napkin Evidence
 
-- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with Spec 18 learning: local homepage/auth dogfood needs real Clerk test keys; dummy keys only replace the 503 middleware block with a Clerk runtime error.
+- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with Spec 19 learning: keep transient import folders out of docs governance scope and emit explicit retirement errors for unsupported root docs instead of generic unclassified-file throws.
