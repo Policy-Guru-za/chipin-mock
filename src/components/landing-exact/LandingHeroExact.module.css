@@ -346,6 +346,34 @@
   animation: none;
 }
 
+.testimonialStage {
+  display: grid;
+  width: 100%;
+  align-items: start;
+}
+
+.testimonialPane {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.testimonialPaneCurrent {
+  opacity: 1;
+}
+
+.testimonialPaneOutgoing,
+.testimonialPaneIncoming {
+  will-change: opacity;
+}
+
+.testimonialPaneOutgoing {
+  animation: testimonialFadeOut 320ms ease forwards;
+}
+
+.testimonialPaneIncoming {
+  animation: testimonialFadeIn 320ms ease forwards;
+}
+
 .villageAttrDot {
   width: 40px;
   height: 40px;
@@ -489,6 +517,26 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes testimonialFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes testimonialFadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
   }
 }
 

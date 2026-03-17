@@ -13,7 +13,10 @@ vi.mock('@/hooks/useReducedMotion', () => ({
   useReducedMotion: mocks.useReducedMotion,
 }));
 
-import { LandingHeroTestimonialRotator } from '@/components/landing-exact/LandingHeroTestimonialRotator';
+import {
+  LANDING_TESTIMONIAL_TRANSITION_MS,
+  LandingHeroTestimonialRotator,
+} from '@/components/landing-exact/LandingHeroTestimonialRotator';
 import { LANDING_TESTIMONIAL_ROTATION_MS } from '@/components/landing/testimonials';
 
 describe('LandingHeroTestimonialRotator', () => {
@@ -24,6 +27,7 @@ describe('LandingHeroTestimonialRotator', () => {
 
   afterEach(() => {
     cleanup();
+    vi.clearAllTimers();
     vi.useRealTimers();
     vi.clearAllMocks();
   });
@@ -35,15 +39,42 @@ describe('LandingHeroTestimonialRotator', () => {
     expect(screen.getByText('Priya N.')).toBeInTheDocument();
   });
 
-  it('rotates to the next testimonial after the slower interval', () => {
+  it('stays on Priya until the rotation boundary', () => {
     render(<LandingHeroTestimonialRotator />);
+    const testimonial = screen.getByTestId('landing-hero-testimonial');
+
+    act(() => {
+      vi.advanceTimersByTime(LANDING_TESTIMONIAL_ROTATION_MS - 1);
+    });
+
+    expect(testimonial).toHaveAttribute('data-transition-state', 'idle');
+    expect(screen.getByText('Priya N.')).toBeInTheDocument();
+    expect(screen.queryByText('Rachel K.')).not.toBeInTheDocument();
+  });
+
+  it('enters transition at the boundary and settles on Rachel after the crossfade', () => {
+    render(<LandingHeroTestimonialRotator />);
+    const testimonial = screen.getByTestId('landing-hero-testimonial');
 
     act(() => {
       vi.advanceTimersByTime(LANDING_TESTIMONIAL_ROTATION_MS);
     });
 
-    expect(screen.getByText(/No more wandering toy aisles\./i)).toBeInTheDocument();
+    expect(testimonial).toHaveAttribute('data-transition-state', 'transitioning');
+    expect(screen.getByTestId('landing-hero-testimonial-outgoing')).toBeInTheDocument();
+    expect(screen.getByTestId('landing-hero-testimonial-incoming')).toBeInTheDocument();
+    expect(screen.getByText('Priya N.')).toBeInTheDocument();
     expect(screen.getByText('Rachel K.')).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(LANDING_TESTIMONIAL_TRANSITION_MS);
+    });
+
+    expect(testimonial).toHaveAttribute('data-transition-state', 'idle');
+    expect(screen.getByTestId('landing-hero-testimonial-current')).toBeInTheDocument();
+    expect(screen.queryByText('Priya N.')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('landing-hero-testimonial-outgoing')).toBeNull();
+    expect(screen.queryByTestId('landing-hero-testimonial-incoming')).toBeNull();
   });
 
   it('pauses rotation on hover and resumes on mouse leave', () => {
@@ -52,15 +83,25 @@ describe('LandingHeroTestimonialRotator', () => {
 
     fireEvent.mouseEnter(testimonial);
     act(() => {
-      vi.advanceTimersByTime(LANDING_TESTIMONIAL_ROTATION_MS);
+      vi.advanceTimersByTime(LANDING_TESTIMONIAL_ROTATION_MS + LANDING_TESTIMONIAL_TRANSITION_MS);
     });
+    expect(testimonial).toHaveAttribute('data-transition-state', 'idle');
     expect(screen.getByText('Priya N.')).toBeInTheDocument();
 
     fireEvent.mouseLeave(testimonial);
     act(() => {
       vi.advanceTimersByTime(LANDING_TESTIMONIAL_ROTATION_MS);
     });
+
+    expect(testimonial).toHaveAttribute('data-transition-state', 'transitioning');
     expect(screen.getByText('Rachel K.')).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(LANDING_TESTIMONIAL_TRANSITION_MS);
+    });
+
+    expect(screen.getByText('Rachel K.')).toBeInTheDocument();
+    expect(testimonial).toHaveAttribute('data-transition-state', 'idle');
   });
 
   it('pauses rotation while focused and resumes on blur', () => {
@@ -69,27 +110,42 @@ describe('LandingHeroTestimonialRotator', () => {
 
     fireEvent.focus(testimonial);
     act(() => {
-      vi.advanceTimersByTime(LANDING_TESTIMONIAL_ROTATION_MS);
+      vi.advanceTimersByTime(LANDING_TESTIMONIAL_ROTATION_MS + LANDING_TESTIMONIAL_TRANSITION_MS);
     });
+    expect(testimonial).toHaveAttribute('data-transition-state', 'idle');
     expect(screen.getByText('Priya N.')).toBeInTheDocument();
 
     fireEvent.blur(testimonial);
     act(() => {
       vi.advanceTimersByTime(LANDING_TESTIMONIAL_ROTATION_MS);
     });
+
+    expect(testimonial).toHaveAttribute('data-transition-state', 'transitioning');
     expect(screen.getByText('Rachel K.')).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(LANDING_TESTIMONIAL_TRANSITION_MS);
+    });
+
+    expect(screen.getByText('Rachel K.')).toBeInTheDocument();
+    expect(testimonial).toHaveAttribute('data-transition-state', 'idle');
   });
 
   it('stays static and skips the fade class when reduced motion is preferred', () => {
     mocks.useReducedMotion.mockReturnValue(true);
-    const { container } = render(<LandingHeroTestimonialRotator />);
+    render(<LandingHeroTestimonialRotator />);
+    const testimonial = screen.getByTestId('landing-hero-testimonial');
 
     act(() => {
-      vi.advanceTimersByTime(LANDING_TESTIMONIAL_ROTATION_MS * 2);
+      vi.advanceTimersByTime(
+        LANDING_TESTIMONIAL_ROTATION_MS + LANDING_TESTIMONIAL_TRANSITION_MS * 2
+      );
     });
 
+    expect(testimonial).toHaveAttribute('data-transition-state', 'idle');
     expect(screen.getByText('Priya N.')).toBeInTheDocument();
     expect(screen.queryByText('Rachel K.')).not.toBeInTheDocument();
-    expect(container.querySelector('.animate-landing-testimonial-fade')).toBeNull();
+    expect(screen.queryByTestId('landing-hero-testimonial-incoming')).toBeNull();
+    expect(screen.queryByTestId('landing-hero-testimonial-outgoing')).toBeNull();
   });
 });

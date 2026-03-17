@@ -49,7 +49,8 @@ describe('below-nav homepage replica shell contract', () => {
     expect(hero).toContain('/images/homepage-exact/mia_avatar.jpg');
     expect(hero).toContain('3,400+');
     expect(hero).toContain('<LandingHeroTestimonialRotator />');
-    expect(heroRotator).toContain('animate-landing-testimonial-fade');
+    expect(heroRotator).toContain("data-transition-state={transitionState}");
+    expect(heroRotator).not.toContain('animate-landing-testimonial-fade');
     expect(sharedTestimonials).toContain('the present everyone helped with.');
     expect(sharedTestimonials).toContain('Rachel K.');
     expect(sharedTestimonials).toContain('James M.');
@@ -185,8 +186,11 @@ describe('below-nav homepage replica hero contract', () => {
     expect(hero).not.toContain('mobileVillage');
     expect(hero).not.toContain('mobileCtaSection');
     expect(heroRotator).toContain('useReducedMotion');
+    expect(heroRotator).toContain('LANDING_TESTIMONIAL_TRANSITION_MS');
     expect(heroRotator).toContain('onMouseEnter');
     expect(heroRotator).toContain('onFocusCapture');
+    expect(heroRotator).toContain('setTransitionState');
+    expect(heroRotator).not.toContain("key={prefersReducedMotion ? 'static' : activeTestimonial}");
     expect(heroRotator).not.toContain('w-2 h-2');
 
     expect(heroStyles).toContain('.heroLeftRail');
