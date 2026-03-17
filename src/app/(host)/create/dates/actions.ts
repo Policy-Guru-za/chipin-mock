@@ -12,14 +12,16 @@ import {
   isPartyDateWithinRange,
 } from '@/lib/dream-boards/validation';
 import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
-import { parseDateOnly } from '@/lib/utils/date';
+
+import { normalizeCreateFlowDateOnlyInput } from './date-input';
 
 const PARTY_TIME_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/;
 const DEFAULT_PARTY_TIME = '12:00';
 const JOHANNESBURG_OFFSET = '+02:00';
 
 const toPartyDateTimeIso = (dateValue: string, timeValue?: string) => {
-  if (!parseDateOnly(dateValue)) {
+  const normalizedDateValue = normalizeCreateFlowDateOnlyInput(dateValue);
+  if (!normalizedDateValue) {
     return null;
   }
 
@@ -28,7 +30,7 @@ const toPartyDateTimeIso = (dateValue: string, timeValue?: string) => {
     return null;
   }
 
-  const parsed = new Date(`${dateValue}T${resolvedTime}:00${JOHANNESBURG_OFFSET}`);
+  const parsed = new Date(`${normalizedDateValue}T${resolvedTime}:00${JOHANNESBURG_OFFSET}`);
   if (Number.isNaN(parsed.getTime())) {
     return null;
   }
@@ -120,9 +122,20 @@ export async function saveDatesAction(formData: FormData) {
     redirect('/create/dates?error=invalid');
   }
 
-  const birthdayDate = parsed.data.birthdayDate;
-  const partyDate = parsed.data.noPartyPlanned ? birthdayDate : parsed.data.partyDate ?? '';
-  const campaignEndDate = parsed.data.noPartyPlanned ? birthdayDate : parsed.data.campaignEndDate ?? '';
+  const birthdayDate = normalizeCreateFlowDateOnlyInput(parsed.data.birthdayDate);
+  if (!birthdayDate) {
+    redirect('/create/dates?error=invalid');
+  }
+
+  const partyDate = normalizeCreateFlowDateOnlyInput(
+    parsed.data.noPartyPlanned ? birthdayDate : parsed.data.partyDate ?? ''
+  );
+  const campaignEndDate = normalizeCreateFlowDateOnlyInput(
+    parsed.data.noPartyPlanned ? birthdayDate : parsed.data.campaignEndDate ?? ''
+  );
+  if (!partyDate || !campaignEndDate) {
+    redirect('/create/dates?error=invalid');
+  }
 
   if (!isBirthdayDateValid(birthdayDate)) {
     redirect('/create/dates?error=birthday_date');
@@ -134,9 +147,7 @@ export async function saveDatesAction(formData: FormData) {
     redirect('/create/dates?error=campaign_end');
   }
 
-  const birthdayDateObject = parseDateOnly(birthdayDate);
-  const partyDateObject = parseDateOnly(partyDate);
-  if (!birthdayDateObject || !partyDateObject || partyDateObject < birthdayDateObject) {
+  if (partyDate < birthdayDate) {
     redirect('/create/dates?error=birthday_order');
   }
 

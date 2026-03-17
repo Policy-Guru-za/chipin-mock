@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import Link from 'next/link';
 
 import styles from './LandingFooterExact.module.css';
@@ -55,17 +54,6 @@ export function LandingFooterExact() {
           <span className={styles.footerLogoText}>Gifta</span>
         </div>
         <div className={styles.footerTagline}>Birthday gifting, simplified.</div>
-      </div>
-
-      <div className={styles.footerPartner}>
-        <div className={styles.footerPartnerLabel}>Voucher partner</div>
-        <Image
-          src="/images/homepage-exact/takealot_logo.png"
-          alt="Takealot"
-          width={512}
-          height={512}
-          className={styles.footerPartnerLogo}
-        />
       </div>
 
       <div className={styles.footerSocials}>

@@ -198,7 +198,10 @@ This matrix is generated from `scripts/docs/control-matrix.mjs`. Run `pnpm docs:
 | `spec/29_homepage-hero-desktop-only-contributor-constellation.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `spec/30_homepage-hero-headline-libre-baskerville.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `spec/31_favicon-gift-icon-update.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/32_session-placeholder.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/32_create-dates-same-day-validation-hardening.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/33_create-dates-regression-fixes.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/34_homepage-footer-voucher-partner-pill-removal.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/35_session-placeholder.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `spec/SPEC_TEMPLATE.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `tasks/todo.md` | Tier 2 | historical-evidence | Ryan Laubscher | `progress.md`, `spec/00_overview.md`, `workflow-orchestration.md` | 2026-03-12 | `progress.md`, `spec/00_overview.md` |
 | `TESTING.md` | Tier 1 | current-operational | Ryan Laubscher | `package.json`, `vitest.config.ts`, `tests/`, `progress.md`, `spec/SPEC_TEMPLATE.md` | 2026-03-12 | — |

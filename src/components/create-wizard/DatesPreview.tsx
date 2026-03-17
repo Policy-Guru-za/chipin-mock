@@ -3,6 +3,7 @@
 import { memo } from 'react';
 
 import { formatBirthdayPartyLine } from '@/lib/dream-boards/party-visibility';
+import { parseDateOnly } from '@/lib/utils/date';
 
 export interface DatesPreviewProps {
   childName: string;
@@ -16,32 +17,14 @@ export interface DatesPreviewProps {
 }
 
 const formatDate = (dateString: string) => {
-  if (!dateString) {
+  const parsedDate = parseDateOnly(dateString);
+  if (!parsedDate) {
     return 'Date to be confirmed';
   }
 
-  const [year, month, day] = dateString.split('-').map((value) => Number(value));
-  if (
-    !Number.isInteger(year) ||
-    !Number.isInteger(month) ||
-    !Number.isInteger(day) ||
-    month < 1 ||
-    month > 12 ||
-    day < 1 ||
-    day > 31
-  ) {
-    return 'Date to be confirmed';
-  }
-
-  const parsed = new Date(Date.UTC(year, month - 1, day));
-  if (
-    Number.isNaN(parsed.getTime()) ||
-    parsed.getUTCFullYear() !== year ||
-    parsed.getUTCMonth() !== month - 1 ||
-    parsed.getUTCDate() !== day
-  ) {
-    return 'Date to be confirmed';
-  }
+  const parsed = new Date(
+    Date.UTC(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate())
+  );
 
   return parsed.toLocaleDateString('en-ZA', {
     year: 'numeric',

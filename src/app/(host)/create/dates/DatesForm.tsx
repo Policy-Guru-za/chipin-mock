@@ -12,6 +12,7 @@ import {
   WizardPreviewPanel,
   WizardSplitLayout,
 } from '@/components/create-wizard';
+import { getDaysUntilDateOnly } from '@/lib/utils/date';
 
 type DatesFormProps = {
   action: (formData: FormData) => void | Promise<void>;
@@ -32,13 +33,30 @@ const dateInputClassName =
 const dateTimePickerClassName =
   '[&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-70 [&::-webkit-date-and-time-value]:min-h-[1.2rem]';
 
-const getDaysUntil = (dateString: string) => {
-  const today = new Date();
-  const target = new Date(dateString);
-  const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const targetMidnight = new Date(target.getFullYear(), target.getMonth(), target.getDate());
-  const diff = targetMidnight.getTime() - todayMidnight.getTime();
-  return Math.max(0, Math.round(diff / (1000 * 60 * 60 * 24)));
+const resolvePlannedPartyDates = ({
+  birthdayDate,
+  partyDate,
+  campaignEndDate,
+}: {
+  birthdayDate: string;
+  partyDate: string;
+  campaignEndDate: string;
+}) => {
+  if (!birthdayDate) {
+    return { partyDate, campaignEndDate };
+  }
+
+  const nextPartyDate = !partyDate || partyDate < birthdayDate ? birthdayDate : partyDate;
+  let nextCampaignEndDate = campaignEndDate || nextPartyDate;
+
+  if (nextCampaignEndDate > nextPartyDate) {
+    nextCampaignEndDate = nextPartyDate;
+  }
+
+  return {
+    partyDate: nextPartyDate,
+    campaignEndDate: nextCampaignEndDate,
+  };
 };
 
 export function DatesForm({
@@ -53,11 +71,18 @@ export function DatesForm({
   childAge,
   error,
 }: DatesFormProps) {
+  const initialPlannedPartyDates = resolvePlannedPartyDates({
+    birthdayDate: defaultBirthdayDate,
+    partyDate: defaultPartyDate || defaultBirthdayDate,
+    campaignEndDate: defaultCampaignEndDate || defaultPartyDate || defaultBirthdayDate,
+  });
   const [noPartyPlanned, setNoPartyPlanned] = useState(defaultNoPartyPlanned);
   const [birthdayDate, setBirthdayDate] = useState(defaultBirthdayDate);
-  const [partyDate, setPartyDate] = useState(defaultPartyDate || defaultBirthdayDate);
+  const [partyDate, setPartyDate] = useState(
+    defaultNoPartyPlanned ? defaultBirthdayDate : initialPlannedPartyDates.partyDate
+  );
   const [campaignEndDate, setCampaignEndDate] = useState(
-    defaultCampaignEndDate || defaultPartyDate || defaultBirthdayDate
+    defaultNoPartyPlanned ? defaultBirthdayDate : initialPlannedPartyDates.campaignEndDate
   );
   const [partyDateTimeTime, setPartyDateTimeTime] = useState(
     defaultNoPartyPlanned || !defaultPartyDateTimeDate ? '' : defaultPartyDateTimeTime
@@ -66,7 +91,10 @@ export function DatesForm({
   const effectivePartyDate = noPartyPlanned ? birthdayDate : partyDate;
   const effectiveCampaignEndDate = noPartyPlanned ? birthdayDate : campaignEndDate;
   const previewPartyDateTimeDate = !noPartyPlanned && partyDateTimeTime ? effectivePartyDate : '';
-  const campaignDays = useMemo(() => getDaysUntil(effectiveCampaignEndDate), [effectiveCampaignEndDate]);
+  const campaignDays = useMemo(
+    () => getDaysUntilDateOnly(effectiveCampaignEndDate),
+    [effectiveCampaignEndDate]
+  );
 
   return (
     <form action={action}>
@@ -93,7 +121,16 @@ export function DatesForm({
                   if (noPartyPlanned) {
                     setPartyDate(nextBirthday);
                     setCampaignEndDate(nextBirthday);
+                    return;
                   }
+
+                  const nextSchedule = resolvePlannedPartyDates({
+                    birthdayDate: nextBirthday,
+                    partyDate,
+                    campaignEndDate,
+                  });
+                  setPartyDate(nextSchedule.partyDate);
+                  setCampaignEndDate(nextSchedule.campaignEndDate);
                 }}
                 className={`${dateInputClassName} ${dateTimePickerClassName}`}
               />
@@ -116,9 +153,14 @@ export function DatesForm({
                       setPartyDate(birthdayDate);
                       setCampaignEndDate(birthdayDate);
                       setPartyDateTimeTime('');
-                    } else if (!partyDate) {
-                      setPartyDate(birthdayDate);
-                      setCampaignEndDate(birthdayDate);
+                    } else {
+                      const nextSchedule = resolvePlannedPartyDates({
+                        birthdayDate,
+                        partyDate,
+                        campaignEndDate,
+                      });
+                      setPartyDate(nextSchedule.partyDate);
+                      setCampaignEndDate(nextSchedule.campaignEndDate);
                     }
                   }}
                   className="peer sr-only"
@@ -162,13 +204,16 @@ export function DatesForm({
                       type="date"
                       required
                       enterKeyHint="next"
+                      min={birthdayDate}
                       value={partyDate}
                       onChange={(event) => {
-                        const nextPartyDate = event.currentTarget.value;
-                        setPartyDate(nextPartyDate);
-                        if (!campaignEndDate || campaignEndDate < nextPartyDate) {
-                          setCampaignEndDate(nextPartyDate);
-                        }
+                        const nextSchedule = resolvePlannedPartyDates({
+                          birthdayDate,
+                          partyDate: event.currentTarget.value,
+                          campaignEndDate,
+                        });
+                        setPartyDate(nextSchedule.partyDate);
+                        setCampaignEndDate(nextSchedule.campaignEndDate);
                       }}
                       className={`${dateInputClassName} ${dateTimePickerClassName}`}
                     />
@@ -181,8 +226,16 @@ export function DatesForm({
                       type="date"
                       required
                       enterKeyHint="next"
+                      max={partyDate || birthdayDate}
                       value={campaignEndDate}
-                      onChange={(event) => setCampaignEndDate(event.currentTarget.value)}
+                      onChange={(event) => {
+                        const nextSchedule = resolvePlannedPartyDates({
+                          birthdayDate,
+                          partyDate,
+                          campaignEndDate: event.currentTarget.value,
+                        });
+                        setCampaignEndDate(nextSchedule.campaignEndDate);
+                      }}
                       className={`${dateInputClassName} ${dateTimePickerClassName}`}
                     />
                   </WizardFieldWrapper>

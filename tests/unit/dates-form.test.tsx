@@ -125,6 +125,59 @@ describe('DatesForm', () => {
     expect(hiddenCampaignEndDate?.value).toBe('2026-07-01');
   });
 
+  it('clamps planned-party dates forward when birthday moves later', () => {
+    const { container } = render(
+      <DatesForm
+        {...defaultProps()}
+        defaultNoPartyPlanned={false}
+        defaultPartyDate="2026-06-16"
+        defaultCampaignEndDate="2026-06-15"
+      />,
+    );
+    const birthdayInput = container.querySelector<HTMLInputElement>('#birthdayDate');
+    const partyDateInput = container.querySelector<HTMLInputElement>('#partyDate');
+    const campaignEndDateInput = container.querySelector<HTMLInputElement>('#campaignEndDate');
+
+    fireEvent.change(birthdayInput!, { target: { value: '2026-06-20' } });
+
+    expect(partyDateInput?.value).toBe('2026-06-20');
+    expect(campaignEndDateInput?.value).toBe('2026-06-15');
+  });
+
+  it('preserves loaded campaign close dates that are before the birthday but before party', () => {
+    const { container } = render(
+      <DatesForm
+        {...defaultProps()}
+        defaultNoPartyPlanned={false}
+        defaultPartyDate="2026-06-20"
+        defaultCampaignEndDate="2026-06-10"
+      />,
+    );
+
+    const campaignEndDateInput = container.querySelector<HTMLInputElement>('#campaignEndDate');
+    expect(campaignEndDateInput?.value).toBe('2026-06-10');
+  });
+
+  it('keeps campaign close on or before party date without enforcing birthday as the minimum', () => {
+    const { container } = render(
+      <DatesForm
+        {...defaultProps()}
+        defaultNoPartyPlanned={false}
+        defaultPartyDate="2026-06-16"
+        defaultCampaignEndDate="2026-06-15"
+      />,
+    );
+    const partyDateInput = container.querySelector<HTMLInputElement>('#partyDate');
+    const campaignEndDateInput = container.querySelector<HTMLInputElement>('#campaignEndDate');
+
+    expect(partyDateInput?.min).toBe('2026-06-15');
+    expect(campaignEndDateInput?.min).toBe('');
+    expect(campaignEndDateInput?.max).toBe('2026-06-16');
+
+    fireEvent.change(campaignEndDateInput!, { target: { value: '2026-06-20' } });
+    expect(campaignEndDateInput?.value).toBe('2026-06-16');
+  });
+
   it('passes childName and birthdayDate to DatesPreview', () => {
     render(<DatesForm {...defaultProps()} />);
     const previews = screen.getAllByTestId('dates-preview');

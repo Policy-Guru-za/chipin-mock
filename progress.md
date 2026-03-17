@@ -2,7 +2,7 @@
 
 ## Current Spec
 
-- `32_session-placeholder`
+- `35_session-placeholder`
 
 ## Current Stage
 
@@ -10,9 +10,9 @@
 
 ## Status
 
-- Closed [`spec/31_favicon-gift-icon-update.md`](./spec/31_favicon-gift-icon-update.md) as done and activated [`spec/32_session-placeholder.md`](./spec/32_session-placeholder.md).
-- Renamed the uploaded gift icon to [`public/Logos/Gifta-favicon.png`](./public/Logos/Gifta-favicon.png) and wired the root layout metadata to use it for the favicon links.
-- Added focused regression coverage for the favicon contract and verified the rendered icon link plus asset response on the running localhost server.
+- Closed [`spec/34_homepage-footer-voucher-partner-pill-removal.md`](./spec/34_homepage-footer-voucher-partner-pill-removal.md) as done and activated [`spec/35_session-placeholder.md`](./spec/35_session-placeholder.md).
+- Removed the footer voucher-partner pill from the exact landing footer and pruned the now-unused partner image/styles.
+- Tightened the remaining footer spacing, updated the landing regression coverage, and preserved the upstream voucher-band partner messaging.
 
 ## Blockers
 
@@ -20,30 +20,32 @@
 
 ## Next Step
 
-- Rename [`spec/32_session-placeholder.md`](./spec/32_session-placeholder.md) in place when the next session topic is known.
+- Rename [`spec/35_session-placeholder.md`](./spec/35_session-placeholder.md) in place when the next session topic is known.
 
 ## Last Session Spec
 
-- `31_favicon-gift-icon-update`
+- `34_homepage-footer-voucher-partner-pill-removal`
 
 ## Last Completed Spec
 
-- `31_favicon-gift-icon-update`
+- `34_homepage-footer-voucher-partner-pill-removal`
 
 ## Last Green Commands
 
-- `pnpm docs:audit -- --sync` (passed; 185 markdown files)
-- `pnpm docs:audit` (passed; 185 markdown files)
+- `pnpm exec vitest run tests/unit/landing-below-nav-replica.test.ts` (passed; 1 file, 12 tests)
+- `pnpm docs:audit -- --sync` (passed; 188 markdown files)
+- `pnpm docs:audit` (passed; 188 markdown files)
 - `pnpm lint` (0 errors, 108 warnings)
 - `pnpm typecheck` (clean)
-- `pnpm test` (198 test files, 947 tests passed)
+- `pnpm test` (198 test files, 960 tests passed)
 
 ## Dogfood Evidence
 
-- Live localhost dogfood succeeded on the already-running marketing server at `http://localhost:3000`: a local HTML fetch confirmed `<link rel="shortcut icon" href="/Logos/Gifta-favicon.png">` and `<link rel="icon" href="/Logos/Gifta-favicon.png">`, and a direct asset fetch returned `200 image/png` for `/Logos/Gifta-favicon.png`.
-- Focused regression proof: `tests/unit/root-layout-metadata.test.ts` passed inside the full suite and now locks the stable favicon asset path plus the root metadata icon contract.
-- Full gate proof: docs audit sync, docs audit, lint, typecheck, and the full test suite all passed after the favicon refresh and final handoff artifact sync.
+- Live localhost dogfood succeeded on the already-running marketing server at `http://localhost:3000`: `agent-browser open http://localhost:3000 && agent-browser set viewport 1920 929 && agent-browser wait --load networkidle && agent-browser eval 'window.scrollTo(0, document.body.scrollHeight)' && agent-browser wait 1000 && agent-browser screenshot output/spec34-footer-no-partner-pill-bottom.png --annotate && agent-browser close` captured the footer viewport and confirmed the voucher-partner pill is gone while the remaining footer blocks stay balanced; the upstream voucher band still carries the official partner callout.
+- Screenshot proof for Spec 34 is saved at [`output/spec34-footer-no-partner-pill-bottom.png`](./output/spec34-footer-no-partner-pill-bottom.png).
+- Focused regression proof: `pnpm exec vitest run tests/unit/landing-below-nav-replica.test.ts` passed after the runtime update and now locks the no-pill footer contract plus the tightened footer spacing rules.
+- Full gate proof: docs audit sync, docs audit, lint, typecheck, and the full test suite all passed after the footer cleanup and final artifact sync.
 
 ## Napkin Evidence
 
-- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with Spec 31 learning: when an uploaded asset becomes a runtime surface like the favicon, move it to a stable descriptive repo path before wiring metadata to it.
+- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with Spec 34 learning: when a marketing partnership already has a dedicated upstream section, remove redundant footer pills and rebalance the footer rhythm instead of repeating the claim again in the closing footer.

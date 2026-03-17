@@ -1,10 +1,10 @@
 .footer {
   position: relative;
-  padding: 48px 20px;
+  padding: 44px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
   background: linear-gradient(180deg, transparent, rgb(255 252 249 / 95%));
 }
 
@@ -32,28 +32,6 @@
   font-size: 13px;
   font-weight: 500;
   color: #999;
-}
-
-.footerPartner {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 20px;
-  border: 1px solid rgb(11 121 191 / 8%);
-  border-radius: 24px;
-  background: rgb(11 121 191 / 4%);
-}
-
-.footerPartnerLabel {
-  font-size: 12px;
-  font-weight: 500;
-  color: #999;
-}
-
-.footerPartnerLogo {
-  width: auto;
-  height: 20px;
-  border-radius: 3px;
 }
 
 .footerSocials {
@@ -119,27 +97,9 @@
   color: #bbb;
 }
 
-@media (max-width: 768px) {
-  .footerPartner {
-    padding: 6px 14px;
-  }
-
-  .footerPartnerLogo {
-    height: 20px;
-    min-height: 20px;
-  }
-}
-
 @media (max-width: 480px) {
   .footer {
-    gap: 20px;
-    padding: 36px 16px;
-  }
-}
-
-@media (max-width: 375px) {
-  .footerPartnerLogo {
-    height: 20px;
-    min-height: 20px;
+    gap: 18px;
+    padding: 32px 16px;
   }
 }

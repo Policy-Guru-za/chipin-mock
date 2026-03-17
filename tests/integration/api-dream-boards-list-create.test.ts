@@ -20,6 +20,11 @@ const tomorrowDateOnly = () => {
   return formatDateOnlyLocal(date);
 };
 
+const toSlashDate = (date: string) => {
+  const [year, month, day] = date.split('-');
+  return `${day}/${month}/${year}`;
+};
+
 const mockAuth = () => {
   vi.doMock('@/lib/api/handler', () => ({
     enforceApiAuth: vi.fn(async () => ({
@@ -328,6 +333,44 @@ describe('POST /api/v1/dream-boards', () => {
     expect(payload.error.code).toBe('validation_error');
     expect(insert).not.toHaveBeenCalled();
     expect(getActiveCharityById).not.toHaveBeenCalled();
+    expect(markApiKeyUsed).not.toHaveBeenCalled();
+  });
+
+  it('rejects slash-formatted date strings at the public API boundary', async () => {
+    mockAuth();
+
+    const markApiKeyUsed = vi.fn(async () => undefined);
+    mockDreamBoardWriteQueries({ markApiKeyUsed });
+
+    const insert = vi.fn();
+    vi.doMock('@/lib/db', () => ({ db: { insert } }));
+    vi.doMock('@/lib/utils/encryption', () => ({
+      encryptSensitiveValue: vi.fn(() => 'encrypted-card'),
+    }));
+
+    const { POST } = await loadHandler();
+    const response = await POST(
+      new Request('http://localhost/api/v1/dream-boards', {
+        method: 'POST',
+        body: JSON.stringify({
+          child_name: 'Maya',
+          child_photo_url: 'https://images.example/photo.jpg',
+          birthday_date: toSlashDate(tomorrowDateOnly()),
+          party_date: toSlashDate(tomorrowDateOnly()),
+          gift_name: 'Train set',
+          gift_icon_id: 'train',
+          goal_cents: 35000,
+          payout_email: 'parent@example.com',
+          host_whatsapp_number: '+27821234567',
+        }),
+      })
+    );
+
+    const payload = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(payload.error.code).toBe('validation_error');
+    expect(insert).not.toHaveBeenCalled();
     expect(markApiKeyUsed).not.toHaveBeenCalled();
   });
 

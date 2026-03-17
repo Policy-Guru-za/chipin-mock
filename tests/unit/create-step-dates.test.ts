@@ -11,6 +11,11 @@ const addDays = (days: number) => {
   return date.toISOString().split('T')[0];
 };
 
+const toSlashDate = (date: string) => {
+  const [year, month, day] = date.split('-');
+  return `${day}/${month}/${year}`;
+};
+
 const toJohannesburgIso = (date: string, time = '12:00') =>
   new Date(`${date}T${time}:00+02:00`).toISOString();
 
@@ -146,6 +151,95 @@ describe('saveDatesAction', () => {
     formData.set('campaignEndDate', addDays(19));
 
     await expect(saveDatesAction(formData)).rejects.toThrow('REDIRECT:/create/dates?error=birthday_order');
+  });
+
+  it('allows a future campaign close date before the birthday when it is on/before party date', async () => {
+    const redirectMock = vi.fn((url: string) => {
+      throw new Error(`REDIRECT:${url}`);
+    });
+    const updateHostCreateDreamBoardDraft = vi.fn(async () => undefined);
+
+    vi.doMock('next/navigation', () => ({ redirect: redirectMock }));
+    vi.doMock('@/lib/auth/clerk-wrappers', () => ({ requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })) }));
+    vi.doMock('@/lib/dream-boards/draft', () => ({
+      getHostCreateDreamBoardDraft: vi.fn(async () => makeDraft()),
+      updateHostCreateDreamBoardDraft,
+    }));
+
+    const { saveDatesAction } = await loadModule();
+    const formData = new FormData();
+    formData.set('birthdayDate', addDays(20));
+    formData.set('partyDate', addDays(25));
+    formData.set('campaignEndDate', addDays(18));
+
+    await expect(saveDatesAction(formData)).rejects.toThrow('REDIRECT:/create/voucher');
+    expect(updateHostCreateDreamBoardDraft).toHaveBeenCalledWith('host-1', {
+      birthdayDate: addDays(20),
+      partyDate: addDays(25),
+      campaignEndDate: addDays(18),
+      partyDateTime: null,
+    });
+  });
+
+  it('allows same-day birthday, party, and campaign close dates', async () => {
+    const redirectMock = vi.fn((url: string) => {
+      throw new Error(`REDIRECT:${url}`);
+    });
+    const updateHostCreateDreamBoardDraft = vi.fn(async () => undefined);
+    const sameDay = addDays(20);
+
+    vi.doMock('next/navigation', () => ({ redirect: redirectMock }));
+    vi.doMock('@/lib/auth/clerk-wrappers', () => ({ requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })) }));
+    vi.doMock('@/lib/dream-boards/draft', () => ({
+      getHostCreateDreamBoardDraft: vi.fn(async () => makeDraft()),
+      updateHostCreateDreamBoardDraft,
+    }));
+
+    const { saveDatesAction } = await loadModule();
+    const formData = new FormData();
+    formData.set('birthdayDate', sameDay);
+    formData.set('partyDate', sameDay);
+    formData.set('campaignEndDate', sameDay);
+
+    await expect(saveDatesAction(formData)).rejects.toThrow('REDIRECT:/create/voucher');
+    expect(updateHostCreateDreamBoardDraft).toHaveBeenCalledWith('host-1', {
+      birthdayDate: sameDay,
+      partyDate: sameDay,
+      campaignEndDate: sameDay,
+      partyDateTime: null,
+    });
+  });
+
+  it('normalizes localized date inputs before validation and storage', async () => {
+    const redirectMock = vi.fn((url: string) => {
+      throw new Error(`REDIRECT:${url}`);
+    });
+    const updateHostCreateDreamBoardDraft = vi.fn(async () => undefined);
+    const birthdayDate = addDays(20);
+    const partyDate = addDays(22);
+
+    vi.doMock('next/navigation', () => ({ redirect: redirectMock }));
+    vi.doMock('@/lib/auth/clerk-wrappers', () => ({ requireHostAuth: vi.fn(async () => ({ hostId: 'host-1' })) }));
+    vi.doMock('@/lib/dream-boards/draft', () => ({
+      getHostCreateDreamBoardDraft: vi.fn(async () => makeDraft()),
+      updateHostCreateDreamBoardDraft,
+    }));
+
+    const { saveDatesAction } = await loadModule();
+    const formData = new FormData();
+    formData.set('birthdayDate', toSlashDate(birthdayDate));
+    formData.set('partyDate', toSlashDate(partyDate));
+    formData.set('campaignEndDate', toSlashDate(partyDate));
+    formData.set('partyDateTimeDate', toSlashDate(partyDate));
+    formData.set('partyDateTimeTime', '14:30');
+
+    await expect(saveDatesAction(formData)).rejects.toThrow('REDIRECT:/create/voucher');
+    expect(updateHostCreateDreamBoardDraft).toHaveBeenCalledWith('host-1', {
+      birthdayDate,
+      partyDate,
+      campaignEndDate: partyDate,
+      partyDateTime: toJohannesburgIso(partyDate, '14:30'),
+    });
   });
 
   it('defaults party and campaign dates to birthday when noPartyPlanned is true', async () => {

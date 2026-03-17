@@ -52,8 +52,27 @@ describe('below-nav homepage replica contract', () => {
     expect(timeline).toContain('3.4k+');
     expect(voucherBand).toContain('Official voucher partner');
     expect(voucherBand).toContain('Takealot');
-    expect(footer).toContain('Voucher partner');
     expect(footer).toContain('Birthday gifting, simplified.');
+  });
+
+  it('removes the footer voucher-partner pill and tightens the remaining footer rhythm', () => {
+    const footer = readSource('src/components/landing-exact/LandingFooterExact.tsx');
+    const footerStyles = readSource('src/components/landing-exact/LandingFooterExact.module.css');
+
+    expect(footer).not.toContain("import Image from 'next/image';");
+    expect(footer).not.toContain('Voucher partner');
+    expect(footer).not.toContain('styles.footerPartner');
+    expect(footer).not.toContain('takealot_logo.png');
+
+    expect(footerStyles).toContain('.footer {');
+    expect(footerStyles).toContain('padding: 44px 20px;');
+    expect(footerStyles).toContain('gap: 20px;');
+    expect(footerStyles).toContain('@media (max-width: 480px)');
+    expect(footerStyles).toContain('gap: 18px;');
+    expect(footerStyles).toContain('padding: 32px 16px;');
+    expect(footerStyles).not.toContain('.footerPartner');
+    expect(footerStyles).not.toContain('.footerPartnerLabel');
+    expect(footerStyles).not.toContain('.footerPartnerLogo');
   });
 
   it('removes only the timeline eyebrow and tightens the section top rhythm', () => {
