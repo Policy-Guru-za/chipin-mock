@@ -34,6 +34,8 @@ describe('MobileNav component', () => {
 
     const dialog = screen.getByRole('dialog');
     expect(dialog).toHaveAttribute('id', 'mobile-nav');
+    expect(screen.queryByText('How it works')).not.toBeInTheDocument();
+    expect(screen.queryByText('Trust & safety')).not.toBeInTheDocument();
   });
 
   it('closes when the close button is clicked', async () => {

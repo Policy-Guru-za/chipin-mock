@@ -16,11 +16,6 @@ interface MobileNavProps {
   isClerkEnabled?: boolean;
 }
 
-const navLinks = [
-  { href: '/#how-it-works', label: 'How it works' },
-  { href: '/#safety', label: 'Trust & safety' },
-];
-
 export function MobileNav({ isOpen, onClose, isClerkEnabled = false }: MobileNavProps) {
   const prefersReducedMotion = useReducedMotion();
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -149,25 +144,8 @@ export function MobileNav({ isOpen, onClose, isClerkEnabled = false }: MobileNav
                   </button>
                 </div>
 
-                {/* Nav links */}
-                <nav className="flex-1 px-6 py-6">
-                  <ul className="space-y-2">
-                    {navLinks.map((link) => (
-                      <li key={link.href}>
-                        <Link
-                          href={link.href}
-                          onClick={handleLinkClick}
-                          className="block rounded-xl px-4 py-3 text-base font-medium text-text transition-colors hover:bg-subtle"
-                        >
-                          {link.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </nav>
-
                 {/* CTA */}
-                <div className="border-t border-border px-6 py-6">
+                <div className="mt-auto border-t border-border px-6 py-6">
                   {isClerkEnabled ? (
                     <div className="mb-4 flex items-center justify-center">
                       <SignedOut>

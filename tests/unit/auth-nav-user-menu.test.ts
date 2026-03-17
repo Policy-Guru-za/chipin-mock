@@ -24,11 +24,15 @@ describe('auth-aware navigation and user avatar menu', () => {
     expect(landingContent).not.toContain('Trust & safety');
   });
 
-  it('uses shared avatar menu in shared and landing navs', () => {
+  it('uses shared avatar menu and no top links in shared and landing navs', () => {
     const header = readSource('src/components/layout/Header.tsx');
     const mobileNav = readSource('src/components/layout/MobileNav.tsx');
     const landingNav = readSource('src/components/landing/LandingNav.tsx');
 
+    expect(header).not.toContain('How it works');
+    expect(header).not.toContain('Trust & safety');
+    expect(mobileNav).not.toContain('How it works');
+    expect(mobileNav).not.toContain('Trust & safety');
     expect(header).toContain('<UserAvatarMenu afterSignOutUrl="/" />');
     expect(mobileNav).toContain('<UserAvatarMenu afterSignOutUrl="/" variant="compact" />');
     expect(landingNav).toContain('<UserAvatarMenu afterSignOutUrl="/" variant="compact" />');

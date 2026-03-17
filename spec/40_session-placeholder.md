@@ -1,8 +1,8 @@
-# 39_session-placeholder
+# 40_session-placeholder
 
 ## Objective
 
-- Reserve slot 39 for the next bounded work session and rename this file in place when that topic is known.
+- Reserve slot 40 for the next bounded work session and rename this file in place when that topic is known.
 
 ## In Scope
 

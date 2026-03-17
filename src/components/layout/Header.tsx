@@ -9,7 +9,6 @@ import { buttonVariants } from '@/components/ui/button';
 import { MenuIcon } from '@/components/icons';
 import { MobileNav } from '@/components/layout/MobileNav';
 import { trackNavDrawerOpened } from '@/lib/analytics/metrics';
-const navLinkClasses = 'text-sm font-medium text-text-muted transition hover:text-text';
 
 interface HeaderProps {
   isClerkEnabled?: boolean;
@@ -42,12 +41,6 @@ export function Header({ isClerkEnabled = false }: HeaderProps) {
 
           {/* Desktop nav */}
           <nav className="hidden items-center gap-6 md:flex">
-            <Link href="/#how-it-works" className={navLinkClasses}>
-              How it works
-            </Link>
-            <Link href="/#safety" className={navLinkClasses}>
-              Trust & safety
-            </Link>
             <Link href="/create" prefetch={false} className={buttonVariants({ size: 'sm' })}>
               Create a Dreamboard
             </Link>
