@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState, useEffect, useMemo, useState } from 'react';
+import { useActionState, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { CelebrationHeader } from '@/components/create-review/CelebrationHeader';
 import { ReviewPreviewCard } from '@/components/create-review/ReviewPreviewCard';
@@ -57,8 +57,10 @@ const formatDate = (value: string) => {
 export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
   const [state, formAction, pending] = useActionState(publishAction, { status: 'preview' });
   const [copied, setCopied] = useState(false);
+  const celebrationHeaderRef = useRef<HTMLDivElement>(null);
   const published = state.status === 'published';
   const shareUrl = state.shareUrl;
+  const celebrationVisible = published && Boolean(shareUrl);
   const voucherSummary = useMemo(
     () => `Takealot Voucher placeholder via ${draft.payoutEmail} and ${draft.hostWhatsAppNumber}`,
     [draft.hostWhatsAppNumber, draft.payoutEmail]
@@ -77,6 +79,15 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
     return () => clearTimeout(timeout);
   }, [copied]);
 
+  useLayoutEffect(() => {
+    if (!celebrationVisible || typeof window === 'undefined') {
+      return;
+    }
+
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    celebrationHeaderRef.current?.focus({ preventScroll: true });
+  }, [celebrationVisible]);
+
   const copyShareUrl = async () => {
     if (!shareUrl) return;
     await navigator.clipboard.writeText(shareUrl);
@@ -91,12 +102,12 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
     ? `Hi there!\n\n${draft.childName} is turning ${draft.childAge}, and friends and family are chipping in for ${draft.giftName}.\n\nView and chip in here: ${shareUrl}\n\nEvery amount helps!`
     : '';
 
-  if (published && shareUrl) {
+  if (celebrationVisible && shareUrl) {
     return (
       <section className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 pb-8 pt-4 sm:px-6 sm:pb-12 sm:pt-8">
         <ConfettiTrigger trigger variant="celebration" celebrationDuration={4000} />
 
-        <div className="animate-fade-up">
+        <div ref={celebrationHeaderRef} tabIndex={-1} className="animate-fade-up focus:outline-none">
           <CelebrationHeader childName={draft.childName} />
         </div>
 

@@ -3,9 +3,23 @@
  */
 import { createElement } from 'react';
 import type { ReactNode } from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
+
+const { mockUseActionState, scrollToMock } = vi.hoisted(() => ({
+  mockUseActionState: vi.fn(),
+  scrollToMock: vi.fn(),
+}));
+
+vi.mock('react', async () => {
+  const actual = await vi.importActual<typeof import('react')>('react');
+
+  return {
+    ...actual,
+    useActionState: mockUseActionState,
+  };
+});
 
 vi.mock('next/image', () => ({
   default: ({
@@ -35,6 +49,10 @@ vi.mock('next/link', () => ({
   }) => createElement('a', { href, ...props }, children),
 }));
 
+vi.mock('@/components/effects/ConfettiTrigger', () => ({
+  ConfettiTrigger: () => null,
+}));
+
 import { ReviewClient, type PublishState } from '@/app/(host)/create/review/ReviewClient';
 
 const draft = {
@@ -51,8 +69,20 @@ const draft = {
   hostWhatsAppNumber: '+27821234567',
 };
 
+const setActionState = (state: PublishState) => {
+  mockUseActionState.mockReturnValue([state, vi.fn(), false]);
+};
+
+beforeEach(() => {
+  scrollToMock.mockReset();
+  mockUseActionState.mockReset();
+  vi.stubGlobal('scrollTo', scrollToMock);
+  setActionState({ status: 'preview' });
+});
+
 afterEach(() => {
   cleanup();
+  vi.unstubAllGlobals();
 });
 
 describe('ReviewClient', () => {
@@ -65,6 +95,7 @@ describe('ReviewClient', () => {
     render(<ReviewClient draft={draft} publishAction={publishAction} />);
 
     expect(screen.getByRole('heading', { name: 'Review your Dreamboard' })).toBeInTheDocument();
+    expect(scrollToMock).not.toHaveBeenCalled();
     expect(screen.getAllByRole('button', { name: 'Create Dreamboard' }).length).toBeGreaterThan(0);
     expect(screen.getByRole('link', { name: 'Edit child details' })).toHaveAttribute(
       'href',
@@ -135,5 +166,29 @@ describe('ReviewClient', () => {
     render(<ReviewClient draft={noPartyDraft} publishAction={publishAction} />);
 
     expect(screen.queryByText(/Birthday Party/i)).toBeNull();
+  });
+
+  it('resets scroll to the top and focuses the celebration state after publish success', () => {
+    const publishAction = async (
+      _state: PublishState,
+      _formData: FormData
+    ): Promise<PublishState> => ({
+      status: 'published',
+      shareUrl: 'https://gifta.co.za/max-dreamboard',
+    });
+
+    setActionState({
+      status: 'published',
+      shareUrl: 'https://gifta.co.za/max-dreamboard',
+    });
+
+    render(<ReviewClient draft={draft} publishAction={publishAction} />);
+
+    const heading = screen.getByRole('heading', { name: "Max's Dreamboard is ready!" });
+    const focusTarget = heading.closest('div[tabindex="-1"]');
+
+    expect(heading).toBeInTheDocument();
+    expect(scrollToMock).toHaveBeenCalledWith({ top: 0, left: 0, behavior: 'auto' });
+    expect(focusTarget).toBe(document.activeElement);
   });
 });
