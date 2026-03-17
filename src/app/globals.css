@@ -200,22 +200,20 @@ a:focus-visible {
 
 @keyframes landing-testimonial-fade {
 
-  0%,
-  8% {
+  0% {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(6px);
   }
 
   12%,
-  88% {
+  84% {
     opacity: 1;
     transform: translateY(0);
   }
 
-  92%,
   100% {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translateY(-4px);
   }
 }
 
@@ -260,7 +258,7 @@ a:focus-visible {
 }
 
 .animate-landing-testimonial-fade {
-  animation: landing-testimonial-fade 5s ease-in-out;
+  animation: landing-testimonial-fade 8s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .animate-landing-float {

@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 const readSource = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8');
 
-describe('below-nav homepage replica contract', () => {
+describe('below-nav homepage replica shell contract', () => {
   it('mounts the exact homepage body under the preserved landing nav seam', () => {
     const landingPage = readSource('src/components/landing/LandingPage.tsx');
 
@@ -40,13 +40,19 @@ describe('below-nav homepage replica contract', () => {
 
   it('uses the reviewed assets and exact below-nav copy anchors', () => {
     const hero = readSource('src/components/landing-exact/LandingHeroExact.tsx');
+    const heroRotator = readSource('src/components/landing-exact/LandingHeroTestimonialRotator.tsx');
+    const sharedTestimonials = readSource('src/components/landing/testimonials.ts');
     const timeline = readSource('src/components/landing-exact/LandingTimelineExact.tsx');
     const voucherBand = readSource('src/components/landing-exact/LandingVoucherBandExact.tsx');
     const footer = readSource('src/components/landing-exact/LandingFooterExact.tsx');
 
     expect(hero).toContain('/images/homepage-exact/mia_avatar.jpg');
     expect(hero).toContain('3,400+');
-    expect(hero).toContain('the present everyone helped with.');
+    expect(hero).toContain('<LandingHeroTestimonialRotator />');
+    expect(heroRotator).toContain('animate-landing-testimonial-fade');
+    expect(sharedTestimonials).toContain('the present everyone helped with.');
+    expect(sharedTestimonials).toContain('Rachel K.');
+    expect(sharedTestimonials).toContain('James M.');
     expect(timeline).toContain('Family Group Chat');
     expect(timeline).toContain('/images/homepage-exact/takealot_logo.png');
     expect(timeline).toContain('3.4k+');
@@ -74,7 +80,9 @@ describe('below-nav homepage replica contract', () => {
     expect(footerStyles).not.toContain('.footerPartnerLabel');
     expect(footerStyles).not.toContain('.footerPartnerLogo');
   });
+});
 
+describe('below-nav homepage replica hero contract', () => {
   it('removes only the timeline eyebrow and tightens the section top rhythm', () => {
     const timeline = readSource('src/components/landing-exact/LandingTimelineExact.tsx');
     const timelineStyles = readSource('src/components/landing-exact/LandingTimelineExact.module.css');
@@ -160,14 +168,15 @@ describe('below-nav homepage replica contract', () => {
 
   it('locks the hero to one semantic rail composition without duplicated desktop/mobile copies', () => {
     const hero = readSource('src/components/landing-exact/LandingHeroExact.tsx');
+    const heroRotator = readSource('src/components/landing-exact/LandingHeroTestimonialRotator.tsx');
     const heroStyles = readSource('src/components/landing-exact/LandingHeroExact.module.css');
 
     expect(hero).toContain('<div className={styles.heroLeftRail}>');
     expect(hero).toContain('<div className={styles.heroRightRail}>');
-    expect(hero).toContain('<VillageTestimonial />');
+    expect(hero).toContain('<LandingHeroTestimonialRotator />');
     expect(hero).toContain('<HeroCreateCta />');
     expect(hero).toContain('<VillageContributors />');
-    expect(hero.match(/<VillageTestimonial/g)).toHaveLength(1);
+    expect(hero.match(/<LandingHeroTestimonialRotator/g)).toHaveLength(1);
     expect(hero.match(/<HeroCreateCta/g)).toHaveLength(1);
     expect(hero.match(/<VillageContributors/g)).toHaveLength(1);
     expect(hero).not.toContain('desktopNarrative');
@@ -175,6 +184,10 @@ describe('below-nav homepage replica contract', () => {
     expect(hero).not.toContain('desktopVisualContributors');
     expect(hero).not.toContain('mobileVillage');
     expect(hero).not.toContain('mobileCtaSection');
+    expect(heroRotator).toContain('useReducedMotion');
+    expect(heroRotator).toContain('onMouseEnter');
+    expect(heroRotator).toContain('onFocusCapture');
+    expect(heroRotator).not.toContain('w-2 h-2');
 
     expect(heroStyles).toContain('.heroLeftRail');
     expect(heroStyles).toContain('.heroRightRail');
@@ -188,7 +201,9 @@ describe('below-nav homepage replica contract', () => {
     expect(heroStyles).not.toContain('.mobileVillage');
     expect(heroStyles).not.toContain('.mobileCtaSection');
   });
+});
 
+describe('below-nav homepage replica layout contract', () => {
   it('keeps the external contributor constellation desktop-only below the true desktop breakpoint', () => {
     const hero = readSource('src/components/landing-exact/LandingHeroExact.tsx');
     const heroStyles = readSource('src/components/landing-exact/LandingHeroExact.module.css');

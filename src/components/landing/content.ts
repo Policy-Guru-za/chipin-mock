@@ -8,27 +8,6 @@ export const contributors = [
   { name: 'Kate', color: '#D8B8E8' },
 ];
 
-export const testimonials = [
-  {
-    quote:
-      "No more wandering toy aisles wondering if they already have it. Sophie got her telescope and the look on her face was everything.",
-    author: 'Rachel K.',
-    relation: 'Mom of Sophie, 8',
-  },
-  {
-    quote:
-      "Finally, a birthday where the gift actually mattered. The other parents loved how easy it was to chip in.",
-    author: 'James M.',
-    relation: 'Dad of twins, 6',
-  },
-  {
-    quote:
-      "My daughter still talks about 'the birthday everyone helped with.' It made the gift feel so special.",
-    author: 'Priya N.',
-    relation: 'Mom of Anaya, 7',
-  },
-];
-
 export const trustItems = [
   { icon: '🏦', text: 'Voucher-ready fulfilment' },
   { icon: '🔒', text: 'Secure payments' },
@@ -38,7 +17,6 @@ export const trustItems = [
 export const navLinks: Array<{ label: string; href: string }> = [];
 
 export const TIMING = {
-  TESTIMONIAL_ROTATION: 5000,
   CONTRIBUTOR_PULSE: 800,
   PROGRESS_DELAY: 1000,
 };

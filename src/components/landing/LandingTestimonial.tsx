@@ -1,15 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { testimonials, TIMING } from './content';
+
+import { LANDING_TESTIMONIAL_ROTATION_MS, landingTestimonials } from './testimonials';
 
 export function LandingTestimonial() {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
 
   useEffect(() => {
     const testimonialInterval = setInterval(() => {
-      setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, TIMING.TESTIMONIAL_ROTATION);
+      setActiveTestimonial((prev) => (prev + 1) % landingTestimonials.length);
+    }, LANDING_TESTIMONIAL_ROTATION_MS);
     return () => clearInterval(testimonialInterval);
   }, []);
 
@@ -28,20 +29,20 @@ export function LandingTestimonial() {
               className="text-[15px] text-[#444] leading-[1.65] mb-3 italic"
               style={{ fontFamily: 'var(--font-dm-serif)' }}
             >
-              &ldquo;{testimonials[activeTestimonial].quote}&rdquo;
+              &ldquo;{landingTestimonials[activeTestimonial].quote}&rdquo;
             </p>
             <p className="text-[13px] text-[#999]">
               <strong className="text-[#666]">
-                {testimonials[activeTestimonial].author}
+                {landingTestimonials[activeTestimonial].author}
               </strong>
               {' · '}
-              {testimonials[activeTestimonial].relation}
+              {landingTestimonials[activeTestimonial].relation}
             </p>
           </div>
         </div>
       </div>
       <div className="flex gap-2 mt-4 ml-[60px]">
-        {testimonials.map((_, i) => (
+        {landingTestimonials.map((_, i) => (
           <div
             key={i}
             className="w-2 h-2 rounded-full transition-colors duration-300"

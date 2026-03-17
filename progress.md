@@ -2,7 +2,7 @@
 
 ## Current Spec
 
-- `35_session-placeholder`
+- `37_session-placeholder`
 
 ## Current Stage
 
@@ -10,9 +10,9 @@
 
 ## Status
 
-- Closed [`spec/34_homepage-footer-voucher-partner-pill-removal.md`](./spec/34_homepage-footer-voucher-partner-pill-removal.md) as done and activated [`spec/35_session-placeholder.md`](./spec/35_session-placeholder.md).
-- Removed the footer voucher-partner pill from the exact landing footer and pruned the now-unused partner image/styles.
-- Tightened the remaining footer spacing, updated the landing regression coverage, and preserved the upstream voucher-band partner messaging.
+- Closed [`spec/36_homepage-testimonial-timing-and-copy-polish.md`](./spec/36_homepage-testimonial-timing-and-copy-polish.md) as done and activated [`spec/37_session-placeholder.md`](./spec/37_session-placeholder.md).
+- Slowed the shared testimonial cadence to 8 seconds, shortened the Rachel quote, and removed the exact hero's extra per-quote entrance replay so the transition feels calmer without changing the shell.
+- Re-ran focused homepage regressions, the full verification gate, and live localhost browser dogfood to confirm the quote now stays on Priya beyond 5 seconds before rotating forward.
 
 ## Blockers
 
@@ -20,32 +20,32 @@
 
 ## Next Step
 
-- Rename [`spec/35_session-placeholder.md`](./spec/35_session-placeholder.md) in place when the next session topic is known.
+- Rename [`spec/37_session-placeholder.md`](./spec/37_session-placeholder.md) in place when the next session topic is known.
 
 ## Last Session Spec
 
-- `34_homepage-footer-voucher-partner-pill-removal`
+- `36_homepage-testimonial-timing-and-copy-polish`
 
 ## Last Completed Spec
 
-- `34_homepage-footer-voucher-partner-pill-removal`
+- `36_homepage-testimonial-timing-and-copy-polish`
 
 ## Last Green Commands
 
-- `pnpm exec vitest run tests/unit/landing-below-nav-replica.test.ts` (passed; 1 file, 12 tests)
-- `pnpm docs:audit -- --sync` (passed; 188 markdown files)
-- `pnpm docs:audit` (passed; 188 markdown files)
-- `pnpm lint` (0 errors, 108 warnings)
+- `pnpm exec vitest run tests/unit/landing-hero-testimonial-rotator.test.tsx tests/unit/landing-below-nav-replica.test.ts` (passed; 2 files, 17 tests)
+- `pnpm docs:audit -- --sync` (passed; 190 markdown files)
+- `pnpm docs:audit` (passed; 190 markdown files)
+- `pnpm lint` (0 errors, 107 warnings)
 - `pnpm typecheck` (clean)
-- `pnpm test` (198 test files, 960 tests passed)
+- `pnpm test` (199 test files, 965 tests passed)
 
 ## Dogfood Evidence
 
-- Live localhost dogfood succeeded on the already-running marketing server at `http://localhost:3000`: `agent-browser open http://localhost:3000 && agent-browser set viewport 1920 929 && agent-browser wait --load networkidle && agent-browser eval 'window.scrollTo(0, document.body.scrollHeight)' && agent-browser wait 1000 && agent-browser screenshot output/spec34-footer-no-partner-pill-bottom.png --annotate && agent-browser close` captured the footer viewport and confirmed the voucher-partner pill is gone while the remaining footer blocks stay balanced; the upstream voucher band still carries the official partner callout.
-- Screenshot proof for Spec 34 is saved at [`output/spec34-footer-no-partner-pill-bottom.png`](./output/spec34-footer-no-partner-pill-bottom.png).
-- Focused regression proof: `pnpm exec vitest run tests/unit/landing-below-nav-replica.test.ts` passed after the runtime update and now locks the no-pill footer contract plus the tightened footer spacing rules.
-- Full gate proof: docs audit sync, docs audit, lint, typecheck, and the full test suite all passed after the footer cleanup and final artifact sync.
+- Live localhost dogfood succeeded on the already-running marketing server at `http://localhost:3000`: reloading the page and waiting 5.5 seconds kept Priya on screen, while a browser-side timing probe confirmed the shortened Rachel quote appeared after hydration at roughly 6.4 seconds into the live client interval, consistent with the slower 8-second cadence once the initial hydration delay is accounted for.
+- Screenshot proof for Spec 36 is saved at [`output/spec36-homepage-testimonial-priya-initial.png`](./output/spec36-homepage-testimonial-priya-initial.png), [`output/spec36-homepage-testimonial-priya-still-at-5s.png`](./output/spec36-homepage-testimonial-priya-still-at-5s.png), and [`output/spec36-homepage-testimonial-rachel-after-hydration.png`](./output/spec36-homepage-testimonial-rachel-after-hydration.png).
+- Focused regression proof: `pnpm exec vitest run tests/unit/landing-hero-testimonial-rotator.test.tsx tests/unit/landing-below-nav-replica.test.ts` passed after the timing/copy polish and now locks the slower shared interval plus the updated Rachel quote contract.
+- Full gate proof: docs audit sync, docs audit, lint, typecheck, and the full test suite all passed after the testimonial polish and final artifact sync.
 
 ## Napkin Evidence
 
-- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with Spec 34 learning: when a marketing partnership already has a dedicated upstream section, remove redundant footer pills and rebalance the footer rhythm instead of repeating the claim again in the closing footer.
+- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with Spec 36 learning: client-side rotation dogfood should measure from post-hydration browser timing rather than only wall-clock waits between CLI screenshots.
