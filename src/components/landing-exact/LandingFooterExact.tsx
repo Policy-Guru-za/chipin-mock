@@ -58,16 +58,13 @@ export function LandingFooterExact() {
 
       <div className={styles.footerSocials}>
         {socialLinks.map((social) => (
-          <a
+          <span
             key={social.name}
-            href={social.url}
-            target="_blank"
-            rel="noopener noreferrer"
             className={styles.footerSocial}
             aria-label={social.name}
           >
             {social.icon}
-          </a>
+          </span>
         ))}
       </div>
 

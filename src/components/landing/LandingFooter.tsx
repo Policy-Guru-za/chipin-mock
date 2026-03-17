@@ -101,16 +101,13 @@ export function LandingFooter() {
 
       <div className="flex items-center gap-4">
         {socialLinks.map((social) => (
-          <a
+          <span
             key={social.name}
-            href={social.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center w-10 h-10 rounded-full text-[#888] bg-black/[0.03] transition-all hover:text-[#5A8E78] hover:bg-[rgba(107,158,136,0.1)] hover:-translate-y-0.5"
+            className="flex items-center justify-center w-10 h-10 rounded-full text-[#888] bg-black/[0.03]"
             aria-label={social.name}
           >
             {socialIcons[social.name]}
-          </a>
+          </span>
         ))}
       </div>
 
