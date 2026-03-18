@@ -6,16 +6,43 @@ const FINAL_STATE_FIELDS = ['Status', 'Exit Criteria State', 'Successor Slot', '
 const VALID_EXIT_CRITERIA_STATES = new Set(['pending', 'satisfied', 'not-satisfied']);
 
 export const REQUIRED_PROGRESS_HEADINGS = [
-  'Current Spec',
-  'Current Stage',
-  'Status',
-  'Blockers',
-  'Next Step',
-  'Last Session Spec',
+  'Active Full Specs',
+  'Quick Tasks',
+  'Recently Closed Specs',
   'Last Completed Spec',
   'Last Green Commands',
   'Dogfood Evidence',
   'Napkin Evidence',
+];
+
+export const REQUIRED_ACTIVE_SPEC_COLUMNS = [
+  'Spec',
+  'Title',
+  'Owner',
+  'Stage',
+  'Status',
+  'Blockers',
+  'Next Step',
+  'Last Updated',
+];
+
+export const REQUIRED_QUICK_TASK_COLUMNS = [
+  'Task ID',
+  'Scope',
+  'Owner',
+  'Verification',
+  'Status',
+  'Next Step',
+];
+
+export const REQUIRED_OVERVIEW_COLUMNS = [
+  'Spec',
+  'Title',
+  'Status',
+  'Closed At',
+  'Owner',
+  'Depends On',
+  'Notes',
 ];
 
 export const REQUIRED_SPEC_HEADINGS = [
@@ -31,7 +58,10 @@ export const REQUIRED_SPEC_HEADINGS = [
 
 export const VALID_SPEC_STATUSES = new Set(['Active', 'Done', 'Superseded']);
 export const TERMINAL_SPEC_STATUSES = new Set(['Done', 'Superseded']);
-export const PLACEHOLDER_SPEC_SUFFIX = '_session-placeholder';
+export const CLOSED_AT_REQUIRED_FROM_SLOT = 40;
+
+const CLOSED_AT_PLACEHOLDER_VALUES = new Set(['', '—', '-', 'None', 'none']);
+const CLOSED_AT_FORMAT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -94,6 +124,109 @@ export const resolveProgressSpecId = (progressText, heading, errors) => {
   return tokens[0];
 };
 
+const splitTableLine = (line) =>
+  line
+    .trim()
+    .replace(/^\|/, '')
+    .replace(/\|$/, '')
+    .split('|')
+    .map((cell) => cell.trim());
+
+export const parseMarkdownTable = (section) => {
+  if (!section) return { headers: [], rows: [] };
+
+  const tableLines = section
+    .split('\n')
+    .map((line) => line.trimEnd())
+    .filter((line) => line.trim().startsWith('|'));
+
+  if (tableLines.length < 2) {
+    return { headers: [], rows: [] };
+  }
+
+  const headers = splitTableLine(tableLines[0]);
+  const rows = [];
+
+  for (const line of tableLines.slice(2)) {
+    if (!line.trim().startsWith('|')) continue;
+    const cells = splitTableLine(line);
+    if (cells.every((cell) => /^:?-{3,}:?$/.test(cell))) continue;
+
+    const row = {};
+    headers.forEach((header, index) => {
+      row[header] = cells[index] ?? '';
+    });
+    rows.push(row);
+  }
+
+  return { headers, rows };
+};
+
+export const isExplicitNone = (section) => {
+  if (!section) return false;
+  const lines = section
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  return lines.length === 1 && /^[-*]\s+None\.?$/i.test(lines[0]);
+};
+
+export const specSlot = (specId) => Number.parseInt(specId.slice(0, 2), 10);
+
+export const normalizeClosedAt = (value = '') => {
+  const trimmed = value.trim();
+  return CLOSED_AT_PLACEHOLDER_VALUES.has(trimmed) ? null : trimmed;
+};
+
+export const isValidClosedAt = (value) => CLOSED_AT_FORMAT.test(value) && !Number.isNaN(Date.parse(value));
+
+export const parseRecentlyClosedEntries = (section) => {
+  if (!section) {
+    return { entries: [], invalidLines: [] };
+  }
+
+  const entries = [];
+  const invalidLines = [];
+
+  for (const rawLine of section.split('\n')) {
+    const line = rawLine.trim();
+    if (!line) continue;
+
+    const bulletMatch = /^[-*]\s+(.+)$/.exec(line);
+    if (!bulletMatch) {
+      invalidLines.push(line);
+      continue;
+    }
+
+    const orderedSpecIds = [];
+    for (const value of backtickedValues(bulletMatch[1])) {
+      if (NUMBERED_SPEC_ID.test(value)) {
+        orderedSpecIds.push(value);
+        continue;
+      }
+
+      const specPathMatch = SPEC_PATH_LABEL.exec(value);
+      if (specPathMatch) {
+        orderedSpecIds.push(specPathMatch[1]);
+      }
+    }
+
+    if (orderedSpecIds.length === 0) {
+      invalidLines.push(line);
+      continue;
+    }
+
+    entries.push({
+      primarySpecId: orderedSpecIds[0],
+      referencedSpecIds: [...new Set(orderedSpecIds)],
+      line,
+    });
+  }
+
+  return { entries, invalidLines };
+};
+
 const parseFinalStateFieldMap = (specId, text, errors) => {
   const body = sectionBody(text, 'Final State');
   if (body === null) {
@@ -154,7 +287,7 @@ const validateBaseFinalState = (specId, finalState, errors) => {
     );
   }
 
-  if (!finalState.notes || finalState.notes === '<free text>') {
+  if (!finalState.notes || finalState.notes === '<specific summary>') {
     errors.push(`spec/${specId}.md: Final State notes must be specific, not a placeholder.`);
   }
 };
@@ -227,23 +360,21 @@ export const validateFinalState = (specId, finalState, actualSpecIds, errors) =>
 };
 
 export const listedSpecs = (overviewText) => {
+  const { headers, rows } = parseMarkdownTable(overviewText);
   const specs = new Map();
 
-  for (const line of overviewText.split('\n')) {
-    if (!/^\| `\d{2}_[^`]+` \|/.test(line)) continue;
+  for (const row of rows) {
+    const specIds = referencedSpecIds(row.Spec ?? '');
+    if (specIds.length !== 1) continue;
 
-    const cells = line.split('|').map((cell) => cell.trim());
-    const specId = cells[1]?.replace(/^`|`$/g, '');
-    const status = cells[3];
-
-    if (specId) {
-      specs.set(specId, { status });
-    }
+    const specId = specIds[0];
+    specs.set(specId, {
+      status: (row.Status ?? '').trim(),
+      closedAt: normalizeClosedAt(row['Closed At'] ?? ''),
+    });
   }
 
-  return specs;
+  return { headers, specs };
 };
 
 export const isNumberedSpecFile = (name) => NUMBERED_SPEC_FILE.test(name) && name !== '00_overview.md';
-
-export const isPlaceholderSpecId = (specId) => specId.endsWith(PLACEHOLDER_SPEC_SUFFIX);

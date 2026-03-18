@@ -18,42 +18,57 @@ const BANNER_PREFIX = '> **Document Status:**';
 const AGENT_GUIDANCE_RULES = [
   {
     test: /^AGENTS\.md$/,
-    required: ['.agents/skills/napkin/SKILL.md', 'docs/napkin/napkin.md', 'Napkin Evidence', 'progress.md', 'spec/00_overview.md'],
+    required: [
+      '.agents/skills/napkin/SKILL.md',
+      'docs/napkin/napkin.md',
+      'progress.md',
+      'spec/00_overview.md',
+      'Active Full Specs',
+      'Quick Tasks',
+      'Last Completed Spec',
+    ],
     banned: [/tasks\/todo\.md/g],
   },
   {
     test: /^README\.md$/,
-    required: ['progress.md', 'spec/00_overview.md'],
+    required: ['.agents/skills/napkin/SKILL.md', 'docs/napkin/napkin.md', 'AGENTS.md', 'progress.md', 'spec/00_overview.md'],
     banned: [/tasks\/todo\.md/g],
   },
   {
     test: /^workflow-orchestration\.md$/,
-    required: ['.agents/skills/napkin/SKILL.md', 'docs/napkin/napkin.md', 'Napkin Evidence', 'progress.md', 'spec/00_overview.md'],
+    required: ['AGENTS.md', 'progress.md', 'spec/00_overview.md', 'Quick Tasks'],
     banned: [/tasks\/todo\.md/g],
   },
   {
     test: /^TESTING\.md$/,
-    required: ['progress.md'],
+    required: ['progress.md', 'Quick Tasks', 'Last Completed Spec'],
     banned: [/tasks\/todo\.md/g],
   },
   {
     test: /^docs\/agent-playbooks\/code_review\.md$/,
-    required: ['progress.md', 'spec/00_overview.md'],
+    required: [
+      '.agents/skills/napkin/SKILL.md',
+      'docs/napkin/napkin.md',
+      'AGENTS.md',
+      'progress.md',
+      'Recently Closed Specs',
+      'Last Completed Spec',
+    ],
     banned: [/tasks\/todo\.md/g],
   },
   {
     test: /^docs\/napkin\/SKILL\.md$/,
-    required: ['.agents/skills/napkin/SKILL.md', 'docs/napkin/napkin.md', 'Napkin Evidence', 'progress.md', 'spec/'],
+    required: ['docs/napkin/napkin.md', 'progress.md', 'Napkin Evidence'],
     banned: [/tasks\/todo\.md/g],
   },
   {
     test: /^\.agents\/skills\/napkin\/SKILL\.md$/,
-    required: ['docs/napkin/napkin.md', 'progress.md', 'spec/00_overview.md'],
+    required: ['docs/napkin/napkin.md', 'progress.md', 'Napkin Evidence'],
     banned: [/tasks\/todo\.md/g],
   },
   {
     test: /^\.agents\/skills\/[^/]+\/SKILL\.md$/,
-    required: ['../napkin/SKILL.md', 'docs/napkin/napkin.md', 'progress.md', 'spec/00_overview.md'],
+    required: ['../napkin/SKILL.md', 'AGENTS.md', 'progress.md'],
     banned: [/tasks\/todo\.md/g],
   },
 ];

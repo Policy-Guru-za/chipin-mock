@@ -15,15 +15,34 @@ type FixtureSpec = {
   exitCriteriaState: FixtureExitState;
   successorSlot: string;
   notes: string;
+  closedAt?: string;
+};
+
+type ActiveSpecRow = {
+  spec: string;
+  title: string;
+  owner?: string;
+  stage?: string;
+  status?: string;
+  blockers?: string;
+  nextStep?: string;
+  lastUpdated?: string;
+};
+
+type QuickTaskRow = {
+  taskId: string;
+  scope: string;
+  owner?: string;
+  verification?: string;
+  status?: string;
+  nextStep?: string;
 };
 
 type FixtureProgress = {
-  currentSpec: string;
-  currentStage?: string;
-  statusLines?: string[];
-  blockers?: string[];
-  nextStep?: string[];
-  lastSessionSpec?: string;
+  activeSpecs?: ActiveSpecRow[];
+  quickTasks?: QuickTaskRow[];
+  recentlyClosedSpecs?: string[];
+  recentlyClosedLines?: string[];
   lastCompletedSpec: string;
   lastGreenCommands?: string[];
   dogfoodEvidence?: string[];
@@ -79,66 +98,96 @@ const overviewDoc = (rows: FixtureSpec[]) => {
   const header = [
     '# Spec Overview',
     '',
-    'Use one numbered spec for every work session.',
+    'Use numbered specs for full-path work.',
     '',
-    'One active spec at a time unless the user says otherwise.',
+    'Multiple numbered specs may be `Active` at the same time.',
     '',
-    'Use `NN_session-placeholder` between sessions and rename that same numbered file in place when the next session topic is known.',
+    'Create new specs on demand with the next available two-digit slot in `spec/`.',
     '',
-    '| Spec | Title | Status | Owner | Depends On | Notes |',
-    '| --- | --- | --- | --- | --- | --- |',
+    'Fast-path work lives in [`../progress.md`](../progress.md) under `## Quick Tasks` and does not require a numbered spec.',
+    '',
+    'Status values: `Active`, `Done`, `Superseded`.',
+    'Terminal rows in slot 40 and above must carry `Closed At` in UTC ISO-8601 once they close.',
+    '',
+    '| Spec | Title | Status | Closed At | Owner | Depends On | Notes |',
+    '| --- | --- | --- | --- | --- | --- | --- |',
   ];
 
   const body = rows.map(
-    ({ id, title, status, notes }) =>
-      `| \`${id}\` | ${title} | ${status} | Codex | None | ${notes} |`
+    ({ id, title, status, notes, closedAt }) =>
+      `| \`${id}\` | ${title} | ${status} | ${closedAt ?? '—'} | Codex | None | ${notes} |`
   );
 
   return `${[...header, ...body, ''].join('\n')}`;
 };
 
+const activeSpecsSection = (rows: ActiveSpecRow[] = []) => {
+  if (rows.length === 0) {
+    return ['## Active Full Specs', '', '- None.', ''];
+  }
+
+  return [
+    '## Active Full Specs',
+    '',
+    '| Spec | Title | Owner | Stage | Status | Blockers | Next Step | Last Updated |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- |',
+    ...rows.map(
+      (row) =>
+        `| \`${row.spec}\` | ${row.title} | ${row.owner ?? 'Codex'} | ${row.stage ?? 'Stage 1'} | ${row.status ?? 'In progress'} | ${row.blockers ?? 'None'} | ${row.nextStep ?? 'Keep going'} | ${row.lastUpdated ?? '2026-03-18'} |`
+    ),
+    '',
+  ];
+};
+
+const quickTasksSection = (rows: QuickTaskRow[] = []) => {
+  if (rows.length === 0) {
+    return ['## Quick Tasks', '', '- None.', ''];
+  }
+
+  return [
+    '## Quick Tasks',
+    '',
+    '| Task ID | Scope | Owner | Verification | Status | Next Step |',
+    '| --- | --- | --- | --- | --- | --- |',
+    ...rows.map(
+      (row) =>
+        `| ${row.taskId} | ${row.scope} | ${row.owner ?? 'Codex'} | ${row.verification ?? '`pnpm test`'} | ${row.status ?? 'In progress'} | ${row.nextStep ?? 'Finish the task'} |`
+    ),
+    '',
+  ];
+};
+
+const recentlyClosedSection = ({
+  specIds = [],
+  lines = [],
+}: {
+  specIds?: string[];
+  lines?: string[];
+}) => {
+  if (specIds.length === 0 && lines.length === 0) {
+    return ['## Recently Closed Specs', '', '- None.', ''];
+  }
+
+  const resolvedLines = lines.length > 0 ? lines : specIds.map((id) => `- \`${id}\``);
+  return ['## Recently Closed Specs', '', ...resolvedLines, ''];
+};
+
 const progressDoc = ({
-  currentSpec,
-  currentStage = 'Fixture stage',
-  statusLines = ['- Fixture status.'],
-  blockers = ['- None.'],
-  nextStep = ['- Fixture next step.'],
-  lastSessionSpec,
+  activeSpecs = [],
+  quickTasks = [],
+  recentlyClosedSpecs = [],
+  recentlyClosedLines = [],
   lastCompletedSpec,
   lastGreenCommands = ['- `pnpm docs:audit`'],
   dogfoodEvidence = ['- Fixture dogfood evidence.'],
   napkinEvidence = ['- Logged in [`docs/napkin/napkin.md`](./docs/napkin/napkin.md).'],
-}: FixtureProgress) => {
-  const lines = [
+}: FixtureProgress) =>
+  [
     '# Progress',
     '',
-    '## Current Spec',
-    '',
-    `- \`${currentSpec}\``,
-    '',
-    '## Current Stage',
-    '',
-    `- ${currentStage}`,
-    '',
-    '## Status',
-    '',
-    ...statusLines,
-    '',
-    '## Blockers',
-    '',
-    ...blockers,
-    '',
-    '## Next Step',
-    '',
-    ...nextStep,
-    '',
-  ];
-
-  if (lastSessionSpec) {
-    lines.push('## Last Session Spec', '', `- \`${lastSessionSpec}\``, '');
-  }
-
-  lines.push(
+    ...activeSpecsSection(activeSpecs),
+    ...quickTasksSection(quickTasks),
+    ...recentlyClosedSection({ specIds: recentlyClosedSpecs, lines: recentlyClosedLines }),
     '## Last Completed Spec',
     '',
     `- \`${lastCompletedSpec}\``,
@@ -154,11 +203,9 @@ const progressDoc = ({
     '## Napkin Evidence',
     '',
     ...napkinEvidence,
-    ''
-  );
+    '',
+  ].join('\n');
 
-  return lines.join('\n');
-};
 const createFixtureRepo = (specs: FixtureSpec[], progress: FixtureProgress) => {
   const repoRoot = mkdtempSync(path.join(tmpdir(), 'gifta-exec-audit-'));
   tempDirs.push(repoRoot);
@@ -176,6 +223,7 @@ const createFixtureRepo = (specs: FixtureSpec[], progress: FixtureProgress) => {
 
   return repoRoot;
 };
+
 const collectErrors = (repoRoot: string) =>
   collectExecutionArtifactErrors({
     repoRoot,
@@ -192,248 +240,241 @@ afterEach(() => {
 });
 
 describe('collectExecutionArtifactErrors - valid ledgers', () => {
-  it('passes for a done last session with an active successor placeholder', () => {
+  it('passes for multiple active specs and a legacy newest done closure', () => {
     const specs: FixtureSpec[] = [
       {
-        id: '02_completed-session',
-        title: 'Completed session',
+        id: '39_finished-task',
+        title: 'Finished task',
         status: 'Done',
         exitCriteriaState: 'satisfied',
         successorSlot: 'none',
         notes: 'Closed cleanly.',
       },
       {
-        id: '03_session-placeholder',
-        title: 'Placeholder',
+        id: '40_parallel-workflow-refactor',
+        title: 'Parallel workflow refactor',
         status: 'Active',
         exitCriteriaState: 'pending',
         successorSlot: 'none',
-        notes: 'Active placeholder.',
+        notes: 'Active parallel workflow refactor.',
+      },
+      {
+        id: '41_docs-audit-follow-up',
+        title: 'Docs audit follow-up',
+        status: 'Active',
+        exitCriteriaState: 'pending',
+        successorSlot: 'none',
+        notes: 'Active docs-audit follow-up.',
       },
     ];
 
     const repoRoot = createFixtureRepo(specs, {
-      currentSpec: '03_session-placeholder',
-      statusLines: [
-        '- Closed [`spec/02_completed-session.md`](./spec/02_completed-session.md) as done and activated [`spec/03_session-placeholder.md`](./spec/03_session-placeholder.md).',
+      activeSpecs: [
+        { spec: '40_parallel-workflow-refactor', title: 'Parallel workflow refactor' },
+        { spec: '41_docs-audit-follow-up', title: 'Docs audit follow-up' },
       ],
-      lastSessionSpec: '02_completed-session',
-      lastCompletedSpec: '02_completed-session',
+      recentlyClosedSpecs: ['39_finished-task'],
+      lastCompletedSpec: '39_finished-task',
     });
 
     expect(collectErrors(repoRoot)).toEqual([]);
   });
 
-  it('passes for a superseded last session with an older completed proof owner', () => {
+  it('passes for a fast-path quick task with no active numbered spec', () => {
     const specs: FixtureSpec[] = [
       {
-        id: '02_completed-session',
-        title: 'Completed session',
+        id: '40_finished-task',
+        title: 'Finished task',
         status: 'Done',
         exitCriteriaState: 'satisfied',
         successorSlot: 'none',
-        notes: 'Last fully completed session.',
-      },
-      {
-        id: '03_gate-a-stop',
-        title: 'Superseded session',
-        status: 'Superseded',
-        exitCriteriaState: 'not-satisfied',
-        successorSlot: '04',
-        notes: 'Stopped at Gate A and rolled into slot 04.',
-      },
-      {
-        id: '04_session-placeholder',
-        title: 'Placeholder',
-        status: 'Active',
-        exitCriteriaState: 'pending',
-        successorSlot: 'none',
-        notes: 'Active placeholder.',
+        notes: 'Closed cleanly.',
+        closedAt: '2026-03-18T10:00:00Z',
       },
     ];
 
     const repoRoot = createFixtureRepo(specs, {
-      currentSpec: '04_session-placeholder',
-      statusLines: [
-        '- Closed [`spec/03_gate-a-stop.md`](./spec/03_gate-a-stop.md) as superseded and activated [`spec/04_session-placeholder.md`](./spec/04_session-placeholder.md).',
+      quickTasks: [
+        {
+          taskId: 'Q-2026-03-18-1',
+          scope: 'Tighten a single copy string',
+          verification: '`pnpm lint`',
+        },
       ],
-      lastSessionSpec: '03_gate-a-stop',
-      lastCompletedSpec: '02_completed-session',
+      recentlyClosedSpecs: ['40_finished-task'],
+      lastCompletedSpec: '40_finished-task',
     });
 
     expect(collectErrors(repoRoot)).toEqual([]);
   });
 
-  it('fails when a done spec has non-satisfied exit criteria', () => {
+  it('passes when a superseded bullet mentions its active successor', () => {
     const specs: FixtureSpec[] = [
       {
-        id: '02_bad-done-session',
-        title: 'Bad done session',
+        id: '40_latest-done',
+        title: 'Latest done',
         status: 'Done',
-        exitCriteriaState: 'not-satisfied',
+        exitCriteriaState: 'satisfied',
         successorSlot: 'none',
-        notes: 'Incorrect terminal metadata.',
+        notes: 'Latest completed proof owner.',
+        closedAt: '2026-03-18T09:00:00Z',
       },
       {
-        id: '03_session-placeholder',
-        title: 'Placeholder',
+        id: '41_gate-a-stop',
+        title: 'Gate A stop',
+        status: 'Superseded',
+        exitCriteriaState: 'not-satisfied',
+        successorSlot: '42',
+        notes: 'Rolled forward into slot 42.',
+        closedAt: '2026-03-18T10:00:00Z',
+      },
+      {
+        id: '42_follow-on',
+        title: 'Follow-on work',
         status: 'Active',
         exitCriteriaState: 'pending',
         successorSlot: 'none',
-        notes: 'Active placeholder.',
+        notes: 'Active follow-on work.',
       },
     ];
 
     const repoRoot = createFixtureRepo(specs, {
-      currentSpec: '03_session-placeholder',
-      lastSessionSpec: '02_bad-done-session',
-      lastCompletedSpec: '02_bad-done-session',
+      activeSpecs: [{ spec: '42_follow-on', title: 'Follow-on work' }],
+      recentlyClosedLines: ['- `41_gate-a-stop` — Superseded by `42_follow-on`'],
+      lastCompletedSpec: '40_latest-done',
     });
 
-    expect(collectErrors(repoRoot)).toContain(
-      'spec/02_bad-done-session.md: Done specs must use `Exit Criteria State: satisfied`.'
-    );
+    expect(collectErrors(repoRoot)).toEqual([]);
   });
 });
 
 describe('collectExecutionArtifactErrors - invalid ledgers', () => {
-  it('fails when a superseded spec has no successor slot', () => {
+  it('fails when an active overview spec is missing from Active Full Specs', () => {
     const specs: FixtureSpec[] = [
       {
-        id: '02_completed-session',
-        title: 'Completed session',
+        id: '39_finished-task',
+        title: 'Finished task',
         status: 'Done',
         exitCriteriaState: 'satisfied',
         successorSlot: 'none',
-        notes: 'Completed cleanly.',
+        notes: 'Closed cleanly.',
       },
       {
-        id: '03_bad-superseded',
-        title: 'Superseded session',
+        id: '40_parallel-workflow-refactor',
+        title: 'Parallel workflow refactor',
+        status: 'Active',
+        exitCriteriaState: 'pending',
+        successorSlot: 'none',
+        notes: 'Still active.',
+      },
+    ];
+
+    const repoRoot = createFixtureRepo(specs, {
+      activeSpecs: [],
+      recentlyClosedSpecs: ['39_finished-task'],
+      lastCompletedSpec: '39_finished-task',
+    });
+
+    expect(collectErrors(repoRoot)).toContain(
+      'progress.md: overview Active spec 40_parallel-workflow-refactor must appear in `## Active Full Specs`.'
+    );
+  });
+
+  it('fails when a terminal spec in slot 40+ omits Closed At', () => {
+    const specs: FixtureSpec[] = [
+      {
+        id: '40_finished-task',
+        title: 'Finished task',
+        status: 'Done',
+        exitCriteriaState: 'satisfied',
+        successorSlot: 'none',
+        notes: 'Closed cleanly.',
+      },
+    ];
+
+    const repoRoot = createFixtureRepo(specs, {
+      recentlyClosedSpecs: ['40_finished-task'],
+      lastCompletedSpec: '40_finished-task',
+    });
+
+    expect(collectErrors(repoRoot)).toContain(
+      'spec/00_overview.md: terminal spec 40_finished-task must include `Closed At` once slot 40 and above adopted the new closure-order contract.'
+    );
+  });
+
+  it('fails when the newest timestamped terminal spec is omitted from Recently Closed Specs', () => {
+    const specs: FixtureSpec[] = [
+      {
+        id: '40_older-done',
+        title: 'Older done',
+        status: 'Done',
+        exitCriteriaState: 'satisfied',
+        successorSlot: 'none',
+        notes: 'Older proof owner.',
+        closedAt: '2026-03-18T09:00:00Z',
+      },
+      {
+        id: '41_newest-done',
+        title: 'Newest done',
+        status: 'Done',
+        exitCriteriaState: 'satisfied',
+        successorSlot: 'none',
+        notes: 'Newest done spec.',
+        closedAt: '2026-03-18T10:00:00Z',
+      },
+    ];
+
+    const repoRoot = createFixtureRepo(specs, {
+      recentlyClosedSpecs: ['40_older-done'],
+      lastCompletedSpec: '40_older-done',
+    });
+
+    expect(collectErrors(repoRoot)).toContain(
+      'progress.md: newest recently closed entry must mirror the newest timestamped terminal spec (41_newest-done).'
+    );
+  });
+
+  it('fails when Last Completed Spec misses the latest timestamped Done proof owner', () => {
+    const specs: FixtureSpec[] = [
+      {
+        id: '40_latest-done',
+        title: 'Latest done',
+        status: 'Done',
+        exitCriteriaState: 'satisfied',
+        successorSlot: 'none',
+        notes: 'Latest completed proof owner.',
+        closedAt: '2026-03-18T09:00:00Z',
+      },
+      {
+        id: '41_gate-a-stop',
+        title: 'Gate A stop',
         status: 'Superseded',
         exitCriteriaState: 'not-satisfied',
-        successorSlot: 'none',
-        notes: 'Missing successor slot.',
+        successorSlot: '42',
+        notes: 'Rolled forward into slot 42.',
+        closedAt: '2026-03-18T10:00:00Z',
       },
       {
-        id: '04_session-placeholder',
-        title: 'Placeholder',
+        id: '42_follow-on',
+        title: 'Follow-on work',
         status: 'Active',
         exitCriteriaState: 'pending',
         successorSlot: 'none',
-        notes: 'Active placeholder.',
+        notes: 'Still active.',
       },
     ];
 
     const repoRoot = createFixtureRepo(specs, {
-      currentSpec: '04_session-placeholder',
-      lastSessionSpec: '03_bad-superseded',
-      lastCompletedSpec: '02_completed-session',
+      activeSpecs: [{ spec: '42_follow-on', title: 'Follow-on work' }],
+      recentlyClosedSpecs: ['41_gate-a-stop'],
+      lastCompletedSpec: '39_older-done',
     });
 
     expect(collectErrors(repoRoot)).toContain(
-      'spec/03_bad-superseded.md: Superseded specs must point to a real successor slot.'
+      'progress.md: last completed spec 39_older-done does not exist in spec/.'
     );
-  });
-
-  it('fails when a placeholder is active without Last Session Spec', () => {
-    const specs: FixtureSpec[] = [
-      {
-        id: '02_completed-session',
-        title: 'Completed session',
-        status: 'Done',
-        exitCriteriaState: 'satisfied',
-        successorSlot: 'none',
-        notes: 'Completed cleanly.',
-      },
-      {
-        id: '03_session-placeholder',
-        title: 'Placeholder',
-        status: 'Active',
-        exitCriteriaState: 'pending',
-        successorSlot: 'none',
-        notes: 'Active placeholder.',
-      },
-    ];
-
-    const repoRoot = createFixtureRepo(specs, {
-      currentSpec: '03_session-placeholder',
-      lastCompletedSpec: '02_completed-session',
-    });
-
     expect(collectErrors(repoRoot)).toContain(
-      'progress.md: missing required heading -> ## Last Session Spec'
-    );
-  });
-
-  it('fails when Last Completed Spec points to a superseded session', () => {
-    const specs: FixtureSpec[] = [
-      {
-        id: '02_completed-session',
-        title: 'Completed session',
-        status: 'Done',
-        exitCriteriaState: 'satisfied',
-        successorSlot: 'none',
-        notes: 'Completed cleanly.',
-      },
-      {
-        id: '03_gate-a-stop',
-        title: 'Superseded session',
-        status: 'Superseded',
-        exitCriteriaState: 'not-satisfied',
-        successorSlot: '04',
-        notes: 'Superseded at Gate A.',
-      },
-      {
-        id: '04_session-placeholder',
-        title: 'Placeholder',
-        status: 'Active',
-        exitCriteriaState: 'pending',
-        successorSlot: 'none',
-        notes: 'Active placeholder.',
-      },
-    ];
-
-    const repoRoot = createFixtureRepo(specs, {
-      currentSpec: '04_session-placeholder',
-      lastSessionSpec: '03_gate-a-stop',
-      lastCompletedSpec: '03_gate-a-stop',
-    });
-
-    expect(collectErrors(repoRoot)).toContain(
-      'progress.md: superseded `## Last Session Spec` (03_gate-a-stop) cannot also be `## Last Completed Spec`.'
-    );
-  });
-
-  it('fails when Napkin Evidence is vague', () => {
-    const specs: FixtureSpec[] = [
-      {
-        id: '02_completed-session',
-        title: 'Completed session',
-        status: 'Done',
-        exitCriteriaState: 'satisfied',
-        successorSlot: 'none',
-        notes: 'Completed cleanly.',
-      },
-      {
-        id: '03_session-placeholder',
-        title: 'Placeholder',
-        status: 'Active',
-        exitCriteriaState: 'pending',
-        successorSlot: 'none',
-        notes: 'Active placeholder.',
-      },
-    ];
-
-    const repoRoot = createFixtureRepo(specs, {
-      currentSpec: '03_session-placeholder',
-      lastSessionSpec: '02_completed-session',
-      lastCompletedSpec: '02_completed-session',
-      napkinEvidence: ['- Reviewed the napkin.'],
-    });
-
-    expect(collectErrors(repoRoot)).toContain(
-      'progress.md: `## Napkin Evidence` must link `docs/napkin/napkin.md` or say `No durable napkin update.`.'
+      'progress.md: `## Last Completed Spec` must match the latest timestamped Done spec (40_latest-done).'
     );
   });
 });

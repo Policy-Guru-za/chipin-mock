@@ -4,31 +4,32 @@ Owner: Ryan Laubscher (@laup30, Ryan@redcliffebay.com)
 
 ## Objective
 
-Ship and maintain Gifta safely against current code and current Tier 1 docs.
+Ship and maintain Gifta safely against current code and the current authoritative docs, while keeping task startup lean.
 
-Use one bounded spec stage at a time for every work session. Keep runtime, docs, generated artifacts, and verification evidence in sync.
+AGENTS is the canonical day-to-day workflow contract. Other workflow docs must point back here instead of redefining the same rules.
 
-## Source of Truth Order
+## Working Truth
 
-1. [`docs/DOCUMENT_CONTROL_MATRIX.md`](./docs/DOCUMENT_CONTROL_MATRIX.md)
-2. Active numbered spec in [`spec/`](./spec/) for the current session
-3. [`progress.md`](./progress.md)
-4. [`docs/Platform-Spec-Docs/CANONICAL.md`](./docs/Platform-Spec-Docs/CANONICAL.md)
-5. Current workspace code in `src/`, `drizzle/migrations/`, `package.json`, and `public/v1/openapi.json`
-6. [`docs/forensic-audit/WORKSPACE_BASELINE_2026-03-12.md`](./docs/forensic-audit/WORKSPACE_BASELINE_2026-03-12.md) and [`docs/forensic-audit/REPORT.md`](./docs/forensic-audit/REPORT.md)
+Use these rules when deciding what to read first and what to trust.
 
-If a doc is marked non-authoritative in the control matrix, do not treat it as current runtime or agent policy.
+### Day-to-day startup order
 
-If docs and code disagree, trust current code and update the docs or clearly label the stale doc as historical/reference.
+1. [`.agents/skills/napkin/SKILL.md`](./.agents/skills/napkin/SKILL.md)
+2. [`docs/napkin/napkin.md`](./docs/napkin/napkin.md)
+3. this file
+4. [`progress.md`](./progress.md)
+5. if you are working on an existing full-path task, read that numbered spec
+6. if document authority or runtime truth is unclear, then read [`docs/DOCUMENT_CONTROL_MATRIX.md`](./docs/DOCUMENT_CONTROL_MATRIX.md), [`docs/Platform-Spec-Docs/CANONICAL.md`](./docs/Platform-Spec-Docs/CANONICAL.md), and the relevant subsystem docs
 
-## First-Read Workflow
+Do not default to broad documentation sweeps before every small task.
 
-1. Read [`.agents/skills/napkin/SKILL.md`](./.agents/skills/napkin/SKILL.md)
-2. Read [`docs/napkin/napkin.md`](./docs/napkin/napkin.md)
-3. Read this file
-4. Read [`workflow-orchestration.md`](./workflow-orchestration.md)
-5. Read the control matrix before trusting any other repo doc
-6. For every work session, read [`progress.md`](./progress.md), [`spec/00_overview.md`](./spec/00_overview.md), and the active numbered spec before coding
+### Document authority
+
+When docs disagree:
+1. [`docs/DOCUMENT_CONTROL_MATRIX.md`](./docs/DOCUMENT_CONTROL_MATRIX.md) decides which docs are authoritative
+2. [`docs/Platform-Spec-Docs/CANONICAL.md`](./docs/Platform-Spec-Docs/CANONICAL.md) resolves runtime/product conflicts
+3. current workspace code in `src/`, `drizzle/migrations/`, `package.json`, and `public/v1/openapi.json` is the implementation truth
+4. historical plans, prompts, and evidence remain useful context only when the control matrix says so
 
 ## Current Stack
 
@@ -40,129 +41,101 @@ If docs and code disagree, trust current code and update the docs or clearly lab
 - Storage: Vercel Blob
 - Cache / rate limits: Vercel KV with local fallback paths
 - Payments: PayFast, Ozow, SnapScan
-- Payouts: Karri Card, bank, optional charity ledger rows
+- Payouts: Takealot voucher placeholder, Karri Card, bank, optional historical charity ledger rows
 - Observability: Sentry, optional OpenTelemetry / Axiom
 
 ## Repository Rules
 
 - Package manager: `pnpm` only
-- One active numbered spec at a time unless the user says otherwise
 - Keep changes small and reviewable
 - Never discard user changes in the dirty tree
-- Update docs in the same change set when behavior, agent guidance, or generated contracts change
-- Prefer current runtime truth over legacy plan prose
-- Use [`proxy.ts`](./proxy.ts) as the current root request hook reference; do not reintroduce legacy root-middleware guidance unless that file exists again
 - Never add, alter, or delete files outside the project root
 - Never automatically commit files to git
+- Prefer current runtime truth over stale prose
+- Use [`proxy.ts`](./proxy.ts) as the current root request hook reference; do not reintroduce legacy root-middleware guidance unless that file exists again
+- Update Tier 1 docs in the same slice when behavior, agent policy, or generated contracts change
 
-## Agent Operations
+## Execution Lanes
 
-- Repo-scoped Codex safety rail lives in [`.codex/config.toml`](./.codex/config.toml); it keeps file mutation inside this repo and leaves internet access enabled.
-- Canonical review contract lives in [`docs/agent-playbooks/code_review.md`](./docs/agent-playbooks/code_review.md).
-- Repo-local reusable skills live under [`.agents/skills/`](./.agents/skills/). Use them when the task matches their scope before inventing one-off workflows.
+Gifta now supports two lanes.
 
-## Operating Mode
+### Fast Path
 
-Workflow: Discovery -> Spec -> Planning -> Build -> Verify -> Dogfood -> Handoff.
+Use the fast path for small, low-risk, localized work.
+
+Typical fit:
+- small copy/style fix
+- narrow refactor in a few files
+- no auth, permissioning, payments, payouts, schema, migration, API-contract, or docs-governance changes
+- expected to stay under about 30 minutes
+
+Fast path rules:
+- no numbered spec required at start
+- log the work in [`progress.md`](./progress.md) under `## Quick Tasks`
+- define the planned verification there
+- if scope expands or risk increases, promote the work immediately to the next numbered full-path spec
+
+### Full Path
+
+Use the full path for:
+- multi-file work
+- behavior changes
+- auth, security, payment, payout, schema, migration, API, or documentation-system changes
+- anything that needs explicit stages, dogfood, or handoff proof
+
+Full path rules:
+- multiple numbered specs may be Active at the same time
+- do not wait for another Active spec to close before starting a new one
+- create the next numbered spec on demand by using the next available two-digit slot in `spec/`
+- add that spec to the `## Active Full Specs` table in [`progress.md`](./progress.md)
+- add or update its row in [`spec/00_overview.md`](./spec/00_overview.md); Active rows keep `Closed At` empty (`—`)
+
+## Operating Loop
 
 ### 0) The Napkin
 
-- Start with [`.agents/skills/napkin/SKILL.md`](./.agents/skills/napkin/SKILL.md).
-- Use [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) for mistakes, corrections, and patterns.
-- Before handoff, update [`progress.md`](./progress.md) `## Napkin Evidence` with either a link to the napkin update or explicit `No durable napkin update.`.
-- Napkin is memory only, not progress tracking.
+- Start with [`.agents/skills/napkin/SKILL.md`](./.agents/skills/napkin/SKILL.md)
+- Use [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) as working memory for mistakes, corrections, and patterns
+- Before handoff, update [`progress.md`](./progress.md) `## Napkin Evidence` for the most recently closed full-path spec or the most recently completed quick task outcome
+- Napkin is memory only, not progress tracking
 
 ### 1) Discovery
 
-- Read [`.agents/skills/napkin/SKILL.md`](./.agents/skills/napkin/SKILL.md) and [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) before any other repo work.
-- Confirm the relevant Tier 1 doc set exists and is internally consistent.
-- Confirm current repo state; do not assume a clean or empty repo.
-- Map the task to the active spec, current runtime code, and relevant subsystem docs.
+- Read the startup docs in the order above
+- Confirm current repo state; do not assume a clean or empty repo
+- Map the task to the right lane: fast path or full path
+- Read only the subsystem docs needed for the task
 
-### 2) Spec Setup
+### 2) Session Setup
 
-- For every work session, confirm the active numbered spec first.
-- If the active spec is `spec/NN_session-placeholder.md`, rename that same numbered file in place to `spec/NN_<topic>.md` before substantive work starts.
-- Update [`spec/00_overview.md`](./spec/00_overview.md) and [`progress.md`](./progress.md) before coding.
-- Keep one active spec at a time unless the user explicitly allows parallel work.
+#### Fast path
+- add or update a row in `## Quick Tasks` inside [`progress.md`](./progress.md)
+- start work once scope, verification, and next step are recorded
+
+#### Full path
+- inspect the current `## Active Full Specs` table in [`progress.md`](./progress.md)
+- create the next numbered spec in `spec/` using the next available slot
+- add or update the matching row in [`spec/00_overview.md`](./spec/00_overview.md)
+- add or update the spec row in `## Active Full Specs` inside [`progress.md`](./progress.md)
+- then start implementation
+
+No placeholder spec is required.
 
 ### 3) Planning
 
-- Lock assumptions, risks, dependencies, stage plan, test gate, and exit criteria in the active spec.
-- Restate what will change and what will not change before expanding scope.
+- full-path specs must lock objective, scope, dependencies, stage plan, test gate, and exit criteria
+- keep assumptions explicit; do not hide them in thread history
+- fast-path work can keep this lighter, but scope and verification still must be explicit in [`progress.md`](./progress.md)
 
 ### 4) Build
 
-- Implement one bounded stage at a time.
-- Keep the repo runnable after each stage.
-- Update [`progress.md`](./progress.md) as stage status, blockers, or next steps change.
+- implement one bounded slice at a time
+- keep the repo runnable after each slice
+- keep [`progress.md`](./progress.md) current for active specs and quick tasks
 
 ### 5) Verify
 
-- Run the smallest relevant gate after each stage.
-- No stage is complete while a required gate is red.
-- Docs/process changes still need path, link, command, and drift verification.
-
-### 6) Dogfood
-
-- Exercise the changed flow before asking for review or claiming completion.
-- For docs/process work, dogfood by using the new execution artifacts or playbooks end to end and proving the workflow is coherent.
-- If external systems block live verification, use the safest fallback and state the gap explicitly.
-
-### 7) Handoff
-
-- Ensure docs reflect reality.
-- Handoff summary must include the closed spec id, whether it finished as `Done` or `Superseded`, the napkin outcome, commands run, dogfood result, blockers, remaining risk, and the next numbered placeholder.
-
-## Execution Artifacts
-
-- [`spec/00_overview.md`](./spec/00_overview.md): ordered spec registry
-- [`spec/SPEC_TEMPLATE.md`](./spec/SPEC_TEMPLATE.md): required spec structure
-- `spec/NN_<topic>.md`: execution spec for the current session
-- `spec/NN_session-placeholder.md`: standing active placeholder between sessions
-- [`progress.md`](./progress.md): live execution ledger for the active spec plus terminal state, napkin outcome, and proof for the most recently closed / completed sessions
-- [`docs/napkin/napkin.md`](./docs/napkin/napkin.md): working memory only
-
-### Every Work Session
-
-Use numbered specs plus [`progress.md`](./progress.md) for every session.
-
-If the active spec is a placeholder, rename it in place before substantive work and keep the same number through handoff.
-
-When handoff activates the next `NN_session-placeholder`, keep `Current Spec` pointed at that placeholder, set `Last Session Spec` to the most recently closed session, record that session's napkin outcome in `## Napkin Evidence`, and only move proof into `Last Completed Spec`, `Last Green Commands`, and `Dogfood Evidence` when that closed session is actually `Done`.
-
-Use the fullest stage, gate, and dogfood discipline when the session touches:
-
-- new features
-- behavior changes
-- auth, permissioning, or security changes
-- payment, payout, webhook, or ledger changes
-- schema, migration, or API-contract changes
-- major UX or multi-file UI changes
-- agent-policy or documentation-system changes
-
-## Build Loop
-
-1. Confirm the active numbered spec or rename the active placeholder in place.
-2. Update [`spec/00_overview.md`](./spec/00_overview.md).
-3. Update [`progress.md`](./progress.md).
-4. Implement one bounded stage.
-5. Run the relevant gate.
-6. Debug until green.
-7. Dogfood the changed flow.
-8. Record current-session status in [`progress.md`](./progress.md).
-9. Mark the finished session spec `Done` or `Superseded`, create the next numbered placeholder, and update [`progress.md`](./progress.md) so `Current Spec` points at that active placeholder while `Last Session Spec` points at the closed session, `Napkin Evidence` captures the session's napkin outcome, and `Last Completed Spec`, `Last Green Commands`, and `Dogfood Evidence` still point at the latest `Done` session.
-
-Rules:
-
-- No stage is complete while a required gate is red.
-- Do not claim “done” while `Last Green Commands` or `Dogfood Evidence` are stale.
-- No session closes without the next numbered placeholder already active in [`progress.md`](./progress.md) and [`spec/00_overview.md`](./spec/00_overview.md), without `Last Session Spec` attributing the most recently closed session, without `Napkin Evidence` capturing that session's napkin outcome, and without `Last Completed Spec` attributing proof to the latest `Done` session.
-- A real blocker must include the failing command, exact error, current hypothesis, and the missing dependency or external input.
-
-## Verification Gate
-
-Run the smallest relevant gate that proves the changed behavior.
+Run the smallest gate that proves the work.
 
 - Docs / process only: `pnpm docs:audit`
 - Agent-doc or control-matrix changes: `pnpm docs:audit -- --sync`
@@ -179,12 +152,40 @@ pnpm test
 
 If a required gate fails, keep iterating until it passes or stop with a real blocker summary.
 
+### 6) Dogfood
+
+- exercise the changed flow before claiming completion
+- docs/process work still needs dogfooding: use the new workflow end to end and confirm it is coherent
+- if external systems block live verification, use the safest fallback and state the gap explicitly
+
+### 7) Handoff
+
+For full-path specs:
+- mark the spec `Done` or `Superseded`
+- update its [`spec/00_overview.md`](./spec/00_overview.md) row with the terminal status and `Closed At` timestamp
+- move it into `## Recently Closed Specs` in [`progress.md`](./progress.md)
+- if it is `Done`, update `## Last Completed Spec`, `## Last Green Commands`, and `## Dogfood Evidence`
+- update `## Napkin Evidence`
+- keep any still-active specs active; do not create a placeholder
+
+For quick tasks:
+- mark the row completed in `## Quick Tasks`
+- if the task produced a durable learning, update the napkin and `## Napkin Evidence`
+- if the quick task grew into larger work, promote it to a numbered full-path spec instead of stretching the fast path
+
+## Execution Artifacts
+
+- [`progress.md`](./progress.md): live dashboard for active full-path specs, quick tasks, recently closed specs, and latest completed proof
+- [`spec/00_overview.md`](./spec/00_overview.md): lightweight registry of numbered specs, statuses, and closure-order metadata for terminal work
+- [`spec/SPEC_TEMPLATE.md`](./spec/SPEC_TEMPLATE.md): required full-path spec shape
+- `spec/NN_<topic>.md`: numbered full-path execution spec
+- [`docs/napkin/napkin.md`](./docs/napkin/napkin.md): working memory only
+
 ## Approval Gates
 
 ### Gate A — First Green Bounded Slice
 
 Stop and request approval after the first green bounded slice on any of these surfaces:
-
 - auth or role/permission model
 - admin surface or internal jobs
 - public API or webhook contract
@@ -192,19 +193,16 @@ Stop and request approval after the first green bounded slice on any of these su
 - schema or migration path
 - major UX or route flow changes
 
-If a session stops at Gate A before its exit criteria are satisfied and the work is later continued elsewhere, close that session as `Superseded`, not `Done`.
+If a session stops at Gate A before its exit criteria are satisfied and the work is later continued elsewhere, close that spec as `Superseded`, not `Done`.
 
 ### Gate B — Before Trust-Critical Expansion
 
 Stop and request approval before broadening or shipping changes that affect:
-
 - permissioning or admin reach
 - money movement or payout execution
 - retention, deletion, or sensitive-data handling
 - migrations or irreversible data changes
 - public API, webhook, or partner-facing contract changes
-
-If a session stops at Gate B before its exit criteria are satisfied and a later session takes over, close the earlier session as `Superseded`.
 
 ## Runtime Notes
 
@@ -232,7 +230,8 @@ pnpm drizzle:push
 
 ## Documentation Hygiene
 
-- Tier 1 docs can change implementation or agent behavior; keep them current.
-- Tier 2 docs may be current supporting references or explicitly non-authoritative historical material; the control matrix decides which.
-- If you discover drift you are not fixing in code, update the relevant Tier 1 doc and add a follow-up item to [`BACKLOG.md`](./BACKLOG.md).
-- Active session state lives in [`progress.md`](./progress.md) and [`spec/`](./spec/), not in the backlog or napkin.
+- Keep AGENTS lean and authoritative for daily workflow
+- Use [`docs/DOCUMENT_CONTROL_MATRIX.md`](./docs/DOCUMENT_CONTROL_MATRIX.md) when document authority is unclear or when working on docs governance
+- Keep duplicate workflow docs as pointers or task-specific companions, not parallel process authorities
+- If you discover drift you are not fixing in code, update the relevant Tier 1 doc and add a follow-up item to [`BACKLOG.md`](./BACKLOG.md)
+- Active work state lives in [`progress.md`](./progress.md) and numbered specs under `spec/`, not in ad hoc trackers

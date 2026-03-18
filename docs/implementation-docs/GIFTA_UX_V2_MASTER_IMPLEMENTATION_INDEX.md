@@ -1,33 +1,22 @@
+> **Document Status:** Reference only. Reviewed March 12, 2026.
+> Useful context only. Do not use this file as the source of truth for current runtime behavior or agent policy.
+> Canonical replacement: `AGENTS.md`.
 # Gifta UX v2 Master Implementation Index
 
-> **Status:** Current operational guide  
-> **Last reviewed:** March 12, 2026
+## Current Role
 
-## Read Order
+This file is preserved as a legacy index for earlier UX-v2 planning material.
 
-1. [`docs/DOCUMENT_CONTROL_MATRIX.md`](../DOCUMENT_CONTROL_MATRIX.md)
-2. [`docs/Platform-Spec-Docs/CANONICAL.md`](../Platform-Spec-Docs/CANONICAL.md)
-3. [`docs/forensic-audit/WORKSPACE_BASELINE_2026-03-12.md`](../forensic-audit/WORKSPACE_BASELINE_2026-03-12.md)
-4. [`GIFTA_UX_V2_AGENT_EXECUTION_CONTRACT.md`](./GIFTA_UX_V2_AGENT_EXECUTION_CONTRACT.md)
-5. [`GIFTA_UX_V2_DECISION_REGISTER.md`](./GIFTA_UX_V2_DECISION_REGISTER.md)
+## Day-to-Day Workflow Now Lives In
 
-## Current Rule
+1. [`AGENTS.md`](../../AGENTS.md)
+2. [`progress.md`](../../progress.md)
+3. [`spec/00_overview.md`](../../spec/00_overview.md)
+4. [`docs/DOCUMENT_CONTROL_MATRIX.md`](../DOCUMENT_CONTROL_MATRIX.md) when document authority is unclear
+5. [`docs/Platform-Spec-Docs/CANONICAL.md`](../Platform-Spec-Docs/CANONICAL.md) for runtime/product truth
 
-Treat older execution plans, prompts, and evidence packs in this directory as non-authoritative unless the control matrix explicitly marks them current.
+## Use This File Only For
 
-## Current Operational Docs
-
-- [`GIFTA_UX_V2_AGENT_EXECUTION_CONTRACT.md`](./GIFTA_UX_V2_AGENT_EXECUTION_CONTRACT.md)
-- [`GIFTA_UX_V2_DECISION_REGISTER.md`](./GIFTA_UX_V2_DECISION_REGISTER.md)
-- [`docs/Platform-Spec-Docs/CANONICAL.md`](../Platform-Spec-Docs/CANONICAL.md)
-- generated OpenAPI in [`public/v1/openapi.json`](../../public/v1/openapi.json)
-
-## Required Gates
-
-```bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm openapi:generate
-pnpm docs:audit
-```
+- provenance on old UX-v2 plans
+- locating preserved reference material in `docs/implementation-docs/`
+- tracing historical planning context when explicitly needed

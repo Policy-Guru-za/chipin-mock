@@ -1,7 +1,7 @@
 # Code Review Playbook
 
 > **Status:** Current operational guide  
-> **Last reviewed:** March 12, 2026
+> **Last reviewed:** March 18, 2026
 
 ## Use This For
 
@@ -9,29 +9,33 @@ Use this file when the user asks for a review, audit, assessment, or critique of
 
 ## Mandatory Read Order
 
-Before a substantial review, read in this order:
+Before a substantial review, follow the AGENTS startup contract first, then extend it with the review-specific docs below.
 
-1. [`../../AGENTS.md`](../../AGENTS.md)
-2. [`../../progress.md`](../../progress.md)
-3. [`../../spec/00_overview.md`](../../spec/00_overview.md)
-4. resolve the review target spec from [`../../progress.md`](../../progress.md): use `Current Spec` unless it is `NN_session-placeholder`, then use `Last Session Spec`
+Read in this order:
+
+1. [`../../.agents/skills/napkin/SKILL.md`](../../.agents/skills/napkin/SKILL.md)
+2. [`../../docs/napkin/napkin.md`](../../docs/napkin/napkin.md)
+3. [`../../AGENTS.md`](../../AGENTS.md)
+4. [`../../progress.md`](../../progress.md)
 5. [`../DOCUMENT_CONTROL_MATRIX.md`](../DOCUMENT_CONTROL_MATRIX.md)
 6. [`../Platform-Spec-Docs/CANONICAL.md`](../Platform-Spec-Docs/CANONICAL.md)
 7. [`../forensic-audit/REPORT.md`](../forensic-audit/REPORT.md)
 8. [`../../TESTING.md`](../../TESTING.md)
 9. this file
 
-Then read only the current subsystem docs that match the review scope. Do not default to historical plans, evidence packs, or reference-only vendor docs unless they are needed for provenance.
+Then resolve the review target in this order:
+1. explicit user-specified spec or files
+2. matching row in `## Active Full Specs` inside [`../../progress.md`](../../progress.md)
+3. newest item in `## Recently Closed Specs`
+4. [`../../progress.md`](../../progress.md) `## Last Completed Spec`
 
-If the current session lacks an active spec or current progress ledger, report that as operational drift.
-
-If `Current Spec` is `NN_session-placeholder`, treat it as a valid successor placeholder only when `Last Session Spec` cleanly owns the most recent closed session and `Last Completed Spec` still owns the latest `Done` proof. Report drift when placeholder rollover lacks valid terminal-spec linkage.
+Read only the current subsystem docs that match the review scope. Do not default to historical plans, evidence packs, or reference-only vendor docs unless they are needed for provenance.
 
 ## Review Defaults
 
 - Findings first. No summary before the findings.
 - Trust current code and generated artifacts over stale prose.
-- Prioritize user-facing breakage, security risk, permissioning mistakes, data correctness, contract drift, and execution-process gaps over style.
+- Prioritize user-facing breakage, security risk, permissioning mistakes, data correctness, contract drift, and workflow-system gaps over style.
 - Use file references for every material finding.
 - If no findings are discovered, say so explicitly and note residual risks or test gaps.
 
@@ -44,16 +48,14 @@ If `Current Spec` is `NN_session-placeholder`, treat it as a valid successor pla
 
 ## Required Checklist
 
-Review the relevant parts of this checklist for the scope. Do not claim a subsystem is healthy unless you inspected it.
+Review the relevant parts of this checklist for the scope.
 
 ### Execution Hygiene
-
-- active numbered spec exists for the current session
-- [`progress.md`](../../progress.md) identifies current spec, current stage, blockers, next step, last session spec, last completed spec, last green commands, and dogfood evidence
-- the resolved review target spec’s exit criteria and actual verification evidence line up
+- active full-path rows and quick-task rows in [`../../progress.md`](../../progress.md) match the actual work in flight
+- [`../../spec/00_overview.md`](../../spec/00_overview.md) matches numbered spec final states
+- finished full-path specs line up with latest proof in `Last Completed Spec`, `Last Green Commands`, `Dogfood Evidence`, and `Napkin Evidence`
 
 ### Auth, Roles, Permissioning
-
 - Clerk host/admin auth wiring
 - host record mapping and admin allowlist behavior
 - API key auth and scope enforcement
@@ -61,7 +63,6 @@ Review the relevant parts of this checklist for the scope. Do not claim a subsys
 - route/layout/server-handler access boundaries
 
 ### Security and Privacy
-
 - input validation and trusted-host assumptions
 - encryption of card, bank, and webhook secret data
 - sensitive data exposure in logs, exports, responses, or admin views
@@ -70,7 +71,6 @@ Review the relevant parts of this checklist for the scope. Do not claim a subsys
 - retention or anonymization behavior when relevant
 
 ### Database and State
-
 - schema constraints and migration compatibility
 - create -> contribute -> close -> payout lifecycle
 - enum/status transitions
@@ -78,7 +78,6 @@ Review the relevant parts of this checklist for the scope. Do not claim a subsys
 - query/view assumptions that can drift from runtime logic
 
 ### Payments, Payouts, Webhooks
-
 - contribution creation and provider handoff
 - PayFast, Ozow, SnapScan webhook handling
 - Karri flow, bank payout flow, and charity ledger row behavior
@@ -86,7 +85,6 @@ Review the relevant parts of this checklist for the scope. Do not claim a subsys
 - public API and outgoing webhook contract drift
 
 ### UX and UI
-
 - guest, host, admin, and payment-flow regressions
 - loading, error, and empty states
 - mobile flow integrity
@@ -94,7 +92,6 @@ Review the relevant parts of this checklist for the scope. Do not claim a subsys
 - user-facing copy or routing promises that backend/runtime do not honor
 
 ### Operations and Quality
-
 - health checks, observability hooks, feature flags, mock flags
 - docs drift on touched behavior
 - relevant automated coverage and verification evidence
@@ -108,20 +105,13 @@ Use this structure:
 3. `Change Summary`
 4. `Verification / Gaps`
 
-Rules:
-
-- `Findings` must come first and be sorted by severity.
-- Each finding must include the risk, the reason it matters, and at least one file reference.
-- `Open Questions / Assumptions` only after findings.
-- `Change Summary` is secondary; keep it brief.
-- `Verification / Gaps` must state what was run, what was inspected manually, and what was not verified.
-
 ## Verification Expectations
 
 - Inspect `git status --short` before drawing conclusions from current uncommitted work.
-- Compare current verification evidence against the resolved review target spec’s `Test Gate` and `Exit Criteria`.
+- Compare current verification evidence against the resolved target’s `Test Gate` and `Exit Criteria` when a numbered spec exists.
 - Run the smallest useful checks first, then the full repo gates when the task warrants them.
-- Standard gate set for substantial review:
+
+Standard gate set for substantial review:
 
 ```bash
 pnpm docs:audit
@@ -130,11 +120,9 @@ pnpm typecheck
 pnpm test
 ```
 
-- If OpenAPI or agent-doc surfaces changed, include:
+If OpenAPI or docs-governance surfaces changed, include:
 
 ```bash
 pnpm openapi:generate
 pnpm docs:audit -- --sync
 ```
-
-- If you could not run a check, say exactly why.

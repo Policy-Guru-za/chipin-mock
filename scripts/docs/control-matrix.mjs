@@ -1,3 +1,4 @@
+import fs from 'fs';
 import path from 'path';
 
 export const REVIEW_DATE = '2026-03-12';
@@ -33,19 +34,19 @@ const exactEntries = {
   'AGENTS.md': {
     tier: 'Tier 1',
     status: 'current-operational',
-    sourceOfTruth: '`package.json`, `docs/Platform-Spec-Docs/CANONICAL.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md`',
+    sourceOfTruth: '`package.json`, `docs/DOCUMENT_CONTROL_MATRIX.md`, `progress.md`, `spec/00_overview.md`',
     supersededBy: '',
   },
   'README.md': {
     tier: 'Tier 1',
-    status: 'current-operational',
-    sourceOfTruth: '`AGENTS.md`, `progress.md`, `spec/00_overview.md`, `docs/Platform-Spec-Docs/CANONICAL.md`, `package.json`',
+    status: 'current-reference',
+    sourceOfTruth: '`AGENTS.md`, `progress.md`, `spec/00_overview.md`, `package.json`',
     supersededBy: '',
   },
   'TESTING.md': {
     tier: 'Tier 1',
-    status: 'current-operational',
-    sourceOfTruth: '`package.json`, `vitest.config.ts`, `tests/`, `progress.md`, `spec/SPEC_TEMPLATE.md`',
+    status: 'current-reference',
+    sourceOfTruth: '`package.json`, `vitest.config.ts`, `tests/`, `progress.md`, `spec/SPEC_TEMPLATE.md`, `AGENTS.md`',
     supersededBy: '',
   },
   'BACKLOG.md': {
@@ -63,7 +64,7 @@ const exactEntries = {
   },
   'workflow-orchestration.md': {
     tier: 'Tier 1',
-    status: 'current-operational',
+    status: 'current-reference',
     sourceOfTruth: '`AGENTS.md`, `progress.md`, `spec/00_overview.md`, `spec/SPEC_TEMPLATE.md`',
     supersededBy: '',
   },
@@ -71,7 +72,7 @@ const exactEntries = {
     tier: 'Tier 1',
     status: 'current-operational',
     sourceOfTruth:
-      '`AGENTS.md`, `workflow-orchestration.md`, `.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `spec/00_overview.md`, `active numbered spec`, `most recent closed spec`, `most recent done spec`, `git status`',
+      '`AGENTS.md`, `.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `spec/00_overview.md`, `active full specs`, `quick tasks`, `latest completed proof`, `git status`',
     supersededBy: '',
   },
   'spec/00_overview.md': {
@@ -101,14 +102,14 @@ const exactEntries = {
   'docs/agent-playbooks/code_review.md': {
     tier: 'Tier 1',
     status: 'current-operational',
-    sourceOfTruth: '`AGENTS.md`, `progress.md`, `spec/00_overview.md`, `docs/Platform-Spec-Docs/CANONICAL.md`, `TESTING.md`',
+    sourceOfTruth: '`AGENTS.md`, `progress.md`, `docs/Platform-Spec-Docs/CANONICAL.md`, `TESTING.md`',
     supersededBy: '',
   },
   'docs/napkin/SKILL.md': {
     tier: 'Tier 1',
     status: 'current-operational',
     sourceOfTruth:
-      '`.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `workflow-orchestration.md`, `progress.md`',
+      '`.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `progress.md`',
     supersededBy: '',
   },
   'docs/napkin/napkin.md': {
@@ -222,11 +223,7 @@ const exactEntries = {
     CURRENT_RUNTIME_AND_FORENSICS
   ),
   'docs/implementation-docs/GIFTA_UX_V2_AGENT_EXECUTION_CONTRACT.md': {
-    tier: 'Tier 1',
-    status: 'current-operational',
-    sourceOfTruth:
-      '`docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md`, `docs/Platform-Spec-Docs/CANONICAL.md`, `package.json`',
-    supersededBy: '',
+    ...referenceMeta('`AGENTS.md`', '`AGENTS.md`, `progress.md`, `spec/00_overview.md`'),
   },
   'docs/implementation-docs/GIFTA_UX_V2_DECISION_REGISTER.md': {
     tier: 'Tier 1',
@@ -235,11 +232,7 @@ const exactEntries = {
     supersededBy: '',
   },
   'docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md': {
-    tier: 'Tier 1',
-    status: 'current-operational',
-    sourceOfTruth:
-      '`docs/implementation-docs/GIFTA_UX_V2_AGENT_EXECUTION_CONTRACT.md`, `docs/implementation-docs/GIFTA_UX_V2_DECISION_REGISTER.md`, `docs/Platform-Spec-Docs/CANONICAL.md`',
-    supersededBy: '',
+    ...referenceMeta('`AGENTS.md`', '`AGENTS.md`, `progress.md`, `spec/00_overview.md`'),
   },
   'docs/UI-refactors/AI-UI-REFACTOR-PLAYBOOK.md': referenceMeta('`docs/Platform-Spec-Docs/UX.md`'),
 };
@@ -260,16 +253,7 @@ const patternEntries = [
       tier: 'Tier 1',
       status: 'current-operational',
       sourceOfTruth:
-        '`.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md`, `docs/agent-playbooks/code_review.md`',
-      supersededBy: '',
-    },
-  },
-  {
-    test: /^spec\/\d{2}_[^/]+\.md$/,
-    meta: {
-      tier: 'Tier 1',
-      status: 'current-operational',
-      sourceOfTruth: '`AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md`',
+        '`.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `progress.md`, `docs/agent-playbooks/code_review.md`',
       supersededBy: '',
     },
   },
@@ -376,6 +360,33 @@ export const repoRelative = (filePath, cwd = process.cwd()) => {
   return relativePath.split(path.sep).join('/');
 };
 
+const classifyNumberedSpec = (filePath, { cwd = process.cwd() } = {}) => {
+  const normalizedPath = repoRelative(filePath, cwd);
+  if (!/^spec\/\d{2}_[^/]+\.md$/.test(normalizedPath)) {
+    return null;
+  }
+
+  let status = 'current-reference';
+  try {
+    const text = fs.readFileSync(path.resolve(cwd, normalizedPath), 'utf8');
+    const match = /^- Status:\s*(.+)$/m.exec(text);
+    if (match?.[1]?.trim() === 'Active') {
+      status = 'current-operational';
+    }
+  } catch {
+    status = 'current-reference';
+  }
+
+  return {
+    owner: DEFAULT_OWNER,
+    lastReviewed: REVIEW_DATE,
+    tier: 'Tier 1',
+    status,
+    sourceOfTruth: '`AGENTS.md`, `progress.md`, `spec/00_overview.md`',
+    supersededBy: '',
+  };
+};
+
 export const classifyDoc = (filePath, { cwd = process.cwd() } = {}) => {
   const normalizedPath = repoRelative(filePath, cwd);
   const exact = exactEntries[normalizedPath];
@@ -385,6 +396,11 @@ export const classifyDoc = (filePath, { cwd = process.cwd() } = {}) => {
       lastReviewed: REVIEW_DATE,
       ...exact,
     };
+  }
+
+  const numberedSpec = classifyNumberedSpec(filePath, { cwd });
+  if (numberedSpec) {
+    return numberedSpec;
   }
 
   const patternEntry = patternEntries.find((entry) => entry.test.test(normalizedPath));

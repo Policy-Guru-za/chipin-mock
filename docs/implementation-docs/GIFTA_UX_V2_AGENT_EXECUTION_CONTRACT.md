@@ -1,35 +1,28 @@
+> **Document Status:** Reference only. Reviewed March 12, 2026.
+> Useful context only. Do not use this file as the source of truth for current runtime behavior or agent policy.
+> Canonical replacement: `AGENTS.md`.
 # Gifta UX v2 Agent Execution Contract
 
-> **Status:** Current operational guide  
-> **Last reviewed:** March 12, 2026
+## Current Role
 
-## Non-Negotiables
+This file is preserved as a legacy UX-v2 execution reference.
 
-- `pnpm` only
-- no destructive git/file actions without explicit approval
-- do not treat non-authoritative docs as current instructions
-- update Tier 1 docs in the same slice as behavior-changing code
+Day-to-day workflow is now governed by:
+1. [`AGENTS.md`](../../AGENTS.md)
+2. [`progress.md`](../../progress.md)
+3. [`spec/00_overview.md`](../../spec/00_overview.md) for numbered full-path specs
+4. [`docs/DOCUMENT_CONTROL_MATRIX.md`](../DOCUMENT_CONTROL_MATRIX.md) when document authority is unclear
 
-## Mandatory Read Order
+## Still Useful Here
 
-1. [`docs/napkin/SKILL.md`](../napkin/SKILL.md)
-2. [`docs/napkin/napkin.md`](../napkin/napkin.md)
-3. [`docs/DOCUMENT_CONTROL_MATRIX.md`](../DOCUMENT_CONTROL_MATRIX.md)
-4. [`docs/Platform-Spec-Docs/CANONICAL.md`](../Platform-Spec-Docs/CANONICAL.md)
-5. [`GIFTA_UX_V2_DECISION_REGISTER.md`](./GIFTA_UX_V2_DECISION_REGISTER.md)
+- historical context on the earlier UX-v2 execution phase
+- proof that execution guidance once lived under `docs/implementation-docs/`
+- cross-reference to the older decision-register material when needed
 
-## Required Gates
+## Do Not Use This File To Override
 
-```bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm openapi:generate
-pnpm docs:audit
-```
-
-## Documentation Contract
-
-- Current operational or authoritative docs must stay aligned with workspace truth.
-- Historical plans, prompts, and evidence stay preserved but must remain clearly labeled non-authoritative.
-- If generated OpenAPI changes, regenerate `public/v1/openapi.json` before handoff.
+- fast path vs full path rules
+- numbered spec creation rules
+- progress dashboard structure
+- placeholder requirements
+- current handoff requirements

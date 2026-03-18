@@ -2,17 +2,25 @@ import fs from 'fs';
 import path from 'path';
 
 import {
+  CLOSED_AT_REQUIRED_FROM_SLOT,
+  REQUIRED_ACTIVE_SPEC_COLUMNS,
+  REQUIRED_OVERVIEW_COLUMNS,
   REQUIRED_PROGRESS_HEADINGS,
+  REQUIRED_QUICK_TASK_COLUMNS,
   REQUIRED_SPEC_HEADINGS,
   TERMINAL_SPEC_STATUSES,
   VALID_SPEC_STATUSES,
   hasHeading,
+  isExplicitNone,
+  isValidClosedAt,
   isNumberedSpecFile,
-  isPlaceholderSpecId,
   listedSpecs,
   parseFinalState,
+  parseMarkdownTable,
+  parseRecentlyClosedEntries,
   referencedSpecIds,
   resolveProgressSpecId,
+  specSlot,
   sectionBody,
   validateFinalState,
 } from './execution-artifact-audit-helpers.mjs';
@@ -25,33 +33,20 @@ const validateRequiredArtifacts = (requiredPaths, errors, repoRelative) => {
   }
 };
 
-const validateProgressStatus = (statusSection, currentSpecId, lastSessionSpecId, errors) => {
-  if (!currentSpecId || !isPlaceholderSpecId(currentSpecId)) {
-    return;
-  }
-
-  const mentionedSpecIds = referencedSpecIds(statusSection).filter((specId) => specId !== currentSpecId);
-  const mentionsClosure = /\b(closed|completed|finished|superseded|stopped|handoff)\b/i.test(statusSection);
-
-  if (mentionedSpecIds.length > 0 && !lastSessionSpecId) {
-    errors.push(
-      'progress.md: placeholder-active `## Status` references a closed session but `## Last Session Spec` is missing.'
-    );
-    return;
-  }
-
-  if (mentionsClosure && lastSessionSpecId && mentionedSpecIds.length > 0 && !mentionedSpecIds.includes(lastSessionSpecId)) {
-    errors.push(
-      `progress.md: placeholder-active \`## Status\` must reference \`## Last Session Spec\` (${lastSessionSpecId}) when describing the most recent closed session.`
-    );
-  }
-};
-
 const hasSubstantiveNarrative = (section) =>
   section.split('\n').some((line) => {
     const trimmed = line.trim();
     return Boolean(trimmed && trimmed !== '-' && trimmed !== '*');
   });
+
+const validateNarrativeSection = (progressText, heading, errors) => {
+  const section = sectionBody(progressText, heading);
+  if (section === null) return;
+
+  if (!hasSubstantiveNarrative(section)) {
+    errors.push(`progress.md: \`## ${heading}\` must contain substantive evidence.`);
+  }
+};
 
 const validateNapkinEvidence = (progressText, errors) => {
   const napkinEvidence = sectionBody(progressText, 'Napkin Evidence');
@@ -60,7 +55,7 @@ const validateNapkinEvidence = (progressText, errors) => {
   }
 
   if (!hasSubstantiveNarrative(napkinEvidence)) {
-    errors.push('progress.md: `## Napkin Evidence` must describe the closed session napkin outcome.');
+    errors.push('progress.md: `## Napkin Evidence` must describe the latest napkin outcome.');
     return;
   }
 
@@ -72,9 +67,84 @@ const validateNapkinEvidence = (progressText, errors) => {
   }
 };
 
+const validateTableSection = (progressText, heading, requiredColumns, errors) => {
+  const section = sectionBody(progressText, heading);
+  if (section === null) {
+    return { rows: [], isNone: false };
+  }
+
+  if (isExplicitNone(section)) {
+    return { rows: [], isNone: true };
+  }
+
+  const { headers, rows } = parseMarkdownTable(section);
+  if (headers.length === 0) {
+    errors.push(`progress.md: \`## ${heading}\` must contain a markdown table or \`- None.\`.`);
+    return { rows: [], isNone: false };
+  }
+
+  for (const column of requiredColumns) {
+    if (!headers.includes(column)) {
+      errors.push(`progress.md: \`## ${heading}\` is missing required table column (${column}).`);
+    }
+  }
+
+  return { rows, isNone: false };
+};
+
+const validateActiveSpecRows = (progressText, errors) => {
+  const { rows } = validateTableSection(progressText, 'Active Full Specs', REQUIRED_ACTIVE_SPEC_COLUMNS, errors);
+  const activeProgressSpecIds = [];
+
+  rows.forEach((row, index) => {
+    const specIds = referencedSpecIds(row.Spec ?? '');
+    if (specIds.length !== 1) {
+      errors.push(
+        `progress.md: \`## Active Full Specs\` row ${index + 1} must contain exactly one backticked numbered spec id in the Spec column.`
+      );
+      return;
+    }
+
+    activeProgressSpecIds.push(specIds[0]);
+  });
+
+  return activeProgressSpecIds;
+};
+
+const validateQuickTasks = (progressText, errors) => {
+  validateTableSection(progressText, 'Quick Tasks', REQUIRED_QUICK_TASK_COLUMNS, errors);
+};
+
+const validateRecentlyClosedSpecs = (progressText, errors) => {
+  const section = sectionBody(progressText, 'Recently Closed Specs');
+  if (section === null) return [];
+
+  if (isExplicitNone(section)) {
+    return [];
+  }
+
+  if (!hasSubstantiveNarrative(section)) {
+    errors.push('progress.md: `## Recently Closed Specs` must list terminal specs or `- None.`.');
+    return [];
+  }
+
+  const { entries, invalidLines } = parseRecentlyClosedEntries(section);
+  if (invalidLines.length > 0) {
+    errors.push(
+      'progress.md: `## Recently Closed Specs` entries must be bullet lines with a primary backticked numbered spec id.'
+    );
+  }
+
+  if (entries.length === 0) {
+    errors.push('progress.md: `## Recently Closed Specs` must reference backticked numbered spec ids or `- None.`.');
+  }
+
+  return entries.map((entry) => entry.primarySpecId);
+};
+
 const validateProgressArtifact = (progressPath, errors) => {
   if (!fs.existsSync(progressPath)) {
-    return { currentSpecId: null, lastSessionSpecId: null, lastCompletedSpecId: null };
+    return { activeProgressSpecIds: [], recentlyClosedSpecIds: [], lastCompletedSpecId: null };
   }
 
   const progressText = fs.readFileSync(progressPath, 'utf8');
@@ -84,22 +154,16 @@ const validateProgressArtifact = (progressPath, errors) => {
     }
   }
 
-  const currentSpecId = resolveProgressSpecId(progressText, 'Current Spec', errors);
-  const lastSessionSpecId = resolveProgressSpecId(progressText, 'Last Session Spec', errors);
+  const activeProgressSpecIds = validateActiveSpecRows(progressText, errors);
+  validateQuickTasks(progressText, errors);
+  const recentlyClosedSpecIds = validateRecentlyClosedSpecs(progressText, errors);
   const lastCompletedSpecId = resolveProgressSpecId(progressText, 'Last Completed Spec', errors);
 
-  validateProgressStatus(sectionBody(progressText, 'Status') ?? '', currentSpecId, lastSessionSpecId, errors);
+  validateNarrativeSection(progressText, 'Last Green Commands', errors);
+  validateNarrativeSection(progressText, 'Dogfood Evidence', errors);
   validateNapkinEvidence(progressText, errors);
 
-  if (currentSpecId && lastSessionSpecId && currentSpecId === lastSessionSpecId) {
-    errors.push('progress.md: `## Last Session Spec` must not match `## Current Spec`.');
-  }
-
-  if (currentSpecId && lastCompletedSpecId && currentSpecId === lastCompletedSpecId) {
-    errors.push('progress.md: `## Last Completed Spec` must not match `## Current Spec`.');
-  }
-
-  return { currentSpecId, lastSessionSpecId, lastCompletedSpecId };
+  return { activeProgressSpecIds, recentlyClosedSpecIds, lastCompletedSpecId };
 };
 
 const readActualSpecIds = (specDirPath) => {
@@ -137,10 +201,30 @@ const validateSpecFiles = (specDirPath, actualSpecIds, errors) => {
   return specStates;
 };
 
+const requiresClosedAt = (specId) => specSlot(specId) >= CLOSED_AT_REQUIRED_FROM_SLOT;
+
+const newestTimestampedSpecId = (overviewSpecs, predicate) => {
+  const candidates = [...overviewSpecs.entries()]
+    .filter(([specId, entry]) => entry.closedAt && predicate(entry, specId))
+    .sort((left, right) => {
+      const timeDelta = Date.parse(right[1].closedAt) - Date.parse(left[1].closedAt);
+      if (timeDelta !== 0) return timeDelta;
+      return right[0].localeCompare(left[0]);
+    });
+
+  return candidates[0]?.[0] ?? null;
+};
+
 const collectOverviewState = (overviewText, actualSpecIds, specStates, errors) => {
-  const overviewSpecs = listedSpecs(overviewText);
+  const { headers, specs: overviewSpecs } = listedSpecs(overviewText);
   const overviewIds = [...overviewSpecs.keys()].sort();
   const activeOverviewIds = [];
+
+  for (const column of REQUIRED_OVERVIEW_COLUMNS) {
+    if (!headers.includes(column)) {
+      errors.push(`spec/00_overview.md: missing required table column (${column}).`);
+    }
+  }
 
   for (const specId of actualSpecIds.filter((id) => !overviewIds.includes(id))) {
     errors.push(`spec/00_overview.md: missing row for ${specId}.`);
@@ -150,7 +234,7 @@ const collectOverviewState = (overviewText, actualSpecIds, specStates, errors) =
     errors.push(`spec/00_overview.md: lists missing numbered spec ${specId}.`);
   }
 
-  for (const [specId, { status }] of overviewSpecs.entries()) {
+  for (const [specId, { status, closedAt }] of overviewSpecs.entries()) {
     if (!VALID_SPEC_STATUSES.has(status)) {
       errors.push(
         `spec/00_overview.md: ${specId} has invalid status (${status}). Use Active, Done, or Superseded.`
@@ -159,6 +243,21 @@ const collectOverviewState = (overviewText, actualSpecIds, specStates, errors) =
 
     if (status === 'Active') {
       activeOverviewIds.push(specId);
+      if (closedAt) {
+        errors.push(`spec/00_overview.md: Active spec ${specId} must use \`Closed At: —\`.`);
+      }
+    }
+
+    if (closedAt && !isValidClosedAt(closedAt)) {
+      errors.push(
+        `spec/00_overview.md: ${specId} has invalid Closed At value (${closedAt}). Use UTC ISO-8601 like \`2026-03-18T12:34:56Z\`.`
+      );
+    }
+
+    if (TERMINAL_SPEC_STATUSES.has(status) && requiresClosedAt(specId) && !closedAt) {
+      errors.push(
+        `spec/00_overview.md: terminal spec ${specId} must include \`Closed At\` once slot ${CLOSED_AT_REQUIRED_FROM_SLOT} and above adopted the new closure-order contract.`
+      );
     }
 
     const finalStatus = specStates.get(specId)?.status;
@@ -169,94 +268,84 @@ const collectOverviewState = (overviewText, actualSpecIds, specStates, errors) =
     }
   }
 
-  if (activeOverviewIds.length !== 1) {
-    errors.push(
-      `spec/00_overview.md: must contain exactly one Active spec row; found ${activeOverviewIds.length}.`
-    );
-  }
-
-  return { overviewSpecs, activeOverviewIds };
+  return {
+    overviewSpecs,
+    activeOverviewIds,
+    newestTimestampedTerminalSpecId: newestTimestampedSpecId(
+      overviewSpecs,
+      ({ status }) => TERMINAL_SPEC_STATUSES.has(status)
+    ),
+    latestTimestampedDoneSpecId: newestTimestampedSpecId(overviewSpecs, ({ status }) => status === 'Done'),
+  };
 };
 
-const validateCurrentSpec = (
-  currentSpecId,
-  actualSpecIds,
-  overviewSpecs,
+const validateActiveSpecs = (
+  activeProgressSpecIds,
   activeOverviewIds,
-  specStates,
-  errors
-) => {
-  if (!currentSpecId) return;
-
-  if (!actualSpecIds.includes(currentSpecId)) {
-    errors.push(`progress.md: current spec ${currentSpecId} does not exist in spec/.`);
-    return;
-  }
-
-  if (!overviewSpecs.has(currentSpecId)) {
-    errors.push(`progress.md: current spec ${currentSpecId} is missing from spec/00_overview.md.`);
-    return;
-  }
-
-  if (overviewSpecs.get(currentSpecId)?.status !== 'Active') {
-    errors.push(`progress.md: current spec ${currentSpecId} must be marked Active in spec/00_overview.md.`);
-  }
-
-  if (activeOverviewIds.length === 1 && activeOverviewIds[0] !== currentSpecId) {
-    errors.push(
-      `progress.md: current spec ${currentSpecId} does not match the Active overview row ${activeOverviewIds[0]}.`
-    );
-  }
-
-  if (specStates.get(currentSpecId)?.status !== 'Active') {
-    errors.push(`progress.md: current spec ${currentSpecId} must have \`Final State -> Status: Active\`.`);
-  }
-};
-
-const validateLastSessionSpec = (
-  currentSpecId,
-  lastSessionSpecId,
   actualSpecIds,
   overviewSpecs,
   specStates,
   errors
 ) => {
-  if (!lastSessionSpecId) return;
+  for (const specId of activeProgressSpecIds) {
+    if (!actualSpecIds.includes(specId)) {
+      errors.push(`progress.md: active full spec ${specId} does not exist in spec/.`);
+      continue;
+    }
 
-  if (!actualSpecIds.includes(lastSessionSpecId)) {
-    errors.push(`progress.md: last session spec ${lastSessionSpecId} does not exist in spec/.`);
-    return;
+    if (!overviewSpecs.has(specId)) {
+      errors.push(`progress.md: active full spec ${specId} is missing from spec/00_overview.md.`);
+      continue;
+    }
+
+    if (overviewSpecs.get(specId)?.status !== 'Active') {
+      errors.push(`progress.md: active full spec ${specId} must be marked Active in spec/00_overview.md.`);
+    }
+
+    if (specStates.get(specId)?.status !== 'Active') {
+      errors.push(`progress.md: active full spec ${specId} must use \`Final State -> Status: Active\`.`);
+    }
   }
 
-  if (!overviewSpecs.has(lastSessionSpecId)) {
-    errors.push(`progress.md: last session spec ${lastSessionSpecId} is missing from spec/00_overview.md.`);
-    return;
+  for (const specId of activeOverviewIds.filter((id) => !activeProgressSpecIds.includes(id))) {
+    errors.push(`progress.md: overview Active spec ${specId} must appear in \`## Active Full Specs\`.`);
   }
+};
 
-  const overviewStatus = overviewSpecs.get(lastSessionSpecId)?.status;
-  const finalStatus = specStates.get(lastSessionSpecId)?.status;
+const validateRecentlyClosedSpecSet = (
+  recentlyClosedSpecIds,
+  activeProgressSpecIds,
+  actualSpecIds,
+  overviewSpecs,
+  specStates,
+  errors
+) => {
+  for (const specId of recentlyClosedSpecIds) {
+    if (!actualSpecIds.includes(specId)) {
+      errors.push(`progress.md: recently closed spec ${specId} does not exist in spec/.`);
+      continue;
+    }
 
-  if (!TERMINAL_SPEC_STATUSES.has(overviewStatus)) {
-    errors.push(
-      `progress.md: last session spec ${lastSessionSpecId} must be marked Done or Superseded in spec/00_overview.md.`
-    );
-  }
+    if (activeProgressSpecIds.includes(specId)) {
+      errors.push(`progress.md: recently closed spec ${specId} cannot also be listed under \`## Active Full Specs\`.`);
+    }
 
-  if (!TERMINAL_SPEC_STATUSES.has(finalStatus)) {
-    errors.push(
-      `progress.md: last session spec ${lastSessionSpecId} must be terminal in its Final State metadata.`
-    );
-  }
+    const overviewStatus = overviewSpecs.get(specId)?.status;
+    const finalStatus = specStates.get(specId)?.status;
 
-  if (currentSpecId && isPlaceholderSpecId(currentSpecId) && !TERMINAL_SPEC_STATUSES.has(finalStatus)) {
-    errors.push(
-      `progress.md: placeholder-active current spec ${currentSpecId} requires a terminal \`## Last Session Spec\`.`
-    );
+    if (!TERMINAL_SPEC_STATUSES.has(overviewStatus)) {
+      errors.push(`progress.md: recently closed spec ${specId} must be Done or Superseded in spec/00_overview.md.`);
+    }
+
+    if (!TERMINAL_SPEC_STATUSES.has(finalStatus)) {
+      errors.push(`progress.md: recently closed spec ${specId} must be terminal in its Final State metadata.`);
+    }
   }
 };
 
 const validateLastCompletedSpec = (
   lastCompletedSpecId,
+  activeProgressSpecIds,
   actualSpecIds,
   overviewSpecs,
   specStates,
@@ -269,9 +358,8 @@ const validateLastCompletedSpec = (
     return;
   }
 
-  if (!overviewSpecs.has(lastCompletedSpecId)) {
-    errors.push(`progress.md: last completed spec ${lastCompletedSpecId} is missing from spec/00_overview.md.`);
-    return;
+  if (activeProgressSpecIds.includes(lastCompletedSpecId)) {
+    errors.push(`progress.md: last completed spec ${lastCompletedSpecId} cannot also be Active.`);
   }
 
   if (overviewSpecs.get(lastCompletedSpecId)?.status !== 'Done') {
@@ -279,39 +367,56 @@ const validateLastCompletedSpec = (
   }
 
   if (specStates.get(lastCompletedSpecId)?.status !== 'Done') {
-    errors.push(
-      `progress.md: last completed spec ${lastCompletedSpecId} must use \`Final State -> Status: Done\`.`
-    );
+    errors.push(`progress.md: last completed spec ${lastCompletedSpecId} must use \`Final State -> Status: Done\`.`);
   }
 };
 
-const validateProgressRelationships = (
-  currentSpecId,
-  lastSessionSpecId,
+const validateRecentlyClosedRelationships = (
+  recentlyClosedSpecIds,
   lastCompletedSpecId,
+  overviewSpecs,
   specStates,
+  newestTimestampedTerminalSpecId,
+  latestTimestampedDoneSpecId,
   errors
 ) => {
-  if (!lastSessionSpecId || !lastCompletedSpecId) return;
+  if (newestTimestampedTerminalSpecId) {
+    if (recentlyClosedSpecIds[0] !== newestTimestampedTerminalSpecId) {
+      errors.push(
+        `progress.md: newest recently closed entry must mirror the newest timestamped terminal spec (${newestTimestampedTerminalSpecId}).`
+      );
+    }
 
-  const lastSessionStatus = specStates.get(lastSessionSpecId)?.status;
-  const lastCompletedStatus = specStates.get(lastCompletedSpecId)?.status;
+    if (latestTimestampedDoneSpecId && lastCompletedSpecId !== latestTimestampedDoneSpecId) {
+      errors.push(
+        `progress.md: \`## Last Completed Spec\` must match the latest timestamped Done spec (${latestTimestampedDoneSpecId}).`
+      );
+    }
 
-  if (lastSessionStatus === 'Done' && lastCompletedSpecId !== lastSessionSpecId) {
+    const newestTimestampedStatus = overviewSpecs.get(newestTimestampedTerminalSpecId)?.status;
+    if (newestTimestampedStatus === 'Superseded' && lastCompletedSpecId === newestTimestampedTerminalSpecId) {
+      errors.push(
+        `progress.md: superseded newest recently closed spec ${newestTimestampedTerminalSpecId} cannot also be \`## Last Completed Spec\`.`
+      );
+    }
+
+    return;
+  }
+
+  if (recentlyClosedSpecIds.length === 0 || !lastCompletedSpecId) return;
+
+  const mostRecentClosedSpecId = recentlyClosedSpecIds[0];
+  const mostRecentClosedStatus = specStates.get(mostRecentClosedSpecId)?.status;
+
+  if (mostRecentClosedStatus === 'Done' && lastCompletedSpecId !== mostRecentClosedSpecId) {
     errors.push(
-      `progress.md: when \`## Last Session Spec\` (${lastSessionSpecId}) is Done, \`## Last Completed Spec\` must match it.`
+      `progress.md: when the newest recently closed spec (${mostRecentClosedSpecId}) is Done, \`## Last Completed Spec\` must match it.`
     );
   }
 
-  if (lastSessionStatus === 'Superseded' && lastCompletedSpecId === lastSessionSpecId) {
+  if (mostRecentClosedStatus === 'Superseded' && lastCompletedSpecId === mostRecentClosedSpecId) {
     errors.push(
-      `progress.md: superseded \`## Last Session Spec\` (${lastSessionSpecId}) cannot also be \`## Last Completed Spec\`.`
-    );
-  }
-
-  if (currentSpecId && isPlaceholderSpecId(currentSpecId) && lastCompletedStatus !== 'Done') {
-    errors.push(
-      'progress.md: placeholder-active current spec requires `## Last Completed Spec` to point at a Done session.'
+      `progress.md: superseded newest recently closed spec ${mostRecentClosedSpecId} cannot also be \`## Last Completed Spec\`.`
     );
   }
 };
@@ -319,8 +424,8 @@ const validateProgressRelationships = (
 const validateSpecOverview = (
   specOverviewPath,
   actualSpecIds,
-  currentSpecId,
-  lastSessionSpecId,
+  activeProgressSpecIds,
+  recentlyClosedSpecIds,
   lastCompletedSpecId,
   specStates,
   errors
@@ -328,24 +433,51 @@ const validateSpecOverview = (
   if (!fs.existsSync(specOverviewPath)) return;
 
   const overviewText = fs.readFileSync(specOverviewPath, 'utf8');
-  const { overviewSpecs, activeOverviewIds } = collectOverviewState(
+  const {
+    overviewSpecs,
+    activeOverviewIds,
+    newestTimestampedTerminalSpecId,
+    latestTimestampedDoneSpecId,
+  } = collectOverviewState(
     overviewText,
     actualSpecIds,
     specStates,
     errors
   );
 
-  validateCurrentSpec(currentSpecId, actualSpecIds, overviewSpecs, activeOverviewIds, specStates, errors);
-  validateLastSessionSpec(
-    currentSpecId,
-    lastSessionSpecId,
+  validateActiveSpecs(
+    activeProgressSpecIds,
+    activeOverviewIds,
     actualSpecIds,
     overviewSpecs,
     specStates,
     errors
   );
-  validateLastCompletedSpec(lastCompletedSpecId, actualSpecIds, overviewSpecs, specStates, errors);
-  validateProgressRelationships(currentSpecId, lastSessionSpecId, lastCompletedSpecId, specStates, errors);
+  validateRecentlyClosedSpecSet(
+    recentlyClosedSpecIds,
+    activeProgressSpecIds,
+    actualSpecIds,
+    overviewSpecs,
+    specStates,
+    errors
+  );
+  validateLastCompletedSpec(
+    lastCompletedSpecId,
+    activeProgressSpecIds,
+    actualSpecIds,
+    overviewSpecs,
+    specStates,
+    errors
+  );
+  validateRecentlyClosedRelationships(
+    recentlyClosedSpecIds,
+    lastCompletedSpecId,
+    overviewSpecs,
+    specStates,
+    newestTimestampedTerminalSpecId,
+    latestTimestampedDoneSpecId,
+    errors
+  );
 };
 
 export const collectExecutionArtifactErrors = ({ repoRoot, repoRelative }) => {
@@ -357,7 +489,7 @@ export const collectExecutionArtifactErrors = ({ repoRoot, repoRelative }) => {
 
   validateRequiredArtifacts([progressPath, specOverviewPath, specTemplatePath], errors, repoRelative);
 
-  const { currentSpecId, lastSessionSpecId, lastCompletedSpecId } = validateProgressArtifact(
+  const { activeProgressSpecIds, recentlyClosedSpecIds, lastCompletedSpecId } = validateProgressArtifact(
     progressPath,
     errors
   );
@@ -367,8 +499,8 @@ export const collectExecutionArtifactErrors = ({ repoRoot, repoRelative }) => {
   validateSpecOverview(
     specOverviewPath,
     actualSpecIds,
-    currentSpecId,
-    lastSessionSpecId,
+    activeProgressSpecIds,
+    recentlyClosedSpecIds,
     lastCompletedSpecId,
     specStates,
     errors

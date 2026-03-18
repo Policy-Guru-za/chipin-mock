@@ -1,9 +1,10 @@
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { classifyDoc } from '../../scripts/docs/control-matrix.mjs';
 import { collectDocs, collectDocsWithMetadata } from '../../scripts/docs/audit.mjs';
 
 const tempDirs: string[] = [];
@@ -70,6 +71,23 @@ describe('docs audit helpers', () => {
     expect(result.docsWithMetadata[0]?.metadata.status).toBe('current-operational');
   });
 
+  it('classifies active numbered specs as operational and closed specs as reference', () => {
+    const repoRoot = createTempRepo();
+    const activeSpecPath = writeDoc(
+      repoRoot,
+      'spec/40_parallel-workflow-refactor.md',
+      '# 40_parallel-workflow-refactor\n\n## Final State\n\n- Status: Active\n- Exit Criteria State: pending\n- Successor Slot: none\n- Notes: Active spec.\n'
+    );
+    const doneSpecPath = writeDoc(
+      repoRoot,
+      'spec/39_finished-task.md',
+      '# 39_finished-task\n\n## Final State\n\n- Status: Done\n- Exit Criteria State: satisfied\n- Successor Slot: none\n- Notes: Done spec.\n'
+    );
+
+    expect(classifyDoc(activeSpecPath, { cwd: repoRoot })?.status).toBe('current-operational');
+    expect(classifyDoc(doneSpecPath, { cwd: repoRoot })?.status).toBe('current-reference');
+  });
+
   it('surfaces actionable errors for unsupported markdown still inside docs audit scope', () => {
     const repoRoot = createTempRepo();
     const notesPath = writeDoc(repoRoot, 'notes/random.md');
@@ -80,5 +98,21 @@ describe('docs audit helpers', () => {
     expect(result.errors).toEqual([
       'notes/random.md: markdown file is in docs:audit scope but has no control-matrix rule. Either exclude its directory from docs governance or classify it in scripts/docs/control-matrix.mjs.',
     ]);
+  });
+
+  it('keeps README on the napkin-first startup contract before AGENTS delegation', () => {
+    const readme = readFileSync(new URL('../../README.md', import.meta.url), 'utf8');
+
+    expect(readme).toContain('.agents/skills/napkin/SKILL.md');
+    expect(readme).toContain('docs/napkin/napkin.md');
+    expect(readme).toContain('AGENTS.md');
+  });
+
+  it('keeps the review playbook aligned with napkin-first startup', () => {
+    const playbook = readFileSync(new URL('../../docs/agent-playbooks/code_review.md', import.meta.url), 'utf8');
+
+    expect(playbook).toContain('.agents/skills/napkin/SKILL.md');
+    expect(playbook).toContain('docs/napkin/napkin.md');
+    expect(playbook).toContain('AGENTS.md');
   });
 });

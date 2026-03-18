@@ -1,8 +1,10 @@
 # Spec Template
 
-Use this template for the active session spec.
+Use this template for any numbered **full-path** task.
 
-If the current active file is `spec/NN_session-placeholder.md`, rename that same numbered file to `spec/NN_<topic>.md` before replacing the placeholder content below.
+Create a new numbered spec on demand by using the next available slot in `spec/`.
+
+Use the fast path in [`../AGENTS.md`](../AGENTS.md) when the task is small enough to stay out of a numbered spec.
 
 ## Objective
 
@@ -33,11 +35,11 @@ If the current active file is `spec/NN_session-placeholder.md`, rename that same
 ## Exit Criteria
 
 - Define the conditions that must be true before the spec can be marked done.
-- Include how session-close napkin handling will be proven in [`../progress.md`](../progress.md) when the spec hands off.
+- Include how dogfood and napkin handling will be proven in [`../progress.md`](../progress.md) when the spec closes.
 
 ## Final State
 
 - Status: Active | Done | Superseded
 - Exit Criteria State: pending | satisfied | not-satisfied
 - Successor Slot: none | NN
-- Notes: <free text>
+- Notes: <specific summary>

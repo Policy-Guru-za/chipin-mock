@@ -18,16 +18,16 @@ This matrix is generated from `scripts/docs/control-matrix.mjs`. Run `pnpm docs:
 
 | Path | Tier | Status | Owner | Source of truth | Last reviewed | Superseded by |
 | --- | --- | --- | --- | --- | --- | --- |
-| `.agents/skills/docs-sync/SKILL.md` | Tier 1 | current-operational | Ryan Laubscher | `.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md`, `docs/agent-playbooks/code_review.md` | 2026-03-12 | — |
-| `.agents/skills/execution-loop/SKILL.md` | Tier 1 | current-operational | Ryan Laubscher | `.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md`, `docs/agent-playbooks/code_review.md` | 2026-03-12 | — |
+| `.agents/skills/docs-sync/SKILL.md` | Tier 1 | current-operational | Ryan Laubscher | `.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `progress.md`, `docs/agent-playbooks/code_review.md` | 2026-03-12 | — |
+| `.agents/skills/execution-loop/SKILL.md` | Tier 1 | current-operational | Ryan Laubscher | `.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `progress.md`, `docs/agent-playbooks/code_review.md` | 2026-03-12 | — |
 | `.agents/skills/napkin/SKILL.md` | Tier 1 | current-operational | Ryan Laubscher | `docs/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `progress.md` | 2026-03-12 | — |
-| `.agents/skills/payments-webhooks-debug/SKILL.md` | Tier 1 | current-operational | Ryan Laubscher | `.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md`, `docs/agent-playbooks/code_review.md` | 2026-03-12 | — |
-| `.agents/skills/release-verification/SKILL.md` | Tier 1 | current-operational | Ryan Laubscher | `.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md`, `docs/agent-playbooks/code_review.md` | 2026-03-12 | — |
-| `.agents/skills/review-flow/SKILL.md` | Tier 1 | current-operational | Ryan Laubscher | `.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md`, `docs/agent-playbooks/code_review.md` | 2026-03-12 | — |
-| `AGENTS.md` | Tier 1 | current-operational | Ryan Laubscher | `package.json`, `docs/Platform-Spec-Docs/CANONICAL.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `.agents/skills/payments-webhooks-debug/SKILL.md` | Tier 1 | current-operational | Ryan Laubscher | `.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `progress.md`, `docs/agent-playbooks/code_review.md` | 2026-03-12 | — |
+| `.agents/skills/release-verification/SKILL.md` | Tier 1 | current-operational | Ryan Laubscher | `.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `progress.md`, `docs/agent-playbooks/code_review.md` | 2026-03-12 | — |
+| `.agents/skills/review-flow/SKILL.md` | Tier 1 | current-operational | Ryan Laubscher | `.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `progress.md`, `docs/agent-playbooks/code_review.md` | 2026-03-12 | — |
+| `AGENTS.md` | Tier 1 | current-operational | Ryan Laubscher | `package.json`, `docs/DOCUMENT_CONTROL_MATRIX.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `BACKLOG.md` | Tier 1 | current-operational | Ryan Laubscher | `docs/forensic-audit/REPORT.md`, `docs/Platform-Spec-Docs/CANONICAL.md`, `src/`, `progress.md` | 2026-03-12 | — |
 | `CHANGELOG.md` | Tier 1 | current-reference | Ryan Laubscher | `git log`, `docs/forensic-audit/WORKSPACE_BASELINE_2026-03-12.md`, `docs/DOCUMENT_CONTROL_MATRIX.md` | 2026-03-12 | — |
-| `docs/agent-playbooks/code_review.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md`, `docs/Platform-Spec-Docs/CANONICAL.md`, `TESTING.md` | 2026-03-12 | — |
+| `docs/agent-playbooks/code_review.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `progress.md`, `docs/Platform-Spec-Docs/CANONICAL.md`, `TESTING.md` | 2026-03-12 | — |
 | `docs/demo_db_full_reset.md` | Tier 2 | reference-non-authoritative | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/Platform-Spec-Docs/CANONICAL.md` |
 | `docs/Demo-Mode/demo-mode-brief.md` | Tier 2 | reference-non-authoritative | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/Platform-Spec-Docs/CANONICAL.md` |
 | `docs/DOCUMENT_CONTROL_MATRIX.md` | Tier 1 | current-authoritative | Ryan Laubscher | `scripts/docs/control-matrix.mjs`, `scripts/docs/audit.mjs` | 2026-03-12 | — |
@@ -63,7 +63,7 @@ This matrix is generated from `scripts/docs/control-matrix.mjs`. Run `pnpm docs:
 | `docs/implementation-docs/evidence/ux-v2/phase-c/C8-EVIDENCE-TEMPLATE.md` | Tier 2 | historical-evidence | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json`, `docs/forensic-audit/WORKSPACE_BASELINE_2026-03-12.md` | 2026-03-12 | `docs/forensic-audit/REPORT.md` |
 | `docs/implementation-docs/FORENSIC_REMEDIATION_EXECUTION_ROADMAP.md` | Tier 2 | historical-plan | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md` |
 | `docs/implementation-docs/GIFTA_UX_V2_ACCESSIBILITY_AND_EDGE_CASE_TEST_PLAN.md` | Tier 2 | historical-plan | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md` |
-| `docs/implementation-docs/GIFTA_UX_V2_AGENT_EXECUTION_CONTRACT.md` | Tier 1 | current-operational | Ryan Laubscher | `docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md`, `docs/Platform-Spec-Docs/CANONICAL.md`, `package.json` | 2026-03-12 | — |
+| `docs/implementation-docs/GIFTA_UX_V2_AGENT_EXECUTION_CONTRACT.md` | Tier 2 | reference-non-authoritative | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | `AGENTS.md` |
 | `docs/implementation-docs/GIFTA_UX_V2_ANALYTICS_TELEMETRY_SPEC.md` | Tier 2 | historical-plan | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md` |
 | `docs/implementation-docs/GIFTA_UX_V2_API_CONTRACT_PARITY_SPEC.md` | Tier 2 | historical-plan | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md` |
 | `docs/implementation-docs/GIFTA_UX_V2_CHARITY_DOMAIN_SPEC.md` | Tier 2 | historical-plan | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md` |
@@ -71,7 +71,7 @@ This matrix is generated from `scripts/docs/control-matrix.mjs`. Run `pnpm docs:
 | `docs/implementation-docs/GIFTA_UX_V2_DB_ROLLOUT_RUNBOOK.md` | Tier 2 | historical-plan | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md` |
 | `docs/implementation-docs/GIFTA_UX_V2_DECISION_REGISTER.md` | Tier 1 | current-authoritative | Ryan Laubscher | `src/lib/ux-v2/decision-locks.ts`, `docs/Platform-Spec-Docs/CANONICAL.md` | 2026-03-12 | — |
 | `docs/implementation-docs/GIFTA_UX_V2_GO_NO_GO_TEMPLATE.md` | Tier 2 | historical-plan | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md` |
-| `docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md` | Tier 1 | current-operational | Ryan Laubscher | `docs/implementation-docs/GIFTA_UX_V2_AGENT_EXECUTION_CONTRACT.md`, `docs/implementation-docs/GIFTA_UX_V2_DECISION_REGISTER.md`, `docs/Platform-Spec-Docs/CANONICAL.md` | 2026-03-12 | — |
+| `docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md` | Tier 2 | reference-non-authoritative | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | `AGENTS.md` |
 | `docs/implementation-docs/GIFTA_UX_V2_PAYOUT_ENGINE_SPEC.md` | Tier 2 | historical-plan | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md` |
 | `docs/implementation-docs/GIFTA_UX_V2_PHASE_B_EXECUTION_PLAN.md` | Tier 2 | historical-plan | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md` |
 | `docs/implementation-docs/GIFTA_UX_V2_PHASE_B_GO_NO_GO_TEMPLATE.md` | Tier 2 | historical-plan | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/implementation-docs/GIFTA_UX_V2_MASTER_IMPLEMENTATION_INDEX.md` |
@@ -105,7 +105,7 @@ This matrix is generated from `scripts/docs/control-matrix.mjs`. Run `pnpm docs:
 | `docs/Integration-docs/RESEND_INTEGRATION_GUIDE.md` | Tier 2 | reference-non-authoritative | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/Platform-Spec-Docs/INTEGRATIONS.md` |
 | `docs/Integration-docs/whatsapp-cloud-api-gifta-integration-guide.md` | Tier 2 | reference-non-authoritative | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/Platform-Spec-Docs/INTEGRATIONS.md` |
 | `docs/napkin/napkin.md` | Tier 1 | working-memory | Ryan Laubscher | `session learnings`, `repo workflow` | 2026-03-12 | — |
-| `docs/napkin/SKILL.md` | Tier 1 | current-operational | Ryan Laubscher | `.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `workflow-orchestration.md`, `progress.md` | 2026-03-12 | — |
+| `docs/napkin/SKILL.md` | Tier 1 | current-operational | Ryan Laubscher | `.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `AGENTS.md`, `progress.md` | 2026-03-12 | — |
 | `docs/payment-docs/ozow-oneapi-developer-reference.md` | Tier 2 | reference-non-authoritative | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/Platform-Spec-Docs/PAYMENTS.md` |
 | `docs/payment-docs/ozow-oneapi-open-questions.md` | Tier 2 | reference-non-authoritative | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/Platform-Spec-Docs/PAYMENTS.md` |
 | `docs/payment-docs/payfast-developer-reference.md` | Tier 2 | reference-non-authoritative | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/Platform-Spec-Docs/PAYMENTS.md` |
@@ -164,51 +164,52 @@ This matrix is generated from `scripts/docs/control-matrix.mjs`. Run `pnpm docs:
 | `docs/UX/ui-specs/20-COMMUNICATIONS.md` | Tier 2 | reference-non-authoritative | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/Platform-Spec-Docs/UX.md` |
 | `docs/UX/ui-specs/21-CELEBRATIONS-DELIGHT.md` | Tier 2 | reference-non-authoritative | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/Platform-Spec-Docs/UX.md` |
 | `docs/UX/ui-specs/README.md` | Tier 2 | reference-non-authoritative | Ryan Laubscher | `src/`, `drizzle/migrations/`, `package.json`, `public/v1/openapi.json` | 2026-03-12 | `docs/Platform-Spec-Docs/UX.md` |
-| `progress.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `spec/00_overview.md`, `active numbered spec`, `most recent closed spec`, `most recent done spec`, `git status` | 2026-03-12 | — |
-| `README.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md`, `docs/Platform-Spec-Docs/CANONICAL.md`, `package.json` | 2026-03-12 | — |
+| `progress.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `.agents/skills/napkin/SKILL.md`, `docs/napkin/napkin.md`, `spec/00_overview.md`, `active full specs`, `quick tasks`, `latest completed proof`, `git status` | 2026-03-12 | — |
+| `README.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md`, `package.json` | 2026-03-12 | — |
 | `spec/00_overview.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/NN_*.md` | 2026-03-12 | — |
-| `spec/01_agent-execution-system-import.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/02_always-active-spec-invariant.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/03_placeholder-handoff-proof-model.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/04_contract-truth-and-payfast-recovery.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/05_platform-fee-removal.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/06_execution-ledger-hardening.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/07_napkin-enforcement.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/08_dreamboard-create-voucher-flow.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/09_voucher-payout-api-contract-fix.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/10_karri-default-path-decoupling.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/11_openapi-contract-determinism.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/12_karri-config-readiness-alignment.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/13_charity-product-disablement.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/14_legacy-charity-admin-access.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/15_dreamboard-truth-cleanup-follow-up.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/16_dreamboard-pivot-hardening.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/17_draft-strict-parsing-fix.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/18_below-nav-homepage-replica.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/19_control-matrix-gap-remediation.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/20_hero-font-token-cleanup.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/21_landing-nav-seam-alignment.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/22_homepage-hero-headline-nowrap.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/23_agentation-homepage-dev-overlay.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/24_homepage-nav-strip-removal.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/25_homepage-hero-top-inset-polish.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/26_homepage-desktop-quote-stack-refactor.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/27_homepage-hero-duplicate-rail-cleanup.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/28_homepage-timeline-eyebrow-removal.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/29_homepage-hero-desktop-only-contributor-constellation.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/30_homepage-hero-headline-libre-baskerville.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/31_favicon-gift-icon-update.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/32_create-dates-same-day-validation-hardening.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/33_create-dates-regression-fixes.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/34_homepage-footer-voucher-partner-pill-removal.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/35_homepage-testimonial-rotation-restoration.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/36_homepage-testimonial-timing-and-copy-polish.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/37_create-review-publish-scroll-reset.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/38_homepage-testimonial-scroll-glitch-fix.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/39_shared-header-top-link-removal.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
-| `spec/40_session-placeholder.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/01_agent-execution-system-import.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/02_always-active-spec-invariant.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/03_placeholder-handoff-proof-model.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/04_contract-truth-and-payfast-recovery.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/05_platform-fee-removal.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/06_execution-ledger-hardening.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/07_napkin-enforcement.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/08_dreamboard-create-voucher-flow.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/09_voucher-payout-api-contract-fix.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/10_karri-default-path-decoupling.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/11_openapi-contract-determinism.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/12_karri-config-readiness-alignment.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/13_charity-product-disablement.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/14_legacy-charity-admin-access.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/15_dreamboard-truth-cleanup-follow-up.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/16_dreamboard-pivot-hardening.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/17_draft-strict-parsing-fix.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/18_below-nav-homepage-replica.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/19_control-matrix-gap-remediation.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/20_hero-font-token-cleanup.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/21_landing-nav-seam-alignment.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/22_homepage-hero-headline-nowrap.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/23_agentation-homepage-dev-overlay.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/24_homepage-nav-strip-removal.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/25_homepage-hero-top-inset-polish.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/26_homepage-desktop-quote-stack-refactor.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/27_homepage-hero-duplicate-rail-cleanup.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/28_homepage-timeline-eyebrow-removal.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/29_homepage-hero-desktop-only-contributor-constellation.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/30_homepage-hero-headline-libre-baskerville.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/31_favicon-gift-icon-update.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/32_create-dates-same-day-validation-hardening.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/33_create-dates-regression-fixes.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/34_homepage-footer-voucher-partner-pill-removal.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/35_homepage-testimonial-rotation-restoration.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/36_homepage-testimonial-timing-and-copy-polish.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/37_create-review-publish-scroll-reset.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/38_homepage-testimonial-scroll-glitch-fix.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/39_shared-header-top-link-removal.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/40_parallel-active-specs-hybrid-fast-path.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/41_workflow-audit-hardening.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `spec/SPEC_TEMPLATE.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `tasks/todo.md` | Tier 2 | historical-evidence | Ryan Laubscher | `progress.md`, `spec/00_overview.md`, `workflow-orchestration.md` | 2026-03-12 | `progress.md`, `spec/00_overview.md` |
-| `TESTING.md` | Tier 1 | current-operational | Ryan Laubscher | `package.json`, `vitest.config.ts`, `tests/`, `progress.md`, `spec/SPEC_TEMPLATE.md` | 2026-03-12 | — |
-| `workflow-orchestration.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md`, `spec/SPEC_TEMPLATE.md` | 2026-03-12 | — |
+| `TESTING.md` | Tier 1 | current-reference | Ryan Laubscher | `package.json`, `vitest.config.ts`, `tests/`, `progress.md`, `spec/SPEC_TEMPLATE.md`, `AGENTS.md` | 2026-03-12 | — |
+| `workflow-orchestration.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md`, `spec/SPEC_TEMPLATE.md` | 2026-03-12 | — |
 

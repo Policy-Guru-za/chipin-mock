@@ -1,47 +1,34 @@
 # Progress
 
-## Current Spec
-
-- `40_session-placeholder`
-
-## Current Stage
-
-- Awaiting next session topic
-
-## Status
-
-- Closed [`spec/39_shared-header-top-link-removal.md`](./spec/39_shared-header-top-link-removal.md) after removing the shared-shell `How it works` and `Trust & safety` headings from both the desktop header and mobile drawer while preserving the remaining CTA/auth balance.
-- Moved the progress ledger forward to `40_session-placeholder` while carrying the green Spec 39 verification, localhost dogfood proof, and the new napkin note.
-
-## Blockers
+## Active Full Specs
 
 - None.
 
-## Next Step
+## Quick Tasks
 
-- Rename `40_session-placeholder` in place once the next session topic is known.
+- None.
 
-## Last Session Spec
+## Recently Closed Specs
 
-- `39_shared-header-top-link-removal`
+- `41_workflow-audit-hardening` — Done
+- `40_parallel-active-specs-hybrid-fast-path` — Done
+- `39_shared-header-top-link-removal` — Done
 
 ## Last Completed Spec
 
-- `39_shared-header-top-link-removal`
+- `41_workflow-audit-hardening`
 
 ## Last Green Commands
 
-- `pnpm exec vitest run tests/unit/auth-nav-user-menu.test.ts tests/unit/mobile-nav.test.tsx` (passed; 2 files, 5 tests)
 - `pnpm docs:audit -- --sync` (passed; 193 markdown files)
-- `pnpm docs:audit` (passed; 193 markdown files)
-- `pnpm lint` (0 errors, 107 warnings)
+- `pnpm lint` (0 errors, 110 warnings)
 - `pnpm typecheck` (clean)
-- `pnpm test` (199 test files, 967 tests passed)
+- `pnpm test` (199 test files, 970 tests passed)
 
 ## Dogfood Evidence
 
-- Live localhost shared-header proof on `http://localhost:3000/maya-birthday-demo` shows the desktop header reduced to Gifta + Create + Sign in in [`output/spec39-shared-header-demo-board-desktop.png`](./output/spec39-shared-header-demo-board-desktop.png), and the mobile drawer reduced to Sign in + Create in [`output/spec39-shared-header-demo-board-mobile-drawer.png`](./output/spec39-shared-header-demo-board-mobile-drawer.png); a direct host-route visual pass remained auth-blocked by the signed-out Clerk redirect, but both host and guest layouts share the same updated `Header`/`MobileNav` components.
+- Dogfooded the hardened workflow end to end by running Spec 41 as a live full-path task with no placeholder spec, keeping the README/review entrypoints napkin-first while AGENTS stayed canonical, proving in regression fixtures that successor references no longer misclassify active specs, and then closing the spec with overview-level `Closed At` metadata so newest-proof ownership is derived independently of `Recently Closed Specs` wording.
 
 ## Napkin Evidence
 
-- See [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) for the Spec 39 shared-header dogfood route-selection note.
+- See [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) for the 2026-03-18 note about parsing only the primary recently-closed spec entry and using overview-level `Closed At` metadata for independent closure ordering.

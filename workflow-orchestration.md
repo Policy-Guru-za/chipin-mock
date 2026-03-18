@@ -1,71 +1,52 @@
-## Workflow Orchestration
+# Workflow Orchestration
 
-### Operating Loop
+> AGENTS is the canonical workflow document.
+> This file is a companion reference that summarizes artifact responsibilities under the current model.
 
-1. **Discovery**
-- read [`.agents/skills/napkin/SKILL.md`](./.agents/skills/napkin/SKILL.md) and [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) before other repo work
-- confirm source-of-truth docs and current repo state
-- inspect [`progress.md`](./progress.md), [`spec/00_overview.md`](./spec/00_overview.md), and the active numbered spec for the current session
-- map the task to the relevant runtime surfaces before changing code or docs
+## Core Principle
 
-2. **Spec**
-- confirm the active numbered spec in [`spec/`](./spec/)
-- if it is `spec/NN_session-placeholder.md`, rename that same numbered file in place to `spec/NN_<topic>.md` before substantive work starts
-- update [`spec/00_overview.md`](./spec/00_overview.md) and [`progress.md`](./progress.md) before coding
-- keep one active spec at a time unless the user says otherwise
+Use the lightest lane that still preserves correctness:
+- **Fast path** for small, low-risk work tracked in [`progress.md`](./progress.md) under `## Quick Tasks`
+- **Full path** for larger or riskier work tracked by numbered specs plus [`progress.md`](./progress.md)
 
-3. **Planning**
-- lock objective, scope, dependencies, stage plan, test gate, and exit criteria in the active spec
-- keep assumptions explicit; do not let them hide in thread history
+## Artifact Responsibilities
 
-4. **Build**
-- implement one bounded stage at a time
-- keep the repo runnable after each stage
-- update [`progress.md`](./progress.md) as status, blockers, and next step change
+### `AGENTS.md`
+- canonical workflow rules
+- startup order
+- fast path vs full path thresholds
+- verification and handoff requirements
 
-5. **Verify**
-- run the smallest gate that proves the stage
-- no red gate means no completed stage
-- for docs/process work, verify links, commands, control-matrix classification, and agent guidance drift
+### `progress.md`
+- active full specs dashboard
+- quick-task dashboard
+- recently closed specs
+- latest completed proof (`Last Completed Spec`, green commands, dogfood, napkin evidence)
 
-6. **Dogfood**
-- exercise the changed flow before claiming completion
-- docs/process work still needs dogfooding: use the new execution flow or playbook end to end and confirm it makes sense in practice
+### `spec/00_overview.md`
+- registry of numbered full-path specs
+- terminal closure-order metadata (`Closed At`) for newest-proof checks
+- may contain multiple `Active` rows
+- no placeholder row is required
 
-7. **Handoff**
-- docs reflect reality
-- summary includes the closed spec id, whether it finished as `Done` or `Superseded`, the napkin outcome, commands run, dogfood result, blockers, remaining risk, and the next numbered placeholder
+### `spec/NN_<topic>.md`
+- full-path plan and execution record for one numbered task
+- multiple numbered specs may be active in parallel
 
-### Artifact Rules
+## Operating Loop
 
-- [`progress.md`](./progress.md) is the live ledger for the active spec, the terminal ledger plus napkin outcome for the most recently closed spec, and the proof ledger for the most recently completed spec
-- [`spec/00_overview.md`](./spec/00_overview.md) is the ordered registry of numbered specs
-- [`spec/SPEC_TEMPLATE.md`](./spec/SPEC_TEMPLATE.md) defines the required spec structure
-- `spec/NN_<topic>.md` is the active execution spec for the current session
-- `spec/NN_session-placeholder.md` is the standing active placeholder between sessions
-- [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) is memory only
+1. Read napkin, then [`AGENTS.md`](./AGENTS.md), then [`progress.md`](./progress.md)
+2. Choose the correct lane
+3. For fast path, add or update a quick-task row and start work
+4. For full path, allocate the next numbered spec, add it to [`spec/00_overview.md`](./spec/00_overview.md), add it to `## Active Full Specs`, then start work
+5. Verify with the smallest useful gate
+6. Dogfood the changed flow
+7. Close the task by updating the relevant dashboard/proof sections; do not create a placeholder
 
-When `Current Spec` is a successor placeholder, use `Last Session Spec` as the owner of the most recently closed session state, `Napkin Evidence` as the owner of that session's napkin outcome, and `Last Completed Spec` as the owner of `Last Green Commands` and `Dogfood Evidence`.
-
-### Definition Of Done
+## Definition Of Done
 
 - relevant gate is green
 - dogfood is complete or clearly blocked with explicit evidence
-- [`progress.md`](./progress.md) contains current active-session state and correctly attributed completed-session proof
-- [`progress.md`](./progress.md) contains `## Napkin Evidence` for the most recently closed session, linking [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) or explicitly stating `No durable napkin update.`
-- any session closed before satisfying exit criteria is explicitly marked `Superseded`
-- the next numbered placeholder is already active before the finished session is closed
-- relevant Tier 1 docs and generated artifacts reflect the shipped state
-
-### Default Heuristics
-
-Every work session uses the spec/progress system.
-
-Apply the fullest stage and gate discipline when the session touches:
-
-- multi-file work
-- behavior changes
-- auth, security, payment, payout, schema, or API-contract changes
-- major UX or routing changes
-- agent-policy or documentation-system changes
-- anything expected to take more than about 30 minutes
+- [`progress.md`](./progress.md) accurately reflects active work and latest completed proof
+- the relevant numbered spec is `Done` or `Superseded` when the work used the full path
+- `## Napkin Evidence` records the most recent durable workflow learning or explicit `No durable napkin update.`
