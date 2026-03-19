@@ -302,7 +302,7 @@
   position: relative;
   width: 100%;
   max-width: 540px;
-  padding-top: 4px;
+  padding-top: 12px;
 }
 
 .villageTestimonial::before {

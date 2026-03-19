@@ -8,10 +8,10 @@
   --landing-exact-ink: #2c2520;
   --landing-exact-ink-soft: #3d3d3d;
   --landing-exact-ink-faint: #666;
+  --landing-exact-stitch-ink: #100e13;
   --landing-exact-surface: #fffcf9;
   --landing-exact-surface-warm: #faf7f2;
   --landing-exact-surface-cream: #fffbf7;
-  --landing-exact-takealot-blue: #0b79bf;
 
   font-family: var(--font-dm-sans);
   color: var(--landing-exact-ink-soft);

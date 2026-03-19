@@ -6,60 +6,96 @@ import styles from './LandingVoucherBandExact.module.css';
 export function LandingVoucherBandExact() {
   return (
     <>
-      <section id="trust" className={styles.voucherBand}>
-        <div className={styles.voucherBandInner}>
-          <div className={styles.voucherText}>
+      <section id="trust" className={styles.payoutBand}>
+        <div className={styles.payoutBandInner}>
+          <div className={styles.payoutText}>
+            <div className={styles.partnerEyebrow}>Strategic payments partner</div>
             <h2>
-              Everyone chipped in — now it&apos;s a <em>digital voucher</em>, ready to spend.
+              Everyone chipped in — now the payout <em>lands securely</em>.
             </h2>
-            <p className={styles.voucherDetails}>
-              Once the Dreamboard closes, the full amount raised becomes a{' '}
-              <strong>digital voucher</strong> — redeemable across Takealot&apos;s entire
-              catalogue, so the birthday child gets exactly what they wished for. The
-              voucher is sent at just the right moment, and details are kept securely on file
-              until then.
+            <p className={styles.payoutDetails}>
+              When the Dreamboard closes, Gifta sends the funds directly to the host parent&apos;s
+              bank account, or to the birthday child&apos;s Karri Card when they already have one.
+              No voucher codes, no retailer restrictions — just simple, secure payout delivery.
             </p>
+            <div className={styles.payoutHighlights}>
+              <div className={styles.payoutHighlight}>Host parent bank account</div>
+              <div className={styles.payoutHighlight}>Birthday child&apos;s Karri Card</div>
+            </div>
           </div>
 
-          <div className={styles.voucherVisual}>
+          <div className={styles.payoutVisual}>
             <div>
-              <div className={styles.voucherCard}>
-                <div className={styles.voucherCardHeader}>
-                  <div className={styles.voucherCardBrand}>
-                    <span className={styles.voucherCardEmoji}>🎁</span>
-                    <span className={styles.voucherCardBrandText}>Gifta</span>
+              <div className={styles.payoutCard}>
+                <div className={styles.payoutCardHeader}>
+                  <div className={styles.payoutCardBrand}>
+                    <span className={styles.payoutCardEmoji}>🏦</span>
+                    <div>
+                      <div className={styles.payoutCardBrandText}>Gifta payout</div>
+                      <div className={styles.payoutCardBrandSub}>Paid out when the Dreamboard closes</div>
+                    </div>
+                  </div>
+                  <div className={styles.payoutCardStatus}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    Ready to send
                   </div>
                 </div>
 
-                <div className={styles.voucherCardBody}>
-                  <div className={styles.voucherCardLabel}>Gift voucher for</div>
-                  <div className={styles.voucherCardGift}>Ballet Starter Kit</div>
-                  <div className={styles.voucherCardFor}>Mia&apos;s 6th Birthday 🩰</div>
-                  <div className={styles.voucherCardAmountRow}>
-                    <div>
-                      <div className={styles.voucherCardAmountLabel}>Amount raised</div>
-                      <div className={styles.voucherCardAmountValue}>R1,850</div>
+                <div className={styles.payoutCardBody}>
+                  <div className={styles.payoutCardSection}>
+                    <div className={styles.payoutCardLabel}>Primary destination</div>
+                    <div className={styles.payoutCardValue}>Host parent bank account</div>
+                    <div className={styles.payoutCardMeta}>
+                      Secure bank payout details stay on file for delivery at close.
                     </div>
-                    <div className={styles.voucherCardStatus}>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                      Ready
+                  </div>
+                  <div className={styles.payoutCardSection}>
+                    <div className={styles.payoutCardLabel}>Optional child destination</div>
+                    <div className={styles.payoutCardValue}>Birthday child&apos;s Karri Card</div>
+                    <div className={styles.payoutCardMeta}>
+                      Used when the child already has a Karri Card available for direct payout.
+                    </div>
+                  </div>
+                  <div className={styles.payoutCardAmountRow}>
+                    <div>
+                      <div className={styles.payoutCardAmountLabel}>Amount raised</div>
+                      <div className={styles.payoutCardAmountValue}>R1,850</div>
+                    </div>
+                    <div className={styles.payoutCardAmountHint}>
+                      Direct payout when Mia&apos;s Dreamboard closes
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className={styles.voucherCoBrand}>
-                <Image
-                  src="/images/homepage-exact/takealot_logo.png"
-                  alt="Takealot"
-                  width={512}
-                  height={512}
-                  className={styles.voucherCoBrandLogo}
-                />
-                <div className={styles.voucherCoBrandDivider} />
-                <div className={styles.voucherCoBrandLabel}>Official voucher partner</div>
+              <div className={styles.partnerRail}>
+                <div className={styles.partnerLockup}>
+                  <Image
+                    src="/images/homepage-exact/stitch_logo.svg"
+                    alt="Stitch"
+                    width={108}
+                    height={21}
+                    className={styles.partnerRailLogo}
+                  />
+                  <div className={styles.partnerLockupTitle}>Superpowered by Stitch.</div>
+                  <div className={styles.partnerLockupCopy}>Strategic payments partner</div>
+                </div>
+                <div className={styles.partnerRailDivider} />
+                <div className={styles.partnerLockup}>
+                  <Image
+                    src="/images/homepage-exact/karri_logo.png"
+                    alt="Karri"
+                    width={124}
+                    height={28}
+                    className={styles.partnerRailLogo}
+                  />
+                  <div className={styles.partnerLockupTitle}>Karri Card payout option</div>
+                  <div className={styles.partnerLockupCopy}>
+                    For birthday children who already have a Karri Card
+                  </div>
+                </div>
               </div>
             </div>
           </div>

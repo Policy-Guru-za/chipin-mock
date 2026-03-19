@@ -9,9 +9,9 @@ export const contributors = [
 ];
 
 export const trustItems = [
-  { icon: '🏦', text: 'Voucher-ready fulfilment' },
-  { icon: '🔒', text: 'Secure payments' },
-  { icon: '📱', text: 'Share via WhatsApp' },
+  { icon: '🏦', text: 'Direct bank payouts' },
+  { icon: '💳', text: 'Karri Card option' },
+  { icon: '⚡', text: 'Superpowered by Stitch' },
 ];
 
 export const navLinks: Array<{ label: string; href: string }> = [];
@@ -30,7 +30,7 @@ export const howItWorksSteps = [
     stepLabel: 'Step one',
     title: 'Create a Dreamboard',
     description:
-      "Pick the dream gift, set your goal — you're live and sharing in under a minute. No app download needed.",
+      "Let everyone know what you're raising for — share your Dreamboard and start collecting contributions.",
     gradientFrom: '#6B9E88',
     gradientTo: '#5A8E78',
     theme: 'light' as const,
@@ -39,16 +39,16 @@ export const howItWorksSteps = [
     stepLabel: 'Step two',
     title: 'Share via WhatsApp',
     description:
-      'Drop it in the group chat. Friends and family chip in any amount — no awkward "who\'s paying?" conversations.',
+      'Drop it in the group chat. Friends and family chip in any amount — turning little contributions into one big gift.',
     gradientFrom: '#E8D5BD',
     gradientTo: '#D4B896',
     theme: 'dark' as const,
   },
   {
     stepLabel: 'Step three',
-    title: 'Gift funded!',
+    title: 'Funds paid out securely',
     description:
-      'Voucher details stay on file, so the host is ready when the Dreamboard closes.',
+      'Funds are paid directly to the host parent’s bank account, or to the birthday child’s Karri Card when available.',
     gradientFrom: '#C4785A',
     gradientTo: '#B06A4A',
     theme: 'light' as const,

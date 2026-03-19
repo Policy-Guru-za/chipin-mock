@@ -38,7 +38,7 @@ describe('below-nav homepage replica shell contract', () => {
     expect(homepageOverlay).not.toContain('webhookUrl=');
   });
 
-  it('uses the reviewed assets and exact below-nav copy anchors', () => {
+  it('uses the approved payout-partner assets and exact below-nav copy anchors', () => {
     const hero = readSource('src/components/landing-exact/LandingHeroExact.tsx');
     const heroRotator = readSource('src/components/landing-exact/LandingHeroTestimonialRotator.tsx');
     const sharedTestimonials = readSource('src/components/landing/testimonials.ts');
@@ -54,11 +54,19 @@ describe('below-nav homepage replica shell contract', () => {
     expect(sharedTestimonials).toContain('the present everyone helped with.');
     expect(sharedTestimonials).toContain('Rachel K.');
     expect(sharedTestimonials).toContain('James M.');
+    expect(hero).not.toContain('/images/homepage-exact/stitch_logo.svg');
+    expect(hero).not.toContain('Strategic payments partner');
     expect(timeline).toContain('Family Group Chat');
-    expect(timeline).toContain('/images/homepage-exact/takealot_logo.png');
+    expect(timeline).toContain('/images/homepage-exact/stitch_logo.svg');
+    expect(timeline).toContain('Funds paid out securely');
+    expect(timeline).toContain('Host parent bank account');
     expect(timeline).toContain('3.4k+');
-    expect(voucherBand).toContain('Official voucher partner');
-    expect(voucherBand).toContain('Takealot');
+    expect(voucherBand).toContain('/images/homepage-exact/stitch_logo.svg');
+    expect(voucherBand).toContain('/images/homepage-exact/karri_logo.png');
+    expect(voucherBand).toContain('Strategic payments partner');
+    expect(voucherBand).toContain('Superpowered by Stitch.');
+    expect(voucherBand).toContain('Karri Card payout option');
+    expect(voucherBand).not.toContain('Takealot');
     expect(footer).toContain('Birthday gifting, simplified.');
   });
 

@@ -208,6 +208,7 @@ This matrix is generated from `scripts/docs/control-matrix.mjs`. Run `pnpm docs:
 | `spec/39_shared-header-top-link-removal.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `spec/40_parallel-active-specs-hybrid-fast-path.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `spec/41_workflow-audit-hardening.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/42_homepage-payout-stitch-partnership-rewrite.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `spec/SPEC_TEMPLATE.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `tasks/todo.md` | Tier 2 | historical-evidence | Ryan Laubscher | `progress.md`, `spec/00_overview.md`, `workflow-orchestration.md` | 2026-03-12 | `progress.md`, `spec/00_overview.md` |
 | `TESTING.md` | Tier 1 | current-reference | Ryan Laubscher | `package.json`, `vitest.config.ts`, `tests/`, `progress.md`, `spec/SPEC_TEMPLATE.md`, `AGENTS.md` | 2026-03-12 | — |

@@ -157,6 +157,30 @@ describe('copy matrix compliance', () => {
     expect(landingContent).not.toContain('givingBack');
   });
 
+  it('uses direct-payout Stitch and Karri copy across landing surfaces', () => {
+    const hero = readSource('src/components/landing-exact/LandingHeroExact.tsx');
+    const timeline = readSource('src/components/landing-exact/LandingTimelineExact.tsx');
+    const voucherBand = readSource('src/components/landing-exact/LandingVoucherBandExact.tsx');
+    const landingContent = readSource('src/components/landing/content.ts');
+
+    expect(hero).not.toContain('Superpowered by Stitch.');
+    expect(hero).not.toContain('Strategic payments partner');
+    expect(timeline).toContain('Funds paid out securely');
+    expect(timeline).toContain("birthday child&apos;s Karri Card when available");
+    expect(voucherBand).toContain('Strategic payments partner');
+    expect(voucherBand).toContain('Karri Card payout option');
+    expect(voucherBand).toContain('Superpowered by Stitch.');
+    expect(landingContent).toContain('Direct bank payouts');
+    expect(landingContent).toContain('Karri Card option');
+    expect(landingContent).toContain('Superpowered by Stitch');
+
+    expect(timeline).not.toContain('Takealot');
+    expect(voucherBand).not.toContain('Takealot');
+    expect(voucherBand).not.toContain('digital voucher');
+    expect(landingContent).not.toContain('Voucher-ready fulfilment');
+    expect(landingContent).not.toContain('Voucher details stay on file');
+  });
+
   it('blocks split Dream Board terminology in active UI and partner API text', () => {
     const files = [
       'src/app/(admin)/admin/page.tsx',

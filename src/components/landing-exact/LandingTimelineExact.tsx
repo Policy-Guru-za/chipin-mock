@@ -116,8 +116,8 @@ export function LandingTimelineExact() {
             <div className={styles.timelineStepLabel}>Step one</div>
             <div className={styles.timelineStepTitle}>Create a Dreamboard</div>
             <div className={styles.timelineStepDescription}>
-              Pick the dream gift, set your goal — you&apos;re live and sharing in under a
-              minute. No app download needed.
+              Let everyone know what you&apos;re raising for — share your Dreamboard and
+              start collecting contributions.
             </div>
 
             <div className={styles.miniForm}>
@@ -228,37 +228,43 @@ export function LandingTimelineExact() {
 
           <div className={styles.timelineContent}>
             <div className={styles.timelineStepLabel}>Step three</div>
-            <div className={styles.timelineStepTitle}>Gift funded!</div>
+            <div className={styles.timelineStepTitle}>Funds paid out securely</div>
             <div className={styles.timelineStepDescription}>
-              The host receives a Takealot voucher — ready to get exactly what was wished
-              for. No guesswork, no gift receipts.
+              When the Dreamboard closes, Gifta pays out directly to the host parent&apos;s
+              bank account, or straight to the birthday child&apos;s Karri Card when available.
             </div>
 
-            <div className={styles.miniVoucher}>
-              <div className={styles.miniVoucherTop}>
-                <div className={styles.miniVoucherBrand}>
-                  <span>🎁</span>
-                  Gifta
+            <div className={styles.miniPayout}>
+              <div className={styles.miniPayoutTop}>
+                <div className={styles.miniPayoutBrand}>
+                  <span>🏦</span>
+                  Gifta payout
                 </div>
-                <div className={styles.miniVoucherBadge}>
+                <div className={styles.miniPayoutBadge}>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Delivered
+                  Secure
                 </div>
               </div>
 
-              <div className={styles.miniVoucherGift}>Ballet Starter Kit</div>
-              <div className={styles.miniVoucherFor}>For Mia&apos;s 6th Birthday</div>
-              <div className={styles.miniVoucherPartner}>
-                Redeemable at
+              <div className={styles.miniPayoutTitle}>Host parent bank account</div>
+              <div className={styles.miniPayoutFor}>
+                with a Karri Card option for the birthday child when they already have one.
+              </div>
+              <div className={styles.miniPayoutDestinations}>
+                <div className={styles.miniPayoutChip}>Bank account</div>
+                <div className={styles.miniPayoutChip}>Karri Card</div>
+              </div>
+              <div className={styles.miniPayoutPartner}>
                 <Image
-                  src="/images/homepage-exact/takealot_logo.png"
-                  alt="Takealot"
-                  width={512}
-                  height={512}
-                  className={styles.miniVoucherPartnerLogo}
+                  src="/images/homepage-exact/stitch_logo.svg"
+                  alt="Stitch"
+                  width={92}
+                  height={18}
+                  className={styles.miniPayoutPartnerLogo}
                 />
+                <span>Superpowered by Stitch.</span>
               </div>
             </div>
           </div>
