@@ -10,41 +10,18 @@ export const HOMEPAGE_SOCIAL_IMAGE_SIZE = {
 } as const;
 export const HOMEPAGE_SOCIAL_IMAGE_CONTENT_TYPE = 'image/png';
 
-let brandMarkDataUriPromise: Promise<string> | null = null;
+let emailLockupDataUriPromise: Promise<string> | null = null;
 
-const getBrandMarkDataUri = () => {
-  if (!brandMarkDataUriPromise) {
-    brandMarkDataUriPromise = readFile(
-      join(process.cwd(), 'public/Logos/Gifta-logo-transparent.png'),
+const getEmailLockupDataUri = () => {
+  if (!emailLockupDataUriPromise) {
+    emailLockupDataUriPromise = readFile(
+      join(process.cwd(), 'public/Logos/Email.png'),
       'base64'
     ).then((data) => `data:image/png;base64,${data}`);
   }
 
-  return brandMarkDataUriPromise;
+  return emailLockupDataUriPromise;
 };
-
-function BrandPill({ label }: { label: string }) {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '14px 24px',
-        borderRadius: '999px',
-        backgroundColor: 'rgba(255,255,255,0.72)',
-        border: '1px solid rgba(15,118,110,0.10)',
-        fontSize: '22px',
-        fontWeight: 700,
-        color: '#0F766E',
-        letterSpacing: '0.06em',
-        textTransform: 'uppercase',
-      }}
-    >
-      {label}
-    </div>
-  );
-}
 
 function ValueChip({ label }: { label: string }) {
   return (
@@ -67,25 +44,38 @@ function ValueChip({ label }: { label: string }) {
   );
 }
 
-function BrandLockup({ brandMarkSrc }: { brandMarkSrc: string }) {
+function EmailLockup({ emailLockupSrc }: { emailLockupSrc: string }) {
   return (
     <div
       style={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '24px',
+        gap: '34px',
         width: '100%',
       }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={brandMarkSrc}
-        alt="Gifta"
-        width={240}
-        height={300}
-        style={{ width: '240px', height: '300px', objectFit: 'contain' }}
-      />
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '26px 34px',
+          borderRadius: '30px',
+          backgroundColor: '#F9FBFB',
+          border: '1px solid rgba(15,118,110,0.08)',
+          boxShadow: '0 22px 50px rgba(21,59,54,0.08)',
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={emailLockupSrc}
+          alt="Gifta"
+          width={520}
+          height={172}
+          style={{ width: '520px', height: '172px', objectFit: 'contain' }}
+        />
+      </div>
 
       <div
         style={{
@@ -125,7 +115,7 @@ function BrandLockup({ brandMarkSrc }: { brandMarkSrc: string }) {
 }
 
 export const createHomepageSocialImage = async () => {
-  const brandMarkSrc = await getBrandMarkDataUri();
+  const emailLockupSrc = await getEmailLockupDataUri();
 
   return new ImageResponse(
     (
@@ -182,11 +172,10 @@ export const createHomepageSocialImage = async () => {
             style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
+              justifyContent: 'flex-end',
               width: '100%',
             }}
           >
-            <BrandPill label="Gifta" />
             <div
               style={{
                 display: 'flex',
@@ -210,7 +199,7 @@ export const createHomepageSocialImage = async () => {
             </div>
           </div>
 
-          <BrandLockup brandMarkSrc={brandMarkSrc} />
+          <EmailLockup emailLockupSrc={emailLockupSrc} />
 
           <div style={{ display: 'flex', gap: '14px' }}>
             <ValueChip label="Dreamboards" />
