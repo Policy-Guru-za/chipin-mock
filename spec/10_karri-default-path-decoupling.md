@@ -1,5 +1,7 @@
 # 10_karri-default-path-decoupling
 
+> Historical context note (2026-03-19): this closed spec documents the superseded voucher-default period. Current intended product truth is bank payout by default with optional Karri, while remaining voucher runtime remnants are follow-up cleanup.
+
 ## Objective
 
 - Finish removing Karri from the default Dreamboard product experience while preserving Karri as a gated legacy or partner capability.

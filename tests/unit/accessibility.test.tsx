@@ -25,7 +25,6 @@ describe('C7 accessibility hardening', () => {
     const marketingLayout = readSource('src/app/(marketing)/layout.tsx');
     const signIn = readSource('src/app/sign-in/[[...sign-in]]/page.tsx');
     const signUp = readSource('src/app/sign-up/[[...sign-up]]/page.tsx');
-    const demo = readSource('src/app/demo/payment-simulator/page.tsx');
 
     expect(guestLayout).toContain('id="main-content"');
     expect(hostLayout).toContain('id="main-content"');
@@ -33,7 +32,6 @@ describe('C7 accessibility hardening', () => {
     expect(marketingLayout).toContain('id="main-content"');
     expect(signIn).toContain('id="main-content"');
     expect(signUp).toContain('id="main-content"');
-    expect(demo).toContain('id="main-content"');
   });
 
   it('sets required aria labels and alert roles', () => {
@@ -54,7 +52,7 @@ describe('C7 accessibility hardening', () => {
     const header = readSource('src/components/layout/Header.tsx');
     const landingNav = readSource('src/components/landing/LandingNav.tsx');
     const pagination = readSource('src/components/admin/AdminPagination.tsx');
-    const contributionParts = readSource('src/components/forms/ContributionFormParts.tsx');
+    const contributeDetails = readSource('src/app/(guest)/[slug]/contribute/ContributeDetailsClient.tsx');
     const iconSizeClasses = buttonVariants({ size: 'icon' });
 
     expect(iconSizeClasses).toContain('h-11');
@@ -64,8 +62,7 @@ describe('C7 accessibility hardening', () => {
     expect(landingNav).not.toContain('min-h-[44px]');
     expect(landingNav).not.toContain('min-w-[44px]');
     expect(pagination).toContain('min-h-[44px]');
-    expect(contributionParts).toContain('min-h-[44px]');
-    expect(contributionParts).toContain('min-w-[44px]');
+    expect(contributeDetails).toContain('min-h-11');
   });
 
   it('adds error, not-found, and loading fallback surfaces', () => {

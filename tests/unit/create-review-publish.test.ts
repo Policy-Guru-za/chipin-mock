@@ -32,12 +32,15 @@ afterEach(() => {
   vi.unmock('@/lib/integrations/whatsapp');
   vi.unmock('@/lib/utils/slug');
   vi.unmock('@/lib/observability/logger');
+  vi.unstubAllEnvs();
   vi.clearAllMocks();
   vi.resetModules();
 });
 
 describe('publishDreamBoardAction', () => {
   it('persists draft message to the published Dreamboard payload', async () => {
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://www.gifta.co.za');
+
     const returning = vi.fn(async () => [{ id: 'board-1' }]);
     const values = vi.fn(() => ({ returning }));
     const insert = vi.fn(() => ({ values }));
@@ -79,7 +82,7 @@ describe('publishDreamBoardAction', () => {
     expect(clearDreamBoardDraft).toHaveBeenCalledWith('host-1');
     expect(sendDreamBoardLink).toHaveBeenCalledWith(
       '+27821234567',
-      'https://gifta.co.za/maya-birthday-abc123',
+      'https://www.gifta.co.za/maya-birthday-abc123',
       'Maya'
     );
 
@@ -87,7 +90,7 @@ describe('publishDreamBoardAction', () => {
       status: 'published',
       boardId: 'board-1',
       slug: 'maya-birthday-abc123',
-      shareUrl: 'https://gifta.co.za/maya-birthday-abc123',
+      shareUrl: 'https://www.gifta.co.za/maya-birthday-abc123',
     });
   });
 });

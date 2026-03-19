@@ -52,7 +52,7 @@ export type AdminDreamBoardDataset = {
 
 export type AdminContributionFilters = AdminListParams & {
   statuses?: Array<'pending' | 'processing' | 'completed' | 'failed' | 'refunded'>;
-  paymentProviders?: Array<'payfast' | 'ozow' | 'snapscan'>;
+  paymentProviders?: Array<'stitch'>;
   createdFrom?: Date;
   createdTo?: Date;
   dreamBoardId?: string;
@@ -65,7 +65,7 @@ export type AdminContributionDataset = {
   dreamBoardSlug: string;
   childName: string;
   contributorName: string | null;
-  paymentProvider: 'payfast' | 'ozow' | 'snapscan';
+  paymentProvider: 'stitch';
   paymentStatus: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
   amountCents: number;
   charityCents: number;

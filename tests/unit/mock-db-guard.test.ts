@@ -18,8 +18,7 @@ afterEach(() => {
 });
 
 describe('assertNotProductionDb', () => {
-  it('skips checks when mocks are disabled', async () => {
-    process.env.MOCK_PAYMENTS = 'false';
+  it('skips checks when karri mock mode is disabled', async () => {
     process.env.MOCK_KARRI = 'false';
 
     const { assertNotProductionDb } = await loadModule();
@@ -27,9 +26,8 @@ describe('assertNotProductionDb', () => {
     expect(() => assertNotProductionDb()).not.toThrow();
   });
 
-  it('throws when mock mode is enabled without DATABASE_URL', async () => {
-    process.env.MOCK_PAYMENTS = 'true';
-    process.env.MOCK_KARRI = 'false';
+  it('throws when karri mock mode is enabled without DATABASE_URL', async () => {
+    process.env.MOCK_KARRI = 'true';
     process.env.DATABASE_URL = '';
 
     const { assertNotProductionDb } = await loadModule();
@@ -38,7 +36,6 @@ describe('assertNotProductionDb', () => {
   });
 
   it('throws when mock mode targets a production database', async () => {
-    process.env.MOCK_PAYMENTS = 'false';
     process.env.MOCK_KARRI = 'true';
     process.env.DATABASE_URL = 'postgres://user:pass@prod.db.example.com/chipin';
 
@@ -47,9 +44,8 @@ describe('assertNotProductionDb', () => {
     expect(() => assertNotProductionDb()).toThrow(/production database/i);
   });
 
-  it('allows mock mode with a non-production database', async () => {
-    process.env.MOCK_PAYMENTS = 'true';
-    process.env.MOCK_KARRI = 'false';
+  it('allows karri mock mode with a non-production database', async () => {
+    process.env.MOCK_KARRI = 'true';
     process.env.DATABASE_URL = 'postgres://user:pass@staging.db.example.com/chipin';
 
     const { assertNotProductionDb } = await loadModule();

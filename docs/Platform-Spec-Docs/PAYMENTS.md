@@ -1,43 +1,44 @@
 # Payments
 
 > **Status:** Current reference  
-> **Last reviewed:** March 12, 2026
+> **Last reviewed:** March 19, 2026
 
-## Current Providers
+## Current Runtime State
 
-- PayFast
-- Ozow
-- SnapScan
+- No live guest payment provider is enabled right now.
+- Public contribution routes now show a Stitch-coming-soon placeholder instead of a working checkout.
+- Active payment creation, provider selection, inbound provider webhooks, demo payment simulator, and reconciliation routes have been removed.
+- Future direction: Stitch, but the integration is not implemented yet.
 
-## Contribution Create Flow
+## Public Guest Flow
 
-Source route: [`src/app/api/internal/contributions/create/route.ts`](../../src/app/api/internal/contributions/create/route.ts)
+Source files:
+
+- [`src/app/(guest)/[slug]/contribute/page.tsx`](../../src/app/(guest)/[slug]/contribute/page.tsx)
+- [`src/app/(guest)/[slug]/contribute/ContributeDetailsClient.tsx`](../../src/app/(guest)/[slug]/contribute/ContributeDetailsClient.tsx)
+- [`src/app/(guest)/[slug]/contribute/payment/page.tsx`](../../src/app/(guest)/[slug]/contribute/payment/page.tsx)
+- [`src/app/(guest)/[slug]/payment-failed/page.tsx`](../../src/app/(guest)/[slug]/payment-failed/page.tsx)
+- [`src/lib/payments/index.ts`](../../src/lib/payments/index.ts)
 
 Current behavior:
 
-- validates `dreamBoardId`, contribution amount, contributor details, and provider
-- allows contributions while board status is `active` or `funded`
-- charges the provider `amount_cents` only for new contribution attempts
-- persists contribution with `amount_cents`, `fee_cents`, provider, ref, and pending status
-- creates provider-specific payment intent/redirect payload
+- `/{slug}/contribute` renders Dreamboard context plus a public Stitch-coming-soon placeholder.
+- `/{slug}/contribute/payment` redirects back to `/{slug}/contribute`.
+- `/{slug}/payment-failed` redirects back to `/{slug}/contribute`.
+- `/{slug}/thanks` can still render historical receipt state for stored `stitch` contribution refs, but no live checkout path currently lands there.
 
 ## Current Money Semantics
 
-- contributor chooses gift amount
-- active checkout is fee-free; provider charge amount equals `amount_cents`
-- completed goal progress uses `amount_cents`
-- payout math still respects stored legacy `fee_cents` and current `net_cents`
-- `fee_cents` and contribution `net_cents` remain in storage and partner payloads for backward compatibility only
+- The public guest flow does not create live contributions right now.
+- Historical contribution storage still keeps `amount_cents`, `fee_cents`, `net_cents`, `payment_provider`, `payment_status`, and `payment_ref` fields for ledger/admin compatibility.
+- The active runtime enum for `payment_provider` is now `stitch`.
+- Payout math continues to respect stored contribution amounts.
 
-## Webhooks
+## Webhooks and Jobs
 
-Webhook route handlers live under:
-
-- `/api/webhooks/payfast`
-- `/api/webhooks/ozow`
-- `/api/webhooks/snapscan`
-
-On successful completion they update contribution state, refresh board totals, and may emit partner webhooks / notifications.
+- No inbound payment-provider webhook routes are active.
+- No payment reconciliation job route is active.
+- Outbound partner webhook dispatch still lives under [`src/lib/webhooks/`](../../src/lib/webhooks/) for Dreamboard/contribution events generated elsewhere in the runtime.
 
 Current outbound partner webhook events:
 
@@ -48,5 +49,6 @@ Legacy wildcard endpoint subscriptions and non-emitted legacy event names are no
 
 ## Known Constraints
 
+- Stitch integration is future work; this doc should not describe a live Stitch API flow until code exists.
 - Current docs should describe provider reality as implemented, not older freehand examples.
 - Use [`docs/Platform-Spec-Docs/API.md`](./API.md) plus generated OpenAPI for contract work.

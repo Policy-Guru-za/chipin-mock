@@ -3,8 +3,10 @@
 > Canonical replacement: `docs/Platform-Spec-Docs/NFR-OPERATIONS.md`.
 # Runbook: Payment Provider Outage
 
+> 2026-03-19 note: Gifta's current public guest flow is a Stitch-coming-soon placeholder with no live checkout provider. Treat this runbook as legacy/future contingency guidance only unless a live provider is reintroduced.
+
 ## Purpose
-Guide for responding to PayFast/Ozow/SnapScan outages, degradations, or widespread payment failures.
+Guide for responding to historical or future live checkout provider outages, degradations, or widespread payment failures.
 
 ## Detection Signals
 - Sentry alerts for payment initiation or webhook failures.

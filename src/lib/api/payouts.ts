@@ -1,4 +1,5 @@
 import { decryptSensitiveValue } from '@/lib/utils/encryption';
+import { getConfiguredAppUrl } from '@/lib/utils/request';
 import { serializeGiftData } from '@/lib/api/gifts';
 
 type PayoutApiRecord = {
@@ -56,7 +57,7 @@ const serializeRecipientBasics = (record: Record<string, unknown>) => {
 };
 
 const serializeRecipientGiftData = (record: Record<string, unknown>) => {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const baseUrl = getConfiguredAppUrl();
   return {
     gift_data: serializeGiftData({
       giftName: typeof record.giftName === 'string' ? record.giftName : null,

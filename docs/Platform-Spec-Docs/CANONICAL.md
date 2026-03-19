@@ -1,7 +1,7 @@
 # Gifta Canonical Spec (Source of Truth)
 
-> **Version:** 2.0.7
-> **Last Updated:** March 13, 2026
+> **Version:** 2.0.9
+> **Last Updated:** March 19, 2026
 > **Status:** Authoritative
 > **Supersedes:** v1.1.1 (January 21, 2026)
 
@@ -11,7 +11,7 @@
 
 Resolve conflicts across docs. When anything disagrees, this file wins.
 
-This document reflects current runtime behavior in `src/` and `drizzle/migrations/`, plus locked UX v2 decisions. Where a decision is locked but runtime is still gated by feature flags, the runtime gate is noted explicitly.
+This document reflects the intended product truth for active Gifta surfaces, plus locked UX v2 decisions and explicit notes where persisted/runtime compatibility still lags behind that direction.
 
 ---
 
@@ -19,6 +19,8 @@ This document reflects current runtime behavior in `src/` and `drizzle/migration
 
 | Version | Date | Summary |
 |---------|------|---------|
+| 2.0.9 | 2026-03-19 | Docs contract alignment: active product truth is now bank + optional Karri for payouts, Takealot vouchers are removed from the intended product story, and legacy voucher-era runtime drift is called out explicitly instead of treated as canonical. |
+| 2.0.8 | 2026-03-19 | Payment runtime simplification: active guest contribution routes now stop at a public Stitch-coming-soon placeholder, PayFast/Ozow/SnapScan runtime surfaces are removed, and the active `payment_provider` enum/runtime truth is `stitch`. |
 | 2.0.7 | 2026-03-13 | Charity product disablement: active Dreamboard host, guest, thank-you, dashboard, landing, admin navigation, and public Dreamboard API/OpenAPI surfaces no longer expose charity; historical charity data remains for ops/admin reconciliation only. |
 | 2.0.6 | 2026-03-12 | Karri default-path decoupling: standard Dreamboard runtime no longer depends on Karri config, public API `karri_card` writes are gated by `UX_V2_ENABLE_KARRI_WRITE_PATH`, and readiness reports Karri as disabled unless write-path or automation mode is enabled. |
 | 2.0.5 | 2026-03-12 | Dreamboard create-flow pivot: default host creation is now `child -> gift -> dates -> voucher -> review`, charity is removed from the active host path, and new host-created boards use `takealot_voucher` as the real payout-method runtime truth. |
@@ -41,28 +43,27 @@ This document reflects current runtime behavior in `src/` and `drizzle/migration
   - Step 1: The Child (name, photo, age, birthday)
   - Step 2: The Gift (name, description, icon selection; host UI does not collect goal amount)
   - Step 3: The Dates (birthday, party date, campaign end date)
-  - Step 4: Voucher Details (payout email + host WhatsApp only)
+  - Step 4: Payout Details (bank details plus optional Karri selection)
   - Step 5: Review
   - Confirmation: review, publish, share via WhatsApp
-  - Legacy compatibility routes `/create/giving-back` and `/create/payout` redirect to `/create/voucher` and are not active host-flow steps.
-- **Contributor flow:** 4 steps (view board, amount/details, payment, thank you). No sign-in.
+  - Current docs follow the intended `/create/payout` contract; legacy `/create/voucher` runtime remnants are pending cleanup and are not canonical product truth.
+- **Contributor flow:** public Dreamboard view plus a Stitch-coming-soon contribution placeholder. Legacy `/{slug}/contribute/payment` and `/{slug}/payment-failed` routes redirect back to `/{slug}/contribute`; `/{slug}/thanks` can still render historical receipt state for stored `stitch` contribution refs. No sign-in.
 
 ### Gift and Payout Model
 
-- **Payout methods:** Takealot voucher placeholder, Karri Card, or bank transfer.
-  - `payout_method` enum: `karri_card`, `bank`, `takealot_voucher` (Decision Register D-001, LOCKED).
-  - `takealot_voucher` is the default runtime truth for newly created host Dreamboards and requires only `payout_email` plus `host_whatsapp_number`.
+- **Payout methods:** bank transfer with an optional Karri Card path.
+  - Intended active `payout_method` product contract: `karri_card`, `bank` (Decision Register D-001).
   - Karri Card fields: `karri_card_number`, `karri_card_holder_name`.
   - Bank fields: `bank_name`, `bank_account_number_encrypted`, `bank_account_last4`, `bank_branch_code`, `bank_account_holder`.
-  - Active host create flow writes `takealot_voucher` only. Karri/bank remain valid for legacy records and partner/API-managed paths.
+  - Intended host create flow writes bank payout details, with Karri available when selected.
   - Partner API Karri writes are blocked unless `UX_V2_ENABLE_KARRI_WRITE_PATH=true`.
   - Partner API bank writes are still gated by `UX_V2_ENABLE_BANK_WRITE_PATH`.
-- **Payout types:** `karri_card`, `bank`, `takealot_voucher`, `charity` (Decision Register D-002, LOCKED).
+- **Payout types:** intended active product contract `karri_card`, `bank`, `charity` (Decision Register D-002).
   - A single Dreamboard may produce multiple payout rows: one gift payout (type matches `payout_method`) and optionally one charity payout (type = `charity`).
   - Uniqueness constraint: one payout per `(dream_board_id, type)`.
   - Dreamboard transitions to `paid_out` only when all required payout rows for that board are `completed`.
-- **Current runtime state:** active Dreamboard product flows create no new charity allocation. Historical boards can still carry existing charity totals, and payout planning can still create historical charity payout rows where those legacy allocations already exist. Standard Dreamboard mode defaults to `takealot_voucher`; `karri_card` writes are disabled unless `UX_V2_ENABLE_KARRI_WRITE_PATH=true`. Automated execution is implemented for `karri_card` only (`KARRI_AUTOMATION_ENABLED`); bank, `takealot_voucher`, and historical charity payouts currently require manual completion.
-- **Public partner payout contract:** `PayoutType` is gift-only (`karri_card | bank | takealot_voucher`); charity payout rows are filtered out of public API responses.
+- **Current product/runtime note:** active Dreamboard product flows create no new charity allocation. Historical boards can still carry existing charity totals, and payout planning can still create historical charity payout rows where those legacy allocations already exist. Automated execution is implemented for `karri_card` only (`KARRI_AUTOMATION_ENABLED`); bank and historical charity payouts currently require manual completion. Legacy `takealot_voucher` code/data remnants still exist and are pending cleanup, but they are not canonical product truth.
+- **Public partner payout contract:** intended gift payout contract is `karri_card | bank`; charity payout rows are filtered out of public API responses.
 
 ### Charity Model
 
@@ -82,10 +83,10 @@ This document reflects current runtime behavior in `src/` and `drizzle/migration
 
 ### Fee Semantics
 
-Decision Register D-004 (LOCKED): fee-free active checkout with legacy fee compatibility.
+Decision Register D-004 (LOCKED): fee-free contribution model with a current public placeholder runtime and legacy fee compatibility.
 
-- **Contributor chooses gift amount only.** Active checkout charges that amount with no additional Gifta platform fee.
-- **Checkout display:** contribution amount and total are the same for new payments.
+- **No live guest checkout is enabled right now.** Public contribution routes stop at the Stitch-coming-soon placeholder.
+- **When contribution payments return, contributors choose gift amount only.** Active checkout total should equal the contribution amount with no additional Gifta platform fee.
 - **`raised_cents` tracks gift amount only.** This remains the source for goal progress and funded checks.
 - **Funded condition** (Decision Register D-005, LOCKED): Dreamboard is funded when `raised_cents >= goal_cents`, where `raised_cents` = `SUM(contributions.amount_cents)` for completed contributions.
 - **Runtime rule for status transition:** auto-transition to `funded` is executed only when current status is `active` and `goal_cents > 0`.
@@ -103,9 +104,9 @@ Decision Register D-004 (LOCKED): fee-free active checkout with legacy fee compa
 
 ### Payments
 
-- **Inbound providers:** PayFast (card, primary), Ozow (EFT), SnapScan (QR).
-- **PayFast ITN hardening required:** signature verification, source IP validation, amount check, PayFast server validation call, idempotency by `(payment_provider, payment_ref)`.
-- **Stitch:** parked until float/settlement/compliance clarified; revisit in Phase 2.
+- **No live inbound payment provider is active.** Public contribution routes now render a Stitch-coming-soon placeholder instead of a working checkout.
+- **Removed runtime surfaces:** PayFast, Ozow, and SnapScan provider modules, inbound webhooks, mock/demo payment routes, and reconciliation routes are no longer part of the active runtime.
+- **Future direction:** Stitch, but the integration is not implemented yet.
 - **Current outbound partner webhook events:** `contribution.received`, `pot.funded`.
 - **Unsupported outbound webhook subscriptions:** wildcard `*` and all non-emitted legacy event names are legacy data only and are normalized away at the webhook-endpoint boundary.
 
@@ -165,7 +166,7 @@ Dates:
 - Constraint: `birthday_date <= party_date` and `campaign_end_date <= party_date` when set.
 
 Payout:
-- `payout_method` = `karri_card | bank | takealot_voucher` (enum, not null, default `takealot_voucher`)
+- intended active product `payout_method` = `karri_card | bank`
 - `karri_card_number` (encrypted, nullable — required when method = karri_card)
 - `karri_card_holder_name` (nullable — required when method = karri_card)
 - `bank_name` (nullable — required when method = bank)
@@ -174,7 +175,7 @@ Payout:
 - `bank_branch_code` (nullable — required when method = bank)
 - `bank_account_holder` (nullable — required when method = bank)
 - `payout_email` (not null)
-- Constraint: when method = `takealot_voucher`, all Karri/bank fields must be NULL.
+- legacy compatibility note: persisted/runtime cleanup for `takealot_voucher` is still pending and remains non-canonical.
 
 Charity:
 - Schema retained for historical/internal use; active product writes clear these fields and public Dreamboard APIs omit them.
@@ -203,7 +204,7 @@ Timestamps:
 - `fee_cents` (integer, not null) — legacy compatibility field; new rows write `0`.
 - `net_cents` (generated column: `amount_cents - fee_cents`) — legacy contribution compatibility field; equals `amount_cents` for new rows and does not drive goal progress.
 - `charity_cents` (integer, nullable) — historical/internal charity allocation; active product writes `null`.
-- `payment_provider` = `payfast | ozow | snapscan` (enum, not null)
+- `payment_provider` = `stitch` (enum, not null) — retained for historical/admin ledger compatibility while live guest checkout is disabled.
 - `payment_ref` (not null, unique with provider), `payment_status` = `pending | processing | completed | failed | refunded`
 - `payment_error_message` (nullable)
 - `ip_address` (inet, nullable), `user_agent` (nullable)
@@ -212,7 +213,7 @@ Timestamps:
 ### payouts
 
 - `id` (UUID, PK), `partner_id` (FK), `dream_board_id` (FK)
-- `type` = `karri_card | bank | takealot_voucher | charity` (enum, not null)
+- intended active product `type` = `karri_card | bank | charity`
 - Public partner API serializes gift payout types only and filters out `charity` rows.
 - `gross_cents`, `fee_cents`, `charity_cents` (default 0), `net_cents` (all integer, not null)
   - `fee_cents` remains available for historical payout rows; new fee-free contribution history will typically produce `0`.
@@ -281,7 +282,7 @@ Timestamps:
 - **Charity payout calculation:** `gross_cents = charity_total_cents`; `net_cents = charity_total_cents` (no additional fee on charity payouts).
 - **Payout state machine:** `pending` → `processing` → `completed` or `failed`. Failed payouts may be retried (`failed` → `processing`).
 - **Board `paid_out` transition:** the Dreamboard status moves to `paid_out` only when all required payout rows for that board have status `completed`.
-- **Current runtime:** `karri_card` payouts can be processed automatically via Karri queue/automation. Bank, `takealot_voucher`, and historical charity payout rows are created and tracked but not auto-executed.
+- **Current runtime:** `karri_card` payouts can be processed automatically via Karri queue/automation. Bank and historical charity payout rows are created and tracked but not auto-executed. Legacy `takealot_voucher` remnants are pending cleanup and are not current product truth.
 
 ### Reminder System
 
@@ -298,10 +299,10 @@ Timestamps:
 UX v2 delivery status in runtime:
 
 - **Schema:** expanded schema is live (bank payout fields, charity split fields, reminder retry/WhatsApp fields, expanded enums).
-- **Host UX flow:** 5-step create flow (`/create/child` → `/create/voucher` → `/create/review`) and dashboard/admin surfaces are live.
-- **Default host payout path:** newly created host Dreamboards use `takealot_voucher`; legacy compatibility routes still exist for `/create/giving-back` and `/create/payout`, but they redirect into `/create/voucher`.
+- **Host UX flow:** intended 5-step create flow (`/create/child` → `/create/payout` → `/create/review`) and dashboard/admin surfaces are live.
+- **Default host payout path:** intended new host Dreamboards use bank payout details with an optional Karri path. Legacy voucher-era route/code remnants still exist in runtime and are pending cleanup.
 - **Partner API write gates:** `karri_card` and bank writes remain feature-flagged (`UX_V2_ENABLE_KARRI_WRITE_PATH`, `UX_V2_ENABLE_BANK_WRITE_PATH`). Active Dreamboard public contract routes do not expose charity writes.
-- **Payout execution:** automated execution is Karri-only; bank/`takealot_voucher`/historical charity payouts remain manual completion paths.
+- **Payout execution:** automated execution is Karri-only; bank and historical charity payouts remain manual completion paths.
 
 ---
 

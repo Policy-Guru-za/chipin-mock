@@ -1,7 +1,7 @@
 # Product Specification
 
 > **Status:** Current reference  
-> **Last reviewed:** March 12, 2026
+> **Last reviewed:** March 19, 2026
 
 ## Current Product Shape
 
@@ -17,9 +17,9 @@ Gifta is a free Dreamboard gifting orchestration platform built around one prima
 
 - Clerk-authenticated host/admin flows
 - five-step host create flow plus review/publish
-- public guest contribute + payment + thank-you flow
-- PayFast, Ozow, SnapScan payments
-- `takealot_voucher` default host-create payout path, with `karri_card` and bank preserved as gated legacy or partner payout capabilities in the data model and payout engine
+- public guest contribute placeholder + historical thank-you flow
+- Stitch-coming-soon placeholder only (no live guest checkout)
+- bank payout as the intended default product path, with optional Karri preserved as a gated path in the data model and payout engine
 - optional charity configuration and charity payout rows outside the active default host create path
 - partner API for Dreamboards, contributions, payouts, and webhooks
 

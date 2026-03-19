@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 import { enforceRateLimit } from '@/lib/auth/rate-limit';
 import { log } from '@/lib/observability/logger';
-import { getClientIp } from '@/lib/utils/request';
+import { getClientIp, getConfiguredAppUrl } from '@/lib/utils/request';
 
 // Allowlist of property keys to prevent PII leakage
 const ALLOWED_PROPERTY_KEYS = new Set([
@@ -32,7 +32,6 @@ const customMetricSchema = z.object({
     'host_create_failed',
     'host_create_published',
     'guest_view_loaded',
-    'contribution_redirect_started',
     'contribution_failed',
     'reminder_requested',
     'payout_created',
@@ -46,13 +45,9 @@ const customMetricSchema = z.object({
     'contribution_started',
     'contribution_completed',
     'goal_reached',
-    'payment_method_selected',
     'wizard_step_completed',
     'share_link_clicked',
     'nav_drawer_opened',
-    'payment_redirect_started',
-    'snapscan_qr_shown',
-    'snapscan_reference_copied',
   ]),
   timestamp: z.number(),
   properties: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
@@ -64,15 +59,7 @@ const RATE_LIMIT_WINDOW_SECONDS = 60;
 function isValidOrigin(request: NextRequest): boolean {
   const origin = request.headers.get('origin');
   const referer = request.headers.get('referer');
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-  const appOrigin = (() => {
-    if (!appUrl) return null;
-    try {
-      return new URL(appUrl).origin;
-    } catch {
-      return null;
-    }
-  })();
+  const appOrigin = new URL(getConfiguredAppUrl()).origin;
 
   if (process.env.NODE_ENV === 'development') return true;
 

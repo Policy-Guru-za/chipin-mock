@@ -12,37 +12,7 @@ const isProductionDatabaseUrl = (databaseUrl: string): boolean => {
   return PRODUCTION_DENYLIST.some((token) => normalized.includes(token));
 };
 
-const PAYMENT_PROVIDERS = [
-  {
-    name: 'PayFast',
-    keys: ['PAYFAST_MERCHANT_ID', 'PAYFAST_MERCHANT_KEY'],
-  },
-  {
-    name: 'Ozow',
-    keys: [
-      'OZOW_CLIENT_ID',
-      'OZOW_CLIENT_SECRET',
-      'OZOW_SITE_CODE',
-      'OZOW_BASE_URL',
-      'OZOW_WEBHOOK_SECRET',
-    ],
-  },
-  {
-    name: 'SnapScan',
-    keys: ['SNAPSCAN_SNAPCODE', 'SNAPSCAN_WEBHOOK_AUTH_KEY'],
-  },
-];
-
 const getMissingKeys = (keys: string[]) => keys.filter((key) => !hasValue(process.env[key]));
-const hasAnyKey = (keys: string[]) => keys.some((key) => hasValue(process.env[key]));
-const hasAllKeys = (keys: string[]) => keys.every((key) => hasValue(process.env[key]));
-
-/** Returns true when payment providers should be mocked. */
-export const isMockPayments = (): boolean => isEnabled(process.env.MOCK_PAYMENTS);
-
-/** Returns true when payment webhook validation should be mocked. */
-export const isMockPaymentWebhooks = (): boolean =>
-  isEnabled(process.env.MOCK_PAYMENT_WEBHOOKS);
 
 /** Returns true when Karri Card requests should be mocked. */
 export const isMockKarri = (): boolean => isEnabled(process.env.MOCK_KARRI);
@@ -55,26 +25,22 @@ export const isWhatsAppReminderDispatchEnabled = (): boolean =>
   isEnabled(process.env.UX_V2_ENABLE_WHATSAPP_REMINDER_DISPATCH);
 
 /** Returns true when any sandbox mock flag is enabled. */
-export const isAnyMockEnabled = (): boolean =>
-  isMockPayments() || isMockPaymentWebhooks() || isMockKarri() || isMockSentry();
-
-/** Returns true when the payment simulator should be available. */
-export const isPaymentSimulatorEnabled = (): boolean => isMockPayments();
+export const isAnyMockEnabled = (): boolean => isMockKarri() || isMockSentry();
 
 /**
- * @deprecated Use specific mock flags instead (isMockPayments, isMockKarri, etc.).
+ * @deprecated Use specific mock flags instead (isMockKarri, etc.).
  */
 export const isDemoMode = (): boolean => {
   if (!demoModeWarningShown && process.env.NODE_ENV === 'development') {
     demoModeWarningShown = true;
-    console.warn('isDemoMode() is deprecated. Use isMockPayments(), isMockKarri(), etc.');
+    console.warn('isDemoMode() is deprecated. Use isMockKarri() and other specific flags.');
   }
   return false;
 };
 
 /** Ensure mock mode cannot point at production databases. */
 export function assertNotProductionDb(): void {
-  if (!isMockPayments() && !isMockKarri()) return;
+  if (!isMockKarri()) return;
 
   const databaseUrl = process.env.DATABASE_URL ?? '';
   if (!databaseUrl.trim()) {
@@ -130,26 +96,6 @@ export const assertStartupConfig = (): void => {
     ]);
     if (missingKarri.length > 0) {
       issues.push(`Karri configuration incomplete. Missing: ${missingKarri.join(', ')}`);
-    }
-  }
-
-  if (!isMockPayments()) {
-    const configuredProviders: string[] = [];
-    PAYMENT_PROVIDERS.forEach((provider) => {
-      const missingKeys = getMissingKeys(provider.keys);
-      if (missingKeys.length === 0 && hasAllKeys(provider.keys)) {
-        configuredProviders.push(provider.name);
-        return;
-      }
-      if (hasAnyKey(provider.keys)) {
-        issues.push(`${provider.name} configuration incomplete. Missing: ${missingKeys.join(', ')}`);
-      }
-    });
-
-    if (configuredProviders.length === 0) {
-      issues.push(
-        'No payment providers configured. Set PayFast (PAYFAST_MERCHANT_ID, PAYFAST_MERCHANT_KEY), Ozow (OZOW_CLIENT_ID, OZOW_CLIENT_SECRET, OZOW_SITE_CODE, OZOW_BASE_URL, OZOW_WEBHOOK_SECRET), or SnapScan (SNAPSCAN_SNAPCODE, SNAPSCAN_WEBHOOK_AUTH_KEY).'
-      );
     }
   }
 

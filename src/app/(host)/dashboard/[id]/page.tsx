@@ -11,6 +11,7 @@ import {
   listCompletedContributionsForDreamBoard,
   listPayoutsForDreamBoard,
 } from '@/lib/host/queries';
+import { getConfiguredAppUrl } from '@/lib/utils/request';
 
 export default async function DreamBoardDetailPage({
   params,
@@ -30,7 +31,7 @@ export default async function DreamBoardDetailPage({
     listCompletedContributionsForDreamBoard(board.id),
     listBirthdayMessages(board.id),
   ]);
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const baseUrl = getConfiguredAppUrl();
   const view = buildDashboardDetailViewModel(board, payoutRows, { baseUrl });
 
   if (view.isComplete) {

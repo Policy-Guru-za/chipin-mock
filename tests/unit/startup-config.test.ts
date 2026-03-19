@@ -37,11 +37,10 @@ afterEach(() => {
 });
 
 describe('startup config validation', () => {
-  it('skips payment provider checks when mock payments are enabled', async () => {
+  it('does not require legacy payment-provider configuration anymore', async () => {
     setBaseEnv();
     clearPaymentEnv();
     process.env.NODE_ENV = 'production';
-    process.env.MOCK_PAYMENTS = 'true';
     process.env.MOCK_KARRI = 'true';
 
     const { assertStartupConfig } = await loadModule();
@@ -49,37 +48,22 @@ describe('startup config validation', () => {
     expect(() => assertStartupConfig()).not.toThrow();
   });
 
-  it('throws when no payment providers are configured and mock payments are disabled', async () => {
+  it('ignores partial legacy payment-provider env without raising startup errors', async () => {
     setBaseEnv();
     clearPaymentEnv();
     process.env.NODE_ENV = 'production';
-    process.env.MOCK_PAYMENTS = 'false';
-    process.env.MOCK_KARRI = 'true';
-
-    const { assertStartupConfig } = await loadModule();
-
-    expect(() => assertStartupConfig()).toThrow(/No payment providers configured/);
-  });
-
-  it('throws when payfast is partially configured', async () => {
-    setBaseEnv();
-    clearPaymentEnv();
-    process.env.NODE_ENV = 'production';
-    process.env.MOCK_PAYMENTS = 'false';
     process.env.MOCK_KARRI = 'true';
     process.env.PAYFAST_MERCHANT_ID = '10000100';
-    process.env.PAYFAST_MERCHANT_KEY = '';
 
     const { assertStartupConfig } = await loadModule();
 
-    expect(() => assertStartupConfig()).toThrow(/PAYFAST_MERCHANT_KEY/);
+    expect(() => assertStartupConfig()).not.toThrow();
   });
 
   it('throws when karri is required but missing', async () => {
     setBaseEnv();
     clearPaymentEnv();
     process.env.NODE_ENV = 'production';
-    process.env.MOCK_PAYMENTS = 'true';
     process.env.MOCK_KARRI = 'false';
     process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
     process.env.KARRI_BASE_URL = '';
@@ -94,7 +78,6 @@ describe('startup config validation', () => {
     setBaseEnv();
     clearPaymentEnv();
     process.env.NODE_ENV = 'production';
-    process.env.MOCK_PAYMENTS = 'true';
     process.env.MOCK_KARRI = 'false';
     process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
     process.env.KARRI_AUTOMATION_ENABLED = 'false';
@@ -111,7 +94,6 @@ describe('startup config validation', () => {
     setBaseEnv();
     clearPaymentEnv();
     process.env.NODE_ENV = 'production';
-    process.env.MOCK_PAYMENTS = 'true';
     process.env.MOCK_KARRI = 'false';
     process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'false';
     process.env.KARRI_AUTOMATION_ENABLED = 'false';
@@ -127,7 +109,6 @@ describe('startup config validation', () => {
     setBaseEnv();
     clearPaymentEnv();
     process.env.NODE_ENV = 'production';
-    process.env.MOCK_PAYMENTS = 'true';
     process.env.MOCK_KARRI = 'true';
     process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
     process.env.KARRI_AUTOMATION_ENABLED = 'false';
@@ -144,7 +125,6 @@ describe('startup config validation', () => {
     setBaseEnv();
     clearPaymentEnv();
     process.env.NODE_ENV = 'development';
-    process.env.MOCK_PAYMENTS = 'false';
     process.env.MOCK_KARRI = 'true';
     process.env.RESEND_API_KEY = '';
 

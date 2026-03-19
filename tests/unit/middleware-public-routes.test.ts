@@ -22,9 +22,9 @@ describe('middleware public routes', () => {
     expect(middleware).toContain('DEV_PREVIEW');
   });
 
-  it('allowlists guest contribution create endpoint', () => {
+  it('does not keep the removed guest contribution create endpoint allowlisted', () => {
     const middleware = readSource('src/middleware.ts');
-    expect(middleware).toContain("'/api/internal/contributions/create'");
+    expect(middleware).not.toContain("'/api/internal/contributions/create'");
   });
 
   it('allowlists guest contribution reminder endpoint', () => {

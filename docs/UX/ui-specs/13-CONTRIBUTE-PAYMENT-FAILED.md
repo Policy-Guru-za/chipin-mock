@@ -3,13 +3,19 @@
 > Canonical replacement: `docs/Platform-Spec-Docs/UX.md`.
 # 13 — CONTRIBUTE PAYMENT FAILED (Error Recovery)
 
-**Route:** `/[slug]/payment-failed`
-**Purpose:** Handle failed payment gracefully and offer recovery options
+**Route:** Legacy `/[slug]/payment-failed`
+**Purpose:** Historical failure-screen reference only; current guest flow redirects away from this route
 **Audience:** Contributors whose payment declined or was cancelled
 **Device Priority:** Mobile-first
 **Context:** Payment attempt failed; help user recover without losing contribution data
 
 ---
+
+## Runtime Alignment (2026-03-19)
+
+- Current public guest flow does not expose a live payment attempt, so `/[slug]/payment-failed` is no longer an active user-facing recovery screen.
+- Runtime redirects this route back to `/[slug]/contribute`.
+- Keep the detailed failure UX below as historical/future reference only.
 
 ## 1. Screen Overview
 

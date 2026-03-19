@@ -85,7 +85,7 @@ const fetchLogoWithRedirectGuards = async (logoUrl: string) => {
         signal: controller.signal,
         headers: {
           accept: 'image/*,*/*;q=0.1',
-          'user-agent': 'GiftaCharityLogoMirror/1.0 (+https://gifta.co.za)',
+          'user-agent': 'GiftaCharityLogoMirror/1.0 (+https://www.gifta.co.za)',
         },
       });
 

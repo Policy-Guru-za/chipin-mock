@@ -8,6 +8,7 @@ import { sendEmail } from '@/lib/integrations/email';
 import { sendWhatsAppTemplateMessage } from '@/lib/integrations/whatsapp';
 import { log } from '@/lib/observability/logger';
 import { formatDateOnly, parseDateOnly } from '@/lib/utils/date';
+import { getConfiguredAppUrl, joinAppUrl } from '@/lib/utils/request';
 import {
   buildReminderEmailPayload,
   buildReminderWhatsAppTemplatePayload,
@@ -81,8 +82,6 @@ const defaultDispatcher: ReminderDispatcher = {
     }),
 };
 
-const ensureTrailingSlash = (value: string) => (value.endsWith('/') ? value : `${value}/`);
-
 const toDate = (value: Date | string): Date => (value instanceof Date ? value : new Date(value));
 
 const toErrorMessage = (error: unknown): string =>
@@ -106,8 +105,7 @@ const resolveCampaignCloseDate = (record: DueReminderRecord): string => {
 };
 
 const buildReminderUrl = (slug: string): string => {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
-  return `${ensureTrailingSlash(baseUrl)}${slug}`;
+  return joinAppUrl(getConfiguredAppUrl(), `/${slug}`);
 };
 
 const fetchDueReminderIds = async (now: Date, limit: number): Promise<DueReminderId[]> =>

@@ -57,7 +57,6 @@ describe('middleware auth unavailable', () => {
       '/api/internal/webhooks/process',
       '/api/internal/retention/run',
       '/api/internal/karri/batch',
-      '/api/internal/payments/reconcile',
       '/api/internal/api-keys',
       '/api/internal/api-keys/123',
       '/api/internal/api-keys/123/rotate',
@@ -70,7 +69,7 @@ describe('middleware auth unavailable', () => {
   });
 
   it('bypasses webhook endpoints when keys are missing', async () => {
-    const response = await runMiddleware('/api/webhooks/payfast');
+    const response = await runMiddleware('/api/webhooks/stitch');
     expect(response.status).toBe(200);
   });
 

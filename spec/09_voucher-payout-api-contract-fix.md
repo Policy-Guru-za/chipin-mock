@@ -1,5 +1,7 @@
 # 09_voucher-payout-api-contract-fix
 
+> Historical context note (2026-03-19): this closed spec documents legacy voucher payout compatibility work. Current intended product truth no longer treats Takealot vouchers as an active Gifta payout path.
+
 ## Objective
 
 - Fix the voucher payout API contract gap so `takealot_voucher` payouts expose the contact data partners need for manual fulfilment.

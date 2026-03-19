@@ -3,6 +3,8 @@
 > Canonical replacement: `docs/Platform-Spec-Docs/CANONICAL.md`.
 # Demo Mode: Implementation Brief for AI Coding Agent
 
+> 2026-03-19 runtime note: current public guest contribution routes stop at a Stitch-coming-soon placeholder, and the intended payout story is bank with an optional Karri path. PayFast/Ozow/SnapScan, `MOCK_PAYMENTS`, and voucher-era references below are legacy demo concepts unless the runtime adds a live checkout path again.
+
 ## Context and objective
 
 Gifta is a mobile-first birthday gifting platform. The core product works: hosts can sign in, create a Dreamboard (a shareable page for one child's birthday + one dream gift), and share it via WhatsApp. Guests arrive at the shared link and see the Dreamboard.
@@ -70,14 +72,14 @@ Four Dreamboards at different lifecycle stages:
 - Host dashboard shows the final archive: all messages, payout "Completed" (green) with Karri Card reference and completion date.
 - This board exists primarily for the host dashboard demo.
 
-### Guest contribution flow (`/[slug]/contribute` → `/[slug]/contribute/payment` → `/[slug]/thanks`)
+### Guest contribution flow (`/[slug]/contribute` placeholder today; legacy `/[slug]/contribute/payment` reference)
 
 Navigable on Boards 1 and 2 (active boards). The demo should allow:
 
 - Amount selection (R150 / R250 / R500 / custom) — this is private to the contributor, consistent with the no-amounts-displayed constraint.
 - Name + optional anonymity toggle.
 - Message textarea with character counter.
-- Payment provider selection page showing PayFast, Ozow, SnapScan options.
+- Current product truth ends at the Stitch-coming-soon placeholder; any provider-selection/payment-screen exploration below is legacy future-state demo material.
 - Thank-you page with confetti, receipt capture, charity impact display (if applicable), and share CTA.
 
 The contribution flow should work end-to-end in demo mode — meaning a demo user can complete a "contribution" that appears on the board (new avatar, new message) without real payment processing.
@@ -156,18 +158,12 @@ Gift icons: use the universal Gifta logo (`/icons/gifts/gifta-logo.png`) per the
 
 ### Mock flags (`.env.demo`)
 
-The codebase already has sandbox flags:
-```
-MOCK_PAYMENTS=true
-MOCK_PAYMENT_WEBHOOKS=true
-MOCK_KARRI=true
-MOCK_SENTRY=true
-```
+The demo env file still contains legacy payment-mock flags, but the current runtime feature-flag surface primarily relies on `MOCK_KARRI` and `MOCK_SENTRY`.
 
-These are checked via `/src/lib/config/feature-flags.ts`:
-- `isMockPayments()` — simulates payment responses
-- `isMockPaymentWebhooks()` — skips webhook validation
-- `isMockKarri()` — mocks Karri Card payout API
+Historical note:
+- `MOCK_PAYMENTS` / `MOCK_PAYMENT_WEBHOOKS` were part of an earlier live-checkout demo concept and should not be treated as current runtime truth.
+- `MOCK_KARRI=true`
+- `MOCK_SENTRY=true`
 
 There is also a safety guard: `assertNotProductionDb()` blocks mock mode against production databases.
 
@@ -228,7 +224,7 @@ The following are distinct architectural approaches. Each has different tradeoff
 
 **Auth bypass:** Add a `DEMO_AUTH_BYPASS=true` environment variable. When set, the auth functions (`requireClerkUser`, `requireAdminClerkUser`) return a hardcoded demo host/admin user instead of checking Clerk. Middleware skips `auth.protect()` for protected routes.
 
-**How contributions work in the demo:** The seed pre-populates all contributions. If a live demo user wants to make a new contribution during a walkthrough, `MOCK_PAYMENTS=true` already simulates payment — so the full contribute flow would work end-to-end, with the contribution appearing on the board afterward.
+**How contributions work in the demo:** The seed pre-populates all contributions. Under the current product truth, a live walkthrough should stop at the Stitch-coming-soon placeholder unless a new demo-only contribution path is intentionally added.
 
 **What changes:**
 - `/src/lib/db/seed.ts` — expanded with 4 boards, ~30 contributions, charities, payouts.
@@ -331,7 +327,7 @@ The following are distinct architectural approaches. Each has different tradeoff
 
 **Tradeoffs:**
 - Best of both worlds: highest fidelity (real pages, real data) with a polished entry point for demos.
-- Contribution flow works end-to-end (MOCK_PAYMENTS handles it).
+- Contribution flow needs an explicit demo-only continuation if the walkthrough should go beyond today's Stitch placeholder.
 - Requires database + auth bypass (same considerations as Option A).
 - Slightly more work than Option A alone, but the showcase page is trivial.
 - The showcase page gives demos a professional, intentional feel rather than "let me type in a URL."
@@ -361,7 +357,7 @@ The admin dashboard shows GMV, contribution counts, and fee totals computed from
 
 ### Contribution flow in demo mode
 
-For seeded-database options (A, C, E): `MOCK_PAYMENTS=true` already simulates payment. A demo user can tap "Chip in," enter details, select a provider, and reach the thank-you page — with the contribution actually written to the database and appearing on the board. This is the most impressive demo path.
+For seeded-database options (A, C, E): the current truthful demo path stops at the Stitch-coming-soon placeholder. If stakeholders need a deeper walkthrough, add an explicit demo-only continuation path instead of relying on legacy `MOCK_PAYMENTS` assumptions.
 
 For hardcoded options (B, D): The contribution flow can navigate up to the payment page, but actual submission would either fail (no database) or need a special demo handler that shows the thank-you page with mock data. This is less impressive but still functional.
 

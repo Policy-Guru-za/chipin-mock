@@ -5,7 +5,7 @@ import { uiCopy } from '@/lib/ui/copy';
 describe('uiCopy', () => {
   it('provides core state copy strings', () => {
     expect(uiCopy.guest.closed.body).toContain('Dreamboard');
-    expect(uiCopy.guest.paymentsUnavailable.body).toContain('Payments');
+    expect(uiCopy.guest.paymentsUnavailable.body).toContain('payments');
     expect(uiCopy.dashboard.empty.body).toContain('Dreamboards');
     expect(uiCopy.contributions.empty.body).toContain('contributions');
   });

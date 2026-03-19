@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 
 import { log } from '@/lib/observability/logger';
+import { getConfiguredAppUrl } from '@/lib/utils/request';
 import { decryptSensitiveValue } from '@/lib/utils/encryption';
 import { WEBHOOK_DELIVERY_TIMEOUT_MS } from '@/lib/constants/webhooks';
 import { buildDreamBoardWebhookData } from '@/lib/webhooks/payloads';
@@ -35,7 +36,7 @@ const resolveWebhookPayload = async (
     return event.payload;
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const baseUrl = getConfiguredAppUrl();
   const dreamBoardId = meta.dream_board_id;
 
   if (!dreamBoardId) {

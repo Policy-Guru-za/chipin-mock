@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, inArray, lt, ne, sql } from 'drizzle-orm';
+import { and, desc, eq, sql } from 'drizzle-orm';
 
 import type { PaymentProvider } from '@/lib/payments';
 import { isValidUuid } from '@/lib/utils/validation';
@@ -417,23 +417,6 @@ export async function getDreamBoardNotificationContext(dreamBoardId: string) {
   return board ?? null;
 }
 
-export async function updateContributionStatus(
-  id: string,
-  status: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded'
-) {
-  await db
-    .update(contributions)
-    .set({ paymentStatus: status, updatedAt: new Date() })
-    .where(and(eq(contributions.id, id), ne(contributions.paymentStatus, status)));
-}
-
-export async function setContributionCharityCents(id: string, charityCents: number | null) {
-  await db
-    .update(contributions)
-    .set({ charityCents, updatedAt: new Date() })
-    .where(eq(contributions.id, id));
-}
-
 export async function getApiKeyByHash(params: { keyPrefix: string; keyHash: string }) {
   const [apiKey] = await db
     .select({
@@ -453,55 +436,6 @@ export async function getApiKeyByHash(params: { keyPrefix: string; keyHash: stri
 
 export async function markApiKeyUsed(apiKeyId: string) {
   await db.update(apiKeys).set({ lastUsedAt: new Date() }).where(eq(apiKeys.id, apiKeyId));
-}
-
-export async function listContributionsForReconciliation(lookbackStart: Date, cutoff: Date) {
-  return db
-    .select({
-      id: contributions.id,
-      dreamBoardId: contributions.dreamBoardId,
-      paymentProvider: contributions.paymentProvider,
-      paymentRef: contributions.paymentRef,
-      amountCents: contributions.amountCents,
-      feeCents: contributions.feeCents,
-      paymentStatus: contributions.paymentStatus,
-      createdAt: contributions.createdAt,
-    })
-    .from(contributions)
-    .where(
-      and(
-        inArray(contributions.paymentStatus, ['pending', 'processing']),
-        gte(contributions.createdAt, lookbackStart),
-        lt(contributions.createdAt, cutoff)
-      )
-    );
-}
-
-export async function listContributionsForLongTailReconciliation(
-  longTailStart: Date,
-  lookbackStart: Date,
-  cutoff: Date
-) {
-  return db
-    .select({
-      id: contributions.id,
-      dreamBoardId: contributions.dreamBoardId,
-      paymentProvider: contributions.paymentProvider,
-      paymentRef: contributions.paymentRef,
-      amountCents: contributions.amountCents,
-      feeCents: contributions.feeCents,
-      paymentStatus: contributions.paymentStatus,
-      createdAt: contributions.createdAt,
-    })
-    .from(contributions)
-    .where(
-      and(
-        inArray(contributions.paymentStatus, ['pending', 'processing']),
-        gte(contributions.createdAt, longTailStart),
-        lt(contributions.createdAt, lookbackStart),
-        lt(contributions.createdAt, cutoff)
-      )
-    );
 }
 
 export async function markDreamBoardFundedIfNeeded(dreamBoardId: string): Promise<boolean> {

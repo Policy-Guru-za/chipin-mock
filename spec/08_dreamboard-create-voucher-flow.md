@@ -1,5 +1,7 @@
 # 08_dreamboard-create-voucher-flow
 
+> Historical context note (2026-03-19): this closed spec documents the superseded voucher-era host flow. Current intended product truth is payout details with bank by default and optional Karri, not a Takealot voucher step.
+
 ## Objective
 
 - Refactor the default Dreamboard create flow so it becomes a 5-step voucher-placeholder journey with no active charity step, no Karri/bank setup in the host path, and coherent downstream runtime truth.

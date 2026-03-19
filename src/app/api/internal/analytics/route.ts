@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 import { enforceRateLimit } from '@/lib/auth/rate-limit';
 import { log } from '@/lib/observability/logger';
-import { getClientIp } from '@/lib/utils/request';
+import { getClientIp, getConfiguredAppUrl } from '@/lib/utils/request';
 
 const webVitalsSchema = z.object({
   name: z.enum(['CLS', 'FCP', 'LCP', 'TTFB', 'INP']),
@@ -19,15 +19,7 @@ const RATE_LIMIT_WINDOW_SECONDS = 60;
 function isValidOrigin(request: NextRequest): boolean {
   const origin = request.headers.get('origin');
   const referer = request.headers.get('referer');
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-  const appOrigin = (() => {
-    if (!appUrl) return null;
-    try {
-      return new URL(appUrl).origin;
-    } catch {
-      return null;
-    }
-  })();
+  const appOrigin = new URL(getConfiguredAppUrl()).origin;
 
   // Allow in development
   if (process.env.NODE_ENV === 'development') return true;

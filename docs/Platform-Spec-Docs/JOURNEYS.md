@@ -1,7 +1,7 @@
 # Journeys
 
 > **Status:** Current reference  
-> **Last reviewed:** March 13, 2026
+> **Last reviewed:** March 19, 2026
 
 ## Host Journey
 
@@ -12,10 +12,10 @@ Current create flow:
 1. `/create/child`
 2. `/create/gift`
 3. `/create/dates`
-4. `/create/voucher`
+4. `/create/payout`
 5. `/create/review`
 
-Legacy compatibility routes `/create/giving-back` and `/create/payout` redirect to `/create/voucher`; they are not active wizard steps.
+Legacy voucher-era runtime remnants still exist in code, but the intended host product contract is payout details at `/create/payout`, not a Takealot voucher step.
 
 Hosts then manage boards from `/dashboard` and `/dashboard/[id]`.
 Active host product UI does not surface charity summaries or controls.
@@ -25,9 +25,13 @@ Active host product UI does not surface charity summaries or controls.
 Public mobile-web flow:
 
 1. `/{slug}` public Dreamboard
-2. `/{slug}/contribute` amount/details step
-3. `/{slug}/contribute/payment` payment step
-4. `/{slug}/thanks` or `/{slug}/payment-failed`
+2. `/{slug}/contribute` Stitch-coming-soon placeholder step
+3. `/{slug}/thanks` historical receipt state only
+
+Legacy redirect behavior:
+
+- `/{slug}/contribute/payment` redirects back to `/{slug}/contribute`
+- `/{slug}/payment-failed` redirects back to `/{slug}/contribute`
 
 Current display rules:
 

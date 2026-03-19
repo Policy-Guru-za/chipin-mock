@@ -5,7 +5,7 @@ const FETCH_TIMEOUT_MS = 10_000;
 const MAX_REDIRECTS = 4;
 const MAX_HTML_BYTES = 2_000_000;
 
-const CHARITY_USER_AGENT = 'GiftaCharityIngest/1.0 (+https://gifta.co.za)';
+const CHARITY_USER_AGENT = 'GiftaCharityIngest/1.0 (+https://www.gifta.co.za)';
 
 const PRIVATE_HOSTS = new Set(['localhost', '0.0.0.0', '127.0.0.1', '::1']);
 

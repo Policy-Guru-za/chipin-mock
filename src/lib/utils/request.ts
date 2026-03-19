@@ -22,8 +22,19 @@ type ResolveRuntimeBaseUrlOptions = {
   appUrl?: string | null;
 };
 
-const DEFAULT_APP_URL = 'http://localhost:3000';
+const DEFAULT_LOCAL_APP_URL = 'http://localhost:3000';
+export const CANONICAL_PRODUCTION_APP_URL = 'https://www.gifta.co.za';
 const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1', '[::1]']);
+
+const getDefaultAppUrl = () =>
+  process.env.NODE_ENV === 'production' ? CANONICAL_PRODUCTION_APP_URL : DEFAULT_LOCAL_APP_URL;
+
+export const normalizeAppBaseUrl = (value: string) => value.replace(/\/+$/, '');
+
+export const joinAppUrl = (baseUrl: string, path: string) => {
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  return `${normalizeAppBaseUrl(baseUrl)}${normalizedPath}`;
+};
 
 const getFirstHeaderValue = (value: string | null) => value?.split(',')[0]?.trim() ?? null;
 
@@ -101,8 +112,11 @@ const isTrustedHost = (
 
 const resolveConfiguredAppUrl = (appUrl: string | null | undefined) => {
   const parsed = parseOriginCandidate(appUrl);
-  return parsed?.origin ?? DEFAULT_APP_URL;
+  return normalizeAppBaseUrl(parsed?.origin ?? getDefaultAppUrl());
 };
+
+export const getConfiguredAppUrl = (appUrl: string | null | undefined = process.env.NEXT_PUBLIC_APP_URL) =>
+  resolveConfiguredAppUrl(appUrl);
 
 export const resolveRuntimeBaseUrl = ({
   headers,

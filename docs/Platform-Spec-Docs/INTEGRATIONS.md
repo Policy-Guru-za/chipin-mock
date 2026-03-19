@@ -1,7 +1,7 @@
 # Integrations
 
 > **Status:** Current reference  
-> **Last reviewed:** March 12, 2026
+> **Last reviewed:** March 19, 2026
 
 ## Current Integrations
 
@@ -12,15 +12,12 @@
 
 ### Payments
 
-- PayFast
-- Ozow
-- SnapScan
+- Stitch coming-soon placeholder only (no live guest checkout)
 
 ### Payouts
 
-- Takealot voucher placeholder for the standard Dreamboard path
-- Karri Card queue processing and automation for gated legacy or partner flows
 - Bank payout tracking in the payout engine
+- Optional Karri Card queue processing and automation for the gated Karri path
 
 ### Messaging / Email
 
@@ -42,8 +39,6 @@
 
 Derived from [`src/lib/config/feature-flags.ts`](../../src/lib/config/feature-flags.ts):
 
-- `MOCK_PAYMENTS`
-- `MOCK_PAYMENT_WEBHOOKS`
 - `MOCK_KARRI`
 - `UX_V2_ENABLE_KARRI_WRITE_PATH`
 - `MOCK_SENTRY`
@@ -53,6 +48,7 @@ Derived from [`src/lib/config/feature-flags.ts`](../../src/lib/config/feature-fl
 
 ## Notes
 
-- Current docs must reference `MOCK_*` flags, not the removed `DEMO_MODE` control path.
+- Current docs must reference the actual remaining `MOCK_*` flags, not removed payment mocks or the removed `DEMO_MODE` control path.
+- No live inbound payment-provider env block remains in `.env.example`; the active payment story is the public Stitch placeholder only.
 - Karri credentials are required only when `UX_V2_ENABLE_KARRI_WRITE_PATH=true` or `KARRI_AUTOMATION_ENABLED=true`, unless `MOCK_KARRI=true`.
 - Charity URL autofill currently uses Anthropic env wiring in `.env.example`.

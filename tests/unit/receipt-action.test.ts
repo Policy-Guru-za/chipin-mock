@@ -40,7 +40,7 @@ const receiptContribution = {
 describe('requestReceiptAction', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://gifta.co.za');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://www.gifta.co.za');
     getContributionByPaymentRefMock.mockResolvedValue(null);
     enforceRateLimitMock.mockResolvedValue({ allowed: true });
   });

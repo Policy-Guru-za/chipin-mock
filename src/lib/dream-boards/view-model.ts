@@ -112,6 +112,14 @@ const getThankYouCopy = (params: {
   board: DreamBoardRecord;
   contribution?: ContributionRecord | null;
 }) => {
+  if (!params.contribution) {
+    return {
+      headline: 'Stitch payments are coming soon',
+      message: `We\'re finalizing Stitch-powered contributions for ${params.board.childName}'s Dreamboard.`,
+      isComplete: false,
+    };
+  }
+
   const name = getContributorName(params.contribution);
   const isComplete = params.contribution?.paymentStatus === 'completed';
 

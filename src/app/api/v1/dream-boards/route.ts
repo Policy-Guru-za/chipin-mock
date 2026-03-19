@@ -24,6 +24,7 @@ import { resolveWritePathBlockReason } from '@/lib/ux-v2/write-path-gates';
 import { encryptSensitiveValue } from '@/lib/utils/encryption';
 import { generateSlug } from '@/lib/utils/slug';
 import { parseDateOnly } from '@/lib/utils/date';
+import { getConfiguredAppUrl } from '@/lib/utils/request';
 
 import { verifyKarriCardForApi } from './karri';
 
@@ -331,7 +332,7 @@ export const GET = withApiAuth('dreamboards:read', async (request: NextRequest, 
 
   const hasMore = rows.length > limit;
   const items = rows.slice(0, limit);
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const baseUrl = getConfiguredAppUrl();
   const serialized = items
     .map((board) => serializeDreamBoard(board, baseUrl))
     .filter((board): board is NonNullable<ReturnType<typeof serializeDreamBoard>> =>
@@ -494,7 +495,7 @@ export const POST = withApiAuth('dreamboards:write', async (request: NextRequest
       createdAt: created.createdAt,
       updatedAt: created.updatedAt,
     },
-    process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+    getConfiguredAppUrl()
   );
 
   if (!responsePayload) {

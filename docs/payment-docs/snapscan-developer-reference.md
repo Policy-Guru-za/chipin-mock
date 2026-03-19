@@ -3,6 +3,8 @@
 > Canonical replacement: `docs/Platform-Spec-Docs/PAYMENTS.md`.
 # SnapScan Developer Reference (Integration-Focused)
 
+> 2026-03-19 note: retained as legacy provider reference only. Current Gifta product truth is a Stitch-coming-soon placeholder with no live SnapScan checkout.
+
 ## 1. Scope and Audience
 
 - Covers the SnapScan QR-code-based payment collection flow, Merchant API, and webhook delivery/signing as documented at `https://developer.getsnapscan.com/`.

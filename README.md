@@ -1,7 +1,7 @@
 # Gifta
 
 > **Status:** Current workspace reference  
-> **Last reviewed:** March 18, 2026  
+> **Last reviewed:** March 19, 2026  
 > **Scope:** As-built repo state and the current workflow system
 
 ## Start Here
@@ -25,8 +25,8 @@ Read these only when needed:
 Gifta is a Next.js application for one-child, one-gift Dreamboards:
 - Hosts create Dreamboards
 - Guests chip in through a public mobile-web flow
-- Payments use PayFast, Ozow, or SnapScan
-- Standard payout uses a Takealot voucher placeholder; Karri Card and bank remain gated legacy or partner paths
+- Public contribution routes currently stop at a Stitch-coming-soon placeholder (no live checkout)
+- Payouts are documented as bank with an optional Karri Card path
 - Host/admin auth uses Clerk
 
 ## Current Stack
@@ -40,8 +40,8 @@ Gifta is a Next.js application for one-child, one-gift Dreamboards:
 | Auth | Clerk |
 | Storage | Vercel Blob |
 | Cache / rate limits | Vercel KV with local fallback in some paths |
-| Payments | PayFast, Ozow, SnapScan |
-| Payouts | Takealot voucher placeholder, Karri Card, bank, historical charity ledger rows |
+| Payments | Stitch coming-soon placeholder only (no live guest checkout) |
+| Payouts | Bank, optional Karri Card, historical charity ledger rows |
 | Observability | Sentry, optional OpenTelemetry, optional Axiom wiring |
 
 ## Active Work System

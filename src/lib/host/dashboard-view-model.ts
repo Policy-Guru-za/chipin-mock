@@ -11,6 +11,7 @@ import type {
 } from '@/lib/host/queries';
 import { parseDateOnly } from '@/lib/utils/date';
 import { formatZar } from '@/lib/utils/money';
+import { joinAppUrl } from '@/lib/utils/request';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -322,8 +323,8 @@ export const buildDashboardDetailViewModel = (
     payoutMethodLabel,
     payoutRecipientDisplay,
     payouts: visiblePayouts.map(buildPayoutSummary),
-    shareUrl: `${options.baseUrl}/${board.slug}`,
-    publicUrl: `${options.baseUrl}/${board.slug}`,
+    shareUrl: joinAppUrl(options.baseUrl, `/${board.slug}`),
+    publicUrl: joinAppUrl(options.baseUrl, `/${board.slug}`),
     isComplete,
     isFunded,
     // C4 decision: funded boards remain host-editable until closed/paid out.
@@ -342,7 +343,7 @@ export const buildDashboardViewModel = (
     raisedLabel: card.raisedLabel,
     contributionCount: card.contributionCount,
     manageHref: card.manageHref,
-    shareUrl: options?.baseUrl ? `${options.baseUrl}/${board.slug}` : undefined,
+    shareUrl: options?.baseUrl ? joinAppUrl(options.baseUrl, `/${board.slug}`) : undefined,
     displayTitle: card.displayTitle,
     displaySubtitle: card.displaySubtitle,
     displayImage: card.displayImage,

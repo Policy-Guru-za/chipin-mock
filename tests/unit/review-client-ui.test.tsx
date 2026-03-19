@@ -174,12 +174,12 @@ describe('ReviewClient', () => {
       _formData: FormData
     ): Promise<PublishState> => ({
       status: 'published',
-      shareUrl: 'https://gifta.co.za/max-dreamboard',
+      shareUrl: 'https://www.gifta.co.za/max-dreamboard',
     });
 
     setActionState({
       status: 'published',
-      shareUrl: 'https://gifta.co.za/max-dreamboard',
+      shareUrl: 'https://www.gifta.co.za/max-dreamboard',
     });
 
     render(<ReviewClient draft={draft} publishAction={publishAction} />);

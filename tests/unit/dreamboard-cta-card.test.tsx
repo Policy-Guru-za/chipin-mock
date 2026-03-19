@@ -25,7 +25,7 @@ describe('DreamboardCtaCard', () => {
       timeRemainingMessage: '10 days left to chip in 🎁',
     });
 
-    expect(message).toBe('Be the first to contribute and start the celebration.');
+    expect(message).toBe("We're finalizing Stitch-powered contributions for Gifta. Online payments are not available yet.");
   });
 
   it('builds social proof + time copy for active boards with contributors', () => {
@@ -37,8 +37,7 @@ describe('DreamboardCtaCard', () => {
       timeRemainingMessage: '10 days left to chip in 🎁',
     });
 
-    expect(message).toContain('2 people have chipped in.');
-    expect(message).toContain('10 days left to chip in 🎁');
+    expect(message).toBe("We're finalizing Stitch-powered contributions for Gifta. Online payments are not available yet.");
   });
 
   it('builds funded copy for funded boards', () => {
@@ -50,7 +49,7 @@ describe('DreamboardCtaCard', () => {
       timeRemainingMessage: 'irrelevant',
     });
 
-    expect(message).toBe('Gift funded - thank you, everyone! 🎉');
+    expect(message).toBe('This Dreamboard has already hit its goal.');
   });
 
   it('builds closed copy for expired boards', () => {
@@ -70,16 +69,14 @@ describe('DreamboardCtaCard', () => {
       <DreamboardCtaCard
         slug="maya-birthday"
         childName="Maya"
-        stateMessage="2 people have chipped in."
+        stateMessage="We're finalizing Stitch-powered contributions for Gifta. Online payments are not available yet."
         disabled={false}
       />
     );
 
-    const link = screen.getByRole('link', { name: 'Chip in for Maya 💝' });
+    const link = screen.getByRole('link', { name: "View Maya's contribution update" });
     expect(link).toHaveAttribute('href', '/maya-birthday/contribute?source=dream-board');
-    expect(
-      screen.getByText('Secure payments via trusted payment partners.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Stitch integration coming soon.')).toBeInTheDocument();
   });
 
   it('renders closed state without CTA link when disabled', () => {

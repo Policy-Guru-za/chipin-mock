@@ -10,12 +10,7 @@ import {
 } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 
-import {
-  isMockKarri,
-  isMockPaymentWebhooks,
-  isMockPayments,
-  isMockSentry,
-} from '@/lib/config/feature-flags';
+import { isMockKarri, isMockSentry } from '@/lib/config/feature-flags';
 import { getClerkConfigStatus, getClerkUrls } from '@/lib/auth/clerk-config';
 
 const outfit = Outfit({
@@ -60,16 +55,20 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.gifta.co.za'),
   title: 'Gifta - Everyone Chips In. One Perfect Gift.',
   description:
     'Create a Dreamboard for your child\'s birthday. Friends and family chip in toward one meaningful gift — no more gift piles, no more guesswork.',
+  alternates: {
+    canonical: '/',
+  },
   icons: {
     icon: '/Logos/Gifta-favicon.png',
     shortcut: '/Logos/Gifta-favicon.png',
   },
   openGraph: {
     type: 'website',
-    url: 'https://gifta.co.za',
+    url: '/',
     title: 'Gifta',
     description:
       'Create a Dreamboard for your child\'s birthday. Friends and family chip in toward one meaningful gift — no more gift piles, no more guesswork.',
@@ -98,8 +97,6 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const activeMocks = [
-    { label: 'payments', enabled: isMockPayments() },
-    { label: 'payment webhooks', enabled: isMockPaymentWebhooks() },
     { label: 'karri', enabled: isMockKarri() },
     { label: 'sentry', enabled: isMockSentry() },
   ]

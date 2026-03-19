@@ -1,6 +1,6 @@
 # Codebase and Documentation Report
 
-Last updated: March 12, 2026
+Last updated: March 19, 2026
 
 ## Executive Summary
 
@@ -40,9 +40,9 @@ This repository is in a good execution state and a mixed documentation state.
 
 ### Payments and payouts
 
-- Incoming payments: PayFast, Ozow, SnapScan
-- Fee model: active checkout charges `amount_cents` only; historical records may still retain non-zero `fee_cents`; goal progress uses `amount_cents`
-- Gift payout methods: `karri_card`, `bank`
+- Public guest contribution routes currently stop at a Stitch-coming-soon placeholder; no live checkout provider is documented as active in the product truth.
+- Fee model: active checkout intent remains `amount_cents` only; historical records may still retain non-zero `fee_cents`; goal progress uses `amount_cents`
+- Intended gift payout methods: `bank`, optional `karri_card`
 - Optional charity payout rows when charity is enabled
 - Close path is explicit via `POST /api/v1/dream-boards/[id]/close`
 - No in-repo auto-close scheduler exists

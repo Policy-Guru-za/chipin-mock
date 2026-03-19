@@ -108,8 +108,8 @@ describe('GET /api/og/[slug]', () => {
   });
 
   it('uses trusted preview host before NEXT_PUBLIC_APP_URL when constructing absolute image urls', async () => {
-    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://gifta.co.za');
-    vi.stubEnv('VERCEL_URL', 'chipin-mock.vercel.app');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://www.gifta.co.za');
+    vi.stubEnv('VERCEL_URL', 'gifta-preview.vercel.app');
     mocks.getCachedDreamBoardBySlug.mockResolvedValue({
       id: 'board-1',
       slug: 'maya-birthday',
@@ -120,7 +120,7 @@ describe('GET /api/og/[slug]', () => {
     });
 
     const { GET } = await loadHandler();
-    const response = await GET(new NextRequest('https://chipin-mock.vercel.app/api/og/maya-birthday'), {
+    const response = await GET(new NextRequest('https://gifta-preview.vercel.app/api/og/maya-birthday'), {
       params: Promise.resolve({ slug: 'maya-birthday' }),
     });
 
@@ -129,14 +129,14 @@ describe('GET /api/og/[slug]', () => {
     expect(mocks.imageResponseCalls).toHaveLength(1);
 
     const imageSources = collectImageSources(mocks.imageResponseCalls[0]?.element);
-    expect(imageSources).toContain('https://chipin-mock.vercel.app/Logos/Original.png');
-    expect(imageSources).toContain('https://chipin-mock.vercel.app/images/maya.jpg');
-    expect(imageSources.some((url) => url.includes('gifta.co.za'))).toBe(false);
+    expect(imageSources).toContain('https://gifta-preview.vercel.app/Logos/Original.png');
+    expect(imageSources).toContain('https://gifta-preview.vercel.app/images/maya.jpg');
+    expect(imageSources.some((url) => url.includes('www.gifta.co.za'))).toBe(false);
   });
 
   it('ignores untrusted forwarded host values and falls back to trusted request host', async () => {
-    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://gifta.co.za');
-    vi.stubEnv('VERCEL_URL', 'chipin-mock.vercel.app');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://www.gifta.co.za');
+    vi.stubEnv('VERCEL_URL', 'gifta-preview.vercel.app');
     mocks.getCachedDreamBoardBySlug.mockResolvedValue({
       id: 'board-1',
       slug: 'maya-birthday',
@@ -148,7 +148,7 @@ describe('GET /api/og/[slug]', () => {
 
     const { GET } = await loadHandler();
     const response = await GET(
-      new NextRequest('https://chipin-mock.vercel.app/api/og/maya-birthday', {
+      new NextRequest('https://gifta-preview.vercel.app/api/og/maya-birthday', {
         headers: {
           'x-forwarded-host': 'attacker.example',
           'x-forwarded-proto': 'https',
@@ -164,8 +164,8 @@ describe('GET /api/og/[slug]', () => {
     expect(mocks.imageResponseCalls).toHaveLength(1);
 
     const imageSources = collectImageSources(mocks.imageResponseCalls[0]?.element);
-    expect(imageSources).toContain('https://chipin-mock.vercel.app/Logos/Original.png');
-    expect(imageSources).toContain('https://chipin-mock.vercel.app/images/maya.jpg');
+    expect(imageSources).toContain('https://gifta-preview.vercel.app/Logos/Original.png');
+    expect(imageSources).toContain('https://gifta-preview.vercel.app/images/maya.jpg');
     expect(imageSources.some((url) => url.includes('attacker.example'))).toBe(false);
   });
 

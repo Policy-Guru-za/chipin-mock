@@ -3,8 +3,10 @@
 > Canonical replacement: `docs/Platform-Spec-Docs/NFR-OPERATIONS.md`.
 # Runbook: Webhook Failure
 
+> 2026-03-19 note: Gifta's current public guest flow has no live inbound payment provider webhooks. Treat payment-provider sections below as legacy/future contingency guidance; partner/internal webhook handling still applies where relevant.
+
 ## Purpose
-Respond to webhook delivery failures from payment providers or partner integrations.
+Respond to webhook delivery failures from historical/future payment providers or active partner integrations.
 
 ## Detection Signals
 - Sentry alerts on webhook routes.

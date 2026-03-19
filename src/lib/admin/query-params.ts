@@ -92,7 +92,7 @@ export const parseAdminContributionFilters = (
     ['pending', 'processing', 'completed', 'failed', 'refunded'].includes(status),
   ) as AdminContributionFilters['statuses'],
   paymentProviders: splitCsv(params.get('provider')).filter((provider) =>
-    ['payfast', 'ozow', 'snapscan'].includes(provider),
+    ['stitch'].includes(provider),
   ) as AdminContributionFilters['paymentProviders'],
   createdFrom: parseDateParam(params.get('created_from')),
   createdTo: parseDateParam(params.get('created_to')),

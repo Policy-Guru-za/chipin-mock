@@ -4,6 +4,7 @@ import { enforceRateLimit } from '@/lib/auth/rate-limit';
 import { getContributionForReceipt } from '@/lib/db/queries';
 import { sendEmail } from '@/lib/integrations/email';
 import { log } from '@/lib/observability/logger';
+import { getConfiguredAppUrl, joinAppUrl } from '@/lib/utils/request';
 import { formatZar } from '@/lib/utils/money';
 
 const receiptSchema = z.object({
@@ -91,8 +92,7 @@ export async function requestReceiptAction(
   }
 
   const normalizedEmail = parsed.data.email.trim().toLowerCase();
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
-  const boardUrl = `${baseUrl.replace(/\/+$/, '')}/${contribution.slug}`;
+  const boardUrl = joinAppUrl(getConfiguredAppUrl(), `/${contribution.slug}`);
 
   const contributionRateLimit = await enforceRateLimit(`receipt:contribution:${contribution.id}`, {
     limit: RECEIPT_CONTRIBUTION_LIMIT,

@@ -73,8 +73,8 @@ export async function seedDatabase() {
     message: 'Happy birthday, Maya!',
     amountCents: 5000,
     feeCents: 0,
-    paymentProvider: 'payfast',
-    paymentRef: 'PF-TEST-001',
+    paymentProvider: 'stitch',
+    paymentRef: 'STITCH-TEST-001',
     paymentStatus: 'completed',
   });
 

@@ -5,11 +5,11 @@ import { requestReceiptAction } from '@/app/(guest)/[slug]/thanks/actions';
 import { getContributionByPaymentRef } from '@/lib/db/queries';
 import { getCachedDreamBoardBySlug } from '@/lib/dream-boards/cache';
 import { buildThankYouViewModel } from '@/lib/dream-boards/view-model';
-import type { PaymentProvider } from '@/lib/payments';
+import { PAYMENT_PROVIDER } from '@/lib/payments';
 
 type ThanksPageProps = {
   params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ ref?: string; provider?: PaymentProvider }>;
+  searchParams?: Promise<{ ref?: string }>;
 };
 
 export default async function ThankYouPage({ params, searchParams }: ThanksPageProps) {
@@ -21,12 +21,7 @@ export default async function ThankYouPage({ params, searchParams }: ThanksPageP
   }
 
   const ref = searchParamsResolved?.ref;
-  const providerParam = searchParamsResolved?.provider;
-  const provider: PaymentProvider =
-    providerParam && ['payfast', 'ozow', 'snapscan'].includes(providerParam)
-      ? providerParam
-      : 'payfast';
-  const contribution = ref ? await getContributionByPaymentRef(provider, ref) : null;
+  const contribution = ref ? await getContributionByPaymentRef(PAYMENT_PROVIDER, ref) : null;
   const view = buildThankYouViewModel({ board, contribution });
 
   return <ThankYouClient view={view} slug={slug} requestReceiptAction={requestReceiptAction} />;

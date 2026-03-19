@@ -6,13 +6,13 @@
 
 ---
 
-## Runtime Alignment (2026-02-11)
+## Runtime Alignment (2026-03-19)
 
 - Runtime source: `src/lib/effects/confetti.ts`, `src/components/effects/ConfettiTrigger.tsx`, `src/components/effects/PaymentOverlay.tsx`, `src/lib/animations/tokens.ts`, `src/lib/animations/variants.ts`.
 - Implemented and used:
   - Confetti burst/celebration variants with reduced-motion guard.
-  - Payment redirect overlay for PayFast/Ozow transitions.
   - Shared motion tokens/variants for UI animation consistency.
+- Payment redirect overlay references are now historical only because the current guest contribution flow stops at a Stitch-coming-soon placeholder instead of live checkout.
 - Not implemented in runtime:
   - Haptic feedback subsystem
   - Sound effects subsystem

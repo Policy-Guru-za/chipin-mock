@@ -48,11 +48,11 @@ describe('admin csv payload mappers', () => {
         dreamBoardSlug: 'maya',
         childName: 'Maya',
         contributorName: null,
-        paymentProvider: 'payfast',
+        paymentProvider: 'stitch',
         paymentStatus: 'completed',
         amountCents: 10000,
         charityCents: 0,
-        paymentRef: 'PF-1',
+        paymentRef: 'STITCH-1',
         createdAt: new Date('2026-02-01T00:00:00.000Z'),
       },
     ]);

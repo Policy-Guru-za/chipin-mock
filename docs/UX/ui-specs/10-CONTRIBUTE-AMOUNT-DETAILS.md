@@ -3,21 +3,19 @@
 > Canonical replacement: `docs/Platform-Spec-Docs/UX.md`.
 # 10 — CONTRIBUTE AMOUNT & DETAILS (Information Gathering)
 
-**Route:** `/[slug]/contribute` (initial step / combined form)
-**Purpose:** Capture contribution amount, display name, anonymity preference, and optional birthday message
+**Route:** `/[slug]/contribute` (current Stitch placeholder entry point)
+**Purpose:** Current runtime uses this route as the public Stitch-coming-soon placeholder; the detailed amount/name/message spec below is retained as future-facing reference material
 **Audience:** Contributors (gift-givers)
 **Device Priority:** Mobile-first
 **Context:** User has clicked "Chip in" on Dreamboard; now fills out details before payment
 
 ---
 
-## Runtime Alignment (2026-02-11)
+## Runtime Alignment (2026-03-19)
 
-- Runtime source: `src/app/(guest)/[slug]/contribute/page.tsx`, `src/app/(guest)/[slug]/contribute/ContributeDetailsClient.tsx`, `src/components/contribute/ReminderModal.tsx`.
-- Amount presets and limits in runtime: R150 / R250 / R500 presets, custom amount from R20 to R10,000.
-- Contributor message is capped in UI and persisted at 280 chars for payment initiation.
-- Reminder modal currently captures email only and schedules a 3-day reminder via `/api/internal/contributions/reminders`.
-- WhatsApp reminder opt-in fields exist in API schema but are not currently exposed in this UI.
+- Runtime source: `src/app/(guest)/[slug]/contribute/page.tsx`, `src/app/(guest)/[slug]/contribute/ContributeDetailsClient.tsx`.
+- Current runtime does not expose a live amount/details form; this route renders the Stitch-coming-soon placeholder only.
+- Reminder and message-entry details below are preserved as reference for a future live checkout return, not as current runtime truth.
 
 ## 1. Screen Overview
 

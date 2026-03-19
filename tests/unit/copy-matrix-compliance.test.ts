@@ -222,11 +222,12 @@ describe('copy matrix compliance', () => {
     expect(statusBadge).toContain('Gift funded - thank you, everyone! 🎉');
   });
 
-  it('uses remind-me copy from matrix', () => {
+  it('uses Stitch placeholder copy on the contribute surface', () => {
     const details = readSource('src/app/(guest)/[slug]/contribute/ContributeDetailsClient.tsx');
-    const reminderModal = readSource('src/components/contribute/ReminderModal.tsx');
+    const paymentCopy = readSource('src/lib/payments/copy.ts');
 
-    expect(details).toContain('Remind me later');
-    expect(reminderModal).toContain("We&apos;ll send one reminder before this Dreamboard closes.");
+    expect(details).toContain('STITCH_COMING_SOON_COPY');
+    expect(paymentCopy).toContain('Stitch payments coming soon');
+    expect(details).toContain('Online payments are not available yet.');
   });
 });

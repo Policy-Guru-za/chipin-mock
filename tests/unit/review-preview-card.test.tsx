@@ -60,14 +60,14 @@ describe('ReviewPreviewCard', () => {
     const html = renderToStaticMarkup(
       <ReviewPreviewCard
         {...baseProps}
-        shareUrl="https://chipin-mock.vercel.app/max-birthday-ymukga"
+        shareUrl="https://www.gifta.co.za/max-birthday-ymukga"
         onCopyShareUrl={() => undefined}
         copied={false}
       />
     );
 
     expect(html).toContain('Shareable link');
-    expect(html).toContain('https://chipin-mock.vercel.app/max-birthday-ymukga');
+    expect(html).toContain('https://www.gifta.co.za/max-birthday-ymukga');
     expect(html).toContain('Copy');
   });
 

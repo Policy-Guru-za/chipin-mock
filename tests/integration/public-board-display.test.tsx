@@ -141,7 +141,9 @@ describe('public board display integration', () => {
 
   it('shows empty contributor state for zero contributors', () => {
     render(<PublicBoardHarness board={makeBoard({ contributionCount: 0 })} contributors={[]} />);
-    expect(screen.getAllByText('Be the first to contribute and start the celebration.')).toHaveLength(2);
+    expect(
+      screen.getByText("We're finalizing Stitch-powered contributions for Gifta. Online payments are not available yet.")
+    ).toBeInTheDocument();
   });
 
   it('shows all 5 contributors without overflow indicator', () => {
@@ -177,13 +179,15 @@ describe('public board display integration', () => {
       contributionCount: 2,
     });
     render(<PublicBoardHarness board={board} contributors={makeContributors(2)} />);
-    expect(screen.getByText('Gift funded - thank you, everyone! 🎉')).toBeInTheDocument();
+    expect(screen.getByText('This Dreamboard has already hit its goal.')).toBeInTheDocument();
   });
 
-  it('keeps time-remaining copy for active boards with contributors', () => {
+  it('shows Stitch placeholder copy for active boards with contributors', () => {
     const board = makeBoard({ contributionCount: 2, campaignEndDate: addDays(10) });
     render(<PublicBoardHarness board={board} contributors={makeContributors(2)} />);
-    expect(screen.getByText(/days left to chip in|Plenty of time|Just .* days left/)).toBeInTheDocument();
+    expect(
+      screen.getByText("We're finalizing Stitch-powered contributions for Gifta. Online payments are not available yet.")
+    ).toBeInTheDocument();
   });
 
   it('does not render location copy in details card', () => {

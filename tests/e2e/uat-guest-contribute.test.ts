@@ -6,22 +6,18 @@ import { describe, expect, it } from 'vitest';
 const readSource = (path: string) => readFileSync(join(process.cwd(), path), 'utf8');
 
 describe('UAT Guest Contribute (UAT-05..UAT-08)', () => {
-  it('keeps provider journey coverage for payfast, ozow, and snapscan webhook completion', () => {
-    const payfast = readSource('tests/integration/payfast-webhook.test.ts');
-    const ozow = readSource('tests/integration/ozow-webhook.test.ts');
-    const snapscan = readSource('tests/integration/snapscan-webhook.test.ts');
-
-    expect(payfast).toContain('accepts a valid ITN payload and updates contribution state');
-    expect(ozow).toContain('accepts a valid webhook payload');
-    expect(snapscan).toContain('accepts a valid webhook payload');
-  });
-
-  it('keeps two-step contribution flow persistence and create intent handoff checks', () => {
+  it('keeps public Stitch-placeholder coverage on the contribute surface', () => {
     const source = readSource('tests/integration/contribute-two-step-flow.test.tsx');
 
-    expect(source).toContain('persists step-1 details and navigates to payment step');
-    expect(source).toContain('/api/internal/contributions/create');
-    expect(source).toContain('omits contributor name in payload for anonymous contributions');
+    expect(source).toContain('renders a Stitch-coming-soon placeholder instead of a live payment form');
+    expect(source).toContain('redirecting back to the placeholder page');
+  });
+
+  it('keeps source-level placeholder contract checks', () => {
+    const source = readSource('tests/integration/contribute-two-step-flow.test.tsx');
+
+    expect(source).toContain('Stitch payments coming soon');
+    expect(source).toContain("redirect(`/${slug}/contribute`)");
   });
 
   it('keeps reminder scheduling + idempotency coverage', () => {
@@ -37,7 +33,6 @@ describe('UAT Guest Contribute (UAT-05..UAT-08)', () => {
 
     expect(source).toContain('guest_view_loaded');
     expect(source).toContain('contribution_started');
-    expect(source).toContain('contribution_redirect_started');
     expect(source).toContain('contribution_completed');
     expect(source).toContain('contribution_failed');
     expect(source).toContain('reminder_requested');

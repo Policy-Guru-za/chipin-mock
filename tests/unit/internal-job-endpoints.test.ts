@@ -25,10 +25,6 @@ const jobEndpoints: JobEndpoint[] = [
     file: 'src/app/api/internal/karri/batch/route.ts',
   },
   {
-    path: '/api/internal/payments/reconcile',
-    file: 'src/app/api/internal/payments/reconcile/route.ts',
-  },
-  {
     path: '/api/internal/reminders/dispatch',
     file: 'src/app/api/internal/reminders/dispatch/route.ts',
   },

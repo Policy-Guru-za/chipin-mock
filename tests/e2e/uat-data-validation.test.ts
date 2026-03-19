@@ -4,17 +4,16 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import { buildGuestViewModel } from '@/lib/dream-boards/view-model';
-import { calculateFee } from '@/lib/payments/fees';
+import { PAYMENT_PROVIDER, PAYMENT_PROVIDERS, isContributionPaymentsLive } from '@/lib/payments';
 import { calculatePayoutTotals } from '@/lib/payouts/calculation';
 
 const readSource = (path: string) => readFileSync(join(process.cwd(), path), 'utf8');
 
 describe('UAT data validation', () => {
-  it('keeps active checkout fee-free across contribution amounts', () => {
-    expect(calculateFee(1000)).toBe(0);
-    expect(calculateFee(10000)).toBe(0);
-    expect(calculateFee(25000)).toBe(0);
-    expect(calculateFee(10_000_000)).toBe(0);
+  it('keeps contribution payments disabled until Stitch checkout lands', () => {
+    expect(PAYMENT_PROVIDER).toBe('stitch');
+    expect(PAYMENT_PROVIDERS).toEqual(['stitch']);
+    expect(isContributionPaymentsLive()).toBe(false);
   });
 
   it('validates payout arithmetic and non-negative bounded totals', () => {

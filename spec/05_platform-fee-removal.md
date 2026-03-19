@@ -1,5 +1,7 @@
 # 05_platform-fee-removal
 
+> Historical context note (2026-03-19): this closed fee-removal spec predates the Stitch placeholder pivot and voucher-removal docs sync. Treat payment-provider assumptions below as legacy context only.
+
 ## Objective
 
 - Remove Gifta platform fees from all active Dreamboard product flows while preserving historical fee-bearing records, legacy payout compatibility, and current payment-provider UX.
@@ -30,8 +32,8 @@
 - [`../docs/Platform-Spec-Docs/CANONICAL.md`](../docs/Platform-Spec-Docs/CANONICAL.md)
 - [`../docs/Platform-Spec-Docs/PAYMENTS.md`](../docs/Platform-Spec-Docs/PAYMENTS.md)
 - [`../docs/Platform-Spec-Docs/DATA.md`](../docs/Platform-Spec-Docs/DATA.md)
-- [`../src/app/api/internal/contributions/create/route.ts`](../src/app/api/internal/contributions/create/route.ts)
-- [`../src/lib/payments/fees.ts`](../src/lib/payments/fees.ts)
+- [`../src/app/(guest)/[slug]/contribute/page.tsx`](../src/app/(guest)/[slug]/contribute/page.tsx)
+- [`../src/lib/payments/index.ts`](../src/lib/payments/index.ts)
 - [`../src/lib/admin/service.ts`](../src/lib/admin/service.ts)
 - [`../src/lib/api/openapi.ts`](../src/lib/api/openapi.ts)
 

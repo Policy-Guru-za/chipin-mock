@@ -115,9 +115,7 @@ export default async function AdminContributionsPage({
             type: 'select',
             options: [
               { value: '', label: 'Any' },
-              { value: 'payfast', label: 'PayFast' },
-              { value: 'ozow', label: 'Ozow' },
-              { value: 'snapscan', label: 'SnapScan' },
+              { value: 'stitch', label: 'Stitch' },
             ],
           },
           { key: 'created_from', label: 'From', type: 'date' },

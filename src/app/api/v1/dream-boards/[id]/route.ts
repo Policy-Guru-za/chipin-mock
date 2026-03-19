@@ -13,6 +13,7 @@ import { LOCKED_PAYOUT_METHODS } from '@/lib/ux-v2/decision-locks';
 import { resolveWritePathBlockReason } from '@/lib/ux-v2/write-path-gates';
 import { formatDateOnly, parseDateOnly } from '@/lib/utils/date';
 import { encryptSensitiveValue } from '@/lib/utils/encryption';
+import { getConfiguredAppUrl } from '@/lib/utils/request';
 
 import { verifyKarriCardForApi } from '../karri';
 
@@ -327,7 +328,7 @@ export const GET = withApiAuth(
       });
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+    const baseUrl = getConfiguredAppUrl();
     const payload = serializeDreamBoard(board, baseUrl);
     if (!payload) {
       return jsonError({
@@ -490,7 +491,7 @@ export const PATCH = withApiAuth(
       });
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+    const baseUrl = getConfiguredAppUrl();
     const payload = serializeDreamBoard(updated, baseUrl);
     if (!payload) {
       return jsonError({

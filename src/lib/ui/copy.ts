@@ -5,7 +5,7 @@ export const uiCopy = {
       ctaLabel: 'Back to Dreamboard',
     },
     paymentsUnavailable: {
-      body: 'Payments are temporarily unavailable. Please check back shortly.',
+      body: 'Stitch-powered contributions are coming soon. Online payments are not live yet.',
     },
   },
   dashboard: {

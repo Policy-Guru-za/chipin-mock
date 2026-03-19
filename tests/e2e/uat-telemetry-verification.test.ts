@@ -7,7 +7,6 @@ import {
   trackCharityPayoutCreated,
   trackContributionCompleted,
   trackContributionFailed,
-  trackContributionRedirectStarted,
   trackContributionStarted,
   trackGuestViewLoaded,
   trackHostCreateFailed,
@@ -35,12 +34,11 @@ const emitAllCatalogEvents = () => {
     payoutMethod: 'takealot_voucher',
   });
   trackGuestViewLoaded('board-1');
-  trackContributionStarted('board-1', 5000, 'payfast');
-  trackContributionRedirectStarted('payfast');
-  trackContributionCompleted('board-1', 5000, 'payfast');
+  trackContributionStarted('board-1', 5000, 'stitch');
+  trackContributionCompleted('board-1', 5000, 'stitch');
   trackContributionFailed({
     dreamBoardId: 'board-1',
-    paymentProvider: 'payfast',
+    paymentProvider: 'stitch',
     amountCents: 5000,
     failureCode: 'timeout',
   });
@@ -81,7 +79,6 @@ const requiredEventNames = [
   'host_create_published',
   'guest_view_loaded',
   'contribution_started',
-  'contribution_redirect_started',
   'contribution_completed',
   'contribution_failed',
   'reminder_requested',
@@ -128,10 +125,10 @@ describe('UAT telemetry verification (active catalog)', () => {
       dreamBoardId: 'board-1',
       payoutMethod: 'takealot_voucher',
     });
-    trackContributionCompleted('board-1', 5000, 'ozow');
+    trackContributionCompleted('board-1', 5000, 'stitch');
     trackContributionFailed({
       dreamBoardId: 'board-1',
-      paymentProvider: 'ozow',
+      paymentProvider: 'stitch',
       amountCents: 5000,
       failureCode: 'timeout',
     });
@@ -159,7 +156,7 @@ describe('UAT telemetry verification (active catalog)', () => {
     });
     expect(findEvent('contribution_completed')?.properties).toMatchObject({
       dream_board_id: 'board-1',
-      payment_provider: 'ozow',
+      payment_provider: 'stitch',
       amount_cents: 5000,
     });
     expect(findEvent('contribution_failed')?.properties).toMatchObject({

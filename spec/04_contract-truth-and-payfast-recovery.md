@@ -1,5 +1,7 @@
 # 04_contract-truth-and-payfast-recovery
 
+> Historical context note (2026-03-19): this superseded spec reflects a PayFast-era recovery plan. Current Gifta product truth is a Stitch-coming-soon guest placeholder with no live checkout provider.
+
 ## Objective
 
 - Align Gifta's public webhook contract, guest contribution flow, payment recovery behavior, and admin payout surface with current runtime truth while preserving safe rollback and verification paths.
@@ -32,7 +34,7 @@
 - [`../docs/Platform-Spec-Docs/API.md`](../docs/Platform-Spec-Docs/API.md)
 - [`../docs/Platform-Spec-Docs/PAYMENTS.md`](../docs/Platform-Spec-Docs/PAYMENTS.md)
 - [`../src/app/api/v1/webhooks/route.ts`](../src/app/api/v1/webhooks/route.ts)
-- [`../src/lib/payments/reconciliation-job.ts`](../src/lib/payments/reconciliation-job.ts)
+- [`../src/lib/payments/index.ts`](../src/lib/payments/index.ts)
 
 ## Stage Plan
 

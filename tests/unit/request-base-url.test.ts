@@ -10,21 +10,21 @@ afterEach(() => {
 
 describe('resolveRuntimeBaseUrl', () => {
   it('uses trusted deployment host over configured app url', () => {
-    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://gifta.co.za');
-    vi.stubEnv('VERCEL_URL', 'chipin-mock.vercel.app');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://www.gifta.co.za');
+    vi.stubEnv('VERCEL_URL', 'gifta-preview.vercel.app');
 
     const baseUrl = resolveRuntimeBaseUrl({
       headers: makeHeaders({
-        host: 'chipin-mock.vercel.app',
+        host: 'gifta-preview.vercel.app',
         'x-forwarded-proto': 'https',
       }),
     });
 
-    expect(baseUrl).toBe('https://chipin-mock.vercel.app');
+    expect(baseUrl).toBe('https://gifta-preview.vercel.app');
   });
 
   it('falls back to configured app url when host is untrusted', () => {
-    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://gifta.co.za');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://www.gifta.co.za');
 
     const baseUrl = resolveRuntimeBaseUrl({
       headers: makeHeaders({
@@ -33,7 +33,7 @@ describe('resolveRuntimeBaseUrl', () => {
       }),
     });
 
-    expect(baseUrl).toBe('https://gifta.co.za');
+    expect(baseUrl).toBe('https://www.gifta.co.za');
   });
 
   it('allows localhost hosts for local development', () => {

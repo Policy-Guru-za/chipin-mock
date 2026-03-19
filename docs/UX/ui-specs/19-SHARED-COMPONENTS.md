@@ -6,12 +6,13 @@
 
 ---
 
-## Runtime Alignment (2026-02-11)
+## Runtime Alignment (2026-03-19)
 
 - Runtime source: `src/components/ui/*`, `src/components/dream-board/*`, `src/components/admin/*`, `src/components/landing/*`, `src/components/effects/*`.
 - Legacy references to `src/components/layout/Header.tsx` in this document are stale; runtime uses route-specific layouts and `src/components/admin/AdminSidebar.tsx` for admin nav.
 - Current shared UI primitives are in `src/components/ui` (button/input/textarea/card/skeleton/state-card/error fallback).
 - Dreamboard shared components are implemented in `src/components/dream-board` (status badge, progress bar, contributor display, charity card, time remaining).
+- Current landing/payment story is Stitch placeholder only plus bank/optional Karri payout messaging; payment-era shared components described below should be treated as legacy reference unless runtime files confirm them.
 
 ## Table of Contents
 1. [Navigation & Layout Components](#navigation--layout-components)

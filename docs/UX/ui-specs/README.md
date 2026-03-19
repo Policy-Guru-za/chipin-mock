@@ -5,7 +5,7 @@
 
 > **Version:** 2.1
 > **Created:** February 6, 2026
-> **Last Updated:** February 11, 2026
+> **Last Updated:** March 19, 2026
 > **Total Documents:** 22
 > **Total Lines:** 29,100
 > **Purpose:** Screen-level UX specs with runtime alignment notes
@@ -31,7 +31,7 @@ For implementation, always verify against runtime in `src/app`, `src/components`
 
 ---
 
-## Runtime Alignment Snapshot (2026-02-11)
+## Runtime Alignment Snapshot (2026-03-19)
 
 | Doc | Alignment | Notes |
 |---|---|---|
@@ -45,18 +45,18 @@ For implementation, always verify against runtime in `src/app`, `src/components`
 | 07 | High | Payout setup broadly aligned (Karri + bank). |
 | 08 | Partial | Publish flow corrected to preview-first, publish-on-submit, slug sharing URL. |
 | 09 | High | Public Dreamboard largely aligned. |
-| 10 | Partial | Reminder UI is email-only (3-day reminder). |
-| 11 | Partial | Payment methods now include PayFast, Ozow, and SnapScan. |
+| 10 | Partial | Current route is a Stitch-coming-soon placeholder; detailed amount/reminder patterns below are future-facing reference only. |
+| 11 | Low | Legacy payment screen reference only; current product redirects away from `/[slug]/contribute/payment` and does not expose live PayFast/Ozow/SnapScan checkout. |
 | 12 | High | Thank-you flow + receipt capture aligns. |
-| 13 | High | Failure-recovery flow aligns. |
+| 13 | Low | Legacy failure-screen reference only; `/[slug]/payment-failed` now redirects back to the contribute placeholder. |
 | 14 | Partial | Dashboard list runtime aligns; legacy shared-header references are stale. |
 | 15 | Partial | No host close action in runtime; detail and payouts are aligned otherwise. |
 | 16 | High | Edit modal aligns with constrained fields. |
 | 17 | High | Post-campaign view aligns. |
 | 18 | Partial | Admin auth model corrected to email allowlist; no Clerk role-claim gate. |
-| 19 | Low | Shared component inventory required runtime correction. |
+| 19 | Low | Shared component inventory required runtime correction; payment-era shared patterns below are legacy reference only. |
 | 20 | Low | Runtime templates are fewer than the full target matrix in spec. |
-| 21 | Partial | Confetti + reduced-motion logic align; haptic/sound systems are not implemented. |
+| 21 | Partial | Confetti + reduced-motion logic align; payment-overlay sections are now historical because live checkout is disabled. |
 
 ---
 
@@ -91,10 +91,10 @@ For implementation, always verify against runtime in `src/app`, `src/components`
 | # | Document | Lines | Route | Purpose |
 |---|----------|-------|-------|---------|
 | 09 | [Public Dreamboard](./09-PUBLIC-DREAM-BOARD.md) | 981 | `/[slug]` | The WhatsApp-shared board contributors see |
-| 10 | [Contribute: Amount & Details](./10-CONTRIBUTE-AMOUNT-DETAILS.md) | 1,105 | `/[slug]/contribute` | Amount selector, name, message, reminder |
-| 11 | [Contribute: Payment](./11-CONTRIBUTE-PAYMENT.md) | 1,125 | `/[slug]/contribute/payment` | PayFast form, Ozow redirect, SnapScan QR |
+| 10 | [Contribute: Amount & Details](./10-CONTRIBUTE-AMOUNT-DETAILS.md) | 1,105 | `/[slug]/contribute` | Stitch placeholder entry point; detailed amount/reminder spec retained as reference |
+| 11 | [Contribute: Payment](./11-CONTRIBUTE-PAYMENT.md) | 1,125 | Legacy `/[slug]/contribute/payment` | Historical payment-screen reference (not an active route) |
 | 12 | [Contribute: Thank You](./12-CONTRIBUTE-THANK-YOU.md) | 1,081 | `/[slug]/thanks` | Confetti celebration, receipt, share prompt |
-| 13 | [Contribute: Payment Failed](./13-CONTRIBUTE-PAYMENT-FAILED.md) | 872 | `/[slug]/payment-failed` | Friendly error recovery with retry |
+| 13 | [Contribute: Payment Failed](./13-CONTRIBUTE-PAYMENT-FAILED.md) | 872 | Legacy `/[slug]/payment-failed` | Historical failure-screen reference (current runtime redirects away) |
 
 ### Host Dashboard
 

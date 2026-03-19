@@ -4,7 +4,7 @@
 # Stitch Payments Reference
 
 > **Source:** https://docs.stitch.money/api and linked docs (Jan 2026)
-> **Status:** Under evaluation for Gifta
+> **Status:** Current future-facing reference for Gifta; active product truth is still a Stitch-coming-soon placeholder with no live checkout integration in repo
 
 ---
 

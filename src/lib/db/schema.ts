@@ -44,7 +44,7 @@ export const paymentStatusEnum = pgEnum('payment_status', [
   'refunded',
 ]);
 
-export const paymentProviderEnum = pgEnum('payment_provider', ['payfast', 'ozow', 'snapscan']);
+export const paymentProviderEnum = pgEnum('payment_provider', ['stitch']);
 
 export const payoutStatusEnum = pgEnum('payout_status', [
   'pending',

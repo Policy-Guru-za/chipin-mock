@@ -1,7 +1,7 @@
 # Architecture
 
 > **Status:** Current reference  
-> **Last reviewed:** March 12, 2026
+> **Last reviewed:** March 19, 2026
 
 ## Application Shape
 
@@ -37,8 +37,8 @@
 
 ## External Systems
 
-- Payments: PayFast, Ozow, SnapScan
-- Payouts: default host-created boards use `takealot_voucher`; `karri_card` writes are off by default and gated by `UX_V2_ENABLE_KARRI_WRITE_PATH`; bank writes remain gated by `UX_V2_ENABLE_BANK_WRITE_PATH`; charity payout rows may also exist when enabled
+- Payments: Stitch coming-soon placeholder only (no live guest checkout)
+- Payouts: bank payout tracking is the intended default product path, optional Karri writes remain gated by `UX_V2_ENABLE_KARRI_WRITE_PATH`, bank writes remain gated by `UX_V2_ENABLE_BANK_WRITE_PATH`, and historical charity payout rows may also exist when enabled
 - Storage: Vercel Blob
 - Cache / rate limiting: Vercel KV with development fallback in some paths
 - Email: Resend
@@ -50,7 +50,6 @@ There is no in-repo cron scheduler. Jobs are exposed as internal routes and must
 
 - `/api/internal/webhooks/process`
 - `/api/internal/karri/batch`
-- `/api/internal/payments/reconcile`
 - `/api/internal/reminders/dispatch`
 - `/api/internal/retention/run`
 

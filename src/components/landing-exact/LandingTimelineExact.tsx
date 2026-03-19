@@ -190,7 +190,7 @@ export function LandingTimelineExact() {
                 <div className={styles.whatsAppLinkPreview}>
                   <div className={styles.whatsAppLinkPreviewBar} />
                   <div className={styles.whatsAppLinkPreviewBody}>
-                    <div className={styles.whatsAppLinkPreviewDomain}>gifta.co.za</div>
+                    <div className={styles.whatsAppLinkPreviewDomain}>www.gifta.co.za</div>
                     <div className={styles.whatsAppLinkPreviewTitle}>Mia&apos;s Dreamboard 🎁</div>
                     <div className={styles.whatsAppLinkPreviewDescription}>
                       Help fund Mia&apos;s Ballet Starter Kit — chip in any amount

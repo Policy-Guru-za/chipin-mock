@@ -155,7 +155,7 @@ describe('host dashboard view model', () => {
         messageCount: 6,
       },
       [],
-      { baseUrl: 'https://gifta.co.za' }
+      { baseUrl: 'https://www.gifta.co.za' }
     );
 
     expect(detail.statusLabel).toBe('Funded!');
@@ -199,7 +199,7 @@ describe('host dashboard view model', () => {
         messageCount: 6,
       },
       [],
-      { baseUrl: 'https://gifta.co.za' }
+      { baseUrl: 'https://www.gifta.co.za' }
     );
 
     expect(detail.hasBirthdayParty).toBe(false);

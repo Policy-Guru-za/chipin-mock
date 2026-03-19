@@ -21,7 +21,6 @@ const isPublicRoute = createRouteMatcher([
   '/api/v1(.*)',
   '/api/og(.*)',
   '/v1(.*)',
-  '/api/internal/contributions/create', // Public guest checkout endpoint; do not add job-secret auth.
   '/api/internal/contributions/reminders', // Public guest reminder scheduling endpoint.
   '/api/internal/analytics', // Public guest telemetry endpoint.
   '/api/internal/metrics', // Public guest telemetry endpoint.
@@ -30,7 +29,6 @@ const isPublicRoute = createRouteMatcher([
   '/api/internal/webhooks/process',
   '/api/internal/retention/run',
   '/api/internal/karri/batch',
-  '/api/internal/payments/reconcile',
   '/api/internal/reminders/dispatch',
   '/api/internal/api-keys(.*)',
   // Guest pages (route groups are not in URL):
@@ -48,7 +46,6 @@ const bypassExactPaths = new Set([
   '/api/internal/webhooks/process',
   '/api/internal/retention/run',
   '/api/internal/karri/batch',
-  '/api/internal/payments/reconcile',
   '/api/internal/reminders/dispatch',
 ]);
 

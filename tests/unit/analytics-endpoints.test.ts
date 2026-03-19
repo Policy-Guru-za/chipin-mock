@@ -9,6 +9,7 @@ vi.mock('@/lib/observability/logger', () => ({
 // Mock getClientIp
 vi.mock('@/lib/utils/request', () => ({
   getClientIp: vi.fn(() => '127.0.0.1'),
+  getConfiguredAppUrl: vi.fn(() => 'https://www.gifta.co.za'),
 }));
 
 describe('POST /api/internal/analytics', () => {
@@ -104,14 +105,14 @@ describe('POST /api/internal/analytics', () => {
   it('rejects origin-prefix spoofing in production mode', async () => {
     vi.resetModules();
     vi.stubEnv('NODE_ENV', 'production');
-    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://gifta.co.za');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://www.gifta.co.za');
     const routeModule = await import('@/app/api/internal/analytics/route');
     const productionPost = routeModule.POST;
 
-    const request = new NextRequest('https://gifta.co.za/api/internal/analytics', {
+    const request = new NextRequest('https://www.gifta.co.za/api/internal/analytics', {
       method: 'POST',
       headers: {
-        origin: 'https://gifta.co.za.attacker.tld',
+        origin: 'https://www.gifta.co.za.attacker.tld',
       },
       body: JSON.stringify({
         name: 'LCP',
@@ -128,11 +129,11 @@ describe('POST /api/internal/analytics', () => {
   it('rejects requests without origin and referer in production mode', async () => {
     vi.resetModules();
     vi.stubEnv('NODE_ENV', 'production');
-    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://gifta.co.za');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://www.gifta.co.za');
     const routeModule = await import('@/app/api/internal/analytics/route');
     const productionPost = routeModule.POST;
 
-    const request = new NextRequest('https://gifta.co.za/api/internal/analytics', {
+    const request = new NextRequest('https://www.gifta.co.za/api/internal/analytics', {
       method: 'POST',
       body: JSON.stringify({
         name: 'LCP',
@@ -170,7 +171,7 @@ describe('POST /api/internal/metrics', () => {
         properties: {
           dreamBoardId: 'db-123',
           amountCents: 10000,
-          paymentMethod: 'payfast',
+          paymentMethod: 'stitch',
         },
       }),
     });
@@ -217,7 +218,6 @@ describe('POST /api/internal/metrics', () => {
       'contribution_started',
       'contribution_completed',
       'goal_reached',
-      'payment_method_selected',
       'wizard_step_completed',
       'share_link_clicked',
     ];
@@ -249,14 +249,14 @@ describe('POST /api/internal/metrics', () => {
   it('rejects origin-prefix spoofing in production mode', async () => {
     vi.resetModules();
     vi.stubEnv('NODE_ENV', 'production');
-    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://gifta.co.za');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://www.gifta.co.za');
     const routeModule = await import('@/app/api/internal/metrics/route');
     const productionPost = routeModule.POST;
 
-    const request = new NextRequest('https://gifta.co.za/api/internal/metrics', {
+    const request = new NextRequest('https://www.gifta.co.za/api/internal/metrics', {
       method: 'POST',
       headers: {
-        referer: 'https://gifta.co.za.attacker.tld/path',
+        referer: 'https://www.gifta.co.za.attacker.tld/path',
       },
       body: JSON.stringify({
         name: 'contribution_completed',
@@ -271,11 +271,11 @@ describe('POST /api/internal/metrics', () => {
   it('rejects requests without origin and referer in production mode', async () => {
     vi.resetModules();
     vi.stubEnv('NODE_ENV', 'production');
-    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://gifta.co.za');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://www.gifta.co.za');
     const routeModule = await import('@/app/api/internal/metrics/route');
     const productionPost = routeModule.POST;
 
-    const request = new NextRequest('https://gifta.co.za/api/internal/metrics', {
+    const request = new NextRequest('https://www.gifta.co.za/api/internal/metrics', {
       method: 'POST',
       body: JSON.stringify({
         name: 'contribution_completed',

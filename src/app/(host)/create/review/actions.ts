@@ -11,6 +11,7 @@ import { DEFAULT_PARTNER_ID } from '@/lib/db/partners';
 import { dreamBoards } from '@/lib/db/schema';
 import { sendDreamBoardLink } from '@/lib/integrations/whatsapp';
 import { log } from '@/lib/observability/logger';
+import { getConfiguredAppUrl, joinAppUrl } from '@/lib/utils/request';
 import { generateSlug } from '@/lib/utils/slug';
 
 export async function publishDreamBoardAction(
@@ -77,11 +78,7 @@ export async function publishDreamBoardAction(
       };
     }
 
-    const baseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? 'https://gifta.co.za').replace(
-      /\/$/,
-      ''
-    );
-    const shareUrl = `${baseUrl}/${slug}`;
+    const shareUrl = joinAppUrl(getConfiguredAppUrl(), `/${slug}`);
 
     try {
       await sendDreamBoardLink(parsed.data.hostWhatsAppNumber, shareUrl, parsed.data.childName);

@@ -3,6 +3,8 @@
 > Canonical replacement: `docs/Platform-Spec-Docs/PAYMENTS.md`.
 # SnapScan docs: known gaps / uncertainties
 
+> 2026-03-19 note: retained as legacy provider research only. Current Gifta product truth is a Stitch-coming-soon placeholder with no live SnapScan checkout.
+
 Grouped questions an integrator typically needs answered, based on what is *not* specified in the canonical SnapScan developer docs.
 
 ## Auth

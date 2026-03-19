@@ -40,8 +40,8 @@ When docs disagree:
 - Auth: Clerk
 - Storage: Vercel Blob
 - Cache / rate limits: Vercel KV with local fallback paths
-- Payments: PayFast, Ozow, SnapScan
-- Payouts: Takealot voucher placeholder, Karri Card, bank, optional historical charity ledger rows
+- Payments: Stitch coming-soon placeholder only (no live guest checkout)
+- Payouts: bank, optional Karri Card, optional historical charity ledger rows
 - Observability: Sentry, optional OpenTelemetry / Axiom
 
 ## Repository Rules

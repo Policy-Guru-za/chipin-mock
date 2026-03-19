@@ -3,6 +3,8 @@
 > Canonical replacement: `docs/Platform-Spec-Docs/PAYMENTS.md`.
 # PayFast Open Questions / Known Gaps
 
+> 2026-03-19 note: retained as legacy provider research only. Current Gifta product truth is a Stitch-coming-soon placeholder with no live PayFast checkout.
+
 These are integration-relevant uncertainties where the PayFast docs do not fully specify operational behaviour.
 
 Status: OPEN (Phase 1). Track and confirm with PayFast before production.

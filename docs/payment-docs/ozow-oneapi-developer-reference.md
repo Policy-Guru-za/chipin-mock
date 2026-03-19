@@ -3,6 +3,8 @@
 > Canonical replacement: `docs/Platform-Spec-Docs/PAYMENTS.md`.
 # Ozow One API Developer Reference (Integration-Focused)
 
+> 2026-03-19 note: retained as legacy provider reference only. Current Gifta product truth is a Stitch-coming-soon placeholder with no live Ozow checkout.
+
 ## 1. Scope and Audience
 - Covers Ozow One API (Beta) One API + Basic API surfaces, focused on implementing payments, transactions, refunds, settlements, and webhook integrations.
 - Excludes non-One-API Ozow products and non-technical marketing content.
@@ -1128,7 +1130,11 @@ PaymentRequest
 | Field | Type | Required | Description |
 |---|---|---:|---|
 | `siteCode` | `string` | yes | The merchant site code in use for this payment. Site codes are available on the Ozow dashboard. |
-| `region` | `string` | no | ISO 3166-Alpha-2 code for the originating country of the payment.  Must be "ZA" for South Africa.    If region is not specified IP geolocation will be used to determine the applicable region. |
+| `region` | `string` | no | ISO 3166-Alpha-2 code for the originating country of the payment.
+ 
+ Must be "ZA" for South Africa.  
+ 
+ If region is not specified IP geolocation will be used to determine the applicable region. |
 | `amount` | `Amount` | yes | The currency and amount of the payment request. |
 | `amount.currency` | `string` | yes | The ISO 4217 current code. |
 | `amount.value` | `number<float>` | yes | The amount in the currency specified. |
@@ -1174,7 +1180,11 @@ TransactionRequest
 |---|---|---:|---|
 | `paymentRequest` | `PaymentRequest` | yes | The payment request details. |
 | `paymentRequest.siteCode` | `string` | yes | The merchant site code in use for this payment. Site codes are available on the Ozow dashboard. |
-| `paymentRequest.region` | `string` | yes | ISO 3166-Alpha-2 code for the originating country of the payment.  Must be "ZA" for South Africa.    If region is not specified IP geolocation will be used to determine the applicable region. |
+| `paymentRequest.region` | `string` | yes | ISO 3166-Alpha-2 code for the originating country of the payment.
+ 
+ Must be "ZA" for South Africa.  
+ 
+ If region is not specified IP geolocation will be used to determine the applicable region. |
 | `paymentRequest.amount` | `Amount` | yes | The currency and amount of the payment request. |
 | `paymentRequest.amount.currency` | `string` | yes | The ISO 4217 current code. |
 | `paymentRequest.amount.value` | `number<float>` | yes | The amount in the currency specified. |
@@ -1248,7 +1258,16 @@ Refund
 | `amount.value` | `number<float>` | yes | The amount in the currency specified. |
 | `requested` | `string<date-time>` | yes | The date and time the refund was requested. |
 | `completed` | `string<date-time>` | no | The date and time the refund was completed. |
-| `status` | `string` | yes | The refund status.  Possible values are:   * pending - The refund request has been submitted and accepted. * complete - The refund has been paid successfully. * submitted - The refund has been assigned to a batch and is being processed. * failed - The refund payment has failed. * cancelled - The refund has been cancelled before it was submitted. * returned - The refund payment has been returned because the account that was being refunded no longer exists.  Allowed values: pending, complete, submitted, failed, cancelled, returned. |
+| `status` | `string` | yes | The refund status.  Possible values are:
+ 
+ 
+ * pending - The refund request has been submitted and accepted.
+ * complete - The refund has been paid successfully.
+ * submitted - The refund has been assigned to a batch and is being processed.
+ * failed - The refund payment has failed.
+ * cancelled - The refund has been cancelled before it was submitted.
+ * returned - The refund payment has been returned because the account that was being refunded no longer exists.
+  Allowed values: pending, complete, submitted, failed, cancelled, returned. |
 | `reason` | `string` | no | The reason for the status of the refund. |
 | `paidTo` | `BankAccount` | no | The bank details of where the refund was paid to. |
 | `paidTo.insitutionId` | `string<uuid>` | no | The unique identifier of the institution. |

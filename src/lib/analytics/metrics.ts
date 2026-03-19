@@ -8,7 +8,6 @@ export type CustomMetricName =
   | 'host_create_failed'
   | 'host_create_published'
   | 'guest_view_loaded'
-  | 'contribution_redirect_started'
   | 'contribution_failed'
   | 'reminder_requested'
   | 'payout_created'
@@ -22,13 +21,9 @@ export type CustomMetricName =
   | 'contribution_started'
   | 'contribution_completed'
   | 'goal_reached'
-  | 'payment_method_selected'
   | 'wizard_step_completed'
   | 'share_link_clicked'
-  | 'nav_drawer_opened'
-  | 'payment_redirect_started'
-  | 'snapscan_qr_shown'
-  | 'snapscan_reference_copied';
+  | 'nav_drawer_opened';
 
 export type CustomMetricData = {
   name: CustomMetricName;
@@ -141,28 +136,6 @@ export function trackNavDrawerOpened(): void {
   trackMetric('nav_drawer_opened');
 }
 
-/**
- * Track payment redirect start.
- */
-export function trackPaymentRedirectStarted(provider: string): void {
-  trackContributionRedirectStarted(provider);
-  trackMetric('payment_redirect_started', { provider });
-}
-
-/**
- * Track SnapScan QR visibility.
- */
-export function trackSnapscanQrShown(dreamBoardId?: string): void {
-  trackMetric('snapscan_qr_shown', dreamBoardId ? { dreamBoardId } : undefined);
-}
-
-/**
- * Track SnapScan reference copy events.
- */
-export function trackSnapscanReferenceCopied(reference: string): void {
-  trackMetric('snapscan_reference_copied', { reference_last4: reference.slice(-4) });
-}
-
 export function trackHostCreateStarted(): void {
   trackMetric('host_create_started');
 }
@@ -190,12 +163,6 @@ export function trackHostCreatePublished(params: {
 
 export function trackGuestViewLoaded(dreamBoardId: string): void {
   trackMetric('guest_view_loaded', { dream_board_id: dreamBoardId });
-}
-
-export function trackContributionRedirectStarted(paymentProvider: string): void {
-  trackMetric('contribution_redirect_started', {
-    payment_provider: paymentProvider,
-  });
 }
 
 export function trackContributionFailed(params: {

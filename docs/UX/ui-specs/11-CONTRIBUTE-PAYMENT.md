@@ -3,23 +3,20 @@
 > Canonical replacement: `docs/Platform-Spec-Docs/UX.md`.
 # 11 — CONTRIBUTE PAYMENT (Payment Processing)
 
-**Route:** `/[slug]/contribute/payment`
-**Purpose:** Display payment method options and process payment securely
+**Route:** Legacy `/[slug]/contribute/payment`
+**Purpose:** Historical payment-method reference only; current product does not expose a live payment screen
 **Audience:** Contributors ready to pay
 **Device Priority:** Mobile-first
 **Context:** User has filled amount + details; now ready to pay
 
 ---
 
-## Runtime Alignment (2026-02-11)
+## Runtime Alignment (2026-03-19)
 
-- Runtime source: `src/app/(guest)/[slug]/contribute/payment/page.tsx`, `src/app/(guest)/[slug]/contribute/payment/PaymentClient.tsx`, `src/lib/payments/index.ts`.
-- Runtime payment methods are:
-  - PayFast (POST form handoff)
-  - Ozow (redirect)
-  - SnapScan (QR panel)
-- Provider availability is environment-config driven and can change by deployment config.
-- Fee display uses current runtime fee rules (3%, min R3, max R500) and total is shown before submission.
+- Runtime source: legacy `src/app/(guest)/[slug]/contribute/payment/*` remnants only.
+- Current public guest flow redirects away from `/[slug]/contribute/payment` back to `/[slug]/contribute`.
+- PayFast, Ozow, and SnapScan are not current product-truth payment methods; the active product story is a Stitch-coming-soon placeholder with no live checkout.
+- Keep the detailed provider-specific material below as historical integration context only.
 
 ## 1. Screen Overview
 

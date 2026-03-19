@@ -38,7 +38,7 @@ describe('admin query param parsers', () => {
   it('parses contribution and payout filters', () => {
     const contributionParams = new URLSearchParams({
       status: 'completed,failed',
-      provider: 'payfast,ozow',
+      provider: 'stitch,invalid',
       dream_board_id: 'db-2',
       search: 'Ava',
     });
@@ -54,7 +54,7 @@ describe('admin query param parsers', () => {
     const payouts = parseAdminPayoutFilters(payoutParams);
 
     expect(contributions.statuses).toEqual(['completed', 'failed']);
-    expect(contributions.paymentProviders).toEqual(['payfast', 'ozow']);
+    expect(contributions.paymentProviders).toEqual(['stitch']);
     expect(contributions.dreamBoardId).toBe('db-2');
     expect(payouts.statuses).toEqual(['pending', 'completed']);
     expect(payouts.types).toEqual(['karri_card', 'charity']);

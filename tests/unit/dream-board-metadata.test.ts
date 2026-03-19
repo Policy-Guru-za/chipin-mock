@@ -35,15 +35,16 @@ describe('buildDreamBoardMetadata', () => {
         goalCents: 5000,
         raisedCents: 7500,
       },
-      { baseUrl: 'https://chipin-mock.vercel.app', path: '/maya-birthday-123' }
+      { baseUrl: 'https://gifta-preview.vercel.app', path: '/maya-birthday-123' }
     );
 
-    expect(metadata.openGraph?.url).toBe('https://chipin-mock.vercel.app/maya-birthday-123');
+    expect(metadata.openGraph?.url).toBe('https://gifta-preview.vercel.app/maya-birthday-123');
     expect(metadata.openGraph?.images?.[0]?.url).toBe(
-      'https://chipin-mock.vercel.app/api/og/maya-birthday-123'
+      'https://gifta-preview.vercel.app/api/og/maya-birthday-123'
     );
     expect(metadata.twitter?.images).toEqual([
-      'https://chipin-mock.vercel.app/api/og/maya-birthday-123',
+      'https://gifta-preview.vercel.app/api/og/maya-birthday-123',
     ]);
+    expect(metadata.alternates?.canonical).toBe('https://gifta-preview.vercel.app/maya-birthday-123');
   });
 });

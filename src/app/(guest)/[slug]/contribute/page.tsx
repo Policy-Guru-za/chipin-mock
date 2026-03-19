@@ -9,7 +9,6 @@ import { StateCard } from '@/components/ui/state-card';
 import { getCachedDreamBoardBySlug } from '@/lib/dream-boards/cache';
 import { buildDreamBoardMetadata } from '@/lib/dream-boards/metadata';
 import { buildContributionViewModel } from '@/lib/dream-boards/view-model';
-import { getAvailablePaymentProviders } from '@/lib/payments';
 import { uiCopy } from '@/lib/ui/copy';
 import { resolveRuntimeBaseUrl } from '@/lib/utils/request';
 
@@ -26,8 +25,8 @@ export async function generateMetadata({
 
   if (!board) {
     return {
-      title: 'Contribute | Gifta',
-      description: 'Chip in together for a dream gift.',
+      title: 'Stitch Coming Soon | Gifta',
+      description: 'Stitch-powered contributions are coming soon to Gifta.',
     };
   }
 
@@ -44,9 +43,6 @@ export default async function ContributionPage({
   if (!board) {
     notFound();
   }
-
-  const availableProviders = getAvailablePaymentProviders();
-  const hasAvailableProviders = availableProviders.length > 0;
 
   const view = buildContributionViewModel(board);
 
@@ -73,13 +69,13 @@ export default async function ContributionPage({
 
   return (
     <section className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-6 py-12">
-      <ContributeDetailsClient
-        slug={board.slug}
-        dreamBoardId={board.id}
-        childName={board.childName}
-        hasAvailableProviders={hasAvailableProviders}
-        unavailableMessage={uiCopy.guest.paymentsUnavailable.body}
+      <DreamBoardCard
+        imageUrl={view.displayImage}
+        title={view.displayTitle}
+        subtitle={view.displaySubtitle}
+        imagePriority
       />
+      <ContributeDetailsClient slug={board.slug} childName={board.childName} />
     </section>
   );
 }

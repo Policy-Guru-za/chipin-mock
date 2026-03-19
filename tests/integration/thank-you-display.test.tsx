@@ -174,7 +174,10 @@ describe('thank-you display integration', () => {
       <ThankYouClient view={view} slug="maya-birthday" requestReceiptAction={async () => ({ success: true })} />
     );
 
-    expect(screen.getByText('Thanks for your support!')).toBeInTheDocument();
+    expect(screen.getByText('Stitch payments are coming soon')).toBeInTheDocument();
+    expect(
+      screen.getByText("We're finalizing Stitch-powered contributions for Maya's Dreamboard.")
+    ).toBeInTheDocument();
     expect(screen.queryByText(/Contribution amount:/i)).not.toBeInTheDocument();
   });
 

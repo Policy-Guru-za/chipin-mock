@@ -3,6 +3,8 @@
 > Canonical replacement: `docs/Platform-Spec-Docs/PAYMENTS.md`.
 # Ozow One API — Known Gaps / Open Questions
 
+> 2026-03-19 note: retained as legacy provider research only. Current Gifta product truth is a Stitch-coming-soon placeholder with no live Ozow checkout.
+
 This file records Phase 1 decisions and assumptions to unblock integration.
 
 ## Auth and signing
