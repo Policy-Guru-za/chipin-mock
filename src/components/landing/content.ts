@@ -30,7 +30,7 @@ export const howItWorksSteps = [
     stepLabel: 'Step one',
     title: 'Create a Dreamboard',
     description:
-      "Let everyone know what you're raising for — share your Dreamboard and start collecting contributions.",
+      "Let everyone know what you're raising for, choose your payout option, and your Dreamboard is ready to go live in minutes!",
     gradientFrom: '#6B9E88',
     gradientTo: '#5A8E78',
     theme: 'light' as const,

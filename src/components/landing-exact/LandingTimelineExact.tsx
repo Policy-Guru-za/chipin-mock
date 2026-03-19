@@ -116,8 +116,8 @@ export function LandingTimelineExact() {
             <div className={styles.timelineStepLabel}>Step one</div>
             <div className={styles.timelineStepTitle}>Create a Dreamboard</div>
             <div className={styles.timelineStepDescription}>
-              Let everyone know what you&apos;re raising for — share your Dreamboard and
-              start collecting contributions.
+              Let everyone know what you&apos;re raising for, choose your payout option, and
+              your Dreamboard is ready to go live in minutes!
             </div>
 
             <div className={styles.miniForm}>

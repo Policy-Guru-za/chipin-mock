@@ -8,32 +8,32 @@
 
 | Task ID | Scope | Owner | Verification | Status | Next Step |
 | --- | --- | --- | --- | --- | --- |
+| Q-2026-03-19-homepage-exact-step-copy | Update the live homepage exact timeline Step 1 copy to the approved payout-option wording | Codex | `pnpm docs:audit`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, localhost homepage dogfood | Completed | Done |
+| Q-2026-03-19-homepage-how-it-works-copy | Update the public homepage how-it-works Step 1 copy to the approved payout-option wording | Codex | `pnpm docs:audit`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, localhost homepage dogfood | Completed | Done |
 | Q-2026-03-19-homepage-stitch-trim | Remove the extra Stitch hero strip and inline payout-band Stitch card on `/`, then rebalance spacing | Codex | `pnpm docs:audit`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, localhost homepage dogfood | Completed | Done |
 | Q-2026-03-19-homepage-timeline-copy | Update the homepage timeline Step 2 description on `/` to the approved contribution-collection wording | Codex | `pnpm docs:audit`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, localhost homepage dogfood | Completed | Done |
 | Q-2026-03-19-homepage-step-copy-correction | Move the approved contribution-collection copy to Step 1 and restore the original Step 2 WhatsApp copy on `/` | Codex | `pnpm docs:audit`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, localhost homepage dogfood | Completed | Done |
 
 ## Recently Closed Specs
 
+- `43_public-landing-responsiveness-audit` — Done
 - `42_homepage-payout-stitch-partnership-rewrite` — Done
 - `41_workflow-audit-hardening` — Done
 - `40_parallel-active-specs-hybrid-fast-path` — Done
 
 ## Last Completed Spec
 
-- `42_homepage-payout-stitch-partnership-rewrite`
+- `43_public-landing-responsiveness-audit`
 
 ## Last Green Commands
 
-- `pnpm docs:audit -- --sync` (passed; 195 markdown files)
-- `pnpm exec vitest run tests/unit/landing-below-nav-replica.test.ts tests/unit/copy-matrix-compliance.test.ts` (passed; 27 tests)
-- `pnpm lint` (0 errors, 110 warnings)
-- `pnpm typecheck` (clean)
-- `pnpm test` (199 test files, 971 tests passed)
+- `pnpm docs:audit -- --sync` (passed; 196 markdown files)
+- `pnpm docs:audit` (passed; 196 markdown files)
 
 ## Dogfood Evidence
 
-- Dogfooded the localhost homepage payout rewrite at `http://127.0.0.1:3000` and captured the new Stitch trust strip in the hero plus the rewritten payout Step 3 and Stitch/Karri payout band in `output/spec42-homepage-hero.png`, `output/spec42-homepage-timeline.png`, and `output/spec42-homepage-payout-band.png`, confirming the live marketing page no longer shows Takealot/voucher messaging.
+- Dogfooded the public localhost surfaces across desktop, iPad, and mobile form factors, capturing evidence under `output/spec43-responsive/`. Confirmed the marketing landing and Clerk auth entry routes stay visually stable with no horizontal overflow, then confirmed the main guest public routes are currently blocked by a runtime `DATABASE_URL is not set` failure because `/maya-birthday-demo` and `/maya-birthday-demo/contribute` both render the shared guest error boundary instead of real Dreamboard content.
 
 ## Napkin Evidence
 
-- No durable napkin update.
+- Updated `docs/napkin/napkin.md` with a 2026-03-19 audit note: check the browser console on the first DB-backed guest page before treating the guest error boundary as the real route layout.
