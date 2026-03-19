@@ -166,8 +166,12 @@ describe('copy matrix compliance', () => {
     expect(hero).not.toContain('Superpowered by Stitch.');
     expect(hero).not.toContain('Strategic payments partner');
     expect(timeline).toContain('Funds paid out securely');
-    expect(timeline).toContain("birthday child&apos;s Karri Card when available");
-    expect(voucherBand).toContain('Strategic payments partner');
+    expect(timeline).toContain("Your child&apos;s name");
+    expect(timeline).toContain('Your chosen bank account');
+    expect(timeline).toContain("your chosen bank");
+    expect(timeline).toContain("your child&apos;s Karri Card if selected");
+    expect(timeline).toContain("Your child&apos;s Karri card");
+    expect(voucherBand).toContain('Your chosen bank account');
     expect(voucherBand).toContain('Karri Card payout option');
     expect(voucherBand).toContain('Superpowered by Stitch.');
     expect(landingContent).toContain('Direct bank payouts');
@@ -175,8 +179,15 @@ describe('copy matrix compliance', () => {
     expect(landingContent).toContain('Superpowered by Stitch');
 
     expect(timeline).not.toContain('Takealot');
+    expect(timeline).not.toContain('Host parent bank account');
+    expect(timeline).not.toContain("Child&apos;s name");
     expect(voucherBand).not.toContain('Takealot');
+    expect(voucherBand).not.toContain('Strategic payments partner');
     expect(voucherBand).not.toContain('digital voucher');
+    expect(voucherBand).not.toContain('Host parent bank account');
+    expect(voucherBand).not.toContain('styles.payoutHighlights');
+    expect(voucherBand).not.toContain("Your child&apos;s Karri card");
+    expect(voucherBand).not.toContain("Birthday child&apos;s Karri Card");
     expect(landingContent).not.toContain('Voucher-ready fulfilment');
     expect(landingContent).not.toContain('Voucher details stay on file');
   });

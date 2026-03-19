@@ -122,7 +122,7 @@ export function LandingTimelineExact() {
 
             <div className={styles.miniForm}>
               <div className={styles.miniFormRow}>
-                <div className={styles.miniFormLabel}>Child&apos;s name</div>
+                <div className={styles.miniFormLabel}>Your child&apos;s name</div>
                 <div className={`${styles.miniFormInput} ${styles.filledInput}`}>
                   Mia<span className={styles.cursorBlink} />
                 </div>
@@ -230,8 +230,8 @@ export function LandingTimelineExact() {
             <div className={styles.timelineStepLabel}>Step three</div>
             <div className={styles.timelineStepTitle}>Funds paid out securely</div>
             <div className={styles.timelineStepDescription}>
-              When the Dreamboard closes, Gifta pays out directly to the host parent&apos;s
-              bank account, or straight to the birthday child&apos;s Karri Card when available.
+              When your Dreamboard closes, Gifta pays out directly to your chosen bank
+              account, or directly into your child&apos;s Karri Card if selected.
             </div>
 
             <div className={styles.miniPayout}>
@@ -248,13 +248,13 @@ export function LandingTimelineExact() {
                 </div>
               </div>
 
-              <div className={styles.miniPayoutTitle}>Host parent bank account</div>
+              <div className={styles.miniPayoutTitle}>Your chosen bank account</div>
               <div className={styles.miniPayoutFor}>
-                with a Karri Card option for the birthday child when they already have one.
+                with an option to pay out to your child&apos;s Karri Card if they have one.
               </div>
               <div className={styles.miniPayoutDestinations}>
-                <div className={styles.miniPayoutChip}>Bank account</div>
-                <div className={styles.miniPayoutChip}>Karri Card</div>
+                <div className={styles.miniPayoutChip}>Your chosen bank account</div>
+                <div className={styles.miniPayoutChip}>Your child&apos;s Karri card</div>
               </div>
               <div className={styles.miniPayoutPartner}>
                 <Image

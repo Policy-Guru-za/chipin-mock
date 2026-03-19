@@ -9,19 +9,15 @@ export function LandingVoucherBandExact() {
       <section id="trust" className={styles.payoutBand}>
         <div className={styles.payoutBandInner}>
           <div className={styles.payoutText}>
-            <div className={styles.partnerEyebrow}>Strategic payments partner</div>
             <h2>
               Everyone chipped in — now the payout <em>lands securely</em>.
             </h2>
             <p className={styles.payoutDetails}>
-              When the Dreamboard closes, Gifta sends the funds directly to the host parent&apos;s
-              bank account, or to the birthday child&apos;s Karri Card when they already have one.
-              No voucher codes, no retailer restrictions — just simple, secure payout delivery.
+              When the Dreamboard closes, Gifta sends the funds directly to your chosen
+              bank account, or to your child&apos;s Karri Card if this option has been selected.
+              No voucher codes, no retailer restrictions — just simple, secure payout
+              delivery.
             </p>
-            <div className={styles.payoutHighlights}>
-              <div className={styles.payoutHighlight}>Host parent bank account</div>
-              <div className={styles.payoutHighlight}>Birthday child&apos;s Karri Card</div>
-            </div>
           </div>
 
           <div className={styles.payoutVisual}>
@@ -46,16 +42,17 @@ export function LandingVoucherBandExact() {
                 <div className={styles.payoutCardBody}>
                   <div className={styles.payoutCardSection}>
                     <div className={styles.payoutCardLabel}>Primary destination</div>
-                    <div className={styles.payoutCardValue}>Host parent bank account</div>
+                    <div className={styles.payoutCardValue}>Your chosen bank account</div>
                     <div className={styles.payoutCardMeta}>
                       Secure bank payout details stay on file for delivery at close.
                     </div>
                   </div>
                   <div className={styles.payoutCardSection}>
                     <div className={styles.payoutCardLabel}>Optional child destination</div>
-                    <div className={styles.payoutCardValue}>Birthday child&apos;s Karri Card</div>
+                    <div className={styles.payoutCardValue}>Your child&apos;s Karri Card</div>
                     <div className={styles.payoutCardMeta}>
-                      Used when the child already has a Karri Card available for direct payout.
+                      Used when selected, if your child already has a Karri Card available
+                      for direct payout.
                     </div>
                   </div>
                   <div className={styles.payoutCardAmountRow}>
@@ -64,7 +61,7 @@ export function LandingVoucherBandExact() {
                       <div className={styles.payoutCardAmountValue}>R1,850</div>
                     </div>
                     <div className={styles.payoutCardAmountHint}>
-                      Direct payout when Mia&apos;s Dreamboard closes
+                      Direct payout when your Dreamboard closes
                     </div>
                   </div>
                 </div>
@@ -80,7 +77,6 @@ export function LandingVoucherBandExact() {
                     className={styles.partnerRailLogo}
                   />
                   <div className={styles.partnerLockupTitle}>Superpowered by Stitch.</div>
-                  <div className={styles.partnerLockupCopy}>Strategic payments partner</div>
                 </div>
                 <div className={styles.partnerRailDivider} />
                 <div className={styles.partnerLockup}>
@@ -93,7 +89,7 @@ export function LandingVoucherBandExact() {
                   />
                   <div className={styles.partnerLockupTitle}>Karri Card payout option</div>
                   <div className={styles.partnerLockupCopy}>
-                    For birthday children who already have a Karri Card
+                    For children who already have a Karri Card
                   </div>
                 </div>
               </div>

@@ -14,6 +14,7 @@
 | Q-2026-03-19-homepage-timeline-copy | Update the homepage timeline Step 2 description on `/` to the approved contribution-collection wording | Codex | `pnpm docs:audit`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, localhost homepage dogfood | Completed | Done |
 | Q-2026-03-19-homepage-step-copy-correction | Move the approved contribution-collection copy to Step 1 and restore the original Step 2 WhatsApp copy on `/` | Codex | `pnpm docs:audit`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, localhost homepage dogfood | Completed | Done |
 | Q-2026-03-19-homepage-mobile-card-motion | Remove the landing hero and payout-card tilt/float motion on mobile-width viewports while keeping desktop and iPad behavior unchanged | Codex | `pnpm docs:audit`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, localhost landing screenshot dogfood at desktop, iPad, and mobile widths | Completed | Done |
+| Q-2026-03-19-homepage-payout-copy-tweaks | Apply the requested final payout/Karri wording refinements and payout-band chip removal across the live landing timeline and payout band | Codex | `pnpm docs:audit`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, localhost homepage dogfood | Completed | Done |
 
 ## Recently Closed Specs
 
@@ -37,4 +38,4 @@
 
 ## Napkin Evidence
 
-- Updated `docs/napkin/napkin.md` with a 2026-03-19 audit note: check the browser console on the first DB-backed guest page before treating the guest error boundary as the real route layout.
+No durable napkin update.

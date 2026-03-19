@@ -48,7 +48,7 @@ export const howItWorksSteps = [
     stepLabel: 'Step three',
     title: 'Funds paid out securely',
     description:
-      'Funds are paid directly to the host parent’s bank account, or to the birthday child’s Karri Card when available.',
+      'When your Dreamboard closes, Gifta pays out directly to your chosen bank account, or directly into your child’s Karri Card if selected.',
     gradientFrom: '#C4785A',
     gradientTo: '#B06A4A',
     theme: 'light' as const,
