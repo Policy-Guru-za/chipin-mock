@@ -11,6 +11,7 @@ No active full specs.
 
 | Task ID | Scope | Owner | Verification | Status | Next Step |
 | --- | --- | --- | --- | --- | --- |
+| Q-2026-03-19-homepage-social-metadata-hardening | Harden homepage social metadata with generated OG/Twitter images and align Dreamboard metadata to the Gifta sharing contract | Codex | `pnpm lint`, `pnpm typecheck`, `pnpm test`, localhost homepage metadata/image fetches, Dreamboard metadata unit coverage | Completed | Done |
 | Q-2026-03-19-authoritative-payment-doc-sync | Sync Tier 1 payment docs with the Stitch-placeholder runtime and remove stale PayFast/Ozow/SnapScan references from authoritative guidance | Codex | `pnpm docs:audit -- --sync`, `pnpm docs:audit` | Completed | Done |
 | Q-2026-03-19-homepage-exact-step-copy | Update the live homepage exact timeline Step 1 copy to the approved payout-option wording | Codex | `pnpm docs:audit`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, localhost homepage dogfood | Completed | Done |
 | Q-2026-03-19-homepage-how-it-works-copy | Update the public homepage how-it-works Step 1 copy to the approved payout-option wording | Codex | `pnpm docs:audit`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, localhost homepage dogfood | Completed | Done |

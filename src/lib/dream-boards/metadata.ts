@@ -58,6 +58,7 @@ export const buildDreamBoardMetadata = (
       title,
       description,
       url,
+      siteName: 'Gifta',
       type: 'website',
       images: [{ url: imageUrl, alt: altText, width: 1200, height: 630 }],
     },

@@ -56,9 +56,8 @@ const nunito = Nunito({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.gifta.co.za'),
-  title: 'Gifta - Everyone Chips In. One Perfect Gift.',
-  description:
-    'Create a Dreamboard for your child\'s birthday. Friends and family chip in toward one meaningful gift — no more gift piles, no more guesswork.',
+  title: 'Gifta',
+  description: 'Birthday gifting, simplified.',
   alternates: {
     canonical: '/',
   },
@@ -67,25 +66,16 @@ export const metadata: Metadata = {
     shortcut: '/Logos/Gifta-favicon.png',
   },
   openGraph: {
+    title: 'Gifta',
+    description: 'Birthday gifting, simplified.',
     type: 'website',
     url: '/',
-    title: 'Gifta',
-    description:
-      'Create a Dreamboard for your child\'s birthday. Friends and family chip in toward one meaningful gift — no more gift piles, no more guesswork.',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-      },
-    ],
+    siteName: 'Gifta',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Gifta',
-    description:
-      'Create a Dreamboard for your child\'s birthday. Friends and family chip in toward one meaningful gift — no more gift piles, no more guesswork.',
-    images: ['/og-image.png'],
+    description: 'Birthday gifting, simplified.',
   },
 };
 
