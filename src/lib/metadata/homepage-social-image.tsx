@@ -10,248 +10,122 @@ export const HOMEPAGE_SOCIAL_IMAGE_SIZE = {
 } as const;
 export const HOMEPAGE_SOCIAL_IMAGE_CONTENT_TYPE = 'image/png';
 
-let logoDataUriPromise: Promise<string> | null = null;
+let brandMarkDataUriPromise: Promise<string> | null = null;
 
-const getLogoDataUri = () => {
-  if (!logoDataUriPromise) {
-    logoDataUriPromise = readFile(
-      join(process.cwd(), 'public/Logos/Gifta-logo-white.png'),
+const getBrandMarkDataUri = () => {
+  if (!brandMarkDataUriPromise) {
+    brandMarkDataUriPromise = readFile(
+      join(process.cwd(), 'public/Logos/Gifta-logo-transparent.png'),
       'base64'
     ).then((data) => `data:image/png;base64,${data}`);
   }
 
-  return logoDataUriPromise;
+  return brandMarkDataUriPromise;
 };
 
-function LeftPanel({ logoSrc }: { logoSrc: string }) {
+function BrandPill({ label }: { label: string }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '14px 24px',
+        borderRadius: '999px',
+        backgroundColor: 'rgba(255,255,255,0.72)',
+        border: '1px solid rgba(15,118,110,0.10)',
+        fontSize: '22px',
+        fontWeight: 700,
+        color: '#0F766E',
+        letterSpacing: '0.06em',
+        textTransform: 'uppercase',
+      }}
+    >
+      {label}
+    </div>
+  );
+}
+
+function ValueChip({ label }: { label: string }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px 22px',
+        borderRadius: '999px',
+        backgroundColor: 'rgba(15,118,110,0.08)',
+        border: '1px solid rgba(15,118,110,0.10)',
+        fontSize: '22px',
+        fontWeight: 700,
+        color: '#153B36',
+      }}
+    >
+      {label}
+    </div>
+  );
+}
+
+function BrandLockup({ brandMarkSrc }: { brandMarkSrc: string }) {
   return (
     <div
       style={{
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
-        width: '640px',
-        height: '100%',
+        alignItems: 'center',
+        gap: '24px',
+        width: '100%',
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-        <div
-          style={{
-            display: 'flex',
-            width: '178px',
-            height: '48px',
-            padding: '10px 18px',
-            borderRadius: '999px',
-            backgroundColor: 'rgba(255,255,255,0.14)',
-            fontSize: '22px',
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          Gifta
-        </div>
-
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={logoSrc}
-          alt="Gifta"
-          width={280}
-          height={84}
-          style={{ width: '280px', height: '84px', objectFit: 'contain' }}
-        />
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div
-            style={{
-              display: 'flex',
-              fontSize: '72px',
-              fontWeight: 700,
-              lineHeight: 1.02,
-              letterSpacing: '-0.05em',
-              maxWidth: '620px',
-            }}
-          >
-            Birthday gifting, simplified.
-          </div>
-
-          <div
-            style={{
-              display: 'flex',
-              fontSize: '31px',
-              lineHeight: 1.22,
-              color: 'rgba(255,255,255,0.86)',
-              maxWidth: '600px',
-            }}
-          >
-            Create a Dreamboard and let friends and family chip in for one meaningful gift.
-          </div>
-        </div>
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={brandMarkSrc}
+        alt="Gifta"
+        width={240}
+        height={300}
+        style={{ width: '240px', height: '300px', objectFit: 'contain' }}
+      />
 
       <div
         style={{
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           gap: '18px',
-          fontSize: '24px',
-          color: 'rgba(255,255,255,0.78)',
+          textAlign: 'center',
+          maxWidth: '860px',
         }}
       >
         <div
           style={{
             display: 'flex',
-            width: '12px',
-            height: '12px',
-            borderRadius: '999px',
-            backgroundColor: '#F9D66E',
-          }}
-        />
-        www.gifta.co.za
-      </div>
-    </div>
-  );
-}
-
-function ProductMockCard() {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        width: '320px',
-        height: '430px',
-        padding: '28px',
-        borderRadius: '34px',
-        background: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(234,246,241,0.98) 100%)',
-        boxShadow: '0 24px 70px rgba(0,0,0,0.22)',
-      }}
-    >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-        <div
-          style={{
-            display: 'flex',
-            width: '132px',
-            padding: '10px 16px',
-            borderRadius: '999px',
-            backgroundColor: '#E4F0E8',
-            fontSize: '18px',
+            fontSize: '72px',
             fontWeight: 700,
-            color: '#0F766E',
-            alignItems: 'center',
-            justifyContent: 'center',
+            lineHeight: 1.02,
+            letterSpacing: '-0.05em',
+            color: '#143B36',
           }}
         >
-          Dreamboard
+          Birthday gifting, simplified.
         </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', color: '#1F2937' }}>
-          <div style={{ display: 'flex', fontSize: '36px', fontWeight: 700, lineHeight: 1.05 }}>
-            One gift everyone actually wants to give.
-          </div>
-          <div style={{ display: 'flex', fontSize: '22px', lineHeight: 1.25, color: '#4B5563' }}>
-            Share once. Chip in together. Celebrate better.
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div
           style={{
             display: 'flex',
-            flexDirection: 'column',
-            gap: '10px',
-            padding: '18px',
-            borderRadius: '24px',
-            backgroundColor: '#FFFFFF',
+            fontSize: '30px',
+            lineHeight: 1.24,
+            color: '#285C55',
           }}
         >
-          <div style={{ display: 'flex', fontSize: '18px', color: '#6B7280' }}>Progress</div>
-          <div
-            style={{
-              display: 'flex',
-              width: '100%',
-              height: '16px',
-              borderRadius: '999px',
-              backgroundColor: '#D1D5DB',
-              overflow: 'hidden',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                width: '72%',
-                height: '100%',
-                background: 'linear-gradient(90deg, #0F766E 0%, #6B9E88 100%)',
-              }}
-            />
-          </div>
-          <div style={{ display: 'flex', fontSize: '20px', fontWeight: 700, color: '#153B36' }}>
-            Everyone chips in together.
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: '12px' }}>
-          {['Share', 'Chip in', 'Celebrate'].map((label) => (
-            <div
-              key={label}
-              style={{
-                display: 'flex',
-                flex: 1,
-                padding: '14px 10px',
-                borderRadius: '18px',
-                backgroundColor: '#E4F0E8',
-                color: '#153B36',
-                fontSize: '18px',
-                fontWeight: 700,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              {label}
-            </div>
-          ))}
+          One meaningful gift. Friends and family chip in together.
         </div>
       </div>
-    </div>
-  );
-}
-
-function RightPanel() {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        width: '392px',
-        height: '100%',
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'relative',
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          position: 'absolute',
-          top: '66px',
-          right: '14px',
-          bottom: '90px',
-          left: '74px',
-          borderRadius: '42px',
-          backgroundColor: 'rgba(255,255,255,0.10)',
-          transform: 'rotate(-9deg)',
-        }}
-      />
-      <ProductMockCard />
     </div>
   );
 }
 
 export const createHomepageSocialImage = async () => {
-  const logoSrc = await getLogoDataUri();
+  const brandMarkSrc = await getBrandMarkDataUri();
 
   return new ImageResponse(
     (
@@ -260,15 +134,90 @@ export const createHomepageSocialImage = async () => {
           display: 'flex',
           width: '100%',
           height: '100%',
-          background: 'linear-gradient(135deg, #0F766E 0%, #153B36 52%, #1F2937 100%)',
-          padding: '56px',
-          color: '#FFFFFF',
-          alignItems: 'stretch',
-          justifyContent: 'space-between',
+          position: 'relative',
+          overflow: 'hidden',
+          background: 'linear-gradient(135deg, #F7FBFA 0%, #EAF6F1 52%, #D6ECE7 100%)',
+          padding: '40px',
         }}
       >
-        <LeftPanel logoSrc={logoSrc} />
-        <RightPanel />
+        <div
+          style={{
+            position: 'absolute',
+            top: '-120px',
+            right: '-40px',
+            width: '420px',
+            height: '420px',
+            borderRadius: '999px',
+            background: 'radial-gradient(circle, rgba(15,118,110,0.16) 0%, rgba(15,118,110,0) 72%)',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '-150px',
+            left: '-60px',
+            width: '360px',
+            height: '360px',
+            borderRadius: '999px',
+            background: 'radial-gradient(circle, rgba(31,41,55,0.12) 0%, rgba(31,41,55,0) 75%)',
+          }}
+        />
+
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: '100%',
+            height: '100%',
+            padding: '26px 32px',
+            borderRadius: '40px',
+            backgroundColor: 'rgba(255,255,255,0.76)',
+            border: '1px solid rgba(15,118,110,0.10)',
+            boxShadow: '0 30px 90px rgba(21,59,54,0.10)',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+            }}
+          >
+            <BrandPill label="Gifta" />
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                fontSize: '22px',
+                fontWeight: 600,
+                color: '#285C55',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  width: '10px',
+                  height: '10px',
+                  borderRadius: '999px',
+                  backgroundColor: '#0F766E',
+                }}
+              />
+              www.gifta.co.za
+            </div>
+          </div>
+
+          <BrandLockup brandMarkSrc={brandMarkSrc} />
+
+          <div style={{ display: 'flex', gap: '14px' }}>
+            <ValueChip label="Dreamboards" />
+            <ValueChip label="Share once" />
+            <ValueChip label="Chip in together" />
+          </div>
+        </div>
       </div>
     ),
     HOMEPAGE_SOCIAL_IMAGE_SIZE
