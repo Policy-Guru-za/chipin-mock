@@ -615,6 +615,18 @@
     padding: calc(var(--landing-nav-offset, 80px) + var(--landing-hero-top-inset, 20px)) 20px 60px;
   }
 
+  .dreamboardCard {
+    transform: none;
+    animation: none;
+  }
+
+  .dreamboardCard:hover {
+    transform: none !important;
+    box-shadow:
+      0 40px 100px rgb(44 37 32 / 10%),
+      0 8px 32px rgb(74 126 102 / 6%) !important;
+  }
+
   .heroHeadline {
     font-size: 2.5rem;
     letter-spacing: -0.5px;

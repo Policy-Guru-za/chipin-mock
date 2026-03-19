@@ -339,6 +339,19 @@
   }
 
   .payoutCard {
+    transform: none;
+    animation: none;
+  }
+
+  .payoutCard:hover {
+    transform: none !important;
+    box-shadow:
+      0 0 60px 20px rgb(255 255 255 / 50%),
+      0 24px 64px rgb(74 126 102 / 12%),
+      0 1px 3px rgb(0 0 0 / 4%) !important;
+  }
+
+  .payoutCard {
     width: 100%;
     max-width: 360px;
     margin: 0 auto;
