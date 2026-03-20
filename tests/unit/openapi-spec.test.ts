@@ -38,6 +38,12 @@ afterEach(() => {
   vi.resetModules();
 });
 
+const getCreateRequestSchemas = () => ({
+  createRequest: openApiSpec.components.schemas.DreamBoardCreateRequest,
+  bankCreateRequest: openApiSpec.components.schemas.DreamBoardCreateRequestBank,
+  karriCreateRequest: openApiSpec.components.schemas.DreamBoardCreateRequestKarri,
+});
+
 describe('openapi spec', () => {
   it('public spec matches the generated builder', () => {
     const content = readFileSync(resolve(process.cwd(), 'public', 'v1', 'openapi.json'), 'utf8');
@@ -52,12 +58,18 @@ describe('openapi spec', () => {
   });
 
   it('documents Dreamboard bank contract fields and omits charity fields', () => {
-    const createRequest = openApiSpec.components.schemas.DreamBoardCreateRequest;
+    const { createRequest, bankCreateRequest, karriCreateRequest } = getCreateRequestSchemas();
     const updateRequest = openApiSpec.components.schemas.DreamBoardUpdateRequest;
 
-    expect(createRequest.properties).toHaveProperty('payout_method');
-    expect(createRequest.properties).toHaveProperty('bank_account_number');
-    expect(createRequest.properties).not.toHaveProperty('charity_enabled');
+    expect(createRequest.oneOf).toEqual([
+      { $ref: '#/components/schemas/DreamBoardCreateRequestBank' },
+      { $ref: '#/components/schemas/DreamBoardCreateRequestKarri' },
+    ]);
+    expect(bankCreateRequest.properties).toHaveProperty('payout_method');
+    expect(bankCreateRequest.properties).toHaveProperty('bank_account_number');
+    expect(bankCreateRequest.properties).not.toHaveProperty('charity_enabled');
+    expect(karriCreateRequest.properties).toHaveProperty('karri_card_number');
+    expect(karriCreateRequest.properties).not.toHaveProperty('charity_enabled');
     expect(updateRequest.properties).toHaveProperty('payout_method');
     expect(updateRequest.properties).toHaveProperty('bank_account_number');
     expect(updateRequest.properties).not.toHaveProperty('charity_enabled');
@@ -65,33 +77,45 @@ describe('openapi spec', () => {
     expect(openApiSpec.components.schemas.Contribution.properties).not.toHaveProperty('charity_cents');
   });
 
-  it('documents voucher fulfilment contact fields on payout recipient data', () => {
+  it('drops voucher fulfilment fields from payout recipient data', () => {
     const payoutRecipientData = openApiSpec.components.schemas.PayoutRecipientData;
 
-    expect(payoutRecipientData.properties).toHaveProperty('host_whatsapp_number');
-    expect(payoutRecipientData.properties).toHaveProperty('fulfilment_mode');
+    expect(payoutRecipientData.properties).not.toHaveProperty('host_whatsapp_number');
+    expect(payoutRecipientData.properties).not.toHaveProperty('fulfilment_mode');
   });
 
   it('keeps create-request payout and gift icon constraints aligned with runtime', () => {
-    const createRequest = openApiSpec.components.schemas.DreamBoardCreateRequest;
-    const requiredFields = createRequest.required ?? [];
+    const { bankCreateRequest, karriCreateRequest } = getCreateRequestSchemas();
+    const bankRequiredFields = bankCreateRequest.required ?? [];
+    const karriRequiredFields = karriCreateRequest.required ?? [];
 
-    expect(requiredFields).not.toContain('karri_card_number');
-    expect(requiredFields).not.toContain('karri_card_holder_name');
-    expect(requiredFields).not.toContain('gift_image_url');
-    expect(createRequest.properties).toHaveProperty('gift_icon_id');
-    expect(createRequest.properties.gift_description.maxLength).toBe(500);
+    expect(bankRequiredFields).toEqual(
+      expect.arrayContaining([
+        'bank_name',
+        'bank_account_number',
+        'bank_branch_code',
+        'bank_account_holder',
+      ])
+    );
+    expect(bankRequiredFields).not.toContain('payout_method');
+    expect(bankRequiredFields).not.toContain('gift_image_url');
+    expect(karriRequiredFields).toEqual(
+      expect.arrayContaining(['payout_method', 'karri_card_number', 'karri_card_holder_name'])
+    );
+    expect(bankCreateRequest.properties).toHaveProperty('gift_icon_id');
+    expect(bankCreateRequest.properties.gift_description.maxLength).toBe(500);
   });
 
-  it('documents voucher-default and gated karri behavior', () => {
+  it('documents bank-default active payout behavior', () => {
     const payoutMethod = openApiSpec.components.schemas.PayoutMethod;
-    const createRequest = openApiSpec.components.schemas.DreamBoardCreateRequest;
+    const { createRequest, bankCreateRequest } = getCreateRequestSchemas();
     const updateRequest = openApiSpec.components.schemas.DreamBoardUpdateRequest;
 
-    expect(payoutMethod.description).toContain('Standard Dreamboard flows default to takealot_voucher');
-    expect(payoutMethod.description).toContain('UX_V2_ENABLE_KARRI_WRITE_PATH=true');
-    expect(createRequest.description).toContain('Omitted payout_method defaults to takealot_voucher');
-    expect(updateRequest.description).toContain('Karri Card mutation');
+    expect(payoutMethod.description).toContain('Standard Dreamboard flows default to bank');
+    expect(payoutMethod.description).toContain('Bank and Karri Card write paths are active');
+    expect(createRequest.description).toContain('Omitted payout_method defaults to bank and still requires the bank payout fields');
+    expect(bankCreateRequest.properties.payout_method.default).toBe('bank');
+    expect(updateRequest.description).toContain('Bank and Karri Card payout mutations are accepted');
   });
 
   it('stays deterministic when write-path flags are enabled', async () => {
@@ -106,12 +130,12 @@ describe('openapi spec', () => {
 
     expect(flagEnabledSpec).toEqual(json);
     expect(flagEnabledSpec.components.schemas.PayoutMethod.description).toContain(
-      'UX_V2_ENABLE_KARRI_WRITE_PATH=true'
+      'Bank and Karri Card write paths are active'
     );
     expect(flagEnabledSpec.components.schemas.PayoutMethod.description).not.toContain(
-      'enabled for this environment'
+      'UX_V2_ENABLE_KARRI_WRITE_PATH=true'
     );
-    expect(flagEnabledSpec.components.schemas.DreamBoardCreateRequest.properties).not.toHaveProperty(
+    expect(flagEnabledSpec.components.schemas.DreamBoardCreateRequestBank.properties).not.toHaveProperty(
       'charity_enabled'
     );
   });

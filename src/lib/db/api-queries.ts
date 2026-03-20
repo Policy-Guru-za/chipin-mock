@@ -1,4 +1,4 @@
-import { and, desc, eq, lt, ne, or, sql, type SQL } from 'drizzle-orm';
+import { and, desc, eq, lt, or, sql, type SQL } from 'drizzle-orm';
 
 import type { PaginationCursor } from '@/lib/api/pagination';
 import type { WebhookEventType } from '@/lib/webhooks';
@@ -9,6 +9,8 @@ import { contributions, dreamBoards, payouts, webhookEndpoints } from './schema'
 type DreamBoardStatus = typeof dreamBoards.$inferSelect.status;
 type ContributionStatus = typeof contributions.$inferSelect.paymentStatus;
 type PayoutType = typeof payouts.$inferSelect.type;
+
+const publicGiftPayoutTypeCondition = sql<boolean>`${payouts.type}::text IN ('bank', 'karri_card')`;
 
 const dreamBoardApiFields = {
   id: dreamBoards.id,
@@ -163,7 +165,7 @@ export const listPendingPayoutsForApi = async (params: {
   const conditions: SQL[] = [
     eq(payouts.partnerId, params.partnerId),
     eq(payouts.status, 'pending'),
-    ne(payouts.type, 'charity'),
+    publicGiftPayoutTypeCondition,
   ];
   if (params.type) {
     conditions.push(eq(payouts.type, params.type as PayoutType));
@@ -220,7 +222,7 @@ export const getPayoutForApi = async (params: { id: string; partnerId: string })
       and(
         eq(payouts.id, params.id),
         eq(payouts.partnerId, params.partnerId),
-        ne(payouts.type, 'charity')
+        publicGiftPayoutTypeCondition
       )
     )
     .limit(1);

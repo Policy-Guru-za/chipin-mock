@@ -1,7 +1,7 @@
 # Journeys
 
 > **Status:** Current reference  
-> **Last reviewed:** March 19, 2026
+> **Last reviewed:** March 20, 2026
 
 ## Host Journey
 
@@ -15,7 +15,7 @@ Current create flow:
 4. `/create/payout`
 5. `/create/review`
 
-Legacy voucher-era runtime remnants still exist in code, but the intended host product contract is payout details at `/create/payout`, not a Takealot voucher step.
+The host product contract uses payout details at `/create/payout`, not a Takealot voucher step.
 
 Hosts then manage boards from `/dashboard` and `/dashboard/[id]`.
 Active host product UI does not surface charity summaries or controls.

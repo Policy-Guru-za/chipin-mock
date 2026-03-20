@@ -205,6 +205,58 @@ describe('host dashboard view model', () => {
     expect(detail.hasBirthdayParty).toBe(false);
   });
 
+  it('labels legacy voucher payout data explicitly on detail models', () => {
+    const detail = buildDashboardDetailViewModel(
+      {
+        id: 'board-legacy',
+        hostId: 'host-1',
+        slug: 'maya-voucher',
+        childName: 'Maya',
+        childPhotoUrl: 'https://example.com/child.jpg',
+        birthdayDate: '2099-06-11',
+        giftName: 'Scooter',
+        giftImageUrl: 'https://example.com/scooter.jpg',
+        partyDate: '2099-06-12',
+        partyDateTime: null,
+        campaignEndDate: '2099-06-10',
+        message: null,
+        status: 'closed',
+        goalCents: 50000,
+        payoutMethod: 'takealot_voucher',
+        karriCardHolderName: 'Maya Parent',
+        bankAccountHolder: null,
+        payoutEmail: 'parent@example.com',
+        charityEnabled: false,
+        charityName: null,
+        charitySplitType: null,
+        charityPercentageBps: null,
+        charityThresholdCents: null,
+        totalRaisedCents: 55000,
+        totalFeeCents: 1650,
+        totalCharityCents: 0,
+        contributionCount: 11,
+        messageCount: 6,
+      },
+      [
+        {
+          id: 'payout-legacy',
+          type: 'takealot_voucher',
+          status: 'pending',
+          grossCents: 55000,
+          feeCents: 1650,
+          netCents: 53350,
+          externalRef: null,
+          completedAt: null,
+        },
+      ],
+      { baseUrl: 'https://www.gifta.co.za' }
+    );
+
+    expect(detail.payoutMethodLabel).toBe('Takealot Voucher');
+    expect(detail.payoutRecipientDisplay).toBe('parent@example.com');
+    expect(detail.payouts[0]?.typeLabel).toBe('Takealot Voucher');
+  });
+
   it('keeps compatibility wrapper share URL behavior', () => {
     const view = buildDashboardViewModel(
       {

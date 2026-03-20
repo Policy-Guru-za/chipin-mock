@@ -1,18 +1,18 @@
 # Data Model
 
 > **Status:** Current reference  
-> **Last reviewed:** March 19, 2026  
-> **Primary source of truth:** [`src/lib/db/schema.ts`](../../src/lib/db/schema.ts) for persisted compatibility fields; the active product contract below follows the intended bank + optional Karri direction while calling out remaining legacy voucher drift explicitly.
+> **Last reviewed:** March 20, 2026  
+> **Primary source of truth:** [`src/lib/db/schema.ts`](../../src/lib/db/schema.ts) for persisted contract fields and constraints.
 
 ## Core Enums
 
 - `dream_board_status`: `draft | active | funded | closed | paid_out | expired | cancelled`
-- `payout_method`: active product contract `karri_card | bank` (legacy persisted compatibility still retains `takealot_voucher` until runtime cleanup lands)
+- `payout_method`: active product contract `karri_card | bank`
 - `charity_split_type`: `percentage | threshold` (schema retained for historical/internal use)
 - `payment_status`: `pending | processing | completed | failed | refunded`
 - `payment_provider`: `stitch`
 - `payout_status`: `pending | processing | completed | failed`
-- `payout_type`: active product contract `karri_card | bank | charity` (legacy persisted compatibility still retains `takealot_voucher` rows until runtime cleanup lands)
+- `payout_type`: active product contract `karri_card | bank | charity`
 
 ## Core Tables
 
@@ -27,7 +27,7 @@ Important fields:
 - `goal_cents`
 - payout method + method-specific recipient data
 - intended host-create path writes bank payout details and optionally Karri details when selected
-- partner/API `karri_card` writes are gated by `UX_V2_ENABLE_KARRI_WRITE_PATH`; bank writes remain gated by `UX_V2_ENABLE_BANK_WRITE_PATH`
+- host and partner API contracts accept bank and optional Karri payout writes
 - optional historical charity configuration; active product writes clear these fields
 - `status`
 
@@ -47,7 +47,6 @@ Important money fields:
 Stores gift payout rows and, when applicable, historical charity payout rows.
 
 - gift payout type matches the Dreamboard `payout_method`
-- legacy `takealot_voucher` rows may still exist in persisted compatibility data until runtime cleanup lands
 
 ### `payout_items`
 

@@ -14,7 +14,7 @@ afterEach(() => {
 });
 
 describe('saveGivingBackAction', () => {
-  it('clears charity state and redirects legacy submissions to voucher setup', async () => {
+  it('clears charity state and redirects legacy submissions to payout setup', async () => {
     const redirectMock = vi.fn((url: string) => {
       throw new Error(`REDIRECT:${url}`);
     });
@@ -33,7 +33,7 @@ describe('saveGivingBackAction', () => {
     formData.set('charityEnabled', 'on');
     formData.set('charityId', '00000000-0000-4000-8000-000000000001');
 
-    await expect(saveGivingBackAction(formData)).rejects.toThrow('REDIRECT:/create/voucher');
+    await expect(saveGivingBackAction(formData)).rejects.toThrow('REDIRECT:/create/payout');
     expect(updateDreamBoardDraft).toHaveBeenCalledWith('host-1', {
       charityEnabled: false,
       charityId: undefined,

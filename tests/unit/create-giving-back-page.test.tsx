@@ -12,14 +12,14 @@ vi.mock('next/navigation', () => ({
 }));
 
 describe('Create Giving Back Page', () => {
-  it('redirects the legacy giving-back route to /create/voucher', async () => {
+  it('redirects the legacy giving-back route to /create/payout', async () => {
     mocks.redirect.mockImplementation((url: string) => {
       throw new Error(`REDIRECT:${url}`);
     });
 
     const Page = (await import('@/app/(host)/create/giving-back/page')).default;
 
-    expect(() => Page()).toThrow('REDIRECT:/create/voucher');
-    expect(mocks.redirect).toHaveBeenCalledWith('/create/voucher');
+    expect(() => Page()).toThrow('REDIRECT:/create/payout');
+    expect(mocks.redirect).toHaveBeenCalledWith('/create/payout');
   });
 });

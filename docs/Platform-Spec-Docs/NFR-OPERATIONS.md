@@ -1,15 +1,16 @@
 # NFR and Operations
 
 > **Status:** Current reference  
-> **Last reviewed:** March 12, 2026
+> **Last reviewed:** March 20, 2026
 
 ## Health Endpoints
 
 - `/health/live`
 - `/health/ready`
 - `/api/health`
-- `/health/ready` reports Karri as `disabled` in standard mode when both `UX_V2_ENABLE_KARRI_WRITE_PATH` and `KARRI_AUTOMATION_ENABLED` are false
-- Karri credentials are only required for readiness when the Karri write path or automation mode is enabled, unless `MOCK_KARRI=true`
+- `/health/ready` reports `payoutEncryption` separately and reports Karri as `disabled` in standard mode when `KARRI_AUTOMATION_ENABLED` is false
+- `CARD_DATA_ENCRYPTION_KEY` is required for readiness because active payout capture encrypts bank/Karri recipient data
+- Karri service credentials are only required for readiness when automation mode is enabled, unless `MOCK_KARRI=true`
 
 ## Operational Jobs
 

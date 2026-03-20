@@ -1,5 +1,7 @@
 import { createHash } from 'crypto';
 
+import { encryptSensitiveValue } from '@/lib/utils/encryption';
+
 import { db } from './index';
 import {
   apiKeys,
@@ -15,6 +17,9 @@ import {
 import { DEFAULT_PARTNER_ID, DEFAULT_PARTNER_NAME } from './partners';
 
 export async function seedDatabase() {
+  const seedBankAccountNumber = '1234567890';
+  const encryptedSeedBankAccountNumber = encryptSensitiveValue(seedBankAccountNumber);
+
   await db.delete(webhookEvents);
   await db.delete(auditLogs);
   await db.delete(payoutItems);
@@ -57,8 +62,12 @@ export async function seedDatabase() {
       giftImageUrl: '/icons/gifts/train.png',
       giftImagePrompt: null,
       goalCents: 35000,
-      // v2.0+: Voucher-first active payout path
-      payoutMethod: 'takealot_voucher',
+      payoutMethod: 'bank',
+      bankName: 'First National Bank',
+      bankAccountNumberEncrypted: encryptedSeedBankAccountNumber,
+      bankAccountLast4: seedBankAccountNumber.slice(-4),
+      bankBranchCode: '250655',
+      bankAccountHolder: 'Lerato Mahlangu',
       hostWhatsAppNumber: '+27821234567',
       message: "Let's make Maya's birthday magical.",
       status: 'active',
@@ -78,24 +87,26 @@ export async function seedDatabase() {
     paymentStatus: 'completed',
   });
 
-  // v2.0+: Voucher payout row for the active seeded flow
   const [payout] = await db
     .insert(payouts)
     .values({
       partnerId: DEFAULT_PARTNER_ID,
       dreamBoardId: dreamBoard.id,
-      type: 'takealot_voucher',
+      type: 'bank',
       grossCents: 5000,
       feeCents: 0,
       netCents: 5000,
       recipientData: {
         email: 'lerato@gifta.co.za',
-        payoutMethod: 'takealot_voucher',
-        hostWhatsAppNumber: '+27821234567',
+        payoutMethod: 'bank',
         childName: 'Maya',
         giftName: 'Wooden Train Set',
         giftImageUrl: '/icons/gifts/train.png',
-        fulfilmentMode: 'manual_placeholder',
+        bankName: 'First National Bank',
+        bankAccountNumberEncrypted: encryptedSeedBankAccountNumber,
+        bankAccountLast4: seedBankAccountNumber.slice(-4),
+        bankBranchCode: '250655',
+        bankAccountHolder: 'Lerato Mahlangu',
       },
       status: 'pending',
     })

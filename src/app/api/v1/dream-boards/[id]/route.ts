@@ -128,23 +128,6 @@ const updateSchema = z
       }
     }
 
-    if (value.payout_method === 'takealot_voucher') {
-      if (hasAnyKarriField) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['payout_method'],
-          message: 'Karri card fields require payout_method=karri_card',
-        });
-      }
-      if (hasAnyBankField) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['payout_method'],
-          message: 'Bank fields require payout_method=bank',
-        });
-      }
-    }
-
     if (value.payout_method === undefined && hasAnyBankField) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -459,17 +442,6 @@ export const PATCH = withApiAuth(
       updates.bankAccountLast4 = normalizedBankAccountNumber.slice(-4);
       updates.bankBranchCode = parsed.data.bank_branch_code ?? null;
       updates.bankAccountHolder = parsed.data.bank_account_holder ?? null;
-    }
-
-    if (parsed.data.payout_method === 'takealot_voucher') {
-      updates.payoutMethod = 'takealot_voucher';
-      updates.karriCardNumber = null;
-      updates.karriCardHolderName = null;
-      updates.bankName = null;
-      updates.bankAccountNumberEncrypted = null;
-      updates.bankAccountLast4 = null;
-      updates.bankBranchCode = null;
-      updates.bankAccountHolder = null;
     }
 
     if (Object.keys(updates).length > 0) {

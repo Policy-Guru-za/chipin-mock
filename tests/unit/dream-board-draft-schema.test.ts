@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { hostCreateDreamBoardDraftSchema } from '@/lib/dream-boards/schema';
+import {
+  hostCreateDreamBoardDraftPersistedSchema,
+  hostCreateDreamBoardDraftSchema,
+} from '@/lib/dream-boards/schema';
 
 const validDraft = {
   childName: 'Maya',
@@ -16,9 +19,14 @@ const validDraft = {
   giftImageUrl: '/icons/gifts/ballet.png',
   giftImagePrompt: undefined,
   goalCents: 25000,
-  payoutMethod: 'takealot_voucher' as const,
+  payoutMethod: 'bank' as const,
   payoutEmail: 'parent@example.com',
   hostWhatsAppNumber: '+27821234567',
+  bankName: 'Standard Bank',
+  bankAccountNumberEncrypted: 'enc:bank',
+  bankAccountLast4: '1234',
+  bankBranchCode: '051001',
+  bankAccountHolder: 'Maya Parent',
 };
 
 describe('hostCreateDreamBoardDraftSchema', () => {
@@ -43,10 +51,26 @@ describe('hostCreateDreamBoardDraftSchema', () => {
     expect(parsed.success).toBe(true);
   });
 
-  it('rejects legacy payout residue in the active host-create schema', () => {
+  it('accepts Karri drafts when the encrypted card fields are present', () => {
     const parsed = hostCreateDreamBoardDraftSchema.safeParse({
       ...validDraft,
+      payoutMethod: 'karri_card',
       karriCardNumberEncrypted: 'enc-card',
+      karriCardHolderName: 'Maya Parent',
+      bankName: undefined,
+      bankAccountNumberEncrypted: undefined,
+      bankAccountLast4: undefined,
+      bankBranchCode: undefined,
+      bankAccountHolder: undefined,
+    });
+
+    expect(parsed.success).toBe(true);
+  });
+
+  it('rejects legacy voucher payout methods in the active host-create schema', () => {
+    const parsed = hostCreateDreamBoardDraftSchema.safeParse({
+      ...validDraft,
+      payoutMethod: 'takealot_voucher',
     });
 
     expect(parsed.success).toBe(false);
@@ -70,9 +94,9 @@ describe('hostCreateDreamBoardDraftSchema', () => {
       updatedAt: '2026-03-13T10:00:00.000Z',
     };
 
-    const strippedResult = hostCreateDreamBoardDraftSchema
-      .strip()
-      .safeParse(draftWithPersistedFields);
+    const strippedResult = hostCreateDreamBoardDraftPersistedSchema.safeParse(
+      draftWithPersistedFields
+    );
     expect(strippedResult.success).toBe(true);
     if (strippedResult.success) {
       expect(strippedResult.data).not.toHaveProperty('photoFilename');

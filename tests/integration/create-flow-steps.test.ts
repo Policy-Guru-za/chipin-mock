@@ -5,6 +5,7 @@ import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
 type DraftRecord = Record<string, Record<string, unknown>>;
 
 const hostId = 'host-1';
+const ORIGINAL_ENCRYPTION_KEY = process.env.CARD_DATA_ENCRYPTION_KEY;
 
 const addDays = (days: number) => {
   const date = new Date();
@@ -27,22 +28,28 @@ const expectRedirect = async (promise: Promise<unknown>, expected: string) => {
   await expect(promise).rejects.toThrow(`REDIRECT:${expected}`);
 };
 
-const normalizeStoredDraft = (draft: Record<string, unknown>) => ({
-  ...draft,
-  payoutMethod: 'takealot_voucher',
-  karriCardNumberEncrypted: undefined,
-  karriCardHolderName: undefined,
-  bankName: undefined,
-  bankAccountNumberEncrypted: undefined,
-  bankAccountLast4: undefined,
-  bankBranchCode: undefined,
-  bankAccountHolder: undefined,
-  charityEnabled: false,
-  charityId: undefined,
-  charitySplitType: undefined,
-  charityPercentageBps: undefined,
-  charityThresholdCents: undefined,
-});
+const normalizeStoredDraft = (draft: Record<string, unknown>) => {
+  const payoutMethod = draft.payoutMethod === 'karri_card' ? 'karri_card' : 'bank';
+
+  return {
+    ...draft,
+    payoutMethod,
+    karriCardNumberEncrypted:
+      payoutMethod === 'karri_card' ? draft.karriCardNumberEncrypted : undefined,
+    karriCardHolderName: payoutMethod === 'karri_card' ? draft.karriCardHolderName : undefined,
+    bankName: payoutMethod === 'bank' ? draft.bankName : undefined,
+    bankAccountNumberEncrypted:
+      payoutMethod === 'bank' ? draft.bankAccountNumberEncrypted : undefined,
+    bankAccountLast4: payoutMethod === 'bank' ? draft.bankAccountLast4 : undefined,
+    bankBranchCode: payoutMethod === 'bank' ? draft.bankBranchCode : undefined,
+    bankAccountHolder: payoutMethod === 'bank' ? draft.bankAccountHolder : undefined,
+    charityEnabled: false,
+    charityId: undefined,
+    charitySplitType: undefined,
+    charityPercentageBps: undefined,
+    charityThresholdCents: undefined,
+  };
+};
 
 const toHostCreateDraft = (draft: Record<string, unknown> | null | undefined) => {
   if (!draft) return null;
@@ -62,7 +69,15 @@ const toHostCreateDraft = (draft: Record<string, unknown> | null | undefined) =>
     giftImageUrl,
     giftImagePrompt,
     goalCents,
+    payoutMethod,
     payoutEmail,
+    karriCardNumberEncrypted,
+    karriCardHolderName,
+    bankName,
+    bankAccountNumberEncrypted,
+    bankAccountLast4,
+    bankBranchCode,
+    bankAccountHolder,
     hostWhatsAppNumber,
     message,
     updatedAt,
@@ -83,8 +98,15 @@ const toHostCreateDraft = (draft: Record<string, unknown> | null | undefined) =>
     giftImageUrl,
     giftImagePrompt,
     goalCents,
-    payoutMethod: 'takealot_voucher',
+    payoutMethod: payoutMethod === 'karri_card' ? 'karri_card' : 'bank',
     payoutEmail,
+    karriCardNumberEncrypted,
+    karriCardHolderName,
+    bankName,
+    bankAccountNumberEncrypted,
+    bankAccountLast4,
+    bankBranchCode,
+    bankAccountHolder,
     hostWhatsAppNumber,
     message,
     updatedAt,
@@ -103,6 +125,18 @@ const loadActions = async (store: DraftRecord) => {
   vi.doMock('@/lib/auth/clerk-wrappers', () => ({
     requireHostAuth: vi.fn(async () => ({ hostId })),
   }));
+
+  vi.doMock('@/lib/utils/encryption', () => ({
+    encryptSensitiveValue: vi.fn((value: string) => `enc:${value}`),
+  }));
+
+  vi.doMock('@/lib/integrations/karri', () => ({
+    verifyKarriCard: vi.fn(async () => ({ valid: true })),
+  }));
+
+  vi.doMock('@/lib/observability/logger', () => ({ log: vi.fn() }));
+  vi.doMock('@/lib/config/feature-flags', () => ({ isMockSentry: vi.fn(() => false) }));
+  vi.doMock('@sentry/nextjs', () => ({ captureException: vi.fn() }));
 
   const writeDraft = vi.fn(async (id: string, draft: Record<string, unknown>) => {
     const existing = store[id] ?? {};
@@ -132,38 +166,52 @@ const loadActions = async (store: DraftRecord) => {
 };
 
 afterEach(() => {
+  process.env.CARD_DATA_ENCRYPTION_KEY = ORIGINAL_ENCRYPTION_KEY;
   vi.unmock('next/navigation');
   vi.unmock('@/lib/auth/clerk-wrappers');
   vi.unmock('@/lib/dream-boards/draft');
+  vi.unmock('@/lib/utils/encryption');
+  vi.unmock('@/lib/integrations/karri');
+  vi.unmock('@/lib/observability/logger');
+  vi.unmock('@/lib/config/feature-flags');
+  vi.unmock('@sentry/nextjs');
   vi.clearAllMocks();
   vi.resetModules();
 });
 
 describe('create flow step transitions', () => {
-  it('full happy path: voucher placeholder with no charity', async () => {
+  it('full happy path: bank payout with no charity', async () => {
+    process.env.CARD_DATA_ENCRYPTION_KEY = 'secret';
     const store: DraftRecord = { [hostId]: seedChildAndGift() };
     const { saveDatesAction, savePayoutAction } = await loadActions(store);
 
     const datesForm = new FormData();
     datesForm.set('birthdayDate', addDays(20));
     datesForm.set('noPartyPlanned', 'on');
-    await expectRedirect(saveDatesAction(datesForm), '/create/voucher');
+    await expectRedirect(saveDatesAction(datesForm), '/create/payout');
 
-    const voucherForm = new FormData();
-    voucherForm.set('payoutEmail', 'parent@example.com');
-    voucherForm.set('hostWhatsAppNumber', '+27821234567');
-    await expectRedirect(savePayoutAction(voucherForm), '/create/review');
+    const payoutForm = new FormData();
+    payoutForm.set('payoutMethod', 'bank');
+    payoutForm.set('payoutEmail', 'parent@example.com');
+    payoutForm.set('hostWhatsAppNumber', '+27821234567');
+    payoutForm.set('bankName', 'FNB');
+    payoutForm.set('bankAccountNumber', '1234567890');
+    payoutForm.set('bankBranchCode', '250655');
+    payoutForm.set('bankAccountHolder', 'Maya Parent');
+    await expectRedirect(savePayoutAction(payoutForm), '/create/review');
 
-    expect(store[hostId].payoutMethod).toBe('takealot_voucher');
+    expect(store[hostId].payoutMethod).toBe('bank');
     expect(store[hostId].charityEnabled).toBe(false);
-    expect(store[hostId].bankAccountNumberEncrypted).toBeUndefined();
+    expect(store[hostId].bankAccountNumberEncrypted).toBe('enc:1234567890');
+    expect(store[hostId].bankAccountLast4).toBe('7890');
     expect(store[hostId].karriCardNumberEncrypted).toBeUndefined();
 
     const view = buildCreateFlowViewModel({ step: 'review', draft: store[hostId] as any });
     expect(view.redirectTo).toBeUndefined();
   });
 
-  it('prevents skipping voucher setup and redirects back to dates', async () => {
+  it('prevents skipping payout setup and redirects back to dates', async () => {
+    process.env.CARD_DATA_ENCRYPTION_KEY = 'secret';
     const store: DraftRecord = {
       [hostId]: {
         ...seedChildAndGift(),
@@ -171,14 +219,19 @@ describe('create flow step transitions', () => {
     };
 
     const { savePayoutAction } = await loadActions(store);
-    const voucherForm = new FormData();
-    voucherForm.set('payoutEmail', 'parent@example.com');
-    voucherForm.set('hostWhatsAppNumber', '+27821234567');
+    const payoutForm = new FormData();
+    payoutForm.set('payoutMethod', 'bank');
+    payoutForm.set('payoutEmail', 'parent@example.com');
+    payoutForm.set('hostWhatsAppNumber', '+27821234567');
+    payoutForm.set('bankName', 'FNB');
+    payoutForm.set('bankAccountNumber', '1234567890');
+    payoutForm.set('bankBranchCode', '250655');
+    payoutForm.set('bankAccountHolder', 'Maya Parent');
 
-    await expectRedirect(savePayoutAction(voucherForm), '/create/dates');
+    await expectRedirect(savePayoutAction(payoutForm), '/create/dates');
 
     const reviewView = buildCreateFlowViewModel({ step: 'review', draft: store[hostId] as any });
-    expect(reviewView.redirectTo).toBe('/create/voucher');
+    expect(reviewView.redirectTo).toBe('/create/payout');
   });
 
   it('preserves draft data across later updates', async () => {
@@ -190,7 +243,7 @@ describe('create flow step transitions', () => {
     datesForm.set('partyDate', addDays(23));
     datesForm.set('campaignEndDate', addDays(23));
 
-    await expectRedirect(saveDatesAction(datesForm), '/create/voucher');
+    await expectRedirect(saveDatesAction(datesForm), '/create/payout');
 
     expect(store[hostId].childName).toBe('Maya');
     expect(store[hostId].giftName).toBe('Scooter');
@@ -218,7 +271,7 @@ describe('create flow step transitions', () => {
     formData.set('charityEnabled', 'on');
     formData.set('charityId', '00000000-0000-4000-8000-000000000001');
 
-    await expectRedirect(saveGivingBackAction(formData), '/create/voucher');
+    await expectRedirect(saveGivingBackAction(formData), '/create/payout');
 
     expect(store[hostId].charityEnabled).toBe(false);
     expect(store[hostId].charityId).toBeUndefined();
@@ -227,7 +280,8 @@ describe('create flow step transitions', () => {
     expect(store[hostId].charityThresholdCents).toBeUndefined();
   });
 
-  it('preserves the host message while voucher details update later fields', async () => {
+  it('preserves the host message while payout details update later fields', async () => {
+    process.env.CARD_DATA_ENCRYPTION_KEY = 'secret';
     const store: DraftRecord = {
       [hostId]: {
         ...seedChildAndGift(),
@@ -239,13 +293,18 @@ describe('create flow step transitions', () => {
     };
     const { savePayoutAction } = await loadActions(store);
 
-    const voucherForm = new FormData();
-    voucherForm.set('payoutEmail', 'parent@example.com');
-    voucherForm.set('hostWhatsAppNumber', '+27821234567');
+    const payoutForm = new FormData();
+    payoutForm.set('payoutMethod', 'bank');
+    payoutForm.set('payoutEmail', 'parent@example.com');
+    payoutForm.set('hostWhatsAppNumber', '+27821234567');
+    payoutForm.set('bankName', 'FNB');
+    payoutForm.set('bankAccountNumber', '1234567890');
+    payoutForm.set('bankBranchCode', '250655');
+    payoutForm.set('bankAccountHolder', 'Maya Parent');
 
-    await expectRedirect(savePayoutAction(voucherForm), '/create/review');
+    await expectRedirect(savePayoutAction(payoutForm), '/create/review');
 
     expect(store[hostId].message).toBe('Thanks for helping make this happen.');
-    expect(store[hostId].payoutMethod).toBe('takealot_voucher');
+    expect(store[hostId].payoutMethod).toBe('bank');
   });
 });

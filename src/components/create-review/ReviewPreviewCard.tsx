@@ -12,7 +12,7 @@ type ReviewPreviewCardProps = {
   giftImageUrl: string;
   partyDateTimeLabel?: string | null;
   campaignCloseLabel: string;
-  voucherSummary: string;
+  payoutSummary: string;
   shareUrl?: string;
   copied?: boolean;
   onCopyShareUrl?: () => void;
@@ -45,7 +45,7 @@ export function ReviewPreviewCard({
   giftImageUrl: _giftImageUrl,
   partyDateTimeLabel,
   campaignCloseLabel,
-  voucherSummary,
+  payoutSummary,
   shareUrl,
   copied = false,
   onCopyShareUrl,
@@ -93,7 +93,7 @@ export function ReviewPreviewCard({
           giftName={giftName}
           partyDateTimeLabel={partyDateTimeLabel}
           campaignCloseLabel={campaignCloseLabel}
-          voucherSummary={voucherSummary}
+          payoutSummary={payoutSummary}
         />
       </div>
 

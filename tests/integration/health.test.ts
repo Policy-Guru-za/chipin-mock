@@ -15,6 +15,7 @@ const envSnapshot = () => ({
   KV_REST_API_URL: process.env.KV_REST_API_URL,
   KV_REST_API_TOKEN: process.env.KV_REST_API_TOKEN,
   BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
+  CARD_DATA_ENCRYPTION_KEY: process.env.CARD_DATA_ENCRYPTION_KEY,
 });
 
 const restoreEnv = (snapshot: Record<string, string | undefined>) => {
@@ -22,6 +23,7 @@ const restoreEnv = (snapshot: Record<string, string | undefined>) => {
   process.env.KV_REST_API_URL = snapshot.KV_REST_API_URL;
   process.env.KV_REST_API_TOKEN = snapshot.KV_REST_API_TOKEN;
   process.env.BLOB_READ_WRITE_TOKEN = snapshot.BLOB_READ_WRITE_TOKEN;
+  process.env.CARD_DATA_ENCRYPTION_KEY = snapshot.CARD_DATA_ENCRYPTION_KEY;
 };
 
 describe('health endpoints', () => {
@@ -49,6 +51,7 @@ describe('health endpoints', () => {
     delete process.env.KV_REST_API_URL;
     delete process.env.KV_REST_API_TOKEN;
     delete process.env.BLOB_READ_WRITE_TOKEN;
+    delete process.env.CARD_DATA_ENCRYPTION_KEY;
 
     const { GET } = await loadReadyHandler();
     const response = await GET(new Request('http://localhost/health/ready'));
@@ -59,6 +62,7 @@ describe('health endpoints', () => {
     expect(payload.checks.db.ok).toBe(false);
     expect(payload.checks.kv.ok).toBe(false);
     expect(payload.checks.blob.ok).toBe(false);
+    expect(payload.checks.payoutEncryption.ok).toBe(false);
   });
 
   it('returns 200 for /health/ready when adapters are healthy', async () => {
@@ -66,6 +70,7 @@ describe('health endpoints', () => {
       checkDb: vi.fn(async () => ({ ok: true })),
       checkKv: vi.fn(async () => ({ ok: true })),
       checkBlobToken: vi.fn(async () => ({ ok: true })),
+      checkPayoutEncryption: vi.fn(async () => ({ ok: true })),
       checkKarriAutomation: vi.fn(async () => ({ ok: true })),
       checkTakealotGiftCards: vi.fn(async () => ({ ok: true })),
       checkGivenGainAutomation: vi.fn(async () => ({ ok: true })),

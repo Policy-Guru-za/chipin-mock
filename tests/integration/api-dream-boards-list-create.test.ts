@@ -142,7 +142,7 @@ describe('GET /api/v1/dream-boards', () => {
 });
 
 describe('POST /api/v1/dream-boards', () => {
-  it('creates a voucher-default Dreamboard when payout_method is omitted', async () => {
+  it('creates a bank-default Dreamboard when payout_method is omitted', async () => {
     mockAuth();
 
     const markApiKeyUsed = vi.fn(async () => undefined);
@@ -177,6 +177,10 @@ describe('POST /api/v1/dream-boards', () => {
           goal_cents: 35000,
           payout_email: 'parent@example.com',
           host_whatsapp_number: '+27821234567',
+          bank_name: 'Standard Bank',
+          bank_account_number: '1234 5678 9012',
+          bank_branch_code: '051001',
+          bank_account_holder: 'Maya Parent',
         }),
       })
     );
@@ -186,15 +190,19 @@ describe('POST /api/v1/dream-boards', () => {
     expect(payload.data.slug).toBe('maya-birthday-abc123');
     expect(payload.data.gift_data.gift_icon_id).toBe('train');
     expect(payload.data.gift_data.gift_image_url).toBe('http://localhost:3000/icons/gifts/train.png');
-    expect(payload.data.payout_method).toBe('takealot_voucher');
+    expect(payload.data.payout_method).toBe('bank');
     expect(payload.data).not.toHaveProperty('charity_enabled');
-    expect(encryptSensitiveValue).not.toHaveBeenCalled();
+    expect(encryptSensitiveValue).toHaveBeenCalledWith('123456789012');
     expect(values).toHaveBeenCalledWith(
       expect.objectContaining({
-        payoutMethod: 'takealot_voucher',
+        payoutMethod: 'bank',
         karriCardNumber: null,
         karriCardHolderName: null,
-        bankName: null,
+        bankName: 'Standard Bank',
+        bankAccountNumberEncrypted: 'encrypted-card',
+        bankAccountLast4: '9012',
+        bankBranchCode: '051001',
+        bankAccountHolder: 'Maya Parent',
         charityEnabled: false,
         charityId: null,
         charitySplitType: null,
@@ -206,7 +214,7 @@ describe('POST /api/v1/dream-boards', () => {
     expect(insert).toHaveBeenCalled();
   });
 
-  it('returns unsupported operation for karri payout payloads when the karri write path is disabled', async () => {
+  it('accepts karri payout payloads even when the legacy karri toggle is disabled', async () => {
     process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'false';
     mockAuth();
 
@@ -216,7 +224,19 @@ describe('POST /api/v1/dream-boards', () => {
     const encryptSensitiveValue = vi.fn(() => 'encrypted-card');
     vi.doMock('@/lib/utils/encryption', () => ({ encryptSensitiveValue }));
 
-    const insert = vi.fn();
+    vi.doMock('@/lib/utils/slug', () => ({ generateSlug: () => 'maya-birthday-karri-disabled' }));
+
+    const returning = vi.fn(async () => [
+      {
+        id: 'board-1',
+        slug: 'maya-birthday-karri-disabled',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ]);
+    const onConflictDoNothing = vi.fn(() => ({ returning }));
+    const values = vi.fn(() => ({ onConflictDoNothing }));
+    const insert = vi.fn(() => ({ values }));
     vi.doMock('@/lib/db', () => ({ db: { insert } }));
 
     const { POST } = await loadHandler();
@@ -240,15 +260,20 @@ describe('POST /api/v1/dream-boards', () => {
     );
     const payload = await response.json();
 
-    expect(response.status).toBe(422);
-    expect(payload.error.code).toBe('unsupported_operation');
-    expect(payload.error.message).toContain('Karri payout method is not enabled');
-    expect(encryptSensitiveValue).not.toHaveBeenCalled();
-    expect(insert).not.toHaveBeenCalled();
-    expect(markApiKeyUsed).not.toHaveBeenCalled();
+    expect(response.status).toBe(201);
+    expect(payload.data.payout_method).toBe('karri_card');
+    expect(encryptSensitiveValue).toHaveBeenCalledWith('1234567890123456');
+    expect(values).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payoutMethod: 'karri_card',
+        karriCardNumber: 'encrypted-card',
+        karriCardHolderName: 'Maya Parent',
+      })
+    );
+    expect(markApiKeyUsed).toHaveBeenCalledWith('api-key-1');
   });
 
-  it('returns unsupported operation for bank payout payloads before B2', async () => {
+  it('accepts bank payout payloads without a legacy bank toggle', async () => {
     mockAuth();
 
     const markApiKeyUsed = vi.fn(async () => undefined);
@@ -258,7 +283,12 @@ describe('POST /api/v1/dream-boards', () => {
     const encryptSensitiveValue = vi.fn((value: string) => `encrypted-${value}`);
     vi.doMock('@/lib/utils/encryption', () => ({ encryptSensitiveValue }));
 
-    const insert = vi.fn();
+    const returning = vi.fn(async () => [
+      { id: 'board-1', slug: 'maya-birthday-bank', createdAt: new Date(), updatedAt: new Date() },
+    ]);
+    const onConflictDoNothing = vi.fn(() => ({ returning }));
+    const values = vi.fn(() => ({ onConflictDoNothing }));
+    const insert = vi.fn(() => ({ values }));
 
     vi.doMock('@/lib/db', () => ({ db: { insert } }));
 
@@ -286,12 +316,21 @@ describe('POST /api/v1/dream-boards', () => {
     );
     const payload = await response.json();
 
-    expect(response.status).toBe(422);
-    expect(payload.error.code).toBe('unsupported_operation');
-    expect(payload.error.message).toContain('Bank payout method is not yet enabled');
-    expect(encryptSensitiveValue).not.toHaveBeenCalled();
-    expect(insert).not.toHaveBeenCalled();
-    expect(markApiKeyUsed).not.toHaveBeenCalled();
+    expect(response.status).toBe(201);
+    expect(payload.data.payout_method).toBe('bank');
+    expect(encryptSensitiveValue).toHaveBeenCalledWith('123456789012');
+    expect(values).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payoutMethod: 'bank',
+        bankName: 'Standard Bank',
+        bankAccountNumberEncrypted: 'encrypted-123456789012',
+        bankAccountLast4: '9012',
+        bankBranchCode: '051001',
+        bankAccountHolder: 'Maya Parent',
+        karriCardNumber: null,
+      })
+    );
+    expect(markApiKeyUsed).toHaveBeenCalledWith('api-key-1');
   });
 
   it('rejects charity fields because the public create contract no longer supports them', async () => {
@@ -374,7 +413,7 @@ describe('POST /api/v1/dream-boards', () => {
     expect(markApiKeyUsed).not.toHaveBeenCalled();
   });
 
-  it('accepts bank payout payloads when bank write path toggle is enabled', async () => {
+  it('accepts bank payout payloads when legacy bank toggles are present', async () => {
     process.env.UX_V2_ENABLE_BANK_WRITE_PATH = 'true';
     mockAuth();
 
@@ -434,7 +473,7 @@ describe('POST /api/v1/dream-boards', () => {
     expect(markApiKeyUsed).toHaveBeenCalledWith('api-key-1');
   });
 
-  it('accepts karri payloads when the karri write path toggle is enabled', async () => {
+  it('accepts karri payloads when legacy karri toggles are present', async () => {
     process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
     mockAuth();
 

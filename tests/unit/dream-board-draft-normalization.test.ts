@@ -42,16 +42,19 @@ afterEach(() => {
 });
 
 describe('dream board draft host-create normalization', () => {
-  it('strips legacy payout and charity residue from host-create reads', async () => {
+  it('defaults legacy voucher drafts back to bank and strips charity residue from reads', async () => {
     kvStore.set(draftKey, {
       childName: 'Maya',
       giftName: 'Scooter',
       giftImageUrl: '/icons/gifts/scooter.png',
-      payoutMethod: 'bank',
+      payoutMethod: 'takealot_voucher',
       payoutEmail: 'parent@example.com',
       hostWhatsAppNumber: '+27821234567',
       bankName: 'FNB',
       bankAccountNumberEncrypted: 'enc:123456',
+      bankAccountLast4: '3456',
+      bankBranchCode: '250655',
+      bankAccountHolder: 'Maya Parent',
       charityEnabled: true,
       charityId: '00000000-0000-4000-8000-000000000001',
       updatedAt: '2026-01-01T00:00:00.000Z',
@@ -63,17 +66,22 @@ describe('dream board draft host-create normalization', () => {
       childName: 'Maya',
       giftName: 'Scooter',
       giftImageUrl: '/icons/gifts/scooter.png',
-      payoutMethod: 'takealot_voucher',
+      payoutMethod: 'bank',
       payoutEmail: 'parent@example.com',
       hostWhatsAppNumber: '+27821234567',
+      bankName: 'FNB',
+      bankAccountNumberEncrypted: 'enc:123456',
+      bankAccountLast4: '3456',
+      bankBranchCode: '250655',
+      bankAccountHolder: 'Maya Parent',
       updatedAt: '2026-01-01T00:00:00.000Z',
     });
     expect(kvMocks.set).toHaveBeenCalledWith(
       draftKey,
       expect.objectContaining({
-        payoutMethod: 'takealot_voucher',
-        bankName: undefined,
-        bankAccountNumberEncrypted: undefined,
+        payoutMethod: 'bank',
+        bankName: 'FNB',
+        bankAccountNumberEncrypted: 'enc:123456',
         charityEnabled: false,
         charityId: undefined,
       }),
@@ -81,37 +89,48 @@ describe('dream board draft host-create normalization', () => {
     );
   });
 
-  it('normalizes host-create writes back to voucher-only storage', async () => {
+  it('normalizes host-create writes to the selected payout route and clears inactive fields', async () => {
     kvStore.set(draftKey, {
       childName: 'Maya',
       payoutMethod: 'bank',
       bankName: 'FNB',
+      bankAccountNumberEncrypted: 'enc:123456',
+      bankAccountLast4: '3456',
+      bankBranchCode: '250655',
+      bankAccountHolder: 'Maya Parent',
       charityEnabled: true,
       charityId: '00000000-0000-4000-8000-000000000001',
       updatedAt: '2026-01-01T00:00:00.000Z',
     });
 
     const draft = await updateHostCreateDreamBoardDraft('host-1', {
+      payoutMethod: 'karri_card',
       payoutEmail: 'parent@example.com',
       hostWhatsAppNumber: '+27821234567',
+      karriCardNumberEncrypted: 'enc:card',
+      karriCardHolderName: 'Maya Parent',
     });
 
     expect(draft).toEqual(
       expect.objectContaining({
         childName: 'Maya',
-        payoutMethod: 'takealot_voucher',
+        payoutMethod: 'karri_card',
         payoutEmail: 'parent@example.com',
         hostWhatsAppNumber: '+27821234567',
+        karriCardNumberEncrypted: 'enc:card',
+        karriCardHolderName: 'Maya Parent',
       })
     );
-    expect(draft).not.toHaveProperty('bankName');
+    expect(draft?.bankName).toBeUndefined();
     expect(draft).not.toHaveProperty('charityEnabled');
 
     expect(kvStore.get(draftKey)).toEqual(
       expect.objectContaining({
-        payoutMethod: 'takealot_voucher',
+        payoutMethod: 'karri_card',
         payoutEmail: 'parent@example.com',
         hostWhatsAppNumber: '+27821234567',
+        karriCardNumberEncrypted: 'enc:card',
+        karriCardHolderName: 'Maya Parent',
         bankName: undefined,
         charityEnabled: false,
         charityId: undefined,

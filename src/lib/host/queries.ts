@@ -2,10 +2,6 @@ import { and, asc, desc, eq, isNotNull, ne, sql } from 'drizzle-orm';
 
 import { db } from '@/lib/db';
 import { charities, contributions, dreamBoards, payouts } from '@/lib/db/schema';
-import type {
-  DreamBoardGiftPayoutMethod,
-  DreamBoardPayoutType,
-} from '@/lib/dream-boards/payout-methods';
 import { formatDateOnly, parseDateOnly } from '@/lib/utils/date';
 
 export type HostDashboardListRow = {
@@ -42,7 +38,7 @@ export type HostDashboardDetailRow = {
   message: string | null;
   status: string;
   goalCents: number;
-  payoutMethod: DreamBoardGiftPayoutMethod;
+  payoutMethod: string;
   karriCardHolderName: string | null;
   bankAccountHolder: string | null;
   payoutEmail: string;
@@ -61,7 +57,7 @@ export type HostDashboardDetailRow = {
 
 export type HostPayoutRow = {
   id: string;
-  type: DreamBoardPayoutType;
+  type: string;
   status: 'pending' | 'processing' | 'completed' | 'failed';
   grossCents: number;
   feeCents: number;

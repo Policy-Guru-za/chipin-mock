@@ -22,7 +22,7 @@ describe('UAT Edge Cases (EC-01..EC-08)', () => {
     expect(reminders).toContain("payload.error).toBe('invalid_reminder_window')");
     expect(reminders).toContain("payload.error).toBe('board_closed')");
     expect(payout).toContain('keeps failing a completed payout idempotent');
-    expect(givingBack).toContain('clears charity state and redirects legacy submissions to voucher setup');
+    expect(givingBack).toContain('clears charity state and redirects legacy submissions to payout setup');
     expect(session).toContain('keeps payment and failure routes redirecting back to the placeholder page');
     expect(payments).toContain('pins contribution payments to Stitch-only placeholder mode');
     expect(webhookRemoval).toContain('removes provider-specific webhook utilities and routes');

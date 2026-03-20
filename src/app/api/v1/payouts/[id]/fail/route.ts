@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 import { parseBody, validateUuid, withApiAuth } from '@/lib/api/route-utils';
 import { jsonError, jsonSuccess } from '@/lib/api/response';
-import { serializePayout } from '@/lib/api/payouts';
+import { serializePublicPayout } from '@/lib/api/payouts';
 import { getPayoutForApi } from '@/lib/db/api-queries';
 import { failPayout } from '@/lib/payouts/service';
 
@@ -91,6 +91,16 @@ export const POST = withApiAuth(
       });
     }
 
-    return jsonSuccess({ data: serializePayout(payout), requestId, headers: rateLimitHeaders });
+    const serialized = serializePublicPayout(payout);
+    if (!serialized) {
+      return jsonError({
+        error: { code: 'not_found', message: 'Payout not found' },
+        status: 404,
+        requestId,
+        headers: rateLimitHeaders,
+      });
+    }
+
+    return jsonSuccess({ data: serialized, requestId, headers: rateLimitHeaders });
   }
 );

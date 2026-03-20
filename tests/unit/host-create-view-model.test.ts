@@ -14,10 +14,11 @@ const baseDraft: HostCreateDreamBoardDraft = {
   birthdayDate: '2026-06-10',
   partyDate: '2026-06-12',
   campaignEndDate: '2026-06-12',
-  charityEnabled: false,
-  payoutMethod: 'takealot_voucher',
+  payoutMethod: 'karri_card',
   payoutEmail: 'parent@example.com',
   hostWhatsAppNumber: '+27821234567',
+  karriCardNumberEncrypted: 'encrypted',
+  karriCardHolderName: 'Maya Parent',
   updatedAt: '2026-01-01T00:00:00.000Z',
 };
 
@@ -32,49 +33,47 @@ describe('buildCreateFlowViewModel', () => {
     expect(buildCreateFlowViewModel({ step: 'dates', draft: baseDraft }).stepLabel).toBe(
       'Step 3 of 5 — The Dates'
     );
-    expect(buildCreateFlowViewModel({ step: 'voucher', draft: baseDraft }).stepLabel).toBe(
-      'Step 4 of 5 — Voucher Details'
+    expect(buildCreateFlowViewModel({ step: 'payout', draft: baseDraft }).stepLabel).toBe(
+      'Step 4 of 5 — Payout Details'
     );
     expect(buildCreateFlowViewModel({ step: 'review', draft: baseDraft }).stepLabel).toBe(
       'Step 5 of 5 — Review'
     );
   });
 
-  it('redirects missing prerequisites through child, gift, dates, and voucher', () => {
+  it('redirects missing prerequisites through child, gift, dates, and payout', () => {
     expect(buildCreateFlowViewModel({ step: 'gift', draft: null }).redirectTo).toBe('/create/child');
     expect(buildCreateFlowViewModel({ step: 'dates', draft: null }).redirectTo).toBe('/create/gift');
-    expect(buildCreateFlowViewModel({ step: 'voucher', draft: null }).redirectTo).toBe('/create/dates');
-    expect(buildCreateFlowViewModel({ step: 'review', draft: null }).redirectTo).toBe(
-      '/create/voucher'
-    );
+    expect(buildCreateFlowViewModel({ step: 'payout', draft: null }).redirectTo).toBe('/create/dates');
+    expect(buildCreateFlowViewModel({ step: 'review', draft: null }).redirectTo).toBe('/create/payout');
   });
 
   it('treats dates as complete only when birthday, party, and campaign dates exist', () => {
     expect(
       buildCreateFlowViewModel({
-        step: 'voucher',
+        step: 'payout',
         draft: { ...baseDraft, birthdayDate: undefined },
       }).redirectTo
     ).toBe('/create/dates');
 
     expect(
       buildCreateFlowViewModel({
-        step: 'voucher',
+        step: 'payout',
         draft: { ...baseDraft, partyDate: undefined },
       }).redirectTo
     ).toBe('/create/dates');
 
     expect(
       buildCreateFlowViewModel({
-        step: 'voucher',
+        step: 'payout',
         draft: { ...baseDraft, campaignEndDate: undefined },
       }).redirectTo
     ).toBe('/create/dates');
 
-    expect(buildCreateFlowViewModel({ step: 'voucher', draft: baseDraft }).redirectTo).toBeUndefined();
+    expect(buildCreateFlowViewModel({ step: 'payout', draft: baseDraft }).redirectTo).toBeUndefined();
   });
 
-  it('treats voucher setup as complete only for the voucher method with both contacts', () => {
+  it('treats payout as complete for Karri only with required fields', () => {
     expect(buildCreateFlowViewModel({ step: 'review', draft: baseDraft }).redirectTo).toBeUndefined();
 
     expect(
@@ -82,27 +81,50 @@ describe('buildCreateFlowViewModel', () => {
         step: 'review',
         draft: { ...baseDraft, payoutEmail: undefined },
       }).redirectTo
-    ).toBe('/create/voucher');
+    ).toBe('/create/payout');
 
     expect(
       buildCreateFlowViewModel({
         step: 'review',
         draft: { ...baseDraft, hostWhatsAppNumber: undefined },
       }).redirectTo
-    ).toBe('/create/voucher');
+    ).toBe('/create/payout');
 
     expect(
       buildCreateFlowViewModel({
         step: 'review',
-        draft: { ...baseDraft, payoutEmail: undefined },
+        draft: { ...baseDraft, karriCardNumberEncrypted: undefined },
       }).redirectTo
-    ).toBe('/create/voucher');
+    ).toBe('/create/payout');
   });
 
-  it('uses voucher-specific copy for the new step', () => {
-    const view = buildCreateFlowViewModel({ step: 'voucher', draft: baseDraft });
+  it('treats payout as complete for bank only with all required fields', () => {
+    const bankDraft: HostCreateDreamBoardDraft = {
+      ...baseDraft,
+      payoutMethod: 'bank',
+      karriCardNumberEncrypted: undefined,
+      karriCardHolderName: undefined,
+      bankName: 'Standard Bank',
+      bankAccountNumberEncrypted: 'encrypted-bank',
+      bankAccountLast4: '1234',
+      bankBranchCode: '051001',
+      bankAccountHolder: 'Maya Parent',
+    };
 
-    expect(view.title).toBe('Where should we send voucher updates?');
+    expect(buildCreateFlowViewModel({ step: 'review', draft: bankDraft }).redirectTo).toBeUndefined();
+
+    expect(
+      buildCreateFlowViewModel({
+        step: 'review',
+        draft: { ...bankDraft, bankAccountLast4: undefined },
+      }).redirectTo
+    ).toBe('/create/payout');
+  });
+
+  it('uses payout-specific copy for the new step', () => {
+    const view = buildCreateFlowViewModel({ step: 'payout', draft: baseDraft });
+
+    expect(view.title).toBe('Where should the funds go?');
     expect(view.subtitle).toContain("Maya's Dreamboard closes");
   });
 });

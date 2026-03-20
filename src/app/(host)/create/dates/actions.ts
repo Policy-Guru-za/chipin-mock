@@ -175,5 +175,5 @@ export async function saveDatesAction(formData: FormData) {
     partyDateTime,
   });
 
-  redirect('/create/voucher');
+  redirect('/create/payout');
 }

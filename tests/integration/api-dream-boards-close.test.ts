@@ -28,7 +28,7 @@ const buildBoard = (overrides: Record<string, unknown> = {}) => ({
   giftImageUrl: '/icons/gifts/train.png',
   giftImagePrompt: 'A bright train set',
   goalCents: 35000,
-  payoutMethod: 'takealot_voucher',
+  payoutMethod: 'bank',
   message: 'Make it happen',
   status: 'active',
   createdAt: new Date('2026-01-10T10:00:00.000Z'),
@@ -171,11 +171,47 @@ describe('POST /api/v1/dream-boards/[id]/close', () => {
     expect(createPayoutsForDreamBoard).toHaveBeenCalled();
   });
 
-  it('filters charity payouts out of the public close response', async () => {
+  it('blocks legacy voucher boards before mutating status', async () => {
+    mockAuth();
+    const update = mockDb();
+    const recordAuditEvent = vi.fn(async () => undefined);
+    const createPayoutsForDreamBoard = vi.fn(async () => ({ created: [] }));
+
+    vi.doMock('@/lib/db/queries', () => ({
+      getDreamBoardByPublicId: vi.fn(async () =>
+        buildBoard({ status: 'active', payoutMethod: 'takealot_voucher' })
+      ),
+      markApiKeyUsed: vi.fn(async () => undefined),
+    }));
+    vi.doMock('@/lib/payouts/queries', () => ({
+      listPayoutsForDreamBoard: vi.fn(async () => []),
+    }));
+    vi.doMock('@/lib/payouts/service', () => ({ createPayoutsForDreamBoard }));
+    vi.doMock('@/lib/audit', () => ({ recordAuditEvent }));
+
+    const { POST } = await loadHandler();
+    const response = await POST(
+      new Request('http://localhost/api/v1/dream-boards/board-1/close', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ reason: 'manual' }),
+      }),
+      { params: { id: 'board-1' } }
+    );
+    const payload = await response.json();
+
+    expect(response.status).toBe(409);
+    expect(payload.error.code).toBe('conflict');
+    expect(update).not.toHaveBeenCalled();
+    expect(recordAuditEvent).not.toHaveBeenCalled();
+    expect(createPayoutsForDreamBoard).not.toHaveBeenCalled();
+  });
+
+  it('filters charity and legacy voucher payouts out of the public close response', async () => {
     mockAuth();
     const update = mockDb();
 
-    const board = buildBoard({ status: 'active', payoutMethod: 'takealot_voucher' });
+    const board = buildBoard({ status: 'active', payoutMethod: 'bank' });
     const closed = buildBoard({ status: 'closed', raisedCents: 20000 });
     const getDreamBoardByPublicId = vi
       .fn()
@@ -184,13 +220,20 @@ describe('POST /api/v1/dream-boards/[id]/close', () => {
 
     const createPayoutsForDreamBoard = vi.fn(async () => ({
       created: [
-        { id: 'payout-gift', type: 'takealot_voucher' },
+        { id: 'payout-gift', type: 'bank' },
+        { id: 'payout-voucher', type: 'takealot_voucher' },
         { id: 'payout-charity', type: 'charity' },
       ],
     }));
     const listPayoutsForDreamBoard = vi.fn(async () => [
       {
         id: 'payout-gift',
+        type: 'bank',
+        status: 'pending',
+        netCents: 16200,
+      },
+      {
+        id: 'payout-voucher',
         type: 'takealot_voucher',
         status: 'pending',
         netCents: 16200,
@@ -228,7 +271,7 @@ describe('POST /api/v1/dream-boards/[id]/close', () => {
       expect.objectContaining({ dreamBoardId: 'board-1' })
     );
     expect(payload.data.payouts).toEqual([
-      expect.objectContaining({ type: 'takealot_voucher', net_cents: 16200 }),
+      expect.objectContaining({ type: 'bank', net_cents: 16200 }),
     ]);
   });
 

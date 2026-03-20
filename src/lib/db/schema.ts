@@ -144,7 +144,7 @@ export const dreamBoards = pgTable(
     giftImagePrompt: text('gift_image_prompt'), // Deprecated, null for icon-based boards
     goalCents: integer('goal_cents').notNull().default(0),
 
-    // Active host create flow: voucher placeholder; legacy/API flows may still use Karri or bank.
+    // Active Dreamboard payout methods.
     payoutMethod: payoutMethodEnum('payout_method')
       .notNull()
       .default(DEFAULT_HOST_CREATE_PAYOUT_METHOD),
@@ -237,16 +237,6 @@ export const dreamBoards = pgTable(
         AND ${table.bankAccountLast4} IS NOT NULL
         AND ${table.bankBranchCode} IS NOT NULL
         AND ${table.bankAccountHolder} IS NOT NULL
-      )
-      OR (
-        ${table.payoutMethod} = 'takealot_voucher'
-        AND ${table.karriCardNumber} IS NULL
-        AND ${table.karriCardHolderName} IS NULL
-        AND ${table.bankName} IS NULL
-        AND ${table.bankAccountNumberEncrypted} IS NULL
-        AND ${table.bankAccountLast4} IS NULL
-        AND ${table.bankBranchCode} IS NULL
-        AND ${table.bankAccountHolder} IS NULL
       )`
     ),
   })

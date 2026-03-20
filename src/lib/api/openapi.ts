@@ -9,22 +9,147 @@ import { SUPPORTED_WEBHOOK_EVENT_TYPES } from '@/lib/webhooks';
 
 const payoutMethodDescription = [
   `UX v2 enum set. Standard Dreamboard flows default to ${DEFAULT_HOST_CREATE_PAYOUT_METHOD}.`,
-  'Karri Card is legacy or partner-only and requires UX_V2_ENABLE_KARRI_WRITE_PATH=true.',
-  'Bank write path remains gated by UX_V2_ENABLE_BANK_WRITE_PATH.',
-  'Legacy clients that assumed karri_card-only responses must handle bank and takealot_voucher values.',
+  'Bank and Karri Card write paths are active.',
+  'Legacy clients that assumed karri_card-only responses must handle bank values.',
 ].join(' ');
 
 const dreamBoardCreateDescription = [
-  `Creates a Dreamboard. Omitted payout_method defaults to ${DEFAULT_HOST_CREATE_PAYOUT_METHOD}.`,
-  'Karri Card writes return unsupported_operation (422) unless UX_V2_ENABLE_KARRI_WRITE_PATH=true.',
-  'Bank writes return unsupported_operation (422) until UX_V2_ENABLE_BANK_WRITE_PATH=true.',
+  `Creates a Dreamboard. Omitted payout_method defaults to ${DEFAULT_HOST_CREATE_PAYOUT_METHOD} and still requires the bank payout fields.`,
+  'Bank and Karri Card payout writes are accepted.',
 ].join(' ');
 
 const dreamBoardUpdateDescription = [
   'Updates a Dreamboard.',
-  'Karri Card mutation returns unsupported_operation (422) unless UX_V2_ENABLE_KARRI_WRITE_PATH=true.',
-  'Bank mutation returns unsupported_operation (422) until UX_V2_ENABLE_BANK_WRITE_PATH=true.',
+  'Bank and Karri Card payout mutations are accepted.',
 ].join(' ');
+
+const dreamBoardCreateCommonRequired = [
+  'child_name',
+  'child_photo_url',
+  'party_date',
+  'gift_name',
+  'goal_cents',
+  'payout_email',
+  'host_whatsapp_number',
+] as const;
+
+const dreamBoardCreateCommonProperties = {
+  child_name: {
+    type: 'string',
+    minLength: 2,
+    maxLength: 50,
+  },
+  child_age: {
+    type: 'integer',
+    minimum: 1,
+    maximum: 18,
+  },
+  child_photo_url: {
+    type: 'string',
+    format: 'uri',
+  },
+  birthday_date: {
+    type: 'string',
+    format: 'date',
+  },
+  party_date: {
+    type: 'string',
+    format: 'date',
+  },
+  campaign_end_date: {
+    type: 'string',
+    format: 'date',
+  },
+  gift_name: {
+    type: 'string',
+    minLength: 2,
+    maxLength: 200,
+  },
+  gift_description: {
+    type: 'string',
+    maxLength: 500,
+  },
+  gift_icon_id: {
+    type: 'string',
+    description: 'Supported icon identity (curated or system). Required when gift_image_url is omitted.',
+  },
+  gift_image_url: {
+    type: 'string',
+    description:
+      'Gift icon path or URL. Must map to a supported icon in /icons/gifts/. Required when gift_icon_id is omitted.',
+  },
+  gift_image_prompt: {
+    type: 'string',
+    nullable: true,
+    description: 'Deprecated. Legacy AI prompt value.',
+  },
+  goal_cents: {
+    type: 'integer',
+    minimum: 2000,
+  },
+  payout_email: {
+    type: 'string',
+    format: 'email',
+  },
+  host_whatsapp_number: {
+    type: 'string',
+  },
+  message: {
+    type: 'string',
+    maxLength: 280,
+  },
+} as const;
+
+const dreamBoardCreateBankRequired = [
+  ...dreamBoardCreateCommonRequired,
+  'bank_name',
+  'bank_account_number',
+  'bank_branch_code',
+  'bank_account_holder',
+] as const;
+
+const dreamBoardCreateBankProperties = {
+  ...dreamBoardCreateCommonProperties,
+  payout_method: {
+    type: 'string',
+    enum: ['bank'],
+    default: 'bank',
+    description: 'Optional. When omitted, the request is treated as a bank payout request.',
+  },
+  bank_name: {
+    type: 'string',
+  },
+  bank_account_number: {
+    type: 'string',
+  },
+  bank_branch_code: {
+    type: 'string',
+  },
+  bank_account_holder: {
+    type: 'string',
+  },
+} as const;
+
+const dreamBoardCreateKarriRequired = [
+  ...dreamBoardCreateCommonRequired,
+  'payout_method',
+  'karri_card_number',
+  'karri_card_holder_name',
+] as const;
+
+const dreamBoardCreateKarriProperties = {
+  ...dreamBoardCreateCommonProperties,
+  payout_method: {
+    type: 'string',
+    enum: ['karri_card'],
+  },
+  karri_card_number: {
+    type: 'string',
+  },
+  karri_card_holder_name: {
+    type: 'string',
+  },
+} as const;
 
 export const openApiSpec = {
   openapi: '3.0.3',
@@ -1245,105 +1370,23 @@ export const openApiSpec = {
           },
         },
       },
-      DreamBoardCreateRequest: {
+      DreamBoardCreateRequestBank: {
         type: 'object',
-        required: [
-          'child_name',
-          'child_photo_url',
-          'party_date',
-          'gift_name',
-          'goal_cents',
-          'payout_email',
-          'host_whatsapp_number',
+        additionalProperties: false,
+        required: [...dreamBoardCreateBankRequired],
+        properties: dreamBoardCreateBankProperties,
+      },
+      DreamBoardCreateRequestKarri: {
+        type: 'object',
+        additionalProperties: false,
+        required: [...dreamBoardCreateKarriRequired],
+        properties: dreamBoardCreateKarriProperties,
+      },
+      DreamBoardCreateRequest: {
+        oneOf: [
+          { $ref: '#/components/schemas/DreamBoardCreateRequestBank' },
+          { $ref: '#/components/schemas/DreamBoardCreateRequestKarri' },
         ],
-        properties: {
-          child_name: {
-            type: 'string',
-            minLength: 2,
-            maxLength: 50,
-          },
-          child_age: {
-            type: 'integer',
-            minimum: 1,
-            maximum: 18,
-          },
-          child_photo_url: {
-            type: 'string',
-            format: 'uri',
-          },
-          birthday_date: {
-            type: 'string',
-            format: 'date',
-          },
-          party_date: {
-            type: 'string',
-            format: 'date',
-          },
-          campaign_end_date: {
-            type: 'string',
-            format: 'date',
-          },
-          gift_name: {
-            type: 'string',
-            minLength: 2,
-            maxLength: 200,
-          },
-          gift_description: {
-            type: 'string',
-            maxLength: 500,
-          },
-          gift_icon_id: {
-            type: 'string',
-            description:
-              'Supported icon identity (curated or system). Required when gift_image_url is omitted.',
-          },
-          gift_image_url: {
-            type: 'string',
-            description:
-              'Gift icon path or URL. Must map to a supported icon in /icons/gifts/. Required when gift_icon_id is omitted.',
-          },
-          gift_image_prompt: {
-            type: 'string',
-            nullable: true,
-            description: 'Deprecated. Legacy AI prompt value.',
-          },
-          goal_cents: {
-            type: 'integer',
-            minimum: 2000,
-          },
-          payout_method: {
-            $ref: '#/components/schemas/PayoutMethod',
-          },
-          payout_email: {
-            type: 'string',
-            format: 'email',
-          },
-          host_whatsapp_number: {
-            type: 'string',
-          },
-          karri_card_number: {
-            type: 'string',
-          },
-          karri_card_holder_name: {
-            type: 'string',
-          },
-          bank_name: {
-            type: 'string',
-          },
-          bank_account_number: {
-            type: 'string',
-          },
-          bank_branch_code: {
-            type: 'string',
-          },
-          bank_account_holder: {
-            type: 'string',
-          },
-          message: {
-            type: 'string',
-            maxLength: 280,
-          },
-        },
         description: dreamBoardCreateDescription,
       },
       DreamBoardUpdateRequest: {
@@ -1503,8 +1546,7 @@ export const openApiSpec = {
       PayoutType: {
         type: 'string',
         enum: DREAMBOARD_GIFT_PAYOUT_METHODS,
-        description:
-          'UX v2 enum set. Legacy clients that assumed karri_card-only payout types must handle bank and takealot_voucher.',
+        description: 'UX v2 enum set. Legacy clients that assumed karri_card-only payout types must handle bank.',
       },
       PayoutStatus: {
         type: 'string',
@@ -1522,16 +1564,6 @@ export const openApiSpec = {
           },
           payout_method: {
             $ref: '#/components/schemas/PayoutMethod',
-          },
-          host_whatsapp_number: {
-            type: 'string',
-            nullable: true,
-          },
-          fulfilment_mode: {
-            type: 'string',
-            nullable: true,
-            description:
-              'Voucher fulfilment state for manual placeholder flows and future automated delivery modes.',
           },
           karri_card_holder_name: {
             type: 'string',

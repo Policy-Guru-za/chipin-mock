@@ -6,7 +6,7 @@ import { ReviewClient } from '@/app/(host)/create/review/ReviewClient';
 import { WizardSkeletonLoader } from '@/components/create-wizard';
 import { requireHostAuth } from '@/lib/auth/clerk-wrappers';
 import { getHostCreateDreamBoardDraft } from '@/lib/dream-boards/draft';
-import { hostCreateDreamBoardDraftSchema } from '@/lib/dream-boards/schema';
+import { hostCreateDreamBoardDraftPersistedSchema } from '@/lib/dream-boards/schema';
 import { buildCreateFlowViewModel } from '@/lib/host/create-view-model';
 
 export default async function CreateReviewPage() {
@@ -17,7 +17,7 @@ export default async function CreateReviewPage() {
     redirect(view.redirectTo);
   }
 
-  const parsed = hostCreateDreamBoardDraftSchema.strip().safeParse(draft);
+  const parsed = hostCreateDreamBoardDraftPersistedSchema.safeParse(draft);
   if (!parsed.success) {
     redirect('/create');
   }
@@ -35,8 +35,13 @@ export default async function CreateReviewPage() {
           campaignEndDate: parsed.data.campaignEndDate,
           giftName: parsed.data.giftName,
           giftImageUrl: parsed.data.giftImageUrl,
+          payoutMethod: parsed.data.payoutMethod,
           payoutEmail: parsed.data.payoutEmail,
           hostWhatsAppNumber: parsed.data.hostWhatsAppNumber,
+          karriCardHolderName: parsed.data.karriCardHolderName,
+          bankName: parsed.data.bankName,
+          bankAccountLast4: parsed.data.bankAccountLast4,
+          bankAccountHolder: parsed.data.bankAccountHolder,
         }}
         publishAction={publishDreamBoardAction}
       />

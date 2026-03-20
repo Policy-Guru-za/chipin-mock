@@ -8,6 +8,7 @@ import { recordAuditEvent } from '@/lib/audit';
 import { db } from '@/lib/db';
 import { getDreamBoardByPublicId } from '@/lib/db/queries';
 import { dreamBoards } from '@/lib/db/schema';
+import { isDreamBoardGiftPayoutMethod } from '@/lib/dream-boards/payout-methods';
 import { listPayoutsForDreamBoard } from '@/lib/payouts/queries';
 import { createPayoutsForDreamBoard } from '@/lib/payouts/service';
 import { getClientIp } from '@/lib/utils/request';
@@ -20,7 +21,7 @@ const serializePublicPayouts = (
   payouts: Array<{ id: string; type: string; status: string; netCents: number }>
 ) =>
   payouts
-    .filter((payout) => payout.type !== 'charity')
+    .filter((payout) => isDreamBoardGiftPayoutMethod(payout.type))
     .map((payout) => ({
       id: payout.id,
       type: payout.type,
@@ -85,6 +86,18 @@ export const POST = withApiAuth(
           raised_cents: board.raisedCents,
           payouts: serializePublicPayouts(payouts),
         },
+        requestId,
+        headers: rateLimitHeaders,
+      });
+    }
+
+    if (!isDreamBoardGiftPayoutMethod(board.payoutMethod)) {
+      return jsonError({
+        error: {
+          code: 'conflict',
+          message: 'Dreamboard uses an unsupported legacy payout method',
+        },
+        status: 409,
         requestId,
         headers: rateLimitHeaders,
       });

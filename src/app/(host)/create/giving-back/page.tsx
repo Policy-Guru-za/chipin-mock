@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function CreateGivingBackPage() {
-  redirect('/create/voucher');
+  redirect('/create/payout');
 }

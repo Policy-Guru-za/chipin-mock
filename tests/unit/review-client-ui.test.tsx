@@ -65,8 +65,10 @@ const draft = {
   campaignEndDate: '2026-02-28',
   giftName: 'PlayStation II',
   giftImageUrl: 'https://images.example/playstation.jpg',
+  payoutMethod: 'karri_card' as const,
   payoutEmail: 'parent@example.com',
   hostWhatsAppNumber: '+27821234567',
+  karriCardHolderName: 'Max Charter',
 };
 
 const setActionState = (state: PublishState) => {
@@ -86,7 +88,7 @@ afterEach(() => {
 });
 
 describe('ReviewClient', () => {
-  it('renders preview mode with Create Dreamboard CTA and voucher edit link', () => {
+  it('renders preview mode with Create Dreamboard CTA and payout edit link', () => {
     const publishAction = async (
       _state: PublishState,
       _formData: FormData
@@ -109,9 +111,9 @@ describe('ReviewClient', () => {
       'href',
       '/create/dates'
     );
-    expect(screen.getByRole('link', { name: 'Edit voucher details' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Edit payout details' })).toHaveAttribute(
       'href',
-      '/create/voucher'
+      '/create/payout'
     );
   });
 
@@ -126,7 +128,7 @@ describe('ReviewClient', () => {
     expect(screen.getByRole('progressbar', { name: 'Step 5 of 5: Review' })).toBeInTheDocument();
   });
 
-  it('renders the voucher placeholder summary for the default flow', () => {
+  it('renders the payout summary for the selected method', () => {
     const publishAction = async (
       _state: PublishState,
       _formData: FormData
@@ -134,11 +136,7 @@ describe('ReviewClient', () => {
 
     render(<ReviewClient draft={draft} publishAction={publishAction} />);
 
-    expect(
-      screen.getByText(
-        'Takealot Voucher placeholder via parent@example.com and +27821234567'
-      )
-    ).toBeInTheDocument();
+    expect(screen.getByText('Karri Card payout for Max Charter')).toBeInTheDocument();
   });
 
   it('does not show a charity edit link in the default flow', () => {

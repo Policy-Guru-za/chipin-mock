@@ -47,7 +47,7 @@ const makeBoard = (overrides: Partial<BoardRecord> = {}) =>
     giftImageUrl: 'https://example.com/gift.jpg',
     giftImagePrompt: null,
     goalCents: 50000,
-    payoutMethod: 'takealot_voucher',
+    payoutMethod: 'bank',
     payoutEmail: 'parent@example.com',
     charityEnabled: false,
     charityId: null,

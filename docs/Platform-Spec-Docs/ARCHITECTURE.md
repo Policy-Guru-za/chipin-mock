@@ -1,7 +1,7 @@
 # Architecture
 
 > **Status:** Current reference  
-> **Last reviewed:** March 19, 2026
+> **Last reviewed:** March 20, 2026
 
 ## Application Shape
 
@@ -38,7 +38,7 @@
 ## External Systems
 
 - Payments: Stitch coming-soon placeholder only (no live guest checkout)
-- Payouts: bank payout tracking is the intended default product path, optional Karri writes remain gated by `UX_V2_ENABLE_KARRI_WRITE_PATH`, bank writes remain gated by `UX_V2_ENABLE_BANK_WRITE_PATH`, and historical charity payout rows may also exist when enabled
+- Payouts: bank payout tracking is the default product path, optional Karri writes are active, and historical charity payout rows may also exist when enabled
 - Storage: Vercel Blob
 - Cache / rate limiting: Vercel KV with development fallback in some paths
 - Email: Resend

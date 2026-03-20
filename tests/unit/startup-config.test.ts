@@ -11,6 +11,7 @@ const setBaseEnv = () => {
   process.env.BLOB_READ_WRITE_TOKEN = 'blob-token';
   process.env.KV_REST_API_URL = 'https://kv.test';
   process.env.KV_REST_API_TOKEN = 'kv-token';
+  process.env.CARD_DATA_ENCRYPTION_KEY = 'secret';
 };
 
 const clearPaymentEnv = () => {
@@ -60,12 +61,12 @@ describe('startup config validation', () => {
     expect(() => assertStartupConfig()).not.toThrow();
   });
 
-  it('throws when karri is required but missing', async () => {
+  it('throws when karri automation is required but missing', async () => {
     setBaseEnv();
     clearPaymentEnv();
     process.env.NODE_ENV = 'production';
     process.env.MOCK_KARRI = 'false';
-    process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
+    process.env.KARRI_AUTOMATION_ENABLED = 'true';
     process.env.KARRI_BASE_URL = '';
     process.env.KARRI_API_KEY = '';
 
@@ -74,13 +75,12 @@ describe('startup config validation', () => {
     expect(() => assertStartupConfig()).toThrow(/Karri configuration incomplete/);
   });
 
-  it('throws when karri write path is enabled without card encryption key', async () => {
+  it('throws when karri automation is enabled without card encryption key', async () => {
     setBaseEnv();
     clearPaymentEnv();
     process.env.NODE_ENV = 'production';
     process.env.MOCK_KARRI = 'false';
-    process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
-    process.env.KARRI_AUTOMATION_ENABLED = 'false';
+    process.env.KARRI_AUTOMATION_ENABLED = 'true';
     process.env.KARRI_BASE_URL = 'https://karri.test';
     process.env.KARRI_API_KEY = 'token';
     delete process.env.CARD_DATA_ENCRYPTION_KEY;
@@ -90,12 +90,11 @@ describe('startup config validation', () => {
     expect(() => assertStartupConfig()).toThrow(/CARD_DATA_ENCRYPTION_KEY/);
   });
 
-  it('does not require karri config when karri write path and automation are disabled', async () => {
+  it('does not require karri config when automation is disabled', async () => {
     setBaseEnv();
     clearPaymentEnv();
     process.env.NODE_ENV = 'production';
     process.env.MOCK_KARRI = 'false';
-    process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'false';
     process.env.KARRI_AUTOMATION_ENABLED = 'false';
     process.env.KARRI_BASE_URL = '';
     process.env.KARRI_API_KEY = '';
@@ -105,16 +104,27 @@ describe('startup config validation', () => {
     expect(() => assertStartupConfig()).not.toThrow();
   });
 
-  it('does not require live karri config in mock mode when karri write path is enabled', async () => {
+  it('throws when payout encryption is unavailable even if automation is disabled', async () => {
+    setBaseEnv();
+    clearPaymentEnv();
+    process.env.NODE_ENV = 'production';
+    process.env.MOCK_KARRI = 'false';
+    process.env.KARRI_AUTOMATION_ENABLED = 'false';
+    delete process.env.CARD_DATA_ENCRYPTION_KEY;
+
+    const { assertStartupConfig } = await loadModule();
+
+    expect(() => assertStartupConfig()).toThrow(/CARD_DATA_ENCRYPTION_KEY/);
+  });
+
+  it('does not require live karri config in mock mode when karri automation is enabled', async () => {
     setBaseEnv();
     clearPaymentEnv();
     process.env.NODE_ENV = 'production';
     process.env.MOCK_KARRI = 'true';
-    process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
-    process.env.KARRI_AUTOMATION_ENABLED = 'false';
+    process.env.KARRI_AUTOMATION_ENABLED = 'true';
     process.env.KARRI_BASE_URL = '';
     process.env.KARRI_API_KEY = '';
-    delete process.env.CARD_DATA_ENCRYPTION_KEY;
 
     const { assertStartupConfig } = await loadModule();
 

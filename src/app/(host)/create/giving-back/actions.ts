@@ -14,5 +14,5 @@ export async function saveGivingBackAction(_formData: FormData) {
     charityThresholdCents: undefined,
   });
 
-  redirect('/create/voucher');
+  redirect('/create/payout');
 }

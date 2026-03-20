@@ -5,8 +5,6 @@
 | Spec | Title | Owner | Stage | Status | Blockers | Next Step | Last Updated |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 
-No active full specs.
-
 ## Quick Tasks
 
 | Task ID | Scope | Owner | Verification | Status | Next Step |
@@ -27,25 +25,33 @@ No active full specs.
 
 ## Recently Closed Specs
 
+- `50_legacy_voucher_compatibility_cleanup` — Done
+- `49_harden_0021_voucher_migration_replay` — Done
+- `48_voucher-migration-guard-and-seed-repair` — Done
+- `47_payout-encryption-and-openapi-follow-up` — Done
+- `46_voucher-runtime-removal-and-payout-flow-reset` — Done
 - `45_payment-docs-and-voucher-removal-sync` — Done
 - `44_www-host-stitch-placeholder-payment-hard-removal` — Done
 - `43_public-landing-responsiveness-audit` — Done
 - `42_homepage-payout-stitch-partnership-rewrite` — Done
-- `41_workflow-audit-hardening` — Done
 
 ## Last Completed Spec
 
-- `45_payment-docs-and-voucher-removal-sync`
+- `50_legacy_voucher_compatibility_cleanup`
 
 ## Last Green Commands
 
-- `pnpm docs:audit -- --sync` (passed; 198 markdown files)
-- `pnpm docs:audit` (passed; 198 markdown files)
+- `pnpm exec vitest run tests/unit/payout-service-create.test.ts tests/integration/api-dream-boards-close.test.ts tests/integration/api-payouts-voucher.test.ts tests/unit/host-dashboard-view-model.test.ts tests/integration/dashboard-host-flow.test.tsx`
+- `pnpm lint` (passed with existing warnings-only baseline)
+- `pnpm typecheck`
+- `pnpm test`
+- `pnpm docs:audit -- --sync`
+- `pnpm docs:audit`
 
 ## Dogfood Evidence
 
-- Dogfooded the docs sync after `pnpm docs:audit -- --sync` by tracing the updated reference chain across `README.md`, `docs/Platform-Spec-Docs/CANONICAL.md`, `docs/Demo-Mode/demo-mode-brief.md`, one superseded voucher-era spec (`spec/08_dreamboard-create-voucher-flow.md`), and `BACKLOG.md`. Confirmed current docs now describe the Stitch-coming-soon guest placeholder plus bank/optional Karri payout truth, while legacy payment/voucher docs are explicitly marked as historical or reference-only.
+- Live voucher-row dogfood was intentionally not repeated because specs 48-49 already removed the last known voucher boards/payouts from the main DB. Fallback dogfood exercised the close route, payout API, and host dashboard compatibility surfaces through `pnpm exec vitest run tests/unit/payout-service-create.test.ts tests/integration/api-dream-boards-close.test.ts tests/integration/api-payouts-voucher.test.ts tests/unit/host-dashboard-view-model.test.ts tests/integration/dashboard-host-flow.test.tsx`, proving unsupported voucher closes now fail before state mutation, public payout responses hide voucher rows, and dashboard rendering uses explicit `Takealot Voucher` labeling instead of Karri copy.
 
 ## Napkin Evidence
 
-No durable napkin update.
+Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with the legacy-compatibility reminder to keep raw read-model strings plus allowlist filtering/explicit labels after narrowing active enums.

@@ -7,6 +7,7 @@ import { type ReactNode, useEffect, useState } from 'react';
 import { EditDreamBoardModal } from '@/components/host/EditDreamBoardModal';
 import { CheckIcon, WalletIcon } from '@/components/icons';
 import { Button } from '@/components/ui/button';
+import { isLegacyVoucherPayoutMethod } from '@/lib/dream-boards/payout-methods';
 import type { DashboardDetailViewModel } from '@/lib/host/dashboard-view-model';
 import type { HostBirthdayMessageRow, HostContributionRow } from '@/lib/host/queries';
 
@@ -177,9 +178,9 @@ export function DashboardDetailClient({
   const payoutMethodNote =
     view.payoutMethod === 'bank'
       ? 'Bank transfer details on file'
-      : view.payoutMethod === 'takealot_voucher'
-        ? 'Voucher contact details on file'
-        : 'Legacy Karri payout details on file';
+      : isLegacyVoucherPayoutMethod(view.payoutMethod)
+        ? 'Legacy Takealot voucher details on file'
+        : 'Karri card details on file';
   const birthdayLabel = formatHeroDate(view.birthdayDate, {
     day: 'numeric',
     month: 'long',
@@ -467,9 +468,7 @@ export function DashboardDetailClient({
               <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] border border-border bg-white text-primary-700 shadow-input">
                 <WalletIcon size="sm" />
               </span>
-              <h2 className="font-display text-[16px] font-bold tracking-[-0.01em] text-text">
-                {view.payoutMethod === 'takealot_voucher' ? 'Voucher Details' : 'Payout Details'}
-              </h2>
+              <h2 className="font-display text-[16px] font-bold tracking-[-0.01em] text-text">Payout Details</h2>
             </div>
             <p className="mt-4 font-warmth-sans text-[13px] text-text-secondary">
               Method: <span className="text-[14px] font-semibold text-text">{view.payoutMethodLabel}</span>
@@ -479,9 +478,7 @@ export function DashboardDetailClient({
             </p>
             {view.payouts.length === 0 ? (
               <p className="mt-4 font-warmth-sans text-xs text-text-secondary">
-                {view.payoutMethod === 'takealot_voucher'
-                  ? 'Voucher follow-up will be prepared when the Dreamboard is closed.'
-                  : 'Payout will be processed when the Dreamboard is closed.'}
+                Payout will be processed when the Dreamboard is closed.
               </p>
             ) : (
               <ul className="mt-4 space-y-3">

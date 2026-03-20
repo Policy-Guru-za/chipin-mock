@@ -148,6 +148,13 @@
       "when": 1773910800000,
       "tag": "0020_replace_legacy_payment_providers_with_stitch",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1774000000000,
+      "tag": "0021_remove_takealot_voucher_payout",
+      "breakpoints": true
     }
   ]
 }

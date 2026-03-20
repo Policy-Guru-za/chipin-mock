@@ -27,8 +27,13 @@ type ReviewDraftData = {
   campaignEndDate: string;
   giftName: string;
   giftImageUrl: string;
+  payoutMethod: 'karri_card' | 'bank';
   payoutEmail: string;
   hostWhatsAppNumber: string;
+  karriCardHolderName?: string;
+  bankName?: string;
+  bankAccountLast4?: string;
+  bankAccountHolder?: string;
 };
 
 export type PublishState = {
@@ -61,10 +66,26 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
   const published = state.status === 'published';
   const shareUrl = state.shareUrl;
   const celebrationVisible = published && Boolean(shareUrl);
-  const voucherSummary = useMemo(
-    () => `Takealot Voucher placeholder via ${draft.payoutEmail} and ${draft.hostWhatsAppNumber}`,
-    [draft.hostWhatsAppNumber, draft.payoutEmail]
-  );
+  const payoutSummary = useMemo(() => {
+    if (draft.payoutMethod === 'karri_card') {
+      return draft.karriCardHolderName?.trim()
+        ? `Karri Card payout for ${draft.karriCardHolderName.trim()}`
+        : 'Karri Card payout';
+    }
+
+    const accountSuffix = draft.bankAccountLast4 ? ` ending in ${draft.bankAccountLast4}` : '';
+    const holderSuffix = draft.bankAccountHolder?.trim()
+      ? ` · ${draft.bankAccountHolder.trim()}`
+      : '';
+
+    return `${draft.bankName ?? 'Bank'} transfer${accountSuffix}${holderSuffix}`;
+  }, [
+    draft.bankAccountHolder,
+    draft.bankAccountLast4,
+    draft.bankName,
+    draft.karriCardHolderName,
+    draft.payoutMethod,
+  ]);
   const partyDateTimeSummary = formatBirthdayPartyLine({
     birthdayDate: draft.birthdayDate,
     partyDate: draft.partyDate,
@@ -121,7 +142,7 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
             giftImageUrl={draft.giftImageUrl}
             partyDateTimeLabel={partyDateTimeSummary}
             campaignCloseLabel={campaignCloseLabel}
-            voucherSummary={voucherSummary}
+            payoutSummary={payoutSummary}
             shareUrl={shareUrl}
             copied={copied}
             onCopyShareUrl={copyShareUrl}
@@ -170,7 +191,7 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
               giftImageUrl={draft.giftImageUrl}
               partyDateTimeLabel={partyDateTimeSummary}
               campaignCloseLabel={campaignCloseLabel}
-              voucherSummary={voucherSummary}
+              payoutSummary={payoutSummary}
             />
           </div>
 
@@ -194,15 +215,15 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
               Edit dates
             </Link>
             <Link
-              href="/create/voucher"
+              href="/create/payout"
               className="wizard-interactive block py-1.5 text-[13px] font-medium text-primary transition-colors hover:text-sage-deep"
             >
-              Edit voucher details
+              Edit payout details
             </Link>
           </div>
 
           <WizardCTA
-            backHref="/create/voucher"
+            backHref="/create/payout"
             submitLabel="Create Dreamboard"
             pendingLabel="Creating..."
             submitIcon="star"

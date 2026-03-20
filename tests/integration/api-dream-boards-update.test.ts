@@ -164,12 +164,30 @@ describe('PATCH /api/v1/dream-boards/[id]', () => {
     expect(update).toHaveBeenCalled();
   });
 
-  it('returns unsupported operation for payout update payloads before B2', async () => {
+  it('accepts bank payout update payloads without a legacy bank toggle', async () => {
     mockAuth();
     const update = mockDb();
 
+    vi.doMock('@/lib/utils/encryption', () => ({
+      encryptSensitiveValue: vi.fn((value: string) => `encrypted-${value}`),
+    }));
+
+    const getDreamBoardByPublicId = vi
+      .fn()
+      .mockResolvedValueOnce(buildBoard())
+      .mockResolvedValueOnce(
+        buildBoard({
+          payoutMethod: 'bank',
+          karriCardHolderName: null,
+          bankName: 'Standard Bank',
+          bankAccountLast4: '9012',
+          bankBranchCode: '051001',
+          bankAccountHolder: 'Maya Parent',
+        })
+      );
+
     mockDreamBoardUpdateQueries({
-      getDreamBoardByPublicId: vi.fn(async () => buildBoard()),
+      getDreamBoardByPublicId,
     });
 
     const { PATCH } = await loadHandler();
@@ -190,10 +208,9 @@ describe('PATCH /api/v1/dream-boards/[id]', () => {
 
     const payload = await response.json();
 
-    expect(response.status).toBe(422);
-    expect(payload.error.code).toBe('unsupported_operation');
-    expect(payload.error.message).toContain('Bank payout method is not yet enabled');
-    expect(update).not.toHaveBeenCalled();
+    expect(response.status).toBe(200);
+    expect(payload.data.payout_method).toBe('bank');
+    expect(update).toHaveBeenCalled();
   });
 
   it('rejects charity fields because the public update contract no longer supports them', async () => {
@@ -257,13 +274,31 @@ describe('PATCH /api/v1/dream-boards/[id]', () => {
     expect(update).not.toHaveBeenCalled();
   });
 
-  it('returns unsupported operation for karri payout updates when the karri write path is disabled', async () => {
+  it('accepts karri payout updates even when the legacy karri toggle is disabled', async () => {
     process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'false';
     mockAuth();
     const update = mockDb();
 
+    vi.doMock('@/lib/utils/encryption', () => ({
+      encryptSensitiveValue: vi.fn((value: string) => `encrypted-${value}`),
+    }));
+
+    const getDreamBoardByPublicId = vi
+      .fn()
+      .mockResolvedValueOnce(buildBoard({ payoutMethod: 'bank' }))
+      .mockResolvedValueOnce(
+        buildBoard({
+          payoutMethod: 'karri_card',
+          karriCardHolderName: 'Maya Parent',
+          bankName: null,
+          bankAccountLast4: null,
+          bankBranchCode: null,
+          bankAccountHolder: null,
+        })
+      );
+
     mockDreamBoardUpdateQueries({
-      getDreamBoardByPublicId: vi.fn(async () => buildBoard()),
+      getDreamBoardByPublicId,
     });
 
     const { PATCH } = await loadHandler();
@@ -281,13 +316,12 @@ describe('PATCH /api/v1/dream-boards/[id]', () => {
     );
     const payload = await response.json();
 
-    expect(response.status).toBe(422);
-    expect(payload.error.code).toBe('unsupported_operation');
-    expect(payload.error.message).toContain('Karri payout method is not enabled');
-    expect(update).not.toHaveBeenCalled();
+    expect(response.status).toBe(200);
+    expect(payload.data.payout_method).toBe('karri_card');
+    expect(update).toHaveBeenCalled();
   });
 
-  it('accepts karri payout updates when the karri write path toggle is enabled', async () => {
+  it('accepts karri payout updates when legacy karri toggles are present', async () => {
     process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
     mockAuth();
     const update = mockDb();
@@ -300,7 +334,7 @@ describe('PATCH /api/v1/dream-boards/[id]', () => {
       .fn()
       .mockResolvedValueOnce(
         buildBoard({
-          payoutMethod: 'takealot_voucher',
+          payoutMethod: 'bank',
           karriCardHolderName: null,
         })
       )
@@ -336,7 +370,7 @@ describe('PATCH /api/v1/dream-boards/[id]', () => {
     expect(update).toHaveBeenCalled();
   });
 
-  it('accepts bank payout updates when bank write path toggle is enabled', async () => {
+  it('accepts bank payout updates when legacy bank toggles are present', async () => {
     process.env.UX_V2_ENABLE_BANK_WRITE_PATH = 'true';
     mockAuth();
     const update = mockDb();

@@ -2,6 +2,7 @@ import { kvAdapter } from '@/lib/demo/kv-adapter';
 import {
   DEFAULT_HOST_CREATE_PAYOUT_METHOD,
   type DreamBoardGiftPayoutMethod,
+  type HostCreatePayoutMethod,
 } from '@/lib/dream-boards/payout-methods';
 
 const DRAFT_EXPIRY_SECONDS = 60 * 60 * 24 * 7;
@@ -88,8 +89,15 @@ export type HostCreateDreamBoardDraftInput = {
   giftImageUrl?: string;
   giftImagePrompt?: string;
   goalCents?: number;
-  payoutMethod?: typeof DEFAULT_HOST_CREATE_PAYOUT_METHOD;
+  payoutMethod?: HostCreatePayoutMethod;
   payoutEmail?: string;
+  karriCardNumberEncrypted?: string;
+  karriCardHolderName?: string;
+  bankName?: string;
+  bankAccountNumberEncrypted?: string;
+  bankAccountLast4?: string;
+  bankBranchCode?: string;
+  bankAccountHolder?: string;
   hostWhatsAppNumber?: string;
   message?: string;
 };
@@ -109,8 +117,15 @@ export type HostCreateDreamBoardDraft = {
   giftImageUrl?: string;
   giftImagePrompt?: string;
   goalCents?: number;
-  payoutMethod: typeof DEFAULT_HOST_CREATE_PAYOUT_METHOD;
+  payoutMethod: HostCreatePayoutMethod;
   payoutEmail?: string;
+  karriCardNumberEncrypted?: string;
+  karriCardHolderName?: string;
+  bankName?: string;
+  bankAccountNumberEncrypted?: string;
+  bankAccountLast4?: string;
+  bankBranchCode?: string;
+  bankAccountHolder?: string;
   hostWhatsAppNumber?: string;
   message?: string;
   updatedAt: string;
@@ -118,16 +133,34 @@ export type HostCreateDreamBoardDraft = {
 
 const draftKey = (hostId: string) => `draft:host:${hostId}`;
 
+const normalizePayoutFields = (draft: DreamBoardDraft): DreamBoardDraft => {
+  const payoutMethod =
+    draft.payoutMethod === 'karri_card' || draft.payoutMethod === 'bank'
+      ? draft.payoutMethod
+      : DEFAULT_HOST_CREATE_PAYOUT_METHOD;
+
+  if (payoutMethod === 'karri_card') {
+    return {
+      ...draft,
+      payoutMethod,
+      bankName: undefined,
+      bankAccountNumberEncrypted: undefined,
+      bankAccountLast4: undefined,
+      bankBranchCode: undefined,
+      bankAccountHolder: undefined,
+    };
+  }
+
+  return {
+    ...draft,
+    payoutMethod,
+    karriCardNumberEncrypted: undefined,
+    karriCardHolderName: undefined,
+  };
+};
+
 const normalizeDreamBoardDraftPayload = (draft: DreamBoardDraft): DreamBoardDraft => ({
-  ...draft,
-  payoutMethod: DEFAULT_HOST_CREATE_PAYOUT_METHOD,
-  karriCardNumberEncrypted: undefined,
-  karriCardHolderName: undefined,
-  bankName: undefined,
-  bankAccountNumberEncrypted: undefined,
-  bankAccountLast4: undefined,
-  bankBranchCode: undefined,
-  bankAccountHolder: undefined,
+  ...normalizePayoutFields(draft),
   charityEnabled: false,
   charityId: undefined,
   charitySplitType: undefined,
@@ -167,8 +200,16 @@ const toHostCreateDreamBoardDraft = (
     giftImageUrl: draft.giftImageUrl,
     giftImagePrompt: draft.giftImagePrompt,
     goalCents: draft.goalCents,
-    payoutMethod: DEFAULT_HOST_CREATE_PAYOUT_METHOD,
+    payoutMethod:
+      draft.payoutMethod === 'karri_card' ? 'karri_card' : DEFAULT_HOST_CREATE_PAYOUT_METHOD,
     payoutEmail: draft.payoutEmail,
+    karriCardNumberEncrypted: draft.karriCardNumberEncrypted,
+    karriCardHolderName: draft.karriCardHolderName,
+    bankName: draft.bankName,
+    bankAccountNumberEncrypted: draft.bankAccountNumberEncrypted,
+    bankAccountLast4: draft.bankAccountLast4,
+    bankBranchCode: draft.bankBranchCode,
+    bankAccountHolder: draft.bankAccountHolder,
     hostWhatsAppNumber: draft.hostWhatsAppNumber,
     message: draft.message,
     updatedAt: draft.updatedAt,
@@ -195,10 +236,7 @@ export async function updateHostCreateDreamBoardDraft(
   hostId: string,
   draft: HostCreateDreamBoardDraftInput
 ) {
-  const updated = await updateDreamBoardDraft(hostId, {
-    ...draft,
-    payoutMethod: DEFAULT_HOST_CREATE_PAYOUT_METHOD,
-  });
+  const updated = await updateDreamBoardDraft(hostId, draft);
 
   return toHostCreateDreamBoardDraft(updated);
 }

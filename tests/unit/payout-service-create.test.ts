@@ -25,7 +25,10 @@ vi.mock('@/lib/integrations/karri-batch', () => karriBatchMocks);
 
 import { payoutItems, payouts } from '@/lib/db/schema';
 import { LEGACY_PLACEHOLDER } from '@/lib/constants';
-import { createPayoutsForDreamBoard } from '@/lib/payouts/service';
+import {
+  createPayoutsForDreamBoard,
+  UnsupportedGiftPayoutMethodError,
+} from '@/lib/payouts/service';
 
 describe('payout service creation', () => {
   const originalEnv = {
@@ -94,6 +97,34 @@ describe('payout service creation', () => {
         actor: { type: 'admin' },
       })
     ).rejects.toThrow('Dreamboard is not ready for payout');
+  });
+
+  it('rejects legacy voucher payout methods before any writes', async () => {
+    payoutQueryMocks.getDreamBoardPayoutContext.mockResolvedValue({
+      id: 'board-voucher',
+      partnerId: 'partner-1',
+      status: 'closed',
+      payoutMethod: 'takealot_voucher',
+      giftName: 'Train set',
+      giftImageUrl: 'https://images.example/product.jpg',
+      giftImagePrompt: 'A bright train set',
+      payoutEmail: 'host@chipin.co.za',
+      hostWhatsAppNumber: '+27821234567',
+      childName: 'Maya',
+      hostEmail: 'host@chipin.co.za',
+      hostId: 'host-voucher',
+    });
+
+    await expect(
+      createPayoutsForDreamBoard({
+        dreamBoardId: 'board-voucher',
+        actor: { type: 'admin' },
+      })
+    ).rejects.toBeInstanceOf(UnsupportedGiftPayoutMethodError);
+
+    expect(payoutQueryMocks.getContributionTotalsForDreamBoard).not.toHaveBeenCalled();
+    expect(payoutQueryMocks.listPayoutsForDreamBoard).not.toHaveBeenCalled();
+    expect(dbMock.transaction).not.toHaveBeenCalled();
   });
 
   it('skips legacy karri boards without throwing', async () => {

@@ -3,8 +3,8 @@ import { z } from 'zod';
 
 import { encodeCursor } from '@/lib/api/pagination';
 import { parseCursor, parseQuery, withApiAuth } from '@/lib/api/route-utils';
-import { jsonError, jsonPaginated } from '@/lib/api/response';
-import { serializePayout } from '@/lib/api/payouts';
+import { jsonPaginated } from '@/lib/api/response';
+import { serializePublicPayout } from '@/lib/api/payouts';
 import { listPendingPayoutsForApi } from '@/lib/db/api-queries';
 import { LOCKED_PAYOUT_METHODS } from '@/lib/ux-v2/decision-locks';
 
@@ -40,7 +40,9 @@ export const GET = withApiAuth('payouts:read', async (request: NextRequest, cont
 
   const hasMore = rows.length > limit;
   const items = rows.slice(0, limit);
-  const serialized = items.map(serializePayout);
+  const serialized = items
+    .map(serializePublicPayout)
+    .filter((item): item is NonNullable<typeof item> => item !== null);
   const nextCursor =
     hasMore && items.length
       ? encodeCursor({

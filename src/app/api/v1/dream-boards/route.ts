@@ -146,22 +146,6 @@ const createSchema = z
       }
     }
 
-    if (payoutMethod === 'takealot_voucher') {
-      if (hasAnyKarriField) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['payout_method'],
-          message: 'Karri card fields require payout_method=karri_card',
-        });
-      }
-      if (hasAnyBankField) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['payout_method'],
-          message: 'Bank fields require payout_method=bank',
-        });
-      }
-    }
   });
 
 type CreatePayload = z.infer<typeof createSchema>;

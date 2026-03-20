@@ -262,7 +262,7 @@ export function DatesForm({
 
             <WizardCTA
               backHref="/create/gift"
-              submitLabel="Continue to voucher details"
+              submitLabel="Continue to payout details"
               pending={false}
               error={error}
             />

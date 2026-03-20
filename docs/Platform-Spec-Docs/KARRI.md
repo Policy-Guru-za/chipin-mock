@@ -1,7 +1,7 @@
 # Karri
 
 > **Status:** Current reference  
-> **Last reviewed:** March 12, 2026
+> **Last reviewed:** March 20, 2026
 
 ## Current Role
 
@@ -23,15 +23,15 @@ It is not part of the standard default Dreamboard host flow; it remains a gated 
 ## Current Flags
 
 - `MOCK_KARRI`
-- `UX_V2_ENABLE_KARRI_WRITE_PATH`
 - `KARRI_BATCH_ENABLED`
 - `KARRI_AUTOMATION_ENABLED`
 
 ## Activation Rules
 
-- Public API `karri_card` writes are rejected unless `UX_V2_ENABLE_KARRI_WRITE_PATH=true`.
-- Startup and `/health/ready` only require `KARRI_*` credentials when `UX_V2_ENABLE_KARRI_WRITE_PATH=true` or `KARRI_AUTOMATION_ENABLED=true`, unless `MOCK_KARRI=true`.
-- Automated execution still depends on `KARRI_AUTOMATION_ENABLED=true`; enabling the write path alone does not enable payout automation.
+- Host and partner API `karri_card` writes are active.
+- `CARD_DATA_ENCRYPTION_KEY` is required for active payout capture.
+- Startup and `/health/ready` only require `KARRI_*` credentials when `KARRI_AUTOMATION_ENABLED=true`, unless `MOCK_KARRI=true`.
+- Automated execution still depends on `KARRI_AUTOMATION_ENABLED=true`; capture/write-path availability alone does not enable payout automation.
 
 ## Known Runtime Debt
 

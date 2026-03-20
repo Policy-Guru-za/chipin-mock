@@ -4,8 +4,7 @@ import {
   clearDreamBoardDraft,
   getHostCreateDreamBoardDraft,
 } from '@/lib/dream-boards/draft';
-import { DEFAULT_HOST_CREATE_PAYOUT_METHOD } from '@/lib/dream-boards/payout-methods';
-import { hostCreateDreamBoardDraftSchema } from '@/lib/dream-boards/schema';
+import { hostCreateDreamBoardDraftPersistedSchema } from '@/lib/dream-boards/schema';
 import { db } from '@/lib/db';
 import { DEFAULT_PARTNER_ID } from '@/lib/db/partners';
 import { dreamBoards } from '@/lib/db/schema';
@@ -22,7 +21,7 @@ export async function publishDreamBoardAction(
 
   const session = await requireHostAuth();
   const draft = await getHostCreateDreamBoardDraft(session.hostId);
-  const parsed = hostCreateDreamBoardDraftSchema.strip().safeParse(draft);
+  const parsed = hostCreateDreamBoardDraftPersistedSchema.safeParse(draft);
 
   if (!parsed.success) {
     return {
@@ -51,14 +50,22 @@ export async function publishDreamBoardAction(
         giftImageUrl: parsed.data.giftImageUrl,
         giftImagePrompt: parsed.data.giftImagePrompt,
         goalCents: parsed.data.goalCents ?? 0,
-        payoutMethod: DEFAULT_HOST_CREATE_PAYOUT_METHOD,
-        karriCardNumber: null,
-        karriCardHolderName: null,
-        bankName: null,
-        bankAccountNumberEncrypted: null,
-        bankAccountLast4: null,
-        bankBranchCode: null,
-        bankAccountHolder: null,
+        payoutMethod: parsed.data.payoutMethod,
+        karriCardNumber:
+          parsed.data.payoutMethod === 'karri_card' ? parsed.data.karriCardNumberEncrypted : null,
+        karriCardHolderName:
+          parsed.data.payoutMethod === 'karri_card' ? parsed.data.karriCardHolderName ?? null : null,
+        bankName: parsed.data.payoutMethod === 'bank' ? parsed.data.bankName ?? null : null,
+        bankAccountNumberEncrypted:
+          parsed.data.payoutMethod === 'bank'
+            ? parsed.data.bankAccountNumberEncrypted ?? null
+            : null,
+        bankAccountLast4:
+          parsed.data.payoutMethod === 'bank' ? parsed.data.bankAccountLast4 ?? null : null,
+        bankBranchCode:
+          parsed.data.payoutMethod === 'bank' ? parsed.data.bankBranchCode ?? null : null,
+        bankAccountHolder:
+          parsed.data.payoutMethod === 'bank' ? parsed.data.bankAccountHolder ?? null : null,
         charityEnabled: false,
         charityId: null,
         charitySplitType: null,

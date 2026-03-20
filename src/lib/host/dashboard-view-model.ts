@@ -2,6 +2,7 @@ import { getGiftInfo } from '@/lib/dream-boards/gift-info';
 import {
   getDreamBoardGiftPayoutLabel,
   getDreamBoardPayoutTypeLabel,
+  isDreamBoardGiftPayoutMethod,
 } from '@/lib/dream-boards/payout-methods';
 import { hasBirthdayParty } from '@/lib/dream-boards/party-visibility';
 import type {
@@ -189,6 +190,18 @@ const resolveGiftInfo = (board: {
     giftDescription: null,
   });
 
+const getPayoutRecipientDisplay = (board: HostDashboardDetailRow) => {
+  if (board.payoutMethod === 'bank') {
+    return board.bankAccountHolder || board.payoutEmail;
+  }
+
+  if (isDreamBoardGiftPayoutMethod(board.payoutMethod)) {
+    return board.karriCardHolderName || board.payoutEmail;
+  }
+
+  return board.payoutEmail;
+};
+
 export const buildFinancialBreakdown = (
   raisedCents: number,
   feeCents: number,
@@ -279,12 +292,7 @@ export const buildDashboardDetailViewModel = (
   const isComplete = board.status === 'closed' || board.status === 'paid_out';
   const isFunded = board.status === 'funded';
   const payoutMethodLabel = getDreamBoardGiftPayoutLabel(board.payoutMethod);
-  const payoutRecipientDisplay =
-    board.payoutMethod === 'bank'
-      ? board.bankAccountHolder || board.payoutEmail
-      : board.payoutMethod === 'karri_card'
-        ? board.karriCardHolderName || board.payoutEmail
-        : `${board.payoutEmail} · ${board.hostWhatsAppNumber}`;
+  const payoutRecipientDisplay = getPayoutRecipientDisplay(board);
   const birthdayDate = toDate(board.birthdayDate) ?? toDate(board.partyDate);
   const partyDate = toDate(board.partyDate);
   const detailHasBirthdayParty = hasBirthdayParty({

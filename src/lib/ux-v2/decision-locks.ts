@@ -22,7 +22,9 @@ export const LOCKED_RAISED_FUNDED_SEMANTICS = {
 } as const;
 
 export const LOCKED_WRITE_PATH_POLICY = {
-  bankAndCharityWritesEnabledAfterMilestone: 'B4',
+  bankWrites: 'enabled',
+  karriWrites: 'enabled',
+  charityWrites: 'disabled',
 } as const;
 
 export const LOCKED_REMINDER_POLICY = {

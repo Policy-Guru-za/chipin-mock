@@ -1,6 +1,7 @@
 import { decryptSensitiveValue } from '@/lib/utils/encryption';
 import { getConfiguredAppUrl } from '@/lib/utils/request';
 import { serializeGiftData } from '@/lib/api/gifts';
+import { isDreamBoardGiftPayoutMethod } from '@/lib/dream-boards/payout-methods';
 
 type PayoutApiRecord = {
   id: string;
@@ -38,12 +39,6 @@ const serializeRecipientBasics = (record: Record<string, unknown>) => {
   if (typeof record.email === 'string') payload.email = record.email;
   if (typeof record.childName === 'string') payload.child_name = record.childName;
   if (typeof record.payoutMethod === 'string') payload.payout_method = record.payoutMethod;
-  if (typeof record.hostWhatsAppNumber === 'string') {
-    payload.host_whatsapp_number = record.hostWhatsAppNumber;
-  }
-  if (typeof record.fulfilmentMode === 'string') {
-    payload.fulfilment_mode = record.fulfilmentMode;
-  }
   if (typeof record.karriCardHolderName === 'string') {
     payload.karri_card_holder_name = record.karriCardHolderName;
   }
@@ -103,3 +98,11 @@ export const serializePayout = (record: PayoutApiRecord) => ({
   created_at: toIsoString(record.createdAt),
   completed_at: toIsoString(record.completedAt),
 });
+
+export const serializePublicPayout = (record: PayoutApiRecord) => {
+  if (!isDreamBoardGiftPayoutMethod(record.type)) {
+    return null;
+  }
+
+  return serializePayout(record);
+};

@@ -31,7 +31,7 @@ const emitAllCatalogEvents = () => {
   trackHostCreateFailed('payout', 'timeout');
   trackHostCreatePublished({
     dreamBoardId: 'board-1',
-    payoutMethod: 'takealot_voucher',
+    payoutMethod: 'bank',
   });
   trackGuestViewLoaded('board-1');
   trackContributionStarted('board-1', 5000, 'stitch');
@@ -45,25 +45,25 @@ const emitAllCatalogEvents = () => {
   trackReminderRequested('board-1');
   trackPayoutCreated({
     payoutId: 'payout-1',
-    payoutType: 'takealot_voucher',
+    payoutType: 'bank',
     dreamBoardId: 'board-1',
     amountCents: 5000,
   });
   trackPayoutProcessingStarted({
     payoutId: 'payout-1',
-    payoutType: 'takealot_voucher',
+    payoutType: 'bank',
     dreamBoardId: 'board-1',
     amountCents: 5000,
   });
   trackPayoutCompleted({
     payoutId: 'payout-1',
-    payoutType: 'takealot_voucher',
+    payoutType: 'bank',
     dreamBoardId: 'board-1',
     amountCents: 5000,
   });
   trackPayoutFailed({
     payoutId: 'payout-2',
-    payoutType: 'takealot_voucher',
+    payoutType: 'bank',
     dreamBoardId: 'board-2',
     amountCents: 7000,
     failureCode: 'declined',
@@ -123,7 +123,7 @@ describe('UAT telemetry verification (active catalog)', () => {
     trackHostCreateStepCompleted('review');
     trackHostCreatePublished({
       dreamBoardId: 'board-1',
-      payoutMethod: 'takealot_voucher',
+      payoutMethod: 'bank',
     });
     trackContributionCompleted('board-1', 5000, 'stitch');
     trackContributionFailed({
@@ -134,13 +134,13 @@ describe('UAT telemetry verification (active catalog)', () => {
     });
     trackPayoutCompleted({
       payoutId: 'payout-1',
-      payoutType: 'takealot_voucher',
+      payoutType: 'bank',
       dreamBoardId: 'board-1',
       amountCents: 5000,
     });
     trackPayoutFailed({
       payoutId: 'payout-1',
-      payoutType: 'takealot_voucher',
+      payoutType: 'bank',
       dreamBoardId: 'board-1',
       amountCents: 5000,
       failureCode: 'declined',
@@ -152,7 +152,7 @@ describe('UAT telemetry verification (active catalog)', () => {
     expect(findEvent('host_create_step_completed')?.properties).toMatchObject({ step: 'review' });
     expect(findEvent('host_create_published')?.properties).toMatchObject({
       dream_board_id: 'board-1',
-      payout_method: 'takealot_voucher',
+      payout_method: 'bank',
     });
     expect(findEvent('contribution_completed')?.properties).toMatchObject({
       dream_board_id: 'board-1',
@@ -165,7 +165,7 @@ describe('UAT telemetry verification (active catalog)', () => {
     });
     expect(findEvent('payout_completed')?.properties).toMatchObject({
       payout_id: 'payout-1',
-      payout_type: 'takealot_voucher',
+      payout_type: 'bank',
       amount_cents: 5000,
     });
     expect(findEvent('payout_failed')?.properties).toMatchObject({

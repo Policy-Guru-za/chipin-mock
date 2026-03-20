@@ -19,9 +19,14 @@ const validDraft = {
   giftImageUrl: '/icons/gifts/scooter.png',
   giftImagePrompt: undefined,
   goalCents: 0,
-  payoutMethod: 'takealot_voucher' as const,
+  payoutMethod: 'bank' as const,
   payoutEmail: 'parent@example.com',
   hostWhatsAppNumber: '+27821234567',
+  bankName: 'Standard Bank',
+  bankAccountNumberEncrypted: 'enc:bank',
+  bankAccountLast4: '1234',
+  bankBranchCode: '051001',
+  bankAccountHolder: 'Maya Parent',
   message: 'Thanks for helping make this happen.',
 };
 
@@ -76,6 +81,9 @@ describe('publishDreamBoardAction', () => {
         hostId: 'host-1',
         childName: 'Maya',
         giftName: 'PlayStation II',
+        payoutMethod: 'bank',
+        bankName: 'Standard Bank',
+        bankAccountLast4: '1234',
         message: 'Thanks for helping make this happen.',
       })
     );

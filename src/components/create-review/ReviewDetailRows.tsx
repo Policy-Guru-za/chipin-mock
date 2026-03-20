@@ -7,7 +7,7 @@ type ReviewDetailRowsProps = {
   giftName: string;
   partyDateTimeLabel?: string | null;
   campaignCloseLabel: string;
-  voucherSummary: string;
+  payoutSummary: string;
 };
 
 function ClockIcon({ className }: { className?: string }) {
@@ -58,7 +58,7 @@ export function ReviewDetailRows({
   giftName,
   partyDateTimeLabel,
   campaignCloseLabel,
-  voucherSummary,
+  payoutSummary,
 }: ReviewDetailRowsProps) {
   return (
     <div>
@@ -88,8 +88,8 @@ export function ReviewDetailRows({
       <Row
         icon={<WalletIcon className="h-4 w-4 text-ink-faint" />}
         iconContainerClassName="bg-border-soft"
-        label="Voucher plan"
-        value={voucherSummary}
+        label="Payout plan"
+        value={payoutSummary}
       />
     </div>
   );

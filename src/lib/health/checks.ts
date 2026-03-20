@@ -5,7 +5,6 @@ import { kvAdapter } from '@/lib/demo/kv-adapter';
 import { db } from '@/lib/db';
 import {
   isKarriAutomationEnabled,
-  isKarriWritePathEnabled,
 } from '@/lib/ux-v2/write-path-gates';
 
 export type HealthCheckResult = {
@@ -53,8 +52,16 @@ export const checkBlobToken = async (): Promise<HealthCheckResult> => {
   return { ok: true };
 };
 
+export const checkPayoutEncryption = async (): Promise<HealthCheckResult> => {
+  if (!process.env.CARD_DATA_ENCRYPTION_KEY) {
+    return { ok: false, detail: 'CARD_DATA_ENCRYPTION_KEY is not set' };
+  }
+
+  return { ok: true };
+};
+
 export const checkKarriAutomation = async (): Promise<HealthCheckResult> => {
-  if (!isKarriWritePathEnabled() && !isKarriAutomationEnabled()) {
+  if (!isKarriAutomationEnabled()) {
     return { ok: true, detail: 'disabled' };
   }
   if (isMockKarri()) {
@@ -62,9 +69,6 @@ export const checkKarriAutomation = async (): Promise<HealthCheckResult> => {
   }
   if (!process.env.KARRI_BASE_URL || !process.env.KARRI_API_KEY) {
     return { ok: false, detail: 'KARRI_BASE_URL or KARRI_API_KEY is not set' };
-  }
-  if (!process.env.CARD_DATA_ENCRYPTION_KEY) {
-    return { ok: false, detail: 'CARD_DATA_ENCRYPTION_KEY is not set' };
   }
   return { ok: true };
 };

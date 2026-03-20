@@ -18,40 +18,29 @@ afterEach(() => {
 });
 
 describe('ux v2 write path gates', () => {
-  it('defaults all gated write paths to disabled', () => {
+  it('keeps bank and karri write paths enabled by default', () => {
     delete process.env.UX_V2_ENABLE_KARRI_WRITE_PATH;
     delete process.env.UX_V2_ENABLE_BANK_WRITE_PATH;
     delete process.env.UX_V2_ENABLE_CHARITY_WRITE_PATH;
 
-    expect(isKarriWritePathEnabled()).toBe(false);
-    expect(isBankWritePathEnabled()).toBe(false);
+    expect(isKarriWritePathEnabled()).toBe(true);
+    expect(isBankWritePathEnabled()).toBe(true);
     expect(isCharityWritePathEnabled()).toBe(false);
   });
 
-  it('returns explicit karri block reason when karri path is disabled', () => {
+  it('ignores legacy karri and bank env toggles', () => {
     process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'false';
-    process.env.UX_V2_ENABLE_BANK_WRITE_PATH = 'true';
+    process.env.UX_V2_ENABLE_BANK_WRITE_PATH = 'false';
 
+    expect(isKarriWritePathEnabled()).toBe(true);
+    expect(isBankWritePathEnabled()).toBe(true);
     expect(
       resolveWritePathBlockReason({
         karriRequested: true,
-        bankRequested: false,
-        charityRequested: false,
-      })
-    ).toBe('Karri payout method is not enabled');
-  });
-
-  it('returns explicit bank block reason when bank path is disabled', () => {
-    process.env.UX_V2_ENABLE_KARRI_WRITE_PATH = 'true';
-    process.env.UX_V2_ENABLE_BANK_WRITE_PATH = 'false';
-
-    expect(
-      resolveWritePathBlockReason({
-        karriRequested: false,
         bankRequested: true,
         charityRequested: false,
       })
-    ).toBe('Bank payout method is not yet enabled');
+    ).toBeNull();
   });
 
   it('keeps charity write path blocked even when the legacy flag is enabled', () => {

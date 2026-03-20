@@ -26,7 +26,9 @@ vi.mock('@/lib/dream-boards/draft', () => ({
 vi.mock('@/lib/dream-boards/schema', () => ({
   hostCreateDreamBoardDraftSchema: {
     safeParse: mocks.safeParse,
-    strip: () => ({ safeParse: mocks.safeParse }),
+  },
+  hostCreateDreamBoardDraftPersistedSchema: {
+    safeParse: mocks.safeParse,
   },
 }));
 
@@ -124,9 +126,14 @@ const validDraft = {
   campaignEndDate: '2026-06-12',
   giftName: 'Scooter',
   giftImageUrl: '/icons/gifts/scooter.png',
-  payoutMethod: 'takealot_voucher' as const,
+  payoutMethod: 'bank' as const,
   payoutEmail: 'parent@example.com',
   hostWhatsAppNumber: '+27821234567',
+  bankName: 'Standard Bank',
+  bankAccountNumberEncrypted: 'enc:bank',
+  bankAccountLast4: '1234',
+  bankBranchCode: '051001',
+  bankAccountHolder: 'Maya Parent',
 };
 
 afterEach(() => {
@@ -157,7 +164,7 @@ describe('Create Review Page', () => {
     expect(html).toContain('data-child-name="Maya"');
   });
 
-  it('passes voucher contact details from draft', async () => {
+  it('passes payout contact details from draft', async () => {
     const html = await renderPage();
     expect(html).toContain('data-payout-email="parent@example.com"');
     expect(html).toContain('data-host-whatsapp-number="+27821234567"');
@@ -169,7 +176,7 @@ describe('Create Review Page', () => {
     });
     const invalidDraft = {
       ...validDraft,
-      bankName: 'FNB',
+      bankAccountLast4: undefined,
     };
     mocks.getHostCreateDreamBoardDraft.mockResolvedValue(invalidDraft);
     mocks.safeParse.mockReturnValue({ success: false, error: { issues: [] } });

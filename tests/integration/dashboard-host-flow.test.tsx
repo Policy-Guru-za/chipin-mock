@@ -67,7 +67,7 @@ const boardDetailRow = {
   message: 'A dream gift',
   status: 'closed',
   goalCents: 50000,
-  payoutMethod: 'takealot_voucher' as const,
+  payoutMethod: 'bank' as const,
   karriCardHolderName: null,
   bankAccountHolder: null,
   payoutEmail: 'parent@example.com',
@@ -174,7 +174,7 @@ describe('host dashboard flow', () => {
     const quickActionsHeading = screen.getByRole('heading', { name: /quick actions/i });
     expect(quickActionsHeading).toHaveClass('text-[16px]');
     expect(quickActionsHeading).not.toHaveClass('text-[28px]');
-    const payoutHeading = screen.getByRole('heading', { name: /voucher details/i });
+    const payoutHeading = screen.getByRole('heading', { name: /payout details/i });
     expect(payoutHeading).toHaveClass('text-[16px]');
     expect(payoutHeading).not.toHaveClass('text-[24px]');
     expect(screen.getByRole('button', { name: /download birthday messages/i })).toBeInTheDocument();
@@ -206,10 +206,35 @@ describe('host dashboard flow', () => {
     expect(screen.getByText(/Financial Summary/i)).toBeInTheDocument();
     expect(screen.getByText(/Total Raised/i)).toBeInTheDocument();
     expect(screen.queryByText(/Gifta Fee/i)).not.toBeInTheDocument();
-    expect(screen.getByText(/Your Voucher Value/i)).toBeInTheDocument();
+    expect(screen.getByText(/Your Payout/i)).toBeInTheDocument();
     expect(screen.getAllByText(/R\s*500/).length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: /download birthday messages/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /download contributor list/i })).toBeInTheDocument();
+  });
+
+  it('renders explicit legacy voucher payout labels on detail pages', async () => {
+    queryMocks.getDashboardDetailExpanded.mockResolvedValue({
+      ...boardDetailRow,
+      status: 'funded',
+      payoutMethod: 'takealot_voucher',
+    });
+    queryMocks.listPayoutsForDreamBoard.mockResolvedValue([
+      {
+        id: 'payout-voucher-1',
+        type: 'takealot_voucher',
+        status: 'pending',
+        grossCents: 50000,
+        feeCents: 0,
+        netCents: 50000,
+        externalRef: null,
+        completedAt: null,
+      },
+    ]);
+
+    render(await DreamBoardDetailPage({ params: Promise.resolve({ id: 'board-1' }) }));
+
+    expect(screen.getAllByText('Takealot Voucher').length).toBeGreaterThan(0);
+    expect(screen.getByText('Legacy Takealot voucher details on file')).toBeInTheDocument();
   });
 
   it('hides post-campaign download actions when counts are zero', async () => {
