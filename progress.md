@@ -9,6 +9,8 @@
 
 | Task ID | Scope | Owner | Verification | Status | Next Step |
 | --- | --- | --- | --- | --- | --- |
+| Q-2026-03-20-next-env-route-types-revert | Revert the generated dev-only `next-env.d.ts` route-type import so clean environments keep resolving stable Next route typings | Codex | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm docs:audit` | Completed | Done |
+| Q-2026-03-20-homepage-search-seo-hardening | Add homepage-only product-descriptive search metadata and JSON-LD while preserving the current social-preview contract | Codex | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm docs:audit`, localhost homepage HTML metadata/JSON-LD check | Completed | Done (automated coverage green; localhost HTML fetch blocked by Clerk dev-browser / missing-key middleware states) |
 | Q-2026-03-20-homepage-share-hires-branding | Replace the homepage share image source with the higher-fidelity `public/Logos/IMG_1209.PNG` branding asset | Codex | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm docs:audit`, localhost `/opengraph-image` verification | Completed | Done |
 | Q-2026-03-19-homepage-share-fullbleed-email | Simplify the homepage share image to a full-bleed `public/Logos/Email.png` visual with no overlaid copy or chips | Codex | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm docs:audit`, localhost `/opengraph-image` visual check | Completed | Done |
 | Q-2026-03-19-homepage-share-email-lockup | Update the homepage share image to use the approved `public/Logos/Email.png` wordmark instead of the temporary brand-card imagery | Codex | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm docs:audit`, localhost `/opengraph-image` visual check | Completed | Done |
@@ -54,4 +56,4 @@
 
 ## Napkin Evidence
 
-Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with the legacy-compatibility reminder to keep raw read-model strings plus allowlist filtering/explicit labels after narrowing active enums.
+Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with the reminder to restore `next-env.d.ts` to `./.next/types/routes.d.ts` after local `next dev` rewrites it to the dev-only import.

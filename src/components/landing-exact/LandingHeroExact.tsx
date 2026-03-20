@@ -131,8 +131,8 @@ export function LandingHeroExact() {
             <em>Everyone chips in.</em>
           </h1>
           <p className={styles.heroTagline}>
-            Friends and family each give a little. Your child gets the gift they&apos;ve been
-            dreaming of.
+            Create a Dreamboard so friends and family can each chip in for one meaningful
+            birthday gift.
           </p>
           <div className={styles.heroStatAnnotation}>
             <span>🎂</span>
