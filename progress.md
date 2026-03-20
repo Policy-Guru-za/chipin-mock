@@ -9,6 +9,7 @@
 
 | Task ID | Scope | Owner | Verification | Status | Next Step |
 | --- | --- | --- | --- | --- | --- |
+| Q-2026-03-20-google-search-console-html-verification | Publish the provided Google Search Console HTML verification file at the site root so Google can verify ownership and support re-crawl actions | Codex | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm docs:audit`, localhost fetch of `/google5154e017d4f8496a.html` | Completed | Done (exact file copied from `tmp/`, validators green, localhost fetch returned `200 OK` with the expected body) |
 | Q-2026-03-20-next-env-route-types-revert | Revert the generated dev-only `next-env.d.ts` route-type import so clean environments keep resolving stable Next route typings | Codex | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm docs:audit` | Completed | Done |
 | Q-2026-03-20-homepage-search-seo-hardening | Add homepage-only product-descriptive search metadata and JSON-LD while preserving the current social-preview contract | Codex | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm docs:audit`, localhost homepage HTML metadata/JSON-LD check | Completed | Done (automated coverage green; localhost HTML fetch blocked by Clerk dev-browser / missing-key middleware states) |
 | Q-2026-03-20-homepage-share-hires-branding | Replace the homepage share image source with the higher-fidelity `public/Logos/IMG_1209.PNG` branding asset | Codex | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm docs:audit`, localhost `/opengraph-image` verification | Completed | Done |
@@ -56,4 +57,4 @@
 
 ## Napkin Evidence
 
-Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with the reminder to restore `next-env.d.ts` to `./.next/types/routes.d.ts` after local `next dev` rewrites it to the dev-only import.
+Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with the Google Search Console reminder to publish HTML verification files under `public/` with the exact provided filename/content and verify the root URL directly.
