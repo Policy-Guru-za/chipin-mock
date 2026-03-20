@@ -11,6 +11,7 @@ No active full specs.
 
 | Task ID | Scope | Owner | Verification | Status | Next Step |
 | --- | --- | --- | --- | --- | --- |
+| Q-2026-03-20-homepage-share-hires-branding | Replace the homepage share image source with the higher-fidelity `public/Logos/IMG_1209.PNG` branding asset | Codex | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm docs:audit`, localhost `/opengraph-image` verification | Completed | Done |
 | Q-2026-03-19-homepage-share-fullbleed-email | Simplify the homepage share image to a full-bleed `public/Logos/Email.png` visual with no overlaid copy or chips | Codex | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm docs:audit`, localhost `/opengraph-image` visual check | Completed | Done |
 | Q-2026-03-19-homepage-share-email-lockup | Update the homepage share image to use the approved `public/Logos/Email.png` wordmark instead of the temporary brand-card imagery | Codex | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm docs:audit`, localhost `/opengraph-image` visual check | Completed | Done |
 | Q-2026-03-19-homepage-share-brand-card | Replace the homepage share image with a pure Gifta brand card so social scrapers stop falling back to the Mia avatar | Codex | `pnpm lint`, `pnpm typecheck`, `pnpm test`, localhost `/opengraph-image` + homepage meta fetch, live HTML diagnosis proof | Completed | Done |
@@ -47,4 +48,4 @@ No active full specs.
 
 ## Napkin Evidence
 
-- Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with the social-preview rule that a live `og:image` URL must itself return `image/*`; if it resolves to HTML, scrapers can fall back to the first prominent page image (as happened with `mia_avatar.jpg`).
+No durable napkin update.

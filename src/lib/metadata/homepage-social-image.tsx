@@ -10,21 +10,21 @@ export const HOMEPAGE_SOCIAL_IMAGE_SIZE = {
 } as const;
 export const HOMEPAGE_SOCIAL_IMAGE_CONTENT_TYPE = 'image/png';
 
-let emailLockupDataUriPromise: Promise<string> | null = null;
+let shareImageDataUriPromise: Promise<string> | null = null;
 
-const getEmailLockupDataUri = () => {
-  if (!emailLockupDataUriPromise) {
-    emailLockupDataUriPromise = readFile(
-      join(process.cwd(), 'public/Logos/Email.png'),
+const getShareImageDataUri = () => {
+  if (!shareImageDataUriPromise) {
+    shareImageDataUriPromise = readFile(
+      join(process.cwd(), 'public/Logos/IMG_1209.PNG'),
       'base64'
     ).then((data) => `data:image/png;base64,${data}`);
   }
 
-  return emailLockupDataUriPromise;
+  return shareImageDataUriPromise;
 };
 
 export const createHomepageSocialImage = async () => {
-  const emailLockupSrc = await getEmailLockupDataUri();
+  const shareImageSrc = await getShareImageDataUri();
 
   return new ImageResponse(
     (
@@ -38,7 +38,7 @@ export const createHomepageSocialImage = async () => {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={emailLockupSrc}
+          src={shareImageSrc}
           alt="Gifta"
           width={1200}
           height={630}
