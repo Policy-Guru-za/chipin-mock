@@ -173,7 +173,7 @@ describe('copy matrix compliance', () => {
     expect(timeline).toContain("Your child&apos;s Karri card");
     expect(voucherBand).toContain('Your chosen bank account');
     expect(voucherBand).toContain('Karri Card payout option');
-    expect(voucherBand).toContain('Superpowered by Stitch.');
+    expect(voucherBand).toContain('Payments Superpowered by Stitch.');
     expect(landingContent).toContain('Direct bank payouts');
     expect(landingContent).toContain('Karri Card option');
     expect(landingContent).toContain('Superpowered by Stitch');

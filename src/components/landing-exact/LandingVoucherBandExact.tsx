@@ -76,7 +76,7 @@ export function LandingVoucherBandExact() {
                     height={21}
                     className={styles.partnerRailLogo}
                   />
-                  <div className={styles.partnerLockupTitle}>Superpowered by Stitch.</div>
+                  <div className={styles.partnerLockupTitle}>Payments Superpowered by Stitch.</div>
                 </div>
                 <div className={styles.partnerRailDivider} />
                 <div className={styles.partnerLockup}>

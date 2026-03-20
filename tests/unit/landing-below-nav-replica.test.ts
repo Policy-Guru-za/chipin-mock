@@ -67,7 +67,7 @@ describe('below-nav homepage replica shell contract', () => {
     expect(voucherBand).toContain('/images/homepage-exact/stitch_logo.svg');
     expect(voucherBand).toContain('/images/homepage-exact/karri_logo.png');
     expect(voucherBand).toContain('Your chosen bank account');
-    expect(voucherBand).toContain('Superpowered by Stitch.');
+    expect(voucherBand).toContain('Payments Superpowered by Stitch.');
     expect(voucherBand).toContain('Karri Card payout option');
     expect(voucherBand).not.toContain('Strategic payments partner');
     expect(voucherBand).not.toContain('Host parent bank account');

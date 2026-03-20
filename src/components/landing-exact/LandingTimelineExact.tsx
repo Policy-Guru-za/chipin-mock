@@ -264,7 +264,7 @@ export function LandingTimelineExact() {
                   height={18}
                   className={styles.miniPayoutPartnerLogo}
                 />
-                <span>Superpowered by Stitch.</span>
+                <span>Payments Superpowered by Stitch.</span>
               </div>
             </div>
           </div>
