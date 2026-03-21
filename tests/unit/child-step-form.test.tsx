@@ -10,10 +10,15 @@ import { ChildStepForm } from '@/app/(host)/create/child/ChildStepForm';
 
 const mocks = vi.hoisted(() => ({
   useChildPhoto: vi.fn(),
+  trackGoogleAnalyticsEvent: vi.fn(),
 }));
 
 vi.mock('@/components/create-wizard/useChildPhoto', () => ({
   useChildPhoto: mocks.useChildPhoto,
+}));
+
+vi.mock('@/lib/analytics/google', () => ({
+  trackGoogleAnalyticsEvent: mocks.trackGoogleAnalyticsEvent,
 }));
 
 vi.mock('@/components/create-wizard/ChildPhotoDropZone', () => ({
@@ -108,5 +113,22 @@ describe('ChildStepForm', () => {
     );
 
     expect(getByTestId('wizard-cta')).toHaveAttribute('data-submit-label', 'Next');
+  });
+
+  it('tracks the host create start once on mount', () => {
+    render(
+      <ChildStepForm
+        action={vi.fn()}
+        existingPhotoUrl={null}
+        defaultChildName=""
+        defaultChildAge=""
+        error={null}
+      />,
+    );
+
+    expect(mocks.trackGoogleAnalyticsEvent).toHaveBeenCalledWith('host_create_started', {
+      entry_point: 'child',
+    });
+    expect(mocks.trackGoogleAnalyticsEvent).toHaveBeenCalledTimes(1);
   });
 });

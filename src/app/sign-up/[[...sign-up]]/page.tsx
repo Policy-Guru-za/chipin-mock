@@ -1,18 +1,22 @@
 import { SignUp } from '@clerk/nextjs';
 
+import { GoogleAnalyticsTag } from '@/components/analytics/GoogleAnalyticsTag';
 import { getClerkUrls } from '@/lib/auth/clerk-config';
 
 export default function SignUpPage() {
   const { signInUrl, signUpUrl, signUpFallbackRedirectUrl } = getClerkUrls();
 
   return (
-    <main id="main-content" className="flex min-h-screen items-center justify-center bg-surface px-4 py-12">
-      <SignUp
-        path={signUpUrl}
-        routing="path"
-        signInUrl={signInUrl}
-        fallbackRedirectUrl={signUpFallbackRedirectUrl}
-      />
-    </main>
+    <>
+      <GoogleAnalyticsTag />
+      <main id="main-content" className="flex min-h-screen items-center justify-center bg-surface px-4 py-12">
+        <SignUp
+          path={signUpUrl}
+          routing="path"
+          signInUrl={signInUrl}
+          fallbackRedirectUrl={signUpFallbackRedirectUrl}
+        />
+      </main>
+    </>
   );
 }

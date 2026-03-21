@@ -7,9 +7,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
-const { mockUseActionState, scrollToMock } = vi.hoisted(() => ({
+const { mockUseActionState, scrollToMock, trackGoogleAnalyticsEvent } = vi.hoisted(() => ({
   mockUseActionState: vi.fn(),
   scrollToMock: vi.fn(),
+  trackGoogleAnalyticsEvent: vi.fn(),
 }));
 
 vi.mock('react', async () => {
@@ -53,6 +54,10 @@ vi.mock('@/components/effects/ConfettiTrigger', () => ({
   ConfettiTrigger: () => null,
 }));
 
+vi.mock('@/lib/analytics/google', () => ({
+  trackGoogleAnalyticsEvent,
+}));
+
 import { ReviewClient, type PublishState } from '@/app/(host)/create/review/ReviewClient';
 
 const draft = {
@@ -78,6 +83,7 @@ const setActionState = (state: PublishState) => {
 beforeEach(() => {
   scrollToMock.mockReset();
   mockUseActionState.mockReset();
+  trackGoogleAnalyticsEvent.mockReset();
   vi.stubGlobal('scrollTo', scrollToMock);
   setActionState({ status: 'preview' });
 });
@@ -188,5 +194,8 @@ describe('ReviewClient', () => {
     expect(heading).toBeInTheDocument();
     expect(scrollToMock).toHaveBeenCalledWith({ top: 0, left: 0, behavior: 'auto' });
     expect(focusTarget).toBe(document.activeElement);
+    expect(trackGoogleAnalyticsEvent).toHaveBeenCalledWith('host_create_published', {
+      payout_method: 'karri_card',
+    });
   });
 });

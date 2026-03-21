@@ -28,6 +28,7 @@
 
 ## Recently Closed Specs
 
+- `51_google-analytics-non-admin-tracking-rollout` — Done
 - `50_legacy_voucher_compatibility_cleanup` — Done
 - `49_harden_0021_voucher_migration_replay` — Done
 - `48_voucher-migration-guard-and-seed-repair` — Done
@@ -40,21 +41,20 @@
 
 ## Last Completed Spec
 
-- `50_legacy_voucher_compatibility_cleanup`
+- `51_google-analytics-non-admin-tracking-rollout`
 
 ## Last Green Commands
 
-- `pnpm exec vitest run tests/unit/payout-service-create.test.ts tests/integration/api-dream-boards-close.test.ts tests/integration/api-payouts-voucher.test.ts tests/unit/host-dashboard-view-model.test.ts tests/integration/dashboard-host-flow.test.tsx`
+- `pnpm docs:audit -- --sync`
 - `pnpm lint` (passed with existing warnings-only baseline)
 - `pnpm typecheck`
 - `pnpm test`
-- `pnpm docs:audit -- --sync`
 - `pnpm docs:audit`
 
 ## Dogfood Evidence
 
-- Live voucher-row dogfood was intentionally not repeated because specs 48-49 already removed the last known voucher boards/payouts from the main DB. Fallback dogfood exercised the close route, payout API, and host dashboard compatibility surfaces through `pnpm exec vitest run tests/unit/payout-service-create.test.ts tests/integration/api-dream-boards-close.test.ts tests/integration/api-payouts-voucher.test.ts tests/unit/host-dashboard-view-model.test.ts tests/integration/dashboard-host-flow.test.tsx`, proving unsupported voucher closes now fail before state mutation, public payout responses hide voucher rows, and dashboard rendering uses explicit `Takealot Voucher` labeling instead of Karri copy.
+- GA dogfood used two layers of proof. First, source and unit coverage now prove the tag mounts on the approved non-admin layouts/pages, stays off admin routes, sanitizes guest/dashboard paths/titles, and only forwards safe host funnel payloads. Second, a localhost runtime attempt used `NEXT_PUBLIC_GA_MEASUREMENT_ID=G-CRK4NXDF7J pnpm dev --hostname 127.0.0.1 --port 3002` followed by `curl http://127.0.0.1:3002/`, which hit the existing Clerk development blocker (`x-clerk-auth-reason: dev-browser-missing`) before rendered HTML could be fetched in this browserless environment.
 
 ## Napkin Evidence
 
-Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with the Google Search Console reminder to publish HTML verification files under `public/` with the exact provided filename/content and verify the root URL directly.
+Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with the GA4 reminder to disable automatic pageviews and manually send sanitized routes/titles so guest slugs and query params do not leak into Google Analytics.

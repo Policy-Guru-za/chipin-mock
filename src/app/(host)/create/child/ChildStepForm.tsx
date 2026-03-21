@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import {
   WizardCTA,
@@ -13,6 +13,7 @@ import {
 import { ChildPhotoCompactRow } from '@/components/create-wizard/ChildPhotoCompactRow';
 import { ChildPhotoDropZone } from '@/components/create-wizard/ChildPhotoDropZone';
 import { useChildPhoto } from '@/components/create-wizard/useChildPhoto';
+import { trackGoogleAnalyticsEvent } from '@/lib/analytics/google';
 
 type ChildStepFormProps = {
   action: (formData: FormData) => void | Promise<void>;
@@ -22,6 +23,19 @@ type ChildStepFormProps = {
   error: string | null;
 };
 
+function useTrackHostCreateStart() {
+  const trackedStartRef = useRef(false);
+
+  useEffect(() => {
+    if (trackedStartRef.current) {
+      return;
+    }
+
+    trackedStartRef.current = true;
+    trackGoogleAnalyticsEvent('host_create_started', { entry_point: 'child' });
+  }, []);
+}
+
 export function ChildStepForm({
   action,
   existingPhotoUrl,
@@ -29,6 +43,7 @@ export function ChildStepForm({
   defaultChildAge,
   error,
 }: ChildStepFormProps) {
+  useTrackHostCreateStart();
   const {
     inputRef,
     previewObjectUrl,

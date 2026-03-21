@@ -217,6 +217,7 @@ This matrix is generated from `scripts/docs/control-matrix.mjs`. Run `pnpm docs:
 | `spec/48_voucher-migration-guard-and-seed-repair.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `spec/49_harden_0021_voucher_migration_replay.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `spec/50_legacy_voucher_compatibility_cleanup.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
+| `spec/51_google-analytics-non-admin-tracking-rollout.md` | Tier 1 | current-reference | Ryan Laubscher | `AGENTS.md`, `progress.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `spec/SPEC_TEMPLATE.md` | Tier 1 | current-operational | Ryan Laubscher | `AGENTS.md`, `workflow-orchestration.md`, `spec/00_overview.md` | 2026-03-12 | — |
 | `tasks/todo.md` | Tier 2 | historical-evidence | Ryan Laubscher | `progress.md`, `spec/00_overview.md`, `workflow-orchestration.md` | 2026-03-12 | `progress.md`, `spec/00_overview.md` |
 | `TESTING.md` | Tier 1 | current-reference | Ryan Laubscher | `package.json`, `vitest.config.ts`, `tests/`, `progress.md`, `spec/SPEC_TEMPLATE.md`, `AGENTS.md` | 2026-03-12 | — |

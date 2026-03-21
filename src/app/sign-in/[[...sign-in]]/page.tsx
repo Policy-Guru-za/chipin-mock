@@ -2,6 +2,7 @@ import { SignIn } from '@clerk/nextjs';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 
+import { GoogleAnalyticsTag } from '@/components/analytics/GoogleAnalyticsTag';
 import { getClerkUrls } from '@/lib/auth/clerk-config';
 
 export default async function SignInPage() {
@@ -13,13 +14,16 @@ export default async function SignInPage() {
   }
 
   return (
-    <main id="main-content" className="flex min-h-screen items-center justify-center bg-surface px-4 py-12">
-      <SignIn
-        path={signInUrl}
-        routing="path"
-        signUpUrl={signUpUrl}
-        fallbackRedirectUrl={signInFallbackRedirectUrl}
-      />
-    </main>
+    <>
+      <GoogleAnalyticsTag />
+      <main id="main-content" className="flex min-h-screen items-center justify-center bg-surface px-4 py-12">
+        <SignIn
+          path={signInUrl}
+          routing="path"
+          signUpUrl={signUpUrl}
+          fallbackRedirectUrl={signInFallbackRedirectUrl}
+        />
+      </main>
+    </>
   );
 }

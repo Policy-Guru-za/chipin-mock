@@ -9,6 +9,10 @@ import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
 
+const mocks = vi.hoisted(() => ({
+  trackGoogleAnalyticsEvent: vi.fn(),
+}));
+
 vi.mock('next/link', () => ({
   default: ({
     href,
@@ -21,10 +25,15 @@ vi.mock('next/link', () => ({
   }) => createElement('a', { href, ...props }, children),
 }));
 
+vi.mock('@/lib/analytics/google', () => ({
+  trackGoogleAnalyticsEvent: mocks.trackGoogleAnalyticsEvent,
+}));
+
 import { ShareActionsPanel } from '@/components/create-review/ShareActionsPanel';
 
 afterEach(() => {
   cleanup();
+  vi.clearAllMocks();
 });
 
 describe('ShareActionsPanel', () => {
@@ -68,6 +77,32 @@ describe('ShareActionsPanel', () => {
 
     await user.click(screen.getByRole('button', { name: /Copy Link/i }));
     expect(onCopyLink).toHaveBeenCalledTimes(1);
+    expect(mocks.trackGoogleAnalyticsEvent).toHaveBeenCalledWith('share_link_clicked', {
+      channel: 'copy_link',
+    });
+  });
+
+  it('tracks WhatsApp and email share clicks with safe channel labels', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <ShareActionsPanel
+        whatsappHref="https://wa.me/?text=hello"
+        emailHref="mailto:?subject=Hi&body=Hello"
+        copied={false}
+        onCopyLink={() => undefined}
+      />
+    );
+
+    await user.click(screen.getByRole('link', { name: 'WhatsApp' }));
+    await user.click(screen.getByRole('link', { name: 'Email' }));
+
+    expect(mocks.trackGoogleAnalyticsEvent).toHaveBeenCalledWith('share_link_clicked', {
+      channel: 'whatsapp',
+    });
+    expect(mocks.trackGoogleAnalyticsEvent).toHaveBeenCalledWith('share_link_clicked', {
+      channel: 'email',
+    });
   });
 
   it('shows copied feedback label when copied is true', () => {

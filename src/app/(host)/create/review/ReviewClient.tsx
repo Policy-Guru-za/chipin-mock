@@ -13,6 +13,7 @@ import {
   WizardStepper,
 } from '@/components/create-wizard';
 import { ConfettiTrigger } from '@/components/effects/ConfettiTrigger';
+import { trackGoogleAnalyticsEvent } from '@/lib/analytics/google';
 import { formatBirthdayPartyLine } from '@/lib/dream-boards/party-visibility';
 import { CREATE_FLOW_TOTAL_STEPS } from '@/lib/host/create-view-model';
 import { parseDateOnly } from '@/lib/utils/date';
@@ -63,6 +64,7 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
   const [state, formAction, pending] = useActionState(publishAction, { status: 'preview' });
   const [copied, setCopied] = useState(false);
   const celebrationHeaderRef = useRef<HTMLDivElement>(null);
+  const publishTrackedRef = useRef(false);
   const published = state.status === 'published';
   const shareUrl = state.shareUrl;
   const celebrationVisible = published && Boolean(shareUrl);
@@ -108,6 +110,17 @@ export function ReviewClient({ draft, publishAction }: ReviewClientProps) {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     celebrationHeaderRef.current?.focus({ preventScroll: true });
   }, [celebrationVisible]);
+
+  useEffect(() => {
+    if (!published || publishTrackedRef.current) {
+      return;
+    }
+
+    publishTrackedRef.current = true;
+    trackGoogleAnalyticsEvent('host_create_published', {
+      payout_method: draft.payoutMethod,
+    });
+  }, [draft.payoutMethod, published]);
 
   const copyShareUrl = async () => {
     if (!shareUrl) return;
