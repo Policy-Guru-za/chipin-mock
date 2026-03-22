@@ -9,6 +9,7 @@
 
 | Task ID | Scope | Owner | Verification | Status | Next Step |
 | --- | --- | --- | --- | --- | --- |
+| Q-2026-03-22-homepage-card-motion-removal | Remove the hero Dreamboard card and payout card tilt/float motion across all breakpoints so both cards render upright and static everywhere | Codex | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm docs:audit`, homepage visual check at desktop/iPad/mobile widths | Completed | Done (regression coverage and full gate green; browser-run visual dogfood was not available in this session) |
 | Q-2026-03-20-google-search-console-html-verification | Publish the provided Google Search Console HTML verification file at the site root so Google can verify ownership and support re-crawl actions | Codex | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm docs:audit`, localhost fetch of `/google5154e017d4f8496a.html` | Completed | Done (exact file copied from `tmp/`, validators green, localhost fetch returned `200 OK` with the expected body) |
 | Q-2026-03-20-next-env-route-types-revert | Revert the generated dev-only `next-env.d.ts` route-type import so clean environments keep resolving stable Next route typings | Codex | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm docs:audit` | Completed | Done |
 | Q-2026-03-20-homepage-search-seo-hardening | Add homepage-only product-descriptive search metadata and JSON-LD while preserving the current social-preview contract | Codex | `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm docs:audit`, localhost homepage HTML metadata/JSON-LD check | Completed | Done (automated coverage green; localhost HTML fetch blocked by Clerk dev-browser / missing-key middleware states) |
@@ -57,4 +58,4 @@
 
 ## Napkin Evidence
 
-Updated [`docs/napkin/napkin.md`](./docs/napkin/napkin.md) with the GA4 reminder to disable automatic pageviews and manually send sanitized routes/titles so guest slugs and query params do not leak into Google Analytics.
+No durable napkin update.

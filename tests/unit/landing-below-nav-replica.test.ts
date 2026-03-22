@@ -77,6 +77,27 @@ describe('below-nav homepage replica shell contract', () => {
     expect(footer).toContain('Birthday gifting, simplified.');
   });
 
+  it('keeps the hero and payout cards upright and motionless at every breakpoint', () => {
+    const heroStyles = readSource('src/components/landing-exact/LandingHeroExact.module.css');
+    const voucherBandStyles = readSource(
+      'src/components/landing-exact/LandingVoucherBandExact.module.css'
+    );
+
+    expect(heroStyles).toContain('.dreamboardCard {');
+    expect(heroStyles).not.toContain('transform: rotate(1.5deg);');
+    expect(heroStyles).not.toContain('animation: gentleFloat 6s ease-in-out infinite;');
+    expect(heroStyles).not.toContain('.dreamboardCard:hover');
+    expect(heroStyles).not.toContain('@keyframes gentleFloat');
+
+    expect(voucherBandStyles).toContain('.payoutCard {');
+    expect(voucherBandStyles).not.toContain('animation: gentleFloat 6s ease-in-out infinite;');
+    expect(voucherBandStyles).not.toContain('animation-delay: -2s;');
+    expect(voucherBandStyles).not.toContain('.payoutCard:hover');
+    expect(voucherBandStyles).not.toContain('@keyframes gentleFloat');
+    expect(voucherBandStyles).toContain('@media (max-width: 768px)');
+    expect(voucherBandStyles).toContain('max-width: 360px;');
+  });
+
   it('removes the footer voucher-partner pill and tightens the remaining footer rhythm', () => {
     const footer = readSource('src/components/landing-exact/LandingFooterExact.tsx');
     const footerStyles = readSource('src/components/landing-exact/LandingFooterExact.module.css');
